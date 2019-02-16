@@ -1,0 +1,184 @@
+version: '3'
+services:
+  identity-ms:
+    build:
+      context: ./identity-ms-scripts
+      dockerfile: Dockerfile
+    container_name: identity-ms
+    environment:
+      eureka.instance.hostname: eureka
+      ribbon.listOfServers: eureka:9090
+      eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+      activemq.brokerUrl: tcp://activemq:61616
+      cassandra.contactPoints: cassandra:9042
+      mariadb.host: mariadb
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.7
+  rhythm-ms:
+    build:
+      context: ./rhythm-ms-scripts
+      dockerfile: Dockerfile
+    container_name: rhythm-ms
+    environment:
+      eureka.instance.hostname: eureka
+      ribbon.listOfServers: eureka:9090
+      eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+      activemq.brokerUrl: tcp://activemq:61616
+      cassandra.contactPoints: cassandra:9042
+      mariadb.host: mariadb
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.8
+  office-ms:
+    build:
+      context: ./office-ms-scripts
+      dockerfile: Dockerfile
+    container_name: office-ms
+    environment:
+      eureka.instance.hostname: eureka
+      ribbon.listOfServers: eureka:9090
+      eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+      activemq.brokerUrl: tcp://activemq:61616
+      cassandra.contactPoints: cassandra:9042
+      mariadb.host: mariadb
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.9
+  customer-ms:
+    build:
+      context: ./customer-ms-scripts
+      dockerfile: Dockerfile
+    container_name: customer-ms
+    environment:
+      eureka.instance.hostname: eureka
+      ribbon.listOfServers: eureka:9090
+      eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+      activemq.brokerUrl: tcp://activemq:61616
+      cassandra.contactPoints: cassandra:9042
+      mariadb.host: mariadb
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.10
+  ledger-ms:
+    build:
+      context: ./accounting-ms-scripts
+      dockerfile: Dockerfile
+    container_name: ledger-ms
+    environment:
+      eureka.instance.hostname: eureka
+      ribbon.listOfServers: eureka:9090
+      eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+      activemq.brokerUrl: tcp://activemq:61616
+      cassandra.contactPoints: cassandra:9042
+      mariadb.host: mariadb
+    networks:
+      default:
+        ipv4_address: 172.16.238.11
+  portfolio-ms:
+    build:
+      context: ./portfolio-ms-scripts
+      dockerfile: Dockerfile
+    container_name: portfolio-ms
+    environment:
+      eureka.instance.hostname: eureka
+      ribbon.listOfServers: eureka:9090
+      eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+      activemq.brokerUrl: tcp://activemq:61616
+      cassandra.contactPoints: cassandra:9042
+      mariadb.host: mariadb
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.12
+  deposit-account-management-ms:
+    build:
+      context: ./deposit-account-management-ms-scripts
+      dockerfile: Dockerfile
+    container_name: deposit-ms
+    environment:
+      eureka.instance.hostname: eureka
+      ribbon.listOfServers: eureka:9090
+      eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+      activemq.brokerUrl: tcp://activemq:61616
+      cassandra.contactPoints: cassandra:9042
+      mariadb.host: mariadb
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.13
+  teller-ms:
+    build:
+      context: ./teller-ms-scripts
+      dockerfile: Dockerfile
+    container_name: teller-ms
+    environment:
+      eureka.instance.hostname: eureka
+      ribbon.listOfServers: eureka:9090
+      eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+      activemq.brokerUrl: tcp://activemq:61616
+      cassandra.contactPoints: cassandra:9042
+      mariadb.host: mariadb
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.14
+  report-ms:
+    build:
+      context: ./reporting-ms-scripts
+      dockerfile: Dockerfile
+    container_name: report-ms
+    environment:
+      eureka.instance.hostname: eureka
+      ribbon.listOfServers: eureka:9090
+      eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+      activemq.brokerUrl: tcp://activemq:61616
+      cassandra.contactPoints: cassandra:9042
+      mariadb.host: mariadb
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.15
+  # payroll-ms:
+  #   build:
+  #     context: ./payroll-ms-scripts
+  #     dockerfile: Dockerfile
+  #   container_name: payroll-ms
+  #   environment:
+  #     eureka.instance.hostname: eureka
+  #     ribbon.listOfServers: eureka:9090
+  #     eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka
+  #     activemq.brokerUrl: tcp://activemq:61616
+  #     cassandra.contactPoints: cassandra:9042
+  #     mariadb.host: mariadb
+  #     system.publicKey.timestamp: ${TIMESTAMP}
+  #     system.publicKey.modulus: ${MODULUS}
+  #     system.publicKey.exponent: ${EXPONENT}
+  #   networks:
+  #     default:
+  #       ipv4_address: 172.16.238.16
+
+networks:
+  default:
+    external:
+      name: externaltools_app_net

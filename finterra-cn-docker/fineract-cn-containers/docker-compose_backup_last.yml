@@ -1,0 +1,61 @@
+version: '3'
+services:
+  provisioner-ms:
+    build:
+      context: ./provisioner-ms-scripts
+      dockerfile: Dockerfile
+    container_name: provisioner-ms
+    environment:
+      eureka.instance.hostname: 172.16.238.2
+      ribbon.listOfServers: 172.16.238.2:9090
+      eureka.client.serviceUrl.defaultZone: http://172.16.238.2:8761/eureka
+      activemq.brokerUrl: tcp://172.16.238.3:61616
+      cassandra.contactPoints: 206.189.45.92:9042
+      mariadb.host: 68.183.191.246
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.6      
+  identity-ms:
+    build:
+      context: ./identity-ms-scripts
+      dockerfile: Dockerfile
+    container_name: identity-ms
+    environment:
+      eureka.instance.hostname: 172.16.238.2
+      ribbon.listOfServers: 172.16.238.2:9090
+      eureka.client.serviceUrl.defaultZone: http://172.16.238.2:8761/eureka
+      activemq.brokerUrl: tcp://172.16.238.3:61616
+      cassandra.contactPoints: 206.189.45.92:9042
+      mariadb.host: 68.183.191.246
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.7
+  rhythm-ms:
+    build:
+      context: ./rhythm-ms-scripts
+      dockerfile: Dockerfile
+    container_name: rhythm-ms
+    environment:
+      eureka.instance.hostname: 172.16.238.2
+      ribbon.listOfServers: 172.16.238.2:9090
+      eureka.client.serviceUrl.defaultZone: http://172.16.238.2:8761/eureka
+      activemq.brokerUrl: tcp://172.16.238.3:61616
+      cassandra.contactPoints: 206.189.45.92:9042
+      mariadb.host: 68.183.191.246
+      system.publicKey.timestamp: ${TIMESTAMP}
+      system.publicKey.modulus: ${MODULUS}
+      system.publicKey.exponent: ${EXPONENT}
+    networks:
+      default:
+        ipv4_address: 172.16.238.8
+
+networks:
+  default:
+    external:
+      name: externaltools_app_net

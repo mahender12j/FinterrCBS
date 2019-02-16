@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="api/src/main/java"/>
+	<classpathentry kind="src" path="api/src/test/java"/>
+	<classpathentry kind="src" path="component-test/src/main/java"/>
+	<classpathentry excluding="org/apache/fineract/cn/cause/internal/mapper/" kind="src" path="service/src/main/java"/>
+	<classpathentry kind="src" path="service/src/main/java/org/apache/fineract/cn/cause/internal/mapper"/>
+	<classpathentry kind="lib" path="api/build/libs/api-0.1.0-BUILD-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="gradle/wrapper/gradle-wrapper.jar"/>
+	<classpathentry kind="output" path="api/build/classes/java/main"/>
+</classpath>
