@@ -50,6 +50,7 @@ public class CauseService {
     private final CauseRepository causeRepository;
     private final PortraitRepository portraitRepository;
     private final ContactDetailRepository contactDetailRepository;
+    private final CategoryRepository categoryRepository;
     private final CommandRepository commandRepository;
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
@@ -58,6 +59,7 @@ public class CauseService {
     public CauseService(final CauseRepository causeRepository,
                         final PortraitRepository portraitRepository,
                         final ContactDetailRepository contactDetailRepository,
+			final CategoryRepository categoryRepository,
                         final CommandRepository commandRepository,
                         final TaskDefinitionRepository taskDefinitionRepository,
                         final TaskInstanceRepository taskInstanceRepository) {
@@ -65,6 +67,7 @@ public class CauseService {
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
         this.contactDetailRepository = contactDetailRepository;
+	this.categoryRepository = categoryRepository;
         this.commandRepository = commandRepository;
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
@@ -89,6 +92,16 @@ public class CauseService {
                 .map(causeEntity -> {
                     final Cause cause = CauseMapper.map(causeEntity);
                     cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+
+		    final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
+                    if (categoryEntities != null) {
+			    cause.setCauseCategories(
+                            categoryEntities
+                                        .stream()
+                                        .map(CategoryMapper::map)
+                                        .collect(Collectors.toList())
+                        );
+                    }
 
                     // final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCause(causeEntity);
                     // if (contactDetailEntities != null) {

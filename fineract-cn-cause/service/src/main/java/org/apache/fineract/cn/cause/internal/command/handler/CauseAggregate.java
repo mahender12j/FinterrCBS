@@ -22,6 +22,7 @@ import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
+import org.apache.fineract.cn.cause.internal.repository.CategoryRepository;
 import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.mapper.*;
 import org.apache.fineract.cn.cause.internal.repository.*;
@@ -52,7 +53,7 @@ public class CauseAggregate {
     private final IdentificationCardRepository identificationCardRepository;
     private final IdentificationCardScanRepository identificationCardScanRepository;
     private final PortraitRepository portraitRepository;
-    private final ContactDetailRepository contactDetailRepository;
+    private final CategoryRepository categoryRepository;
     private final CommandRepository commandRepository;
     private final TaskAggregate taskAggregate;
 
@@ -62,7 +63,7 @@ public class CauseAggregate {
                           final IdentificationCardRepository identificationCardRepository,
                           final IdentificationCardScanRepository identificationCardScanRepository,
                           final PortraitRepository portraitRepository,
-                          final ContactDetailRepository contactDetailRepository,
+			  final CategoryRepository categoryRepository,
                           final CommandRepository commandRepository,
                           final TaskAggregate taskAggregate) {
         super();
@@ -71,7 +72,7 @@ public class CauseAggregate {
         this.identificationCardRepository = identificationCardRepository;
         this.identificationCardScanRepository = identificationCardScanRepository;
         this.portraitRepository = portraitRepository;
-        this.contactDetailRepository = contactDetailRepository;
+	this.categoryRepository = categoryRepository;
         this.commandRepository = commandRepository;
         this.taskAggregate = taskAggregate;
     }
@@ -88,7 +89,18 @@ public class CauseAggregate {
         causeEntity.setCurrentState(Cause.State.PENDING.name());
         causeEntity.setAddress(savedAddress);
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
-
+        if (cause.getCauseCategories() != null) {
+            this.categoryRepository.save(
+                cause.getCauseCategories()
+                    .stream()
+                    .map(category -> {
+                      final CategoryEntity categoryEntity = CategoryMapper.map(category);
+                      categoryEntity.setCause(savedCauseEntity);
+                      return categoryEntity;
+                    })
+                    .collect(Collectors.toList())
+            );
+        }
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.ACTIVATE);
 
         return cause.getIdentifier();
@@ -140,6 +152,10 @@ public class CauseAggregate {
 
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+	causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
+        causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
+        causeEntity.setSMediaLinks(cause.getSMediaLinks());
+        causeEntity.setVideoUrls(cause.getVideoUrls());
         this.causeRepository.save(causeEntity);
 
         return cause.getIdentifier();

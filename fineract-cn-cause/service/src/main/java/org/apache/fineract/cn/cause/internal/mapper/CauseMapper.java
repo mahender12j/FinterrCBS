@@ -73,6 +73,12 @@ public final class CauseMapper {
         }
         causeEntity.setCreatedBy(UserContextHolder.checkedGetUser());
         causeEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+
+        causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
+        causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
+        causeEntity.setSMediaLinks(cause.getSMediaLinks());
+        causeEntity.setVideoUrls(cause.getVideoUrls());
+
         return causeEntity;
     }
 
@@ -116,6 +122,11 @@ public final class CauseMapper {
             cause.setLastModifiedBy(causeEntity.getLastModifiedBy());
             cause.setLastModifiedOn(DateConverter.toIsoString(causeEntity.getLastModifiedOn()));
         }
+
+        cause.setTaxExemptionPercentage(causeEntity.getTaxExemptionPercentage());
+        cause.setWebsiteUrl(causeEntity.getWebsiteUrl());
+        cause.setSMediaLinks(causeEntity.getSMediaLinks());
+        cause.setVideoUrls(causeEntity.getVideoUrls());
 
         return cause;
     }

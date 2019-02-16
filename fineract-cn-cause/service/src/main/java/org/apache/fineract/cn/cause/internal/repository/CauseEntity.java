@@ -98,6 +98,15 @@ public class CauseEntity {
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime lastModifiedOn;
 
+    @Column(name = "tax_exemption_percentage")
+    private String taxExemptionPercentage;
+    @Column(name = "website_url")
+    private String websiteUrl;
+    @Column(name = "s_media_links")
+    private String sMediaLinks;
+    @Column(name = "video_urls")
+	private String videoUrls;
+
     public CauseEntity() {
         super();
     }
@@ -309,6 +318,38 @@ public class CauseEntity {
     public void setLastModifiedOn(final LocalDateTime lastModifiedOn) {
         this.lastModifiedOn = lastModifiedOn;
     }
+
+    public String getTaxExemptionPercentage() {
+		return taxExemptionPercentage;
+	}
+
+	public void setTaxExemptionPercentage(String taxExemptionPercentage) {
+		this.taxExemptionPercentage = taxExemptionPercentage;
+	}
+
+	public String getWebsiteUrl() {
+		return websiteUrl;
+	}
+
+	public void setWebsiteUrl(String websiteUrl) {
+		this.websiteUrl = websiteUrl;
+	}
+
+	public String getSMediaLinks() {
+		return sMediaLinks;
+	}
+
+	public void setSMediaLinks(String sMediaLinks) {
+		this.sMediaLinks = sMediaLinks;
+	}
+
+	public String getVideoUrls() {
+		return videoUrls;
+	}
+
+	public void setVideoUrls(String videoUrls) {
+		this.videoUrls = videoUrls;
+	}
 
     @Override
     public boolean equals(final Object o) {

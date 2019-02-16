@@ -49,6 +49,11 @@ public interface CauseEventConstants {
 
     String POST_PORTRAIT = "post-portrait";
     String DELETE_PORTRAIT = "delete-portrait";
+    
+    String POST_CATEGORY = "post-category";
+    String PUT_CATEGORY = "put-category";
+    String DELETE_CATEGORY = "delete-category";
+    String POST_CATEGORY_COMPLETE = "post-category-complete";
 
     String POST_DOCUMENT = "post-document";
     String PUT_DOCUMENT = "put-document";
@@ -82,6 +87,9 @@ public interface CauseEventConstants {
 
     String SELECTOR_PUT_PORTRAIT = SELECTOR_NAME + " = '" + POST_PORTRAIT + "'";
     String SELECTOR_DELETE_PORTRAIT = SELECTOR_NAME + " = '" + DELETE_PORTRAIT + "'";
+
+    String SELECTOR_POST_CATEGORY = SELECTOR_NAME + " = '" + POST_CATEGORY + "'";
+    String SELECTOR_PUT_CATEGORY = SELECTOR_NAME + " = '" + PUT_CATEGORY + "'";
 
     String SELECTOR_POST_DOCUMENT = SELECTOR_NAME + " = '" + POST_DOCUMENT + "'";
     String SELECTOR_PUT_DOCUMENT = SELECTOR_NAME + " = '" + PUT_DOCUMENT + "'";
