@@ -124,7 +124,7 @@ public interface CauseManager {
     )
     @ThrowsExceptions({
             @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CauseNotFoundException.class),
-            @ThrowsException(status = HttpStatus.BAD_REQUEST, exception = RatingExecutionException.class)
+            @ThrowsException(status = HttpStatus.BAD_REQUEST, exception = RatingValidationException.class)
     })
     void causeRating(@PathVariable("identifier") final String identifier, @RequestBody final CauseRating rating);
 
