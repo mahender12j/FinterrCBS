@@ -282,7 +282,7 @@ public class CauseRestController {
     @ResponseBody
     ResponseEntity<List<CauseRating>> fetchCauseRatings(@PathVariable("identifier") final String identifier) {
         if (this.causeService.causeExists(identifier)) {
-            return ResponseEntity.ok(this.causeService.fetchRatingsByCause(identifier).collect(Collectors.toList()));
+            return ResponseEntity.ok(this.causeService.fetchRatingsByCause(identifier));
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
