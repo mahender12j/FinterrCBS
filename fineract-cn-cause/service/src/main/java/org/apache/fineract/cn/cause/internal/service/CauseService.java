@@ -169,6 +169,13 @@ public class CauseService {
         return causePage;
     }
 
+    public final Stream<Command> fetchRatingsByCause(final String identifier) {
+        return causeRepository.findByIdentifier(identifier)
+                .map(RatingRepository::findByCause)
+                .orElse(Stream.empty())
+                .map(RatingMapper::map);
+    }
+
     public final Stream<Command> fetchCommandsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
                 .map(commandRepository::findByCause)

@@ -117,6 +117,28 @@ public interface CauseManager {
     List<Command> fetchCauseCommands(@PathVariable("identifier") final String identifier);
 
     @RequestMapping(
+            value = "/causes/{identifier}/ratings",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ThrowsExceptions({
+            @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CauseNotFoundException.class),
+            @ThrowsException(status = HttpStatus.BAD_REQUEST, exception = RatingExecutionException.class)
+    })
+    void causeRating(@PathVariable("identifier") final String identifier, @RequestBody final CauseRating rating);
+
+
+    @RequestMapping(
+            value = "/causes/{identifier}/ratings",
+            method = RequestMethod.GET,
+            produces = MediaType.ALL_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CauseNotFoundException.class)
+    List<Command> fetchCauseRatings(@PathVariable("identifier") final String identifier);
+
+    @RequestMapping(
             value = "/causes/{identifier}/tasks/{taskIdentifier}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,

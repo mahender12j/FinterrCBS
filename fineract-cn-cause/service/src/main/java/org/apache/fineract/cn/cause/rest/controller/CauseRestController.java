@@ -27,6 +27,7 @@ import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.cause.api.v1.domain.Address;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CausePage;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
 import org.apache.fineract.cn.cause.api.v1.domain.ContactDetail;
 import org.apache.fineract.cn.cause.api.v1.domain.ProcessStep;
@@ -246,6 +247,48 @@ public class CauseRestController {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
     }
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/ratings",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+
+    public
+    @ResponseBody
+    ResponseEntity<Void> causeRating(@PathVariable("identifier") final String identifier,
+                                      @RequestBody final CauseRating rating) {
+
+        if (this.causeService.causeExists(identifier)) {
+            this.commandGateway.process(new CreateRatingCommand(identifier, rating));
+           
+        } else {
+            throw ServiceException.notFound("Cause {0} not found.", identifier);
+        }
+        return ResponseEntity.accepted().build();
+    }
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/ratings",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+
+    public
+    @ResponseBody
+    ResponseEntity<List<CauseRating>> fetchCauseRatings(@PathVariable("identifier") final String identifier) {
+        if (this.causeService.causeExists(identifier)) {
+            return ResponseEntity.ok(this.causeService.fetchRatingsByCause(identifier).collect(Collectors.toList()));
+        } else {
+            throw ServiceException.notFound("Cause {0} not found.", identifier);
+        }
+    }
+    
+    
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
