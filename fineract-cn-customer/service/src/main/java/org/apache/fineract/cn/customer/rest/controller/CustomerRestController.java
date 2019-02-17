@@ -229,6 +229,19 @@ public class CustomerRestController {
         referralcode, term, (includeClosed != null ? includeClosed : Boolean.FALSE),
         this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
   }
+
+  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
+  @RequestMapping(
+      value = "/customers/{referralcode}/customer",
+      method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.ALL_VALUE
+  )
+  public
+  @ResponseBody
+  ResponseEntity<CustomerPage> fetchCustomerByReferralcode(@PathVariable("referralcode") final String referralcode) {
+      return ResponseEntity.ok(this.customerService.fetchCustomerByReferralcode(referralcode));
+  }
   
   @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
   @RequestMapping(

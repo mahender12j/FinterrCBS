@@ -121,6 +121,16 @@ public interface CustomerManager {
                                         @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                         @RequestParam(value = "sortDirection", required = false) final String sortDirection);
  
+    @RequestMapping(
+        value = "/customers/{referralcode}/customer",
+        method = RequestMethod.GET,
+        produces = MediaType.ALL_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CustomerNotFoundException.class)
+    CustomerPage fetchCustomerByReferralcode(@PathVariable("referralcode") final String referralcode);
+
+                                                                            
   @RequestMapping(
       value = "/customers/{identifier}/commands",
       method = RequestMethod.POST,

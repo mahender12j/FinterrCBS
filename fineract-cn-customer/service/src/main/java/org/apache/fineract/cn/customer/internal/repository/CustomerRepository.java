@@ -44,6 +44,8 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
 
   Optional<CustomerEntity> findByIdentifier(final String identifier);
 
+  Optional<CustomerEntity> findByRefferalCodeIdentifier(final String referralCode);
+
   Page<CustomerEntity> findByCurrentStateNot(final String state, final Pageable pageable);
 
   Page<CustomerEntity> findByReferenceCustomerAndCurrentStateNot(final String refferalCodeIdentifier, final String state, final Pageable pageable);

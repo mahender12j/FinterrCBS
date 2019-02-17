@@ -185,6 +185,27 @@ public class CustomerService {
     return customerPage;
   }
 
+  public Optional<Customer> fetchCustomerByReferralcode(final String refferalCode) {
+
+    return customerRepository.findByRefferalCodeIdentifier(refferalCode)
+      .map(customerEntity -> {
+        final Customer customer = CustomerMapper.map(customerEntity);
+        customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
+
+        final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(customerEntity);
+        if (contactDetailEntities != null) {
+          customer.setContactDetails(
+              contactDetailEntities
+                  .stream()
+                  .map(ContactDetailMapper::map)
+                  .collect(Collectors.toList())
+          );
+        }
+
+        return customer;
+      });
+  }
+
   public final Stream<Command> fetchCommandsByCustomer(final String identifier) {
     return customerRepository.findByIdentifier(identifier)
         .map(commandRepository::findByCustomer)
