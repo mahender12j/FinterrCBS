@@ -240,7 +240,12 @@ public class CustomerRestController {
   public
   @ResponseBody
   ResponseEntity<CustomerPage> fetchCustomerByReferralcode(@PathVariable("referralcode") final String referralcode) {
-      return ResponseEntity.ok(this.customerService.fetchCustomerByReferralcode(referralcode));
+    final Optional<Customer> customer = this.customerService.fetchCustomerByReferralcode(referralcode);
+    if (customer.isPresent()) {
+      return ResponseEntity.ok(customer.get());
+    } else {
+      throw ServiceException.notFound("Customer {0} not found.", identifier);
+    }
   }
   
   @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
