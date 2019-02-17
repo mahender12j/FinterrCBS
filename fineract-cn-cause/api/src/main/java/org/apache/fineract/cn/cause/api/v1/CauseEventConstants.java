@@ -55,6 +55,11 @@ public interface CauseEventConstants {
     String DELETE_CATEGORY = "delete-category";
     String POST_CATEGORY_COMPLETE = "post-category-complete";
 
+    String POST_RATING = "post-rating";
+    String PUT_RATING = "put-rating";
+    String DELETE_RATING = "delete-rating";
+    String POST_RATING_COMPLETE = "post-rating-complete";
+
     String POST_DOCUMENT = "post-document";
     String PUT_DOCUMENT = "put-document";
     String DELETE_DOCUMENT = "delete-document";
@@ -90,6 +95,13 @@ public interface CauseEventConstants {
 
     String SELECTOR_POST_CATEGORY = SELECTOR_NAME + " = '" + POST_CATEGORY + "'";
     String SELECTOR_PUT_CATEGORY = SELECTOR_NAME + " = '" + PUT_CATEGORY + "'";
+    String SELECTOR_DELETE_CATEGORY = SELECTOR_NAME + " = '" + DELETE_CATEGORY + "'";
+    String SELECTOR_POST_CATEGORY_COMPLETE = SELECTOR_NAME + " = '" + POST_CATEGORY_COMPLETE + "'";
+
+    String SELECTOR_POST_RATING = SELECTOR_NAME + " = '" + POST_RATING + "'";
+    String SELECTOR_PUT_RATING = SELECTOR_NAME + " = '" + PUT_RATINGY + "'";
+    String SELECTOR_DELETE_RATING = SELECTOR_NAME + " = '" + DELETE_RATING + "'";
+    String SELECTOR_POST_RATING_COMPLETE = SELECTOR_NAME + " = '" + POST_RATING_COMPLETE + "'";
 
     String SELECTOR_POST_DOCUMENT = SELECTOR_NAME + " = '" + POST_DOCUMENT + "'";
     String SELECTOR_PUT_DOCUMENT = SELECTOR_NAME + " = '" + PUT_DOCUMENT + "'";

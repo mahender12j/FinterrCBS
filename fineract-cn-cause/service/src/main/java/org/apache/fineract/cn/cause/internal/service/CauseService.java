@@ -51,6 +51,7 @@ public class CauseService {
     private final PortraitRepository portraitRepository;
     private final ContactDetailRepository contactDetailRepository;
     private final CategoryRepository categoryRepository;
+    private final RatingRepository ratingRepository;
     private final CommandRepository commandRepository;
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
@@ -59,7 +60,8 @@ public class CauseService {
     public CauseService(final CauseRepository causeRepository,
                         final PortraitRepository portraitRepository,
                         final ContactDetailRepository contactDetailRepository,
-			final CategoryRepository categoryRepository,
+                        final CategoryRepository categoryRepository,
+                        final RatingRepository ratingRepository,
                         final CommandRepository commandRepository,
                         final TaskDefinitionRepository taskDefinitionRepository,
                         final TaskInstanceRepository taskInstanceRepository) {
@@ -67,7 +69,8 @@ public class CauseService {
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
         this.contactDetailRepository = contactDetailRepository;
-	this.categoryRepository = categoryRepository;
+        this.categoryRepository = categoryRepository;
+        this.ratingRepository = ratingRepository;
         this.commandRepository = commandRepository;
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
@@ -89,19 +92,21 @@ public class CauseService {
 
     public Optional<Cause> findCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
-                .map(causeEntity -> {
-                    final Cause cause = CauseMapper.map(causeEntity);
-                    cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+            .map(causeEntity -> {
+                final Cause cause = CauseMapper.map(causeEntity);
+                cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
 
-		    final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
+		        final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
                     if (categoryEntities != null) {
-			    cause.setCauseCategories(
+			            cause.setCauseCategories(
                             categoryEntities
                                         .stream()
                                         .map(CategoryMapper::map)
                                         .collect(Collectors.toList())
                         );
                     }
+
+                    cause.setAvgRating("3");  // TODO
 
                     // final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCause(causeEntity);
                     // if (contactDetailEntities != null) {

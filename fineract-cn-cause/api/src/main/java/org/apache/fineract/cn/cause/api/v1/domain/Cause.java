@@ -78,6 +78,7 @@ public final class Cause {
 	private String websiteUrl;
 	private String sMediaLinks;
 	private String videoUrls;
+	private String avgRating;
 
 	public Cause() {
 		super();
@@ -323,6 +324,14 @@ public final class Cause {
 		this.videoUrls = videoUrls;
 	}
 
+	public String getAvgRating() {
+		return avgRating;
+	}
+
+	public void setAvgRating(String avgRating) {
+		this.avgRating = avgRating;
+	}
+
 	@Override
 	public String toString() {
 		return "Cause [identifier=" + identifier + ", title=" + title + ", description=" + description + ", startDate="
@@ -334,7 +343,7 @@ public final class Cause {
 				+ ", approvedBy=" + approvedBy + ", approvedOn=" + approvedOn + ", createdBy=" + createdBy
 				+ ", createdOn=" + createdOn + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedOn="
 				+ lastModifiedOn + ", taxExemptionPercentage=" + taxExemptionPercentage + ", websiteUrl=" + websiteUrl
-				+ ", sMediaLinks=" + sMediaLinks + ", videoUrls=" + videoUrls + ", toString()=" + super.toString()
+				+ ", sMediaLinks=" + sMediaLinks + ", videoUrls=" + videoUrls + ", avgRating=" + avgRating + ", toString()=" + super.toString()
 				+ "]";
 	}
 }

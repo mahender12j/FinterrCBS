@@ -54,6 +54,7 @@ public class CauseAggregate {
     private final IdentificationCardScanRepository identificationCardScanRepository;
     private final PortraitRepository portraitRepository;
     private final CategoryRepository categoryRepository;
+    private final RatingRepository ratingRepository;
     private final CommandRepository commandRepository;
     private final TaskAggregate taskAggregate;
 
@@ -63,7 +64,8 @@ public class CauseAggregate {
                           final IdentificationCardRepository identificationCardRepository,
                           final IdentificationCardScanRepository identificationCardScanRepository,
                           final PortraitRepository portraitRepository,
-			  final CategoryRepository categoryRepository,
+                        final CategoryRepository categoryRepository,
+                        final RatingRepository ratingRepository,
                           final CommandRepository commandRepository,
                           final TaskAggregate taskAggregate) {
         super();
@@ -72,7 +74,8 @@ public class CauseAggregate {
         this.identificationCardRepository = identificationCardRepository;
         this.identificationCardScanRepository = identificationCardScanRepository;
         this.portraitRepository = portraitRepository;
-	this.categoryRepository = categoryRepository;
+        this.categoryRepository = categoryRepository;
+        this.ratingRepository = ratingRepository;
         this.commandRepository = commandRepository;
         this.taskAggregate = taskAggregate;
     }
@@ -290,6 +293,27 @@ public class CauseAggregate {
         this.addressRepository.delete(oldAddressEntity);
 
         return updateAddressCommand.identifier();
+    }
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_RATING)
+    public String createRating(final CreateRatingCommand createRatingCommand) {
+        final CauseEntity causeEntity = findCauseEntityOrThrow(createRatingCommand.getCauseIdentifier());
+
+        final RatingEntity ratingEntity = ratingMapper.map(createRatingCommand.getCauseRating());
+
+        ratingEntity.setCause(causeEntity);
+        ratingEntity.setCreatedBy(UserContextHolder.checkedGetUser());
+        ratingEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+
+        this.ratingRepository.save(ratingEntity);
+
+        // causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
+        // causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        // this.causeRepository.save(causeEntity);
+
+        return ratingEntity.getNumber();
     }
 
     // @Transactional
