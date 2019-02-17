@@ -301,7 +301,7 @@ public class CauseAggregate {
     public String createRating(final CreateRatingCommand createRatingCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(createRatingCommand.getCauseIdentifier());
 
-        final RatingEntity ratingEntity = ratingMapper.map(createRatingCommand.getCauseRating());
+        final RatingEntity ratingEntity = RatingMapper.map(createRatingCommand.getCauseRating());
 
         ratingEntity.setCause(causeEntity);
         ratingEntity.setCreatedBy(UserContextHolder.checkedGetUser());
@@ -313,7 +313,7 @@ public class CauseAggregate {
         // causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
         // this.causeRepository.save(causeEntity);
 
-        return ratingEntity.getNumber();
+        return ratingEntity.getIdentifier();
     }
 
     // @Transactional
