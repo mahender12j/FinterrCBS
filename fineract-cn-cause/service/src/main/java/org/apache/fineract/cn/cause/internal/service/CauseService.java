@@ -107,7 +107,9 @@ public class CauseService {
                         );
                     }
 
-                    cause.setAvgRating("3");  // TODO
+                    final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
+
+                    cause.setAvgRating(avgRatingValue.toString());  // TODO
 
                     // final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCause(causeEntity);
                     // if (contactDetailEntities != null) {
