@@ -108,8 +108,8 @@ public class CauseService {
                     }
 
                     final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
-
-                    cause.setAvgRating(avgRatingValue.toString());  // TODO
+                    System.out.println("avgRatingValue :: "+ avgRatingValue);
+                    cause.setAvgRating(avgRatingValue.toString());
 
                     // final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCause(causeEntity);
                     // if (contactDetailEntities != null) {
@@ -166,7 +166,25 @@ public class CauseService {
         if (causeEntities.getSize() > 0) {
             final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
             causePage.setCauses(causes);
-            causeEntities.forEach(causeEntity -> causes.add(CauseMapper.map(causeEntity)));
+            causeEntities.forEach(causeEntity -> {
+                final Cause cause = CauseMapper.map(causeEntity);
+                cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+
+		        final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
+                    if (categoryEntities != null) {
+			            cause.setCauseCategories(
+                            categoryEntities
+                                        .stream()
+                                        .map(CategoryMapper::map)
+                                        .collect(Collectors.toList())
+                        );
+                    }
+
+                    final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
+                    System.out.println("avgRatingValue :: "+ avgRatingValue);
+                    cause.setAvgRating(avgRatingValue.toString());
+                causes.add(cause);
+            });
         }
 
         return causePage;
