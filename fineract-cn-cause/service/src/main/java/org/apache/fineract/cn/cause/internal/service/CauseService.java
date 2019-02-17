@@ -20,6 +20,7 @@ package org.apache.fineract.cn.cause.internal.service;
 
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CausePage;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
 import org.apache.fineract.cn.cause.api.v1.domain.ProcessStep;
 import org.apache.fineract.cn.cause.api.v1.domain.TaskDefinition;
@@ -169,7 +170,7 @@ public class CauseService {
         return causePage;
     }
 
-    public final Stream<Command> fetchRatingsByCause(final String identifier) {
+    public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
                 .map(RatingRepository::findByCause)
                 .orElse(Stream.empty())
