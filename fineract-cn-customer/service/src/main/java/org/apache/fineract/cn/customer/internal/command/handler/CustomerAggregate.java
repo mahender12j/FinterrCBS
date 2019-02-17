@@ -177,15 +177,22 @@ System.out.println("savedAddress  : "+ savedAddress );
     final Customer customer = updateCustomerCommand.customer();
      System.out.println(" UpdateCustomer Start ----");
     final CustomerEntity customerEntity = findCustomerEntityOrThrow(customer.getIdentifier());
- System.out.println(" UpdateCustomer Start ----2`");
-    customerEntity.setGivenName(customer.getGivenName());
-    customerEntity.setMiddleName(customer.getMiddleName());
-    customerEntity.setSurname(customer.getSurname());
-    customerEntity.setAccountBeneficiary(customer.getAccountBeneficiary());
-    customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
-    customerEntity.setAssignedOffice(customer.getAssignedOffice());
-    customerEntity.setAssignedEmployee(customer.getAssignedEmployee());
-
+    System.out.println(" UpdateCustomer Start ----2`");
+    if (customer.getGivenName() != null) {
+      customerEntity.setGivenName(customer.getGivenName());
+    }
+    if (customer.getMiddleName() != null) {
+      customerEntity.setMiddleName(customer.getMiddleName());
+    }
+    if (customer.getSurname() != null) {
+      customerEntity.setSurname(customer.getSurname());
+    }
+    if (customer.getAccountBeneficiary() != null) {
+      customerEntity.setAccountBeneficiary(customer.getAccountBeneficiary());
+    }
+    if (customer.getReferenceCustomer() != null) {
+      customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
+    }
     if (customer.getDateOfBirth() != null ) {
       final LocalDate newDateOfBirth = customer.getDateOfBirth().toLocalDate();
       if (customerEntity.getDateOfBirth() == null) {
@@ -214,9 +221,12 @@ System.out.println("savedAddress  : "+ savedAddress );
 
     customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
     customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-    customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
-    customerEntity.setEthAddress(customer.getEthAddress());
-
+    if (customer.getRefferalCodeIdentifier() != null) {
+      customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
+    }
+    if (customer.getEthAddress() != null) {
+      customerEntity.setEthAddress(customer.getEthAddress());
+    }
     if (customer.getIsDeposited() != null) {
       customerEntity.setIsDeposited(customer.getIsDeposited());
     } else {
@@ -232,23 +242,31 @@ System.out.println("savedAddress  : "+ savedAddress );
     } else {
       customerEntity.setKycStatus("NOTUPLOADED"); 
     }
-    customerEntity.setAccountNumbers(customer.getAccountNumbers());
 
+    if (customer.getAccountNumbers() != null) {
+      customerEntity.setAccountNumbers(customer.getAccountNumbers());
+    }
     if(customer.getAvgMonthlyIncome() != null) {
       customerEntity.setAvgMonthlyIncome(customer.getAvgMonthlyIncome());
     } else {
       customerEntity.setAvgMonthlyIncome(0.0); 
     }
-
-    customerEntity.setNgoName(customer.getNgoName());
-    customerEntity.setDesignation(customer.getDesignation());
-    customerEntity.setNgoRegistrationNumber(customer.getNgoRegistrationNumber());
+    if(customer.getNgoName() != null) {
+      customerEntity.setNgoName(customer.getNgoName());
+    }
+    if(customer.getDesignation() != null) {
+      customerEntity.setDesignation(customer.getDesignation());
+    }
+    if(customer.getNgoRegistrationNumber() != null) {
+      customerEntity.setNgoRegistrationNumber(customer.getNgoRegistrationNumber());
+    }
     if (customer.getDateOfRegistration() != null) {
       customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
     }
-
+    if (customer.getRefAccountNumber() != null) {
+      customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
+    }
     this.customerRepository.save(customerEntity);
-
     return customer.getIdentifier();
   }
 

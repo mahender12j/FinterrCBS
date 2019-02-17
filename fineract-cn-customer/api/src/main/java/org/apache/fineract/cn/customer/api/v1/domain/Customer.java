@@ -96,6 +96,7 @@ public final class Customer {
   private String designation;
   private String ngoRegistrationNumber;
   private String dateOfRegistration;
+  private String refAccountNumber;
 
   public Customer() {
     super();
@@ -357,6 +358,14 @@ public final class Customer {
 	this.dateOfRegistration = dateOfRegistration;
   }
 
+  public String getRefAccountNumber() {
+		return refAccountNumber;
+  }
+
+  public void setRefAccountNumber(String refAccountNumber) {
+	  this.refAccountNumber = refAccountNumber;
+  }
+
    @Override
    public String toString() {
 		return "Customer [identifier=" + identifier + ", type=" + type + ", registrationType=" + registrationType
@@ -368,8 +377,8 @@ public final class Customer {
 				+ ", lastModifiedOn=" + lastModifiedOn + ", refferalCodeIdentifier=" + refferalCodeIdentifier
 				+ ", ethAddress=" + ethAddress + ", isDeposited=" + isDeposited + ", depositedOn=" + depositedOn + ", kycStatus=" + kycStatus
 				+ ", accountNumbers=" + accountNumbers + ", avgMonthlyIncome=" + avgMonthlyIncome + ", ngoName=" + ngoName + ", designation=" + designation + ", ngoRegistrationNumber="
-				+ ngoRegistrationNumber + ", dateOfRegistration=" + dateOfRegistration + ", toString()="
-				+ super.toString() + "]";
+        + ngoRegistrationNumber + ", dateOfRegistration=" + dateOfRegistration + ",  refAccountNumber=" + refAccountNumber 
+        + ", toString()=" + super.toString() + "]";
   }
 }
 

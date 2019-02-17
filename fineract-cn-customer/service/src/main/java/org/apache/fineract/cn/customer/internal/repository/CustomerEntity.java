@@ -109,6 +109,8 @@ public class CustomerEntity {
   @Column(name = "date_of_registration")
   @Convert(converter = LocalDateTimeConverter.class)
   private LocalDateTime dateOfRegistration;
+  @Column(name = "ref_account_number")
+  private String refAccountNumber;
 
   public CustomerEntity() {
     super();
@@ -361,6 +363,14 @@ public class CustomerEntity {
 
   public void setDateOfRegistration(LocalDateTime dateOfRegistration) {
 	this.dateOfRegistration = dateOfRegistration;
+  }
+
+  public String getRefAccountNumber() {
+		return refAccountNumber;
+  }
+
+  public void setRefAccountNumber(String refAccountNumber) {
+	  this.refAccountNumber = refAccountNumber;
   }
 
   @Override

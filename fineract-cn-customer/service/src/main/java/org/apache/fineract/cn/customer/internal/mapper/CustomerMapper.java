@@ -99,6 +99,7 @@ public final class CustomerMapper {
     if (customer.getDateOfRegistration() != null) {
       customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
     }
+    customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
     return customerEntity;
   }
 
@@ -161,6 +162,7 @@ public final class CustomerMapper {
     if (customerEntity.getDateOfRegistration() != null) {
       customer.setDateOfRegistration(DateConverter.toIsoString(customerEntity.getDateOfRegistration()));
     }
+    customer.setRefAccountNumber(customerEntity.getRefAccountNumber());
     return customer;
   }
 }
