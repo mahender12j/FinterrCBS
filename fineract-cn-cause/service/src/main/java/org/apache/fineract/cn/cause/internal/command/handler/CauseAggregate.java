@@ -155,10 +155,12 @@ public class CauseAggregate {
 
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-	causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
+	    causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
         causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
         causeEntity.setSMediaLinks(cause.getSMediaLinks());
         causeEntity.setVideoUrls(cause.getVideoUrls());
+        causeEntity.setCauseTxHash(cause.getCauseTxHash());
+        causeEntity.setAccountNumber(cause.getAccountNumber());
         this.causeRepository.save(causeEntity);
 
         return cause.getIdentifier();
