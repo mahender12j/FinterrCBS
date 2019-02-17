@@ -45,6 +45,6 @@ public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
         Stream<RatingEntity> findAvgRatingByCauseId(
                 @Param("causeIdentifier") String causeIdentifier);
 
-    List<RatingEntity> findByCause(final CauseEntity causeEntity);
+        Stream<RatingEntity> findByCause(final CauseEntity causeEntity);
 }
 
