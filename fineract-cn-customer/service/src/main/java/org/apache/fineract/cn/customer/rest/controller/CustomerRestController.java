@@ -239,7 +239,7 @@ public class CustomerRestController {
   )
   public
   @ResponseBody
-  ResponseEntity<CustomerPage> fetchCustomerByReferralcode(@PathVariable("referralcode") final String referralcode) {
+  ResponseEntity<Customer> fetchCustomerByReferralcode(@PathVariable("referralcode") final String referralcode) {
     final Optional<Customer> customer = this.customerService.fetchCustomerByReferralcode(referralcode);
     if (customer.isPresent()) {
       return ResponseEntity.ok(customer.get());
