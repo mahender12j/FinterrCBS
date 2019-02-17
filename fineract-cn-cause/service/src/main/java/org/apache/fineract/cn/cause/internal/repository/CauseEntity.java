@@ -108,6 +108,8 @@ public class CauseEntity {
     private String videoUrls;
     @Column(name = "cause_tx_hash")
     private String causeTxHash;
+    @Column(name = "account_number")
+    private String accountNumber;
 
     public CauseEntity() {
         super();
@@ -359,6 +361,14 @@ public class CauseEntity {
 
 	public void setCauseTxHash(String causeTxHash) {
 		this.causeTxHash = causeTxHash;
+    }
+    
+    public String getAccountNumber() {
+		return this.accountNumber;
+	}
+
+	public void setAccountNumber(final String accountNumber) {
+		this.accountNumber = accountNumber;
 	}
 
     @Override

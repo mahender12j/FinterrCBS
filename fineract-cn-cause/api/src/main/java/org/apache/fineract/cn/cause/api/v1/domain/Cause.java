@@ -80,6 +80,7 @@ public final class Cause {
 	private String videoUrls;
 	private String avgRating;
 	private String causeTxHash;
+	private String accountNumber;
 
 	public Cause() {
 		super();
@@ -341,6 +342,14 @@ public final class Cause {
 		this.causeTxHash = causeTxHash;
 	}
 
+	public String getAccountNumber() {
+		return this.accountNumber;
+	}
+
+	public void setAccountNumber(final String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+
 	@Override
 	public String toString() {
 		return "Cause [identifier=" + identifier + ", title=" + title + ", description=" + description + ", startDate="
@@ -353,7 +362,7 @@ public final class Cause {
 				+ ", createdOn=" + createdOn + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedOn="
 				+ lastModifiedOn + ", taxExemptionPercentage=" + taxExemptionPercentage + ", websiteUrl=" + websiteUrl
 				+ ", sMediaLinks=" + sMediaLinks + ", videoUrls=" + videoUrls + ", avgRating=" + avgRating 
-				+ ", causeTxHash=" + causeTxHash +", toString()=" + super.toString()
+				+ ", causeTxHash=" + causeTxHash +", accountNumber=" + accountNumber +", toString()=" + super.toString()
 				+ "]";
 	}
 }
