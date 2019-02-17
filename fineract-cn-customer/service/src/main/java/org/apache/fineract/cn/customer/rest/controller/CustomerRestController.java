@@ -244,7 +244,7 @@ public class CustomerRestController {
     if (customer.isPresent()) {
       return ResponseEntity.ok(customer.get());
     } else {
-      throw ServiceException.notFound("Customer {0} not found.", identifier);
+      throw ServiceException.notFound("Customer Referral code {0} not found.", referralcode);
     }
   }
   
