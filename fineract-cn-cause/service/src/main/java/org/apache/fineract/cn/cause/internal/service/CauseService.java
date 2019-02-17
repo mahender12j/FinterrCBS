@@ -168,6 +168,7 @@ public class CauseService {
             causePage.setCauses(causes);
             causeEntities.forEach(causeEntity -> {
                 final Cause cause = CauseMapper.map(causeEntity);
+                System.out.println("CauseService - Cause :: "+cause);
                 cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
 
 		        final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
@@ -180,9 +181,14 @@ public class CauseService {
                         );
                     }
 
-                    final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
+                    final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier);
                     System.out.println("avgRatingValue :: "+ avgRatingValue);
-                    cause.setAvgRating(avgRatingValue.toString());
+                    if (avgRatingValue != null) {
+                        cause.setAvgRating(avgRatingValue.toString());
+                    } else {
+                        cause.setAvgRating("0");
+                    }
+                    
                 causes.add(cause);
             });
         }
