@@ -118,8 +118,13 @@ public class CauseAggregate {
         final CauseEntity causeEntity = findCauseEntityOrThrow(cause.getIdentifier());
 
         causeEntity.setIdentifier(cause.getIdentifier());
-        causeEntity.setTitle(cause.getTitle());
-        causeEntity.setDescription(cause.getDescription());
+
+        if (cause.getTitle() != null) {
+            causeEntity.setTitle(cause.getTitle());
+        }
+        if (cause.getDescription() != null) {
+            causeEntity.setDescription(cause.getDescription());
+        }
         if (cause.getStartDate() != null) {
             causeEntity.setStartDate(LocalDateTime.parse(cause.getStartDate()));
         }
@@ -129,38 +134,74 @@ public class CauseAggregate {
         if (cause.getCompletedDate() != null) {
             causeEntity.setCompletedDate(LocalDateTime.parse(cause.getCompletedDate()));
         }
-        
-        causeEntity.setCurrentState(cause.getCurrentState());
-        causeEntity.setSoftTarget(cause.getSoftTarget());
-        causeEntity.setHardTarget(cause.getHardTarget());
-        causeEntity.setIsTaxExamption(cause.getIsTaxExamption());
-        causeEntity.setActualRaisedFiat(cause.getActualRaisedFiat());
-        causeEntity.setActualRaisedFin(cause.getActualRaisedFin());
-        causeEntity.setMinAmount(cause.getMinAmount());
-        causeEntity.setMaxAmount(cause.getMaxAmount());
+        if (cause.getCurrentState() != null) {
+            causeEntity.setCurrentState(cause.getCurrentState());
+        }
+        if (cause.getSoftTarget() != null) {
+            causeEntity.setSoftTarget(cause.getSoftTarget());
+        }
+        if (cause.getHardTarget() != null) {
+            causeEntity.setHardTarget(cause.getHardTarget());
+        }
+        if (cause.getIsTaxExamption() != null) {
+            causeEntity.setIsTaxExamption(cause.getIsTaxExamption());
+        }
+        if (cause.getActualRaisedFiat() != null) {
+            causeEntity.setActualRaisedFiat(cause.getActualRaisedFiat());
+        }
 
-        causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
-        causeEntity.setManagementFee(cause.getManagementFee());
-        causeEntity.setFinCollLimit(cause.getFinCollLimit());
-        causeEntity.setFinRate(cause.getFinRate());
-        causeEntity.setApprovedBy(cause.getApprovedBy());
-        
+        if (cause.getActualRaisedFin() != null) {
+            causeEntity.setActualRaisedFin(cause.getActualRaisedFin());
+        }
+        if (cause.getMinAmount() != null) {
+            causeEntity.setMinAmount(cause.getMinAmount());
+        }
+        if (cause.getMaxAmount() != null) {
+            causeEntity.setMaxAmount(cause.getMaxAmount());
+        }
+        if (cause.getAcceptedDenominationAmounts() != null) {
+            causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
+        }
+        if (cause.getManagementFee() != null) {
+            causeEntity.setManagementFee(cause.getManagementFee());
+        }
+        if (cause.getFinCollLimit() != null) {
+            causeEntity.setFinCollLimit(cause.getFinCollLimit());
+        }
+        if (cause.getFinRate() != null) {
+            causeEntity.setFinRate(cause.getFinRate());
+        }
+        if (cause.getApprovedBy() != null) {
+            causeEntity.setApprovedBy(cause.getApprovedBy());
+        }
         if (cause.getApprovedOn() != null) {
             causeEntity.setApprovedOn(LocalDateTime.parse(cause.getApprovedOn()));
         }
-
         if (cause.getAddress() != null) {
             this.updateAddress(new UpdateAddressCommand(cause.getIdentifier(), cause.getAddress()));
         }
 
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-	    causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
-        causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
-        causeEntity.setSMediaLinks(cause.getSMediaLinks());
-        causeEntity.setVideoUrls(cause.getVideoUrls());
-        causeEntity.setCauseTxHash(cause.getCauseTxHash());
-        causeEntity.setAccountNumber(cause.getAccountNumber());
+
+        if (cause.getTaxExemptionPercentage() != null) {
+            causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
+        }
+        if (cause.getWebsiteUrl() != null) {
+            causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
+        }
+        if (cause.getSMediaLinks() != null) {
+            causeEntity.setSMediaLinks(cause.getSMediaLinks());
+        }
+        if (cause.getVideoUrls() != null) {
+            causeEntity.setVideoUrls(cause.getVideoUrls());
+        }
+        if (cause.getCauseTxHash() != null) {
+            causeEntity.setCauseTxHash(cause.getCauseTxHash());
+        }
+        if (cause.getAccountNumber() != null) {
+            causeEntity.setAccountNumber(cause.getAccountNumber());
+        }
         this.causeRepository.save(causeEntity);
 
         return cause.getIdentifier();
