@@ -109,7 +109,11 @@ public class CauseService {
 
                     final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
                     System.out.println("avgRatingValue :: "+ avgRatingValue);
-                    cause.setAvgRating(avgRatingValue.toString());
+                    if (avgRatingValue != null) {
+                        cause.setAvgRating(avgRatingValue.toString());
+                    } else {
+                        cause.setAvgRating("0");
+                    }
 
                     // final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCause(causeEntity);
                     // if (contactDetailEntities != null) {

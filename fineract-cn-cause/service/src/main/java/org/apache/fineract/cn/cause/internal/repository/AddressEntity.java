@@ -36,6 +36,8 @@ public class AddressEntity {
     private String postalCode;
     @Column(name = "region")
     private String region;
+    @Column(name = "state")
+    private String state;
     @Column(name = "country_code")
     private String countryCode;
     @Column(name = "country")
@@ -83,6 +85,14 @@ public class AddressEntity {
 
     public void setRegion(final String region) {
         this.region = region;
+    }
+
+    public String getState() {
+        return this.state;
+    }
+
+    public void setState(final String state) {
+        this.state = state;
     }
 
     public String getCountryCode() {

@@ -33,6 +33,7 @@ public final class AddressMapper {
         addressEntity.setCity(address.getCity());
         addressEntity.setPostalCode(address.getPostalCode());
         addressEntity.setRegion(address.getRegion());
+        addressEntity.setState(address.getState());
         addressEntity.setCountryCode(address.getCountryCode());
         addressEntity.setCountry(address.getCountry());
         return addressEntity;
@@ -44,6 +45,7 @@ public final class AddressMapper {
         address.setCity(addressEntity.getCity());
         address.setPostalCode(addressEntity.getPostalCode());
         address.setRegion(addressEntity.getRegion());
+        address.setState(addressEntity.getState());
         address.setCountryCode(addressEntity.getCountryCode());
         address.setCountry(addressEntity.getCountry());
         return address;

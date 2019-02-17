@@ -78,6 +78,7 @@ public final class CauseMapper {
         causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
         causeEntity.setSMediaLinks(cause.getSMediaLinks());
         causeEntity.setVideoUrls(cause.getVideoUrls());
+        causeEntity.setCauseTxHash(cause.getCauseTxHash());
 
         return causeEntity;
     }
@@ -127,7 +128,7 @@ public final class CauseMapper {
         cause.setWebsiteUrl(causeEntity.getWebsiteUrl());
         cause.setSMediaLinks(causeEntity.getSMediaLinks());
         cause.setVideoUrls(causeEntity.getVideoUrls());
-
+        cause.setCauseTxHash(causeEntity.getCauseTxHash());
         return cause;
     }
 }

@@ -79,6 +79,7 @@ public final class Cause {
 	private String sMediaLinks;
 	private String videoUrls;
 	private String avgRating;
+	private String causeTxHash;
 
 	public Cause() {
 		super();
@@ -332,6 +333,14 @@ public final class Cause {
 		this.avgRating = avgRating;
 	}
 
+	public String getCauseTxHash() {
+		return causeTxHash;
+	}
+
+	public void setCauseTxHash(String causeTxHash) {
+		this.causeTxHash = causeTxHash;
+	}
+
 	@Override
 	public String toString() {
 		return "Cause [identifier=" + identifier + ", title=" + title + ", description=" + description + ", startDate="
@@ -343,7 +352,8 @@ public final class Cause {
 				+ ", approvedBy=" + approvedBy + ", approvedOn=" + approvedOn + ", createdBy=" + createdBy
 				+ ", createdOn=" + createdOn + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedOn="
 				+ lastModifiedOn + ", taxExemptionPercentage=" + taxExemptionPercentage + ", websiteUrl=" + websiteUrl
-				+ ", sMediaLinks=" + sMediaLinks + ", videoUrls=" + videoUrls + ", avgRating=" + avgRating + ", toString()=" + super.toString()
+				+ ", sMediaLinks=" + sMediaLinks + ", videoUrls=" + videoUrls + ", avgRating=" + avgRating 
+				+ ", causeTxHash=" + causeTxHash +", toString()=" + super.toString()
 				+ "]";
 	}
 }

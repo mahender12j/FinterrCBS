@@ -28,6 +28,7 @@ public final class Address {
     @NotBlank
     private String city;
     private String region;
+    private String state;
     private String postalCode;
     @NotBlank
     private String countryCode;
@@ -60,6 +61,14 @@ public final class Address {
 
     public void setRegion(final String region) {
         this.region = region;
+    }
+
+    public String getState() {
+        return this.state;
+    }
+
+    public void setState(final String state) {
+        this.state = state;
     }
 
     public String getPostalCode() {

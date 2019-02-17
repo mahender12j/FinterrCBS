@@ -105,7 +105,9 @@ public class CauseEntity {
     @Column(name = "s_media_links")
     private String sMediaLinks;
     @Column(name = "video_urls")
-	private String videoUrls;
+    private String videoUrls;
+    @Column(name = "cause_tx_hash")
+    private String causeTxHash;
 
     public CauseEntity() {
         super();
@@ -349,6 +351,14 @@ public class CauseEntity {
 
 	public void setVideoUrls(String videoUrls) {
 		this.videoUrls = videoUrls;
+    }
+    
+    public String getCauseTxHash() {
+		return causeTxHash;
+	}
+
+	public void setCauseTxHash(String causeTxHash) {
+		this.causeTxHash = causeTxHash;
 	}
 
     @Override
