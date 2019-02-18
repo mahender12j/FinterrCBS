@@ -214,7 +214,7 @@ public class CauseAggregate {
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_CAUSE)
     public String deleteCause(final DeleteCauseCommand deleteCauseCommand) {
-        final CauseEntity causeEntity = findCauseEntityOrThrow(lockCauseCommand.identifier());
+        final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseCommand.identifier());
 
         causeEntity.setCurrentState(Cause.State.DELETED.name());
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
@@ -223,12 +223,12 @@ public class CauseAggregate {
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
         this.commandRepository.save(
-                CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), lockCauseCommand.comment())
+                CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), deleteCauseCommand.comment())
         );
 
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.UNLOCK);
 
-        return lockCauseCommand.identifier();
+        return deleteCauseCommand.identifier();
     }
 
     @Transactional
