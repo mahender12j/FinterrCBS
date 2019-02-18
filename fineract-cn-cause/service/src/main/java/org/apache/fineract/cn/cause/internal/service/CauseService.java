@@ -203,12 +203,12 @@ public class CauseService {
     public Boolean causeRatingExists(final String identifier, final String createdBy) {
         System.out.println("causeRatingExists --- identifier :: " + identifier + "  createdBy :: "+ createdBy);
         
-        // Optional<RatingEntity> rEntity = causeRepository.findByIdentifier(identifier)
-        //         .map(causeEntity -> this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createdBy))
-        //         .orElse(Stream.empty())
-        //         .map(RatingMapper::map);
-        // return (rEntity.size() > 0 ? Boolean.TRUE : Boolean.FALSE);
-        return Boolean.FALSE;
+        Stream<RatingEntity> rEntity = causeRepository.findByIdentifier(identifier)
+                .map(causeEntity -> this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createdBy))
+                .orElse(Stream.empty())
+                .map(RatingMapper::map);
+        return (rEntity.getSize() > 0 ? Boolean.TRUE : Boolean.FALSE);
+        // return Boolean.FALSE;
     }
 
     public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {

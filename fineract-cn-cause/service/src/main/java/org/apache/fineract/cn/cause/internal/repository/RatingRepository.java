@@ -49,7 +49,7 @@ public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
 
         Stream<RatingEntity> findByCauseAndActive(final CauseEntity causeEntity, Boolean active);
 
-        Optional<RatingEntity> findByCauseAndCreatedBy(final CauseEntity causeEntity,final String createdBy);
+        Stream<RatingEntity> findByCauseAndCreatedBy(final CauseEntity causeEntity,final String createdBy);
 
         @Query("SELECT CASE WHEN COUNT(r) > 0 THEN 'true' ELSE 'false' END FROM RatingEntity r WHERE r.cause.identifier = :causeIdentifier AND r.createdBy = :createdBy")
         Boolean existsByCreatedBy(@Param("causeIdentifier") final String causeIdentifier, @Param("createdBy") final String createdBy);

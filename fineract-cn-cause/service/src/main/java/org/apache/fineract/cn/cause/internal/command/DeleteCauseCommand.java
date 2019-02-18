@@ -31,7 +31,7 @@ public class DeleteCauseCommand {
     }
 
     public String getCauseIdentifier() {
-        return causeIdentifier;
+        return this.causeIdentifier;
     }
 
     public String comment() {
