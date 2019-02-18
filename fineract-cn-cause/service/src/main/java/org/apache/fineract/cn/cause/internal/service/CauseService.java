@@ -200,6 +200,10 @@ public class CauseService {
         return causePage;
     }
 
+    public Boolean causeRatingExists(final String createdBy) {
+        return this.ratingRepository.existsByCreatedBy(createdBy);
+    }
+
     public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
                 .map(ratingRepository::findByCause)

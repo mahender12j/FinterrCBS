@@ -262,7 +262,12 @@ public class CauseRestController {
                                       @RequestBody final CauseRating rating) {
 
         if (this.causeService.causeExists(identifier)) {
-            this.commandGateway.process(new CreateRatingCommand(identifier, rating));
+
+            if (this.causeService.causeRatingExists(rating.getCreatedBy())) {
+                this.commandGateway.process(new CreateRatingCommand(identifier, rating));
+            } else {
+                throw ServiceException.notFound("Already rating given for this Cause {0}.", identifier);
+            }
            
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
@@ -282,7 +287,7 @@ public class CauseRestController {
     @ResponseBody
     ResponseEntity<List<CauseRating>> fetchCauseRatings(@PathVariable("identifier") final String identifier) {
         if (this.causeService.causeExists(identifier)) {
-            return ResponseEntity.ok(this.causeService.fetchRatingsByCause(identifier).collect(Collectors.toList()));
+            return ResponseEntity.ok(this.causeService.findByCauseAndActive(identifier, Boolean.TRUE).collect(Collectors.toList()));
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
