@@ -147,7 +147,7 @@ public class CauseRestController {
     )
     public @ResponseBody
     ResponseEntity<Void> deleteCause(@PathVariable("identifier") final String identifier) {
-        this.commandGateway.process(new DeleteCauseCommand(identifier));
+        this.commandGateway.process(new DeleteCauseCommand(identifier, "DELETING CAUSE"));
 
         return ResponseEntity.accepted().build();
     }
