@@ -211,7 +211,7 @@ public class CauseService {
                 .map(RatingMapper::map);
     }
 
-    public final Stream<CauseRating> fetchActiveRatingsByCause(final String identifier, final Boolen active) {
+    public final Stream<CauseRating> fetchActiveRatingsByCause(final String identifier, final Boolean active) {
         return causeRepository.findByIdentifier(identifier)
                 .map(causeEntity -> this.ratingRepository.findByCauseAndActive(causeEntity, active))
                 .orElse(Stream.empty())
