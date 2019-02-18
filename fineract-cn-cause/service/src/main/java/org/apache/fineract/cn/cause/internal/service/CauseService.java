@@ -200,8 +200,8 @@ public class CauseService {
         return causePage;
     }
 
-    public Boolean causeRatingExists(final String createdBy) {
-        return this.ratingRepository.existsByCreatedBy(createdBy);
+    public Boolean causeRatingExists(final String identifier, final String createdBy) {
+        return this.ratingRepository.existsByCreatedBy(identifier, createdBy);
     }
 
     public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {
