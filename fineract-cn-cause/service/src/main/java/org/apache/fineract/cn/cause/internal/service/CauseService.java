@@ -150,8 +150,8 @@ public class CauseService {
         final Page<CauseEntity> causeEntities;
         if (includeClosed) {
             final String userIdentifier = UserContextHolder.checkedGetUser();
-            System.out.prinln("fetchCause --- userIdentifier ::: " + userIdentifier);
-            
+            System.out.println("fetchCause --- userIdentifier ::: " + userIdentifier);
+
             if (term != null) {
                 causeEntities =
                         this.causeRepository.findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContaining(userIdentifier, term, term, term, pageable);
