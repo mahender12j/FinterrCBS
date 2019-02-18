@@ -58,6 +58,7 @@ public interface CauseManager {
     )
     CausePage fetchCauses(@RequestParam(value = "term", required = false) final String term,
                           @RequestParam(value = "includeClosed", required = false) final Boolean includeClosed,
+                          @RequestParam(value = "onlyActive", required = false) final Boolean onlyActive,
                           @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
                           @RequestParam(value = "size", required = false) final Integer size,
                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
@@ -94,6 +95,18 @@ public interface CauseManager {
             @ThrowsException(status = HttpStatus.BAD_REQUEST, exception = CauseValidationException.class)
     })
     void updateCause(@PathVariable("identifier") final String identifier, @RequestBody final Cause cause);
+
+    @RequestMapping(
+            value = "/causes/{identifier}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ThrowsExceptions({
+            @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CauseNotFoundException.class),
+            @ThrowsException(status = HttpStatus.BAD_REQUEST, exception = CauseValidationException.class)
+    })
+    void deleteCause(@PathVariable("identifier") final String identifier, @RequestBody final Cause cause);
 
     @RequestMapping(
             value = "/causes/{identifier}/commands",

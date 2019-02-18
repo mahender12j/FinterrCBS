@@ -145,7 +145,7 @@ public class CauseService {
                 });
     }
 
-    public CausePage fetchCause(final String term, final Boolean includeClosed, final Pageable pageable) {
+    public CausePage fetchCause(final String term, final Boolean includeClosed, final Boolean onlyActive, final Pageable pageable) {
         final Page<CauseEntity> causeEntities;
         if (includeClosed) {
             if (term != null) {
@@ -153,6 +153,14 @@ public class CauseService {
                         this.causeRepository.findByIdentifierContainingOrTitleContainingOrDescriptionContaining(term, term, term, pageable);
             } else {
                 causeEntities = this.causeRepository.findAll(pageable);
+            }
+        } else if (onlyActive) {
+            if (term != null) {
+                causeEntities =
+                        this.causeRepository.findByCurrentStateNotAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
+                                Cause.State.CLOSED.name(), term, term, term, pageable);
+            } else {
+                causeEntities = this.causeRepository.findByCurrentState(Cause.State.ACTIVE.name(), pageable);
             }
         } else {
             if (term != null) {

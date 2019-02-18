@@ -129,12 +129,13 @@ public class CauseRestController {
     @ResponseBody
     ResponseEntity<CausePage> fetchCauses(@RequestParam(value = "term", required = false) final String term,
                                           @RequestParam(value = "includeClosed", required = false) final Boolean includeClosed,
+                                          @RequestParam(value = "onlyActive", required = false) final Boolean onlyActive,
                                           @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
                                           @RequestParam(value = "size", required = false) final Integer size,
                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
         return ResponseEntity.ok(this.causeService.fetchCause(
-                term, (includeClosed != null ? includeClosed : Boolean.FALSE),
+                term, (includeClosed != null ? includeClosed : Boolean.FALSE), (onlyActive != null ? onlyActive : Boolean.FALSE),
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
