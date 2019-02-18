@@ -200,15 +200,17 @@ public class CauseService {
         return causePage;
     }
 
-    public Boolean causeRatingExists(final String identifier, final String createdBy) {
-        System.out.println("causeRatingExists --- identifier :: " + identifier + "  createdBy :: "+ createdBy);
+    public Boolean causeRatingExists(final String causeIdentifier, final String createdBy) {
+        System.out.println("causeRatingExists --- causeIdentifier :: " + causeIdentifier + "  createdBy :: "+ createdBy);
         
-        Stream<CauseRating> rEntity = causeRepository.findByIdentifier(identifier)
-                    .map(causeEntity -> this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createdBy))
-                    .orElse(Stream.empty())
-                    .map(RatingMapper::map);
-        System.out.println("causeRatingExists --- rEntity.count() :: " + rEntity.count());
-        return (rEntity.count() > 0 ? Boolean.TRUE : Boolean.FALSE);
+        return this.causeRepository.existsByCreatedBy(causeIdentifier, createdBy);
+
+        // Stream<CauseRating> rEntity = causeRepository.findByIdentifier(identifier)
+        //             .map(causeEntity -> this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createdBy))
+        //             .orElse(Stream.empty())
+        //             .map(RatingMapper::map);
+        // System.out.println("causeRatingExists --- rEntity.count() :: " + rEntity.count());
+        // return (rEntity.count() > 0 ? Boolean.TRUE : Boolean.FALSE);
         // return Boolean.FALSE;
     }
 
