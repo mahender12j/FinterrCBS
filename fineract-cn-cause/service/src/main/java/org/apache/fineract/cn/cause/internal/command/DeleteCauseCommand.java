@@ -23,19 +23,26 @@ package org.apache.fineract.cn.cause.internal.command;
  */
 public class DeleteCauseCommand {
     private final String causeIdentifier;
+    private final String comment;
 
-    public DeleteCauseCommand(String causeIdentifier) {
+    public DeleteCauseCommand(String causeIdentifier, String comment) {
         this.causeIdentifier = causeIdentifier;
+        this.comment = comment;
     }
 
     public String getCauseIdentifier() {
         return causeIdentifier;
     }
 
+    public String comment() {
+        return this.comment;
+    }
+
     @Override
     public String toString() {
         return "DeleteCauseCommand{" +
                 "causeIdentifier='" + causeIdentifier + '\'' +
+                "comment='" + comment + '\'' +
                 '}';
     }
 }
