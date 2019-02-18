@@ -152,7 +152,7 @@ public class CauseService {
                 causeEntities =
                         this.causeRepository.findByIdentifierContainingOrTitleContainingOrDescriptionContaining(term, term, term, pageable);
             } else {
-                causeEntities = this.causeRepository.findAllByCurrentState(Cause.State.ACTIVE.name(), pageable);
+                causeEntities = this.causeRepository.findByCurrentState(Cause.State.ACTIVE.name(), pageable);
             }
         } else {
             if (term != null) {
@@ -203,9 +203,11 @@ public class CauseService {
     public Boolean causeRatingExists(final String identifier, final String createdBy) {
         System.out.println("causeRatingExists --- identifier :: " + identifier + "  createdBy :: "+ createdBy);
         
-        Long ratingCount = causeRepository.findByIdentifier(identifier)
-                .map(causeEntity -> this.ratingRepository.countByCauseAndCreatedBy(causeEntity, createdBy));
-        return (ratingCount > 0 ? Boolean.TRUE : Boolean.FALSE);
+        Optional<RatingEntity> rEntity = causeRepository.findByIdentifier(identifier)
+                .map(causeEntity -> this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createdBy))
+                .orElse(Stream.empty())
+                .map(RatingMapper::map);
+        return (rEntity.size() > 0 ? Boolean.TRUE : Boolean.FALSE);
     }
 
     public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {

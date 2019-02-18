@@ -138,6 +138,20 @@ public class CauseRestController {
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
+    @RequestMapping(
+            value = "/causes/{identifier}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> deleteCause(@PathVariable("identifier") final String identifier) {
+        this.commandGateway.process(new DeleteCauseCommand(identifier));
+
+        return ResponseEntity.accepted().build();
+    }
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/{identifier}",

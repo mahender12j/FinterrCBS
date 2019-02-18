@@ -43,6 +43,7 @@ public interface CauseEventConstants {
     String UNLOCK_CAUSE = "unlock-cause";
     String CLOSE_CAUSE = "close-cause";
     String REOPEN_CAUSE = "reopen-cause";
+    String DELETE_CAUSE = "delete-cause";
 
     String POST_TASK = "post-task";
     String PUT_TASK = "put-task";
@@ -71,6 +72,7 @@ public interface CauseEventConstants {
 
     String SELECTOR_POST_CAUSE = SELECTOR_NAME + " = '" + POST_CAUSE + "'";
     String SELECTOR_PUT_CAUSE = SELECTOR_NAME + " = '" + PUT_CAUSE + "'";
+    String SELECTOR_DELETE_CAUSE = SELECTOR_NAME + " = '" + DELETE_CAUSE + "'";
     String SELECTOR_PUT_ADDRESS = SELECTOR_NAME + " = '" + PUT_ADDRESS + "'";
     String SELECTOR_PUT_CONTACT_DETAILS = SELECTOR_NAME + " = '" + PUT_CONTACT_DETAILS + "'";
 
