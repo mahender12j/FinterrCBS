@@ -152,7 +152,7 @@ public class CauseService {
                 causeEntities =
                         this.causeRepository.findByIdentifierContainingOrTitleContainingOrDescriptionContaining(term, term, term, pageable);
             } else {
-                causeEntities = this.causeRepository.findAll(pageable);
+                causeEntities = this.causeRepository.findAllByCurrentState(Cause.State.ACTIVE.name(), pageable);
             }
         } else {
             if (term != null) {

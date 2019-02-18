@@ -31,7 +31,7 @@ import java.util.List;
 public final class Cause {
 
 	public enum State {
-		PENDING, ACTIVE, LOCKED, REJECTED, CLOSED
+		PENDING, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED
 	}
 
 	@NotBlank
