@@ -206,7 +206,7 @@ public class CauseService {
 
     public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
-                .map(ratingRepository::findByCause)
+                .map(ratingRepository::findByCauseAndActive)
                 .orElse(Stream.empty())
                 .map(RatingMapper::map);
     }
