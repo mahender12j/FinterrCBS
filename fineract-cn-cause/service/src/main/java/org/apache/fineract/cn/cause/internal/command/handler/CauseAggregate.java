@@ -216,18 +216,21 @@ public class CauseAggregate {
     public String deleteCause(final DeleteCauseCommand deleteCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseCommand.getCauseIdentifier());
 
+        System.out.println("deleteCause --- CauseIndentifier :: "+deleteCauseCommand.getCauseIdentifier());
         causeEntity.setCurrentState(Cause.State.DELETED.name());
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
+        System.out.println("deleteCause --- savedCauseEntity :: "+savedCauseEntity);
+        
 
         this.commandRepository.save(
                 CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), deleteCauseCommand.comment())
         );
 
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.UNLOCK);
-
+        System.out.println("deleteCause --- end :: "+ deleteCauseCommand.getCauseIdentifier());
         return deleteCauseCommand.getCauseIdentifier();
     }
 
