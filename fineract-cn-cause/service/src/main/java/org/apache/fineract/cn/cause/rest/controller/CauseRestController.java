@@ -278,9 +278,9 @@ public class CauseRestController {
         if (this.causeService.causeExists(identifier)) {
 
             if (this.causeService.causeRatingExists(identifier, rating.getCreatedBy())) {
-                this.commandGateway.process(new CreateRatingCommand(identifier, rating));
-            } else {
                 throw ServiceException.notFound("Already rating given for this Cause {0}.", identifier);
+            } else {
+                this.commandGateway.process(new CreateRatingCommand(identifier, rating));
             }
            
         } else {

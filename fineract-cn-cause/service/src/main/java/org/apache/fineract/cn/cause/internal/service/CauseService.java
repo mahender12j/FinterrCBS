@@ -207,6 +207,7 @@ public class CauseService {
                     .map(causeEntity -> this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createdBy))
                     .orElse(Stream.empty())
                     .map(RatingMapper::map);
+        System.out.println("causeRatingExists --- rEntity.count() :: " + rEntity.count());
         return (rEntity.count() > 0 ? Boolean.TRUE : Boolean.FALSE);
         // return Boolean.FALSE;
     }
