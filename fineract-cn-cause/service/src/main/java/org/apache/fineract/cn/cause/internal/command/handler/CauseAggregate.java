@@ -202,6 +202,9 @@ public class CauseAggregate {
         if (cause.getAccountNumber() != null) {
             causeEntity.setAccountNumber(cause.getAccountNumber());
         }
+        if (cause.getEthAddress() != null) {
+            causeEntity.setEthAddress(cause.getEthAddress());
+        }
         this.causeRepository.save(causeEntity);
 
         return cause.getIdentifier();

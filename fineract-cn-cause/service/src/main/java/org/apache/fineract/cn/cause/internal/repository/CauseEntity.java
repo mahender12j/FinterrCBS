@@ -110,6 +110,8 @@ public class CauseEntity {
     private String causeTxHash;
     @Column(name = "account_number")
     private String accountNumber;
+    @Column(name = "eth_address")
+    private String ethAddress;
 
     public CauseEntity() {
         super();
@@ -369,6 +371,14 @@ public class CauseEntity {
 
 	public void setAccountNumber(final String accountNumber) {
 		this.accountNumber = accountNumber;
+    }
+    
+    public String getEthAddress() {
+		return this.ethAddress;
+	}
+
+	public void setEthAddress(final String ethAddress) {
+		this.ethAddress = ethAddress;
 	}
 
     @Override
@@ -377,9 +387,7 @@ public class CauseEntity {
         if (o == null || getClass() != o.getClass()) return false;
 
         CauseEntity that = (CauseEntity) o;
-
         return identifier.equals(that.identifier);
-
     }
 
     @Override

@@ -80,6 +80,7 @@ public final class CauseMapper {
         causeEntity.setVideoUrls(cause.getVideoUrls());
         causeEntity.setCauseTxHash(cause.getCauseTxHash());
         causeEntity.setAccountNumber(cause.getAccountNumber());
+        causeEntity.setEthAddress(cause.getEthAddress());
 
         return causeEntity;
     }
@@ -131,6 +132,7 @@ public final class CauseMapper {
         cause.setVideoUrls(causeEntity.getVideoUrls());
         cause.setCauseTxHash(causeEntity.getCauseTxHash());
         cause.setAccountNumber(causeEntity.getAccountNumber());
+        cause.setEthAddress(causeEntity.getEthAddress());
         return cause;
     }
 }

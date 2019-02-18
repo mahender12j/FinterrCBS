@@ -81,6 +81,7 @@ public final class Cause {
 	private String avgRating;
 	private String causeTxHash;
 	private String accountNumber;
+	private String ethAddress;
 
 	public Cause() {
 		super();
@@ -350,6 +351,14 @@ public final class Cause {
 		this.accountNumber = accountNumber;
 	}
 
+	public String getEthAddress() {
+		return this.ethAddress;
+	}
+
+	public void setEthAddress(final String ethAddress) {
+		this.ethAddress = ethAddress;
+	}
+
 	@Override
 	public String toString() {
 		return "Cause [identifier=" + identifier + ", title=" + title + ", description=" + description + ", startDate="
@@ -362,8 +371,8 @@ public final class Cause {
 				+ ", createdOn=" + createdOn + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedOn="
 				+ lastModifiedOn + ", taxExemptionPercentage=" + taxExemptionPercentage + ", websiteUrl=" + websiteUrl
 				+ ", sMediaLinks=" + sMediaLinks + ", videoUrls=" + videoUrls + ", avgRating=" + avgRating 
-				+ ", causeTxHash=" + causeTxHash +", accountNumber=" + accountNumber +", toString()=" + super.toString()
-				+ "]";
+				+ ", causeTxHash=" + causeTxHash +", accountNumber=" + accountNumber +", ethAddress=" + ethAddress 
+				+" , toString()=" + super.toString() + "]";
 	}
 }
 
