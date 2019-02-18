@@ -24,6 +24,7 @@ import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
 import org.apache.fineract.cn.cause.api.v1.domain.ProcessStep;
 import org.apache.fineract.cn.cause.api.v1.domain.TaskDefinition;
+import org.apache.fineract.cn.api.util.UserContextHolder;
 
 /*import org.apache.fineract.cn.cause.catalog.internal.repository.FieldEntity;
 import org.apache.fineract.cn.cause.catalog.internal.repository.FieldValueEntity;
@@ -148,17 +149,20 @@ public class CauseService {
     public CausePage fetchCause(final String term, final Boolean includeClosed, final Boolean onlyActive, final Pageable pageable) {
         final Page<CauseEntity> causeEntities;
         if (includeClosed) {
+            final String userIdentifier = UserContextHolder.checkedGetUser();
+            System.out.prinln("fetchCause --- userIdentifier ::: " + userIdentifier);
+            
             if (term != null) {
                 causeEntities =
-                        this.causeRepository.findByIdentifierContainingOrTitleContainingOrDescriptionContaining(term, term, term, pageable);
+                        this.causeRepository.findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContaining(userIdentifier, term, term, term, pageable);
             } else {
-                causeEntities = this.causeRepository.findAll(pageable);
+                causeEntities = this.causeRepository.findByCreatedBy(userIdentifier, pageable);
             }
         } else if (onlyActive) {
             if (term != null) {
                 causeEntities =
-                        this.causeRepository.findByCurrentStateNotAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
-                                Cause.State.CLOSED.name(), term, term, term, pageable);
+                        this.causeRepository.findByCurrentStateAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
+                                Cause.State.ACTIVE.name(), term, term, term, pageable);
             } else {
                 causeEntities = this.causeRepository.findByCurrentState(Cause.State.ACTIVE.name(), pageable);
             }
