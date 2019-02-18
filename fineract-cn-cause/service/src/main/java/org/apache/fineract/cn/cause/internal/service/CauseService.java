@@ -201,6 +201,7 @@ public class CauseService {
     }
 
     public Boolean causeRatingExists(final String identifier, final String createdBy) {
+        System.out.println("causeRatingExists --- identifier :: " + identifier + "  createdBy :: "+ createdBy);
         return this.ratingRepository.existsByCreatedBy(identifier, createdBy);
     }
 
