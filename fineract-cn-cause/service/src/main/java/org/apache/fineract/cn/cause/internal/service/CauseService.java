@@ -202,7 +202,10 @@ public class CauseService {
 
     public Boolean causeRatingExists(final String identifier, final String createdBy) {
         System.out.println("causeRatingExists --- identifier :: " + identifier + "  createdBy :: "+ createdBy);
-        return this.ratingRepository.existsByCreatedBy(identifier, createdBy);
+        
+        Long ratingCount = causeRepository.findByIdentifier(identifier)
+                .map(causeEntity -> this.ratingRepository.countByCauseAndCreatedBy(causeEntity, createdBy));
+        return (ratingCount > 0 ? Boolean.TRUE : Boolean.FALSE);
     }
 
     public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {
