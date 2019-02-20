@@ -1,0 +1,4 @@
+autopep8==1.4.3
+mysql-connector==2.1.6
+pycodestyle==2.5.0
+schedule==0.6.0
