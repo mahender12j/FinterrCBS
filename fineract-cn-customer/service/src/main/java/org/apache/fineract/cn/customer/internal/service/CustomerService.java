@@ -103,21 +103,21 @@ public class CustomerService {
             );
           }
 
-          final List<FieldValueEntity> fieldValueEntities = this.fieldValueRepository.findByCustomer(customerEntity);
-          if (fieldValueEntities != null) {
-            customer.setCustomValues(
-                fieldValueEntities
-                    .stream()
-                    .map(fieldValueEntity -> {
-                      final Value value = new Value();
-                      value.setValue(fieldValueEntity.getValue());
-                      final FieldEntity fieldEntity = fieldValueEntity.getField();
-                      value.setCatalogIdentifier(fieldEntity.getCatalog().getIdentifier());
-                      value.setFieldIdentifier(fieldEntity.getIdentifier());
-                      return value;
-                    }).collect(Collectors.toList())
-            );
-          }
+          // final List<FieldValueEntity> fieldValueEntities = this.fieldValueRepository.findByCustomer(customerEntity);
+          // if (fieldValueEntities != null) {
+          //   customer.setCustomValues(
+          //       fieldValueEntities
+          //           .stream()
+          //           .map(fieldValueEntity -> {
+          //             final Value value = new Value();
+          //             value.setValue(fieldValueEntity.getValue());
+          //             final FieldEntity fieldEntity = fieldValueEntity.getField();
+          //             value.setCatalogIdentifier(fieldEntity.getCatalog().getIdentifier());
+          //             value.setFieldIdentifier(fieldEntity.getIdentifier());
+          //             return value;
+          //           }).collect(Collectors.toList())
+          //   );
+          // }
 
           return customer;
         });
