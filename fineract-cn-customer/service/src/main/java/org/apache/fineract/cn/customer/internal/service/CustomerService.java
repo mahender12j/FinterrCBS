@@ -88,11 +88,14 @@ public class CustomerService {
   }
 
   public Optional<Customer> findCustomer(final String identifier) {
+    System.out.println("Find Customer - identifier :: "+identifier);
     return customerRepository.findByIdentifier(identifier)
         .map(customerEntity -> {
           final Customer customer = CustomerMapper.map(customerEntity);
-          customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
 
+          System.out.println("Find Customer - Customer :: "+customer);
+          customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
+          System.out.println("Find Customer - Customer with address :: "+customer);
           final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(customerEntity);
           if (contactDetailEntities != null) {
             customer.setContactDetails(
@@ -102,7 +105,7 @@ public class CustomerService {
                     .collect(Collectors.toList())
             );
           }
-
+          System.out.println("Find Customer - Customer with contact details :: "+customer);
           // final List<FieldValueEntity> fieldValueEntities = this.fieldValueRepository.findByCustomer(customerEntity);
           // if (fieldValueEntities != null) {
           //   customer.setCustomValues(
