@@ -14,7 +14,7 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
- * under the License.hdjdjjd
+ * under the License.
  */
 package org.apache.fineract.cn.customer;
 
@@ -23,12 +23,12 @@ import org.springframework.boot.SpringApplication;
 
 public class CustomerApplication {
 
-  public CustomerApplication() {
-    super();
-  }
+    public CustomerApplication() {
+        super();
+    }
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
 
-    SpringApplication.run(CustomerRestConfiguration.class, args);
-  }
+        SpringApplication.run(CustomerRestConfiguration.class, args);
+    }
 }

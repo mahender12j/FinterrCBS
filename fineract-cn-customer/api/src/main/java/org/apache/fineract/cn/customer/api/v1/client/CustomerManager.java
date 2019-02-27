@@ -30,6 +30,7 @@ import org.apache.fineract.cn.customer.api.v1.domain.IdentificationCardScan;
 import org.apache.fineract.cn.customer.api.v1.domain.ProcessStep;
 import org.apache.fineract.cn.customer.api.v1.domain.TaskDefinition;
 import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.Size;
 import org.apache.fineract.cn.api.annotation.ThrowsException;
 import org.apache.fineract.cn.api.annotation.ThrowsExceptions;
@@ -93,6 +94,17 @@ public interface CustomerManager {
     final Customer.State state = Customer.State.valueOf(customer.getCurrentState());
     return (state == Customer.State.ACTIVE);
   }
+
+
+  @RequestMapping(
+          value = "/customers/{identifier}/find",
+          method = RequestMethod.GET,
+          produces = MediaType.ALL_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE
+  )
+  @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CustomerNotFoundException.class)
+  Map<String, Boolean> findValidCustomer(@PathVariable("identifier") final String identifier);
+
 
   @RequestMapping(
       value = "/customers/{identifier}",
