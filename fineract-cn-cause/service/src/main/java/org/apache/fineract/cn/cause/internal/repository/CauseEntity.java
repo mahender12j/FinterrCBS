@@ -103,7 +103,7 @@ public class CauseEntity {
     @Column(name = "website_url")
     private String websiteUrl;
     @Column(name = "s_media_links")
-    private String sediaLinks;
+    private String smediaLinks;
     @Column(name = "video_urls")
     private String videoUrls;
     @Column(name = "cause_tx_hash")
