@@ -106,7 +106,7 @@ public interface CauseManager {
             @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CauseNotFoundException.class),
             @ThrowsException(status = HttpStatus.BAD_REQUEST, exception = CauseValidationException.class)
     })
-    void deleteCause(@PathVariable("identifier") final String identifier, @RequestBody final Cause cause);
+    void deleteCause(@PathVariable("identifier") final String identifier);
 
     @RequestMapping(
             value = "/causes/{identifier}/commands",
