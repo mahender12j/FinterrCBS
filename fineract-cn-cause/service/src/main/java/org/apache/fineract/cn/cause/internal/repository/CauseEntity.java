@@ -103,7 +103,7 @@ public class CauseEntity {
     @Column(name = "website_url")
     private String websiteUrl;
     @Column(name = "s_media_links")
-    private String sMediaLinks;
+    private String smediaLinks;
     @Column(name = "video_urls")
     private String videoUrls;
     @Column(name = "cause_tx_hash")
@@ -341,12 +341,12 @@ public class CauseEntity {
 		this.websiteUrl = websiteUrl;
 	}
 
-	public String getSMediaLinks() {
-		return sMediaLinks;
+	public String getSmediaLinks() {
+		return smediaLinks;
 	}
 
-	public void setSMediaLinks(String sMediaLinks) {
-		this.sMediaLinks = sMediaLinks;
+	public void setSmediaLinks(String smediaLinks) {
+		this.smediaLinks = smediaLinks;
 	}
 
 	public String getVideoUrls() {

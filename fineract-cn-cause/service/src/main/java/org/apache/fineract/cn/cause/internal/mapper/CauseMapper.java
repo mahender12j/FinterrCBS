@@ -76,7 +76,7 @@ public final class CauseMapper {
 
         causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
         causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
-        causeEntity.setSMediaLinks(cause.getSMediaLinks());
+        causeEntity.setSmediaLinks(cause.getSmediaLinks());
         causeEntity.setVideoUrls(cause.getVideoUrls());
         causeEntity.setCauseTxHash(cause.getCauseTxHash());
         causeEntity.setAccountNumber(cause.getAccountNumber());
@@ -128,7 +128,7 @@ public final class CauseMapper {
 
         cause.setTaxExemptionPercentage(causeEntity.getTaxExemptionPercentage());
         cause.setWebsiteUrl(causeEntity.getWebsiteUrl());
-        cause.setSMediaLinks(causeEntity.getSMediaLinks());
+        cause.setSmediaLinks(causeEntity.getSmediaLinks());
         cause.setVideoUrls(causeEntity.getVideoUrls());
         cause.setCauseTxHash(causeEntity.getCauseTxHash());
         cause.setAccountNumber(causeEntity.getAccountNumber());

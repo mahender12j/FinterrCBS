@@ -76,7 +76,7 @@ public final class Cause {
 	private List<CauseCategory> causeCategories;
 	private String taxExemptionPercentage;
 	private String websiteUrl;
-	private String sMediaLinks;
+	private String smediaLinks;
 	private String videoUrls;
 	private String avgRating;
 	private String causeTxHash;
@@ -311,12 +311,12 @@ public final class Cause {
 		this.websiteUrl = websiteUrl;
 	}
 
-	public String getSMediaLinks() {
-		return sMediaLinks;
+	public String getSmediaLinks() {
+		return smediaLinks;
 	}
 
-	public void setSMediaLinks(String sMediaLinks) {
-		this.sMediaLinks = sMediaLinks;
+	public void setSmediaLinks(String smediaLinks) {
+		this.smediaLinks = smediaLinks;
 	}
 
 	public String getVideoUrls() {
@@ -370,7 +370,7 @@ public final class Cause {
 				+ ", approvedBy=" + approvedBy + ", approvedOn=" + approvedOn + ", createdBy=" + createdBy
 				+ ", createdOn=" + createdOn + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedOn="
 				+ lastModifiedOn + ", taxExemptionPercentage=" + taxExemptionPercentage + ", websiteUrl=" + websiteUrl
-				+ ", sMediaLinks=" + sMediaLinks + ", videoUrls=" + videoUrls + ", avgRating=" + avgRating 
+				+ ", smediaLinks=" + smediaLinks + ", videoUrls=" + videoUrls + ", avgRating=" + avgRating 
 				+ ", causeTxHash=" + causeTxHash +", accountNumber=" + accountNumber +", ethAddress=" + ethAddress 
 				+" , toString()=" + super.toString() + "]";
 	}
