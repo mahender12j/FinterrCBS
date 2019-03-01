@@ -19,6 +19,7 @@
 package org.apache.fineract.cn.accounting.service.internal.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import javax.persistence.Convert;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,9 @@ public interface AccountEntryRepository extends JpaRepository<AccountEntryEntity
                                                                                   final LocalDateTime dateTo,
                                                                                   final String message,
                                                                                   final Pageable pageable);
+
+  List<AccountEntryEntity> findByAccountAndMessageEquals(final AccountEntity accountEntity,
+                                                         final String message);
 
 
   @Query("SELECT CASE WHEN count(a) > 0 THEN true ELSE false END FROM AccountEntryEntity a where a.account = :accountEntity")
