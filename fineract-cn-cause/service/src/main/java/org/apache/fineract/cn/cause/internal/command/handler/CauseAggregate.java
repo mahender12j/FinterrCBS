@@ -190,8 +190,8 @@ public class CauseAggregate {
         if (cause.getWebsiteUrl() != null) {
             causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
         }
-        if (cause.getSMediaLinks() != null) {
-            causeEntity.setSMediaLinks(cause.getSMediaLinks());
+        if (cause.getSmediaLinks() != null) {
+            causeEntity.setSmediaLinks(cause.getSmediaLinks());
         }
         if (cause.getVideoUrls() != null) {
             causeEntity.setVideoUrls(cause.getVideoUrls());
