@@ -154,9 +154,9 @@ public class CauseService {
 
             if (term != null) {
                 causeEntities =
-                        this.causeRepository.findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContainingAndCurrentStateNot(userIdentifier, term, term, term, "DELETED", pageable);
+                        this.causeRepository.findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContainingAndCurrentStateNot(userIdentifier, term, term, term, Cause.State.ACTIVE.DELETED.name(), pageable);
             } else {
-                causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(userIdentifier, "DELETED", pageable);
+                causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(userIdentifier, Cause.State.ACTIVE.DELETED.name(), pageable);
             }
         } else if (onlyActive) {
             if (term != null) {
