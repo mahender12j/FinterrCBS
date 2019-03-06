@@ -239,8 +239,6 @@ System.out.println("savedAddress  : "+ savedAddress );
     
     if(customer.getKycStatus() != null) {
       customerEntity.setKycStatus(customer.getKycStatus());
-    } else {
-      customerEntity.setKycStatus("NOTUPLOADED"); 
     }
 
     if (customer.getAccountNumbers() != null) {
