@@ -23,71 +23,85 @@ import java.util.Objects;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public final class AccountEntry {
 
-  private Type type;
-  private String transactionDate;
-  private String message;
-  private Double amount;
-  private Double balance;
+    private Type type;
+    private String transactionDate;
+    private String message;
+    private Double amount;
+    private Double balance;
+    private String transactionType;
 
-  public String getType() {
-    return this.type.name();
-  }
+    public void setType(Type type) {
+        this.type = type;
+    }
 
-  public void setType(final String type) {
-    this.type = Type.valueOf(type);
-  }
+    public String getTransactionType() {
+        return transactionType;
+    }
 
-  public String getTransactionDate() {
-    return this.transactionDate;
-  }
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
+    }
 
-  public void setTransactionDate(final String transactionDate) {
-    this.transactionDate = transactionDate;
-  }
+    public String getType() {
+        return this.type.name();
+    }
 
-  public String getMessage() {
-    return this.message;
-  }
+    public void setType(final String type) {
+        this.type = Type.valueOf(type);
+    }
 
-  public void setMessage(final String message) {
-    this.message = message;
-  }
+    public String getTransactionDate() {
+        return this.transactionDate;
+    }
 
-  public Double getAmount() {
-    return this.amount;
-  }
+    public void setTransactionDate(final String transactionDate) {
+        this.transactionDate = transactionDate;
+    }
 
-  public void setAmount(final Double amount) {
-    this.amount = amount;
-  }
+    public String getMessage() {
+        return this.message;
+    }
 
-  public Double getBalance() {
-    return this.balance;
-  }
+    public void setMessage(final String message) {
+        this.message = message;
+    }
 
-  public void setBalance(final Double balance) {
-    this.balance = balance;
-  }
+    public Double getAmount() {
+        return this.amount;
+    }
 
-  public enum Type {
-    DEBIT,
-    CREDIT
-  }
+    public void setAmount(final Double amount) {
+        this.amount = amount;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    AccountEntry that = (AccountEntry) o;
-    return type == that.type &&
-        Objects.equals(transactionDate, that.transactionDate) &&
-        Objects.equals(message, that.message) &&
-        Objects.equals(amount, that.amount) &&
-        Objects.equals(balance, that.balance);
-  }
+    public Double getBalance() {
+        return this.balance;
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(type, transactionDate, message, amount, balance);
-  }
+    public void setBalance(final Double balance) {
+        this.balance = balance;
+    }
+
+    public enum Type {
+        DEBIT,
+        CREDIT
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AccountEntry that = (AccountEntry) o;
+        return type == that.type &&
+                Objects.equals(transactionDate, that.transactionDate) &&
+                Objects.equals(message, that.message) &&
+                Objects.equals(amount, that.amount) &&
+                Objects.equals(balance, that.balance) &&
+                Objects.equals(transactionType, that.transactionType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, transactionDate, message, amount, balance, transactionType);
+    }
 }
