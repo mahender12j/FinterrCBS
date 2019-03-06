@@ -120,9 +120,6 @@ public class AccountRestController {
     @ResponseBody
     ResponseEntity<Account> findAccount(@PathVariable("identifier") final String identifier) {
         final Optional<Account> optionalAccount = this.accountService.findAccount(identifier);
-
-        System.out.println("--------------------account-------------" + optionalAccount);
-
         if (optionalAccount.isPresent()) {
             return ResponseEntity.ok(optionalAccount.get());
         } else {

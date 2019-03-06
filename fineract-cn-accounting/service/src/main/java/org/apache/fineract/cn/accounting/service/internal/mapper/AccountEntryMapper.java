@@ -24,19 +24,19 @@ import org.apache.fineract.cn.lang.DateConverter;
 
 public class AccountEntryMapper {
 
-  private AccountEntryMapper() {
-    super();
-  }
+    private AccountEntryMapper() {
+        super();
+    }
 
-  public static AccountEntry map(final AccountEntryEntity accountEntity) {
-    final AccountEntry entry = new AccountEntry();
+    public static AccountEntry map(final AccountEntryEntity accountEntity) {
+        final AccountEntry entry = new AccountEntry();
 
-    entry.setType(accountEntity.getType());
-    entry.setBalance(accountEntity.getBalance());
-    entry.setAmount(accountEntity.getAmount());
-    entry.setMessage(accountEntity.getMessage());
-    entry.setTransactionDate(DateConverter.toIsoString(accountEntity.getTransactionDate()));
-
-    return entry;
-  }
+        entry.setType(accountEntity.getType());
+        entry.setBalance(accountEntity.getBalance());
+        entry.setAmount(accountEntity.getAmount());
+        entry.setMessage(accountEntity.getMessage());
+        entry.setTransactionType(accountEntity.getTransactionType());
+        entry.setTransactionDate(DateConverter.toIsoString(accountEntity.getTransactionDate()));
+        return entry;
+    }
 }

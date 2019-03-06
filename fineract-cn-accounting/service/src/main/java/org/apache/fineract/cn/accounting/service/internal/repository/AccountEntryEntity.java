@@ -36,24 +36,26 @@ import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 @Table(name = "thoth_account_entries")
 public class AccountEntryEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private Long id;
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "account_id")
-  private AccountEntity account;
-  @Column(name = "a_type")
-  private String type;
-  @Column(name = "transaction_date")
-  @Convert(converter = LocalDateTimeConverter.class)
-  private LocalDateTime transactionDate;
-  @Column(name = "message")
-  private String message;
-  @Column(name = "amount")
-  private Double amount;
-  @Column(name = "balance")
-  private Double balance;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "account_id")
+    private AccountEntity account;
+    @Column(name = "a_type")
+    private String type;
+    @Column(name = "transaction_date")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime transactionDate;
+    @Column(name = "message")
+    private String message;
+    @Column(name = "amount")
+    private Double amount;
+    @Column(name = "balance")
+    private Double balance;
+    @Column(name = "transaction_type")
+    private String transactionType;
 
   public AccountEntryEntity() {
     super();
@@ -111,7 +113,16 @@ public class AccountEntryEntity {
     return this.balance;
   }
 
-  public void setBalance(final Double balance) {
-    this.balance = balance;
-  }
+    public void setBalance(final Double balance) {
+        this.balance = balance;
+    }
+
+    public String getTransactionType() {
+        return this.transactionType;
+    }
+
+    public void setTransactionType(final String transactionType) {
+        this.transactionType = transactionType;
+    }
+
 }
