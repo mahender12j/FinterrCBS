@@ -174,10 +174,12 @@ System.out.println("savedAddress  : "+ savedAddress );
   @CommandHandler
   @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_CUSTOMER)
   public String updateCustomer(final UpdateCustomerCommand updateCustomerCommand) {
+
     final Customer customer = updateCustomerCommand.customer();
      System.out.println(" UpdateCustomer Start ----");
     final CustomerEntity customerEntity = findCustomerEntityOrThrow(customer.getIdentifier());
     System.out.println(" UpdateCustomer Start ----2`");
+
     if (customer.getGivenName() != null) {
       customerEntity.setGivenName(customer.getGivenName());
     }
@@ -217,8 +219,10 @@ System.out.println("savedAddress  : "+ savedAddress );
       this.updateAddress(new UpdateAddressCommand(customer.getIdentifier(), customer.getAddress()));
     }
 
-    this.updateContactDetails(new UpdateContactDetailsCommand(customer.getIdentifier(), customer.getContactDetails()));
-
+    if (customer.getContactDetails() != null) {
+      this.updateContactDetails(new UpdateContactDetailsCommand(customer.getIdentifier(), customer.getContactDetails()));
+    }
+    
     customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
     customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
     if (customer.getRefferalCodeIdentifier() != null) {
@@ -229,8 +233,6 @@ System.out.println("savedAddress  : "+ savedAddress );
     }
     if (customer.getIsDeposited() != null) {
       customerEntity.setIsDeposited(customer.getIsDeposited());
-    } else {
-      customerEntity.setIsDeposited(Boolean.FALSE);
     }
 
     if (customer.getDepositedOn() != null) {
