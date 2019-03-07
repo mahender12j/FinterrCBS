@@ -82,7 +82,8 @@ public class UserRestController {
       throw ServiceException.badRequest("Instance may not be null.");
 
     if (service.findByIdentifier(instance.getIdentifier()).isPresent())
-      throw ServiceException.conflict("Instance already exists with identifier:" + instance.getIdentifier());
+      //throw ServiceException.conflict("Instance already exists with identifier:" + instance.getIdentifier());
+      throw ServiceException.conflict("Oops! You  already exist…");
 
     final CreateUserCommand createCommand = new CreateUserCommand(instance);
     this.commandGateway.process(createCommand);
