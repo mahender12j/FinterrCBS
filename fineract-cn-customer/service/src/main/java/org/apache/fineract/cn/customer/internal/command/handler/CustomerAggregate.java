@@ -114,7 +114,7 @@ public class CustomerAggregate {
                            final CatalogRepository catalogRepository,
                            final FieldRepository fieldRepository,
                            final CommandRepository commandRepository,
-			   final AmlDetailRepository amlDetailRepository,
+                           final AmlDetailRepository amlDetailRepository,
                            final TaskAggregate taskAggregate) {
     super();
     this.addressRepository = addressRepository;
@@ -139,7 +139,7 @@ public class CustomerAggregate {
     final Customer customer = createCustomerCommand.customer();
     System.out.println(" createCustomer  customer :: "+ customer);
     final AddressEntity savedAddress = this.addressRepository.save(AddressMapper.map(customer.getAddress()));
-System.out.println("savedAddress  : "+ savedAddress );
+    System.out.println("savedAddress  : "+ savedAddress );
     final CustomerEntity customerEntity = CustomerMapper.map(customer);
     System.out.println("Address : "+customer.getAddress());
     customerEntity.setCurrentState(Customer.State.PENDING.name());
@@ -148,14 +148,14 @@ System.out.println("savedAddress  : "+ savedAddress );
     System.out.println(" ContactDetails : "+customer.getContactDetails());
     if (customer.getContactDetails() != null) {
       this.contactDetailRepository.save(
-          customer.getContactDetails()
-              .stream()
-              .map(contact -> {
-                final ContactDetailEntity contactDetailEntity = ContactDetailMapper.map(contact);
-                contactDetailEntity.setCustomer(savedCustomerEntity);
-                return contactDetailEntity;
-              })
-              .collect(Collectors.toList())
+              customer.getContactDetails()
+                      .stream()
+                      .map(contact -> {
+                        final ContactDetailEntity contactDetailEntity = ContactDetailMapper.map(contact);
+                        contactDetailEntity.setCustomer(savedCustomerEntity);
+                        return contactDetailEntity;
+                      })
+                      .collect(Collectors.toList())
       );
       System.out.println(" Save ended - ContactDetails : "+customer.getContactDetails());
     }
@@ -176,7 +176,7 @@ System.out.println("savedAddress  : "+ savedAddress );
   public String updateCustomer(final UpdateCustomerCommand updateCustomerCommand) {
 
     final Customer customer = updateCustomerCommand.customer();
-     System.out.println(" UpdateCustomer Start ----");
+    System.out.println(" UpdateCustomer Start ----");
     final CustomerEntity customerEntity = findCustomerEntityOrThrow(customer.getIdentifier());
     System.out.println(" UpdateCustomer Start ----2`");
 
@@ -222,7 +222,7 @@ System.out.println("savedAddress  : "+ savedAddress );
     if (customer.getContactDetails() != null) {
       this.updateContactDetails(new UpdateContactDetailsCommand(customer.getIdentifier(), customer.getContactDetails()));
     }
-    
+
     customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
     customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
     if (customer.getRefferalCodeIdentifier() != null) {
@@ -238,7 +238,7 @@ System.out.println("savedAddress  : "+ savedAddress );
     if (customer.getDepositedOn() != null) {
       customerEntity.setDepositedOn(LocalDateTime.parse(customer.getDepositedOn()));
     }
-    
+
     if(customer.getKycStatus() != null) {
       customerEntity.setKycStatus(customer.getKycStatus());
     }
@@ -249,7 +249,7 @@ System.out.println("savedAddress  : "+ savedAddress );
     if(customer.getAvgMonthlyIncome() != null) {
       customerEntity.setAvgMonthlyIncome(customer.getAvgMonthlyIncome());
     } else {
-      customerEntity.setAvgMonthlyIncome(0.0); 
+      customerEntity.setAvgMonthlyIncome(0.0);
     }
     if(customer.getNgoName() != null) {
       customerEntity.setNgoName(customer.getNgoName());
@@ -290,7 +290,7 @@ System.out.println("savedAddress  : "+ savedAddress );
     final CustomerEntity savedCustomerEntity = this.customerRepository.save(customerEntity);
 
     this.commandRepository.save(
-        CommandMapper.create(savedCustomerEntity, Command.Action.ACTIVATE.name(), activateCustomerCommand.comment())
+            CommandMapper.create(savedCustomerEntity, Command.Action.ACTIVATE.name(), activateCustomerCommand.comment())
     );
 
     return activateCustomerCommand.identifier();
@@ -309,7 +309,7 @@ System.out.println("savedAddress  : "+ savedAddress );
     final CustomerEntity savedCustomerEntity = this.customerRepository.save(customerEntity);
 
     this.commandRepository.save(
-        CommandMapper.create(savedCustomerEntity, Command.Action.LOCK.name(), lockCustomerCommand.comment())
+            CommandMapper.create(savedCustomerEntity, Command.Action.LOCK.name(), lockCustomerCommand.comment())
     );
 
     this.taskAggregate.onCustomerCommand(savedCustomerEntity, Command.Action.UNLOCK);
@@ -334,7 +334,7 @@ System.out.println("savedAddress  : "+ savedAddress );
     final CustomerEntity savedCustomerEntity = this.customerRepository.save(customerEntity);
 
     this.commandRepository.save(
-        CommandMapper.create(savedCustomerEntity, Command.Action.UNLOCK.name(), unlockCustomerCommand.comment())
+            CommandMapper.create(savedCustomerEntity, Command.Action.UNLOCK.name(), unlockCustomerCommand.comment())
     );
 
     return unlockCustomerCommand.identifier();
@@ -353,7 +353,7 @@ System.out.println("savedAddress  : "+ savedAddress );
     final CustomerEntity savedCustomerEntity = this.customerRepository.save(customerEntity);
 
     this.commandRepository.save(
-        CommandMapper.create(savedCustomerEntity, Command.Action.CLOSE.name(), closeCustomerCommand.comment())
+            CommandMapper.create(savedCustomerEntity, Command.Action.CLOSE.name(), closeCustomerCommand.comment())
     );
 
     this.taskAggregate.onCustomerCommand(savedCustomerEntity, Command.Action.REOPEN);
@@ -378,7 +378,7 @@ System.out.println("savedAddress  : "+ savedAddress );
     final CustomerEntity savedCustomerEntity = this.customerRepository.save(customerEntity);
 
     this.commandRepository.save(
-        CommandMapper.create(savedCustomerEntity, Command.Action.REOPEN.name(), reopenCustomerCommand.comment())
+            CommandMapper.create(savedCustomerEntity, Command.Action.REOPEN.name(), reopenCustomerCommand.comment())
     );
 
     return reopenCustomerCommand.identifier();
@@ -417,14 +417,14 @@ System.out.println("savedAddress  : "+ savedAddress );
 
     if (updateContactDetailsCommand.contactDetails() != null) {
       this.contactDetailRepository.save(
-          updateContactDetailsCommand.contactDetails()
-              .stream()
-              .map(contact -> {
-                final ContactDetailEntity newContactDetail = ContactDetailMapper.map(contact);
-                newContactDetail.setCustomer(customerEntity);
-                return newContactDetail;
-              })
-              .collect(Collectors.toList())
+              updateContactDetailsCommand.contactDetails()
+                      .stream()
+                      .map(contact -> {
+                        final ContactDetailEntity newContactDetail = ContactDetailMapper.map(contact);
+                        newContactDetail.setCustomer(customerEntity);
+                        return newContactDetail;
+                      })
+                      .collect(Collectors.toList())
       );
     }
 
@@ -600,28 +600,28 @@ System.out.println("savedAddress  : "+ savedAddress );
 
   private void setCustomValues(final Customer customer, final CustomerEntity savedCustomerEntity) {
     this.fieldValueRepository.save(
-        customer.getCustomValues()
-            .stream()
-            .map(value -> {
-              final Optional<CatalogEntity> catalog =
-                  this.catalogRepository.findByIdentifier(value.getCatalogIdentifier());
-              final Optional<FieldEntity> field =
-                  this.fieldRepository.findByCatalogAndIdentifier(
-                      catalog.orElseThrow(() -> ServiceException.notFound("Catalog {0} not found.", value.getCatalogIdentifier())),
-                      value.getFieldIdentifier());
-              final FieldValueEntity fieldValueEntity = FieldValueMapper.map(value);
-              fieldValueEntity.setCustomer(savedCustomerEntity);
-              fieldValueEntity.setField(
-                  field.orElseThrow(() -> ServiceException.notFound("Field {0} not found.", value.getFieldIdentifier())));
-              return fieldValueEntity;
-            })
-            .collect(Collectors.toList())
+            customer.getCustomValues()
+                    .stream()
+                    .map(value -> {
+                      final Optional<CatalogEntity> catalog =
+                              this.catalogRepository.findByIdentifier(value.getCatalogIdentifier());
+                      final Optional<FieldEntity> field =
+                              this.fieldRepository.findByCatalogAndIdentifier(
+                                      catalog.orElseThrow(() -> ServiceException.notFound("Catalog {0} not found.", value.getCatalogIdentifier())),
+                                      value.getFieldIdentifier());
+                      final FieldValueEntity fieldValueEntity = FieldValueMapper.map(value);
+                      fieldValueEntity.setCustomer(savedCustomerEntity);
+                      fieldValueEntity.setField(
+                              field.orElseThrow(() -> ServiceException.notFound("Field {0} not found.", value.getFieldIdentifier())));
+                      return fieldValueEntity;
+                    })
+                    .collect(Collectors.toList())
     );
   }
 
   private CustomerEntity findCustomerEntityOrThrow(String identifier) {
     return this.customerRepository.findByIdentifier(identifier)
-        .orElseThrow(() -> ServiceException.notFound("Customer ''{0}'' not found", identifier));
+            .orElseThrow(() -> ServiceException.notFound("Customer ''{0}'' not found", identifier));
   }
 
   @Transactional

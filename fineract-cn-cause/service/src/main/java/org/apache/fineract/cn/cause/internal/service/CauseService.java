@@ -18,12 +18,9 @@
  */
 package org.apache.fineract.cn.cause.internal.service;
 
-import org.apache.fineract.cn.cause.api.v1.domain.Cause;
-import org.apache.fineract.cn.cause.api.v1.domain.CausePage;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
-import org.apache.fineract.cn.cause.api.v1.domain.Command;
-import org.apache.fineract.cn.cause.api.v1.domain.ProcessStep;
-import org.apache.fineract.cn.cause.api.v1.domain.TaskDefinition;
+import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
+import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
+import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 
 /*import org.apache.fineract.cn.cause.catalog.internal.repository.FieldEntity;
@@ -32,17 +29,17 @@ import org.apache.fineract.cn.cause.catalog.internal.repository.FieldValueReposi
 
 import org.apache.fineract.cn.cause.internal.mapper.*;
 import org.apache.fineract.cn.cause.internal.repository.*;
+import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAdaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
 
 //import org.apache.fineract.cn.cause.catalog.api.v1.domain.Value;
 
@@ -57,6 +54,7 @@ public class CauseService {
     private final CommandRepository commandRepository;
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
+    private final AccountingAdaptor accountingAdaptor;
 
     @Autowired
     public CauseService(final CauseRepository causeRepository,
@@ -65,6 +63,7 @@ public class CauseService {
                         final CategoryRepository categoryRepository,
                         final RatingRepository ratingRepository,
                         final CommandRepository commandRepository,
+                        final AccountingAdaptor accountingAdaptor,
                         final TaskDefinitionRepository taskDefinitionRepository,
                         final TaskInstanceRepository taskInstanceRepository) {
         super();
@@ -76,6 +75,7 @@ public class CauseService {
         this.commandRepository = commandRepository;
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
+        this.accountingAdaptor = accountingAdaptor;
     }
 
     public Boolean causeExists(final String identifier) {
@@ -94,14 +94,14 @@ public class CauseService {
 
     public Optional<Cause> findCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
-            .map(causeEntity -> {
-                final Cause cause = CauseMapper.map(causeEntity);
-                cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+                .map(causeEntity -> {
+                    final Cause cause = CauseMapper.map(causeEntity);
+                    cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
 
-		        final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
+                    final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
                     if (categoryEntities != null) {
-			            cause.setCauseCategories(
-                            categoryEntities
+                        cause.setCauseCategories(
+                                categoryEntities
                                         .stream()
                                         .map(CategoryMapper::map)
                                         .collect(Collectors.toList())
@@ -109,7 +109,7 @@ public class CauseService {
                     }
 
                     final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
-                    System.out.println("avgRatingValue :: "+ avgRatingValue);
+                    System.out.println("avgRatingValue :: " + avgRatingValue);
                     if (avgRatingValue != null) {
                         cause.setAvgRating(avgRatingValue.toString());
                     } else {
@@ -182,39 +182,39 @@ public class CauseService {
         if (causeEntities.getSize() > 0) {
             final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
             causePage.setCauses(causes);
-            causeEntities.forEach(causeEntity -> {
+            for (CauseEntity causeEntity : causeEntities) {
                 final Cause cause = CauseMapper.map(causeEntity);
-                System.out.println("CauseService - Cause :: "+cause);
+                final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
                 cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
 
-		        final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
-                    if (categoryEntities != null) {
-			            cause.setCauseCategories(
+                final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
+                if (categoryEntities != null) {
+                    cause.setCauseCategories(
                             categoryEntities
-                                        .stream()
-                                        .map(CategoryMapper::map)
-                                        .collect(Collectors.toList())
-                        );
-                    }
+                                    .stream()
+                                    .map(CategoryMapper::map)
+                                    .collect(toList())
+                    );
+                }
 
-                    final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
-                    System.out.println("avgRatingValue :: "+ avgRatingValue);
-                    if (avgRatingValue != null) {
-                        cause.setAvgRating(avgRatingValue.toString());
-                    } else {
-                        cause.setAvgRating("0");
-                    }
-                    
+                final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
+                if (avgRatingValue != null) {
+                    cause.setAvgRating(avgRatingValue.toString());
+                } else {
+                    cause.setAvgRating("0");
+                }
+
                 causes.add(cause);
-            });
+            }
         }
 
         return causePage;
     }
 
     public Boolean causeRatingExists(final String causeIdentifier, final String createdBy) {
-        System.out.println("causeRatingExists --- causeIdentifier :: " + causeIdentifier + "  createdBy :: "+ createdBy);
-        
+        System.out.println("causeRatingExists --- causeIdentifier :: " + causeIdentifier + "  createdBy :: " + createdBy);
+
         return this.ratingRepository.existsByCreatedBy(causeIdentifier, createdBy);
 
         // Stream<CauseRating> rEntity = causeRepository.findByIdentifier(identifier)

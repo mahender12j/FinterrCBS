@@ -52,7 +52,7 @@ public final class CauseMapper {
         if (cause.getCompletedDate()!= null) {
             causeEntity.setCompletedDate(LocalDateTime.parse(cause.getCompletedDate()));
         }
-        
+
         causeEntity.setCurrentState(cause.getCurrentState());
         causeEntity.setSoftTarget(cause.getSoftTarget());
         causeEntity.setHardTarget(cause.getHardTarget());
@@ -67,7 +67,7 @@ public final class CauseMapper {
         causeEntity.setFinCollLimit(cause.getFinCollLimit());
         causeEntity.setFinRate(cause.getFinRate());
         causeEntity.setApprovedBy(cause.getApprovedBy());
-        
+
         if (cause.getApprovedOn() != null) {
             causeEntity.setApprovedOn(LocalDateTime.parse(cause.getApprovedOn()));
         }
@@ -87,7 +87,7 @@ public final class CauseMapper {
 
     public static Cause map(final CauseEntity causeEntity) {
         final Cause cause = new Cause();
-        
+
         cause.setIdentifier(causeEntity.getIdentifier());
         cause.setTitle(causeEntity.getTitle());
         cause.setDescription(causeEntity.getDescription());
@@ -113,11 +113,11 @@ public final class CauseMapper {
         cause.setFinCollLimit(causeEntity.getFinCollLimit());
         cause.setFinRate(causeEntity.getFinRate());
         cause.setApprovedBy(causeEntity.getApprovedBy());
-        
+
         if (causeEntity.getApprovedOn() != null) {
             cause.setApprovedOn(DateConverter.toIsoString(causeEntity.getApprovedOn()));
         }
-        
+
         cause.setCreatedBy(causeEntity.getCreatedBy());
         cause.setCreatedOn(DateConverter.toIsoString(causeEntity.getCreatedOn()));
 

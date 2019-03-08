@@ -20,6 +20,7 @@ package org.apache.fineract.cn.cause.rest.controller;
 
 //import org.apache.fineract.cn.cause.catalog.internal.service.FieldValueValidator;
 
+import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.util.UserContextHolder;
@@ -37,6 +38,7 @@ import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.repository.PortraitEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
+import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAdaptor;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.slf4j.Logger;
@@ -134,6 +136,7 @@ public class CauseRestController {
                                           @RequestParam(value = "size", required = false) final Integer size,
                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
+
         return ResponseEntity.ok(this.causeService.fetchCause(
                 term, (includeClosed != null ? includeClosed : Boolean.FALSE), (onlyActive != null ? onlyActive : Boolean.FALSE),
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
@@ -274,7 +277,7 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> causeRating(@PathVariable("identifier") final String identifier,
-                                      @RequestBody final CauseRating rating) {
+                                     @RequestBody final CauseRating rating) {
 
         if (this.causeService.causeExists(identifier)) {
 
@@ -283,7 +286,7 @@ public class CauseRestController {
             } else {
                 this.commandGateway.process(new CreateRatingCommand(identifier, rating));
             }
-           
+
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
@@ -307,8 +310,7 @@ public class CauseRestController {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
     }
-    
-    
+
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(

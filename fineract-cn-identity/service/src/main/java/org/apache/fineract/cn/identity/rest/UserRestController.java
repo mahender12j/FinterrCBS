@@ -65,8 +65,8 @@ public class UserRestController {
   }
 
   @RequestMapping(method = RequestMethod.GET,
-      consumes = {MediaType.ALL_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+          consumes = {MediaType.ALL_VALUE},
+          produces = {MediaType.APPLICATION_JSON_VALUE})
   @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTITY_MANAGEMENT)
   public @ResponseBody List<User> findAll() {
     return this.service.findAll();
@@ -91,8 +91,8 @@ public class UserRestController {
   }
 
   @RequestMapping(value= PathConstants.IDENTIFIER_RESOURCE_STRING, method = RequestMethod.GET,
-      consumes = {MediaType.ALL_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+          consumes = {MediaType.ALL_VALUE},
+          produces = {MediaType.APPLICATION_JSON_VALUE})
   @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTITY_MANAGEMENT)
   public @ResponseBody ResponseEntity<User> get(@PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String userIdentifier)
   {
@@ -100,12 +100,12 @@ public class UserRestController {
   }
 
   @RequestMapping(value = PathConstants.IDENTIFIER_RESOURCE_STRING + "/roleIdentifier", method = RequestMethod.PUT,
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+          consumes = {MediaType.APPLICATION_JSON_VALUE},
+          produces = {MediaType.APPLICATION_JSON_VALUE})
   @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTITY_MANAGEMENT)
   public @ResponseBody ResponseEntity<Void> changeUserRole(
-      @PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String userIdentifier,
-      @RequestBody @Valid final RoleIdentifier roleIdentifier)
+          @PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String userIdentifier,
+          @RequestBody @Valid final RoleIdentifier roleIdentifier)
   {
     if (userIdentifier.equals(IdentityConstants.SU_NAME))
       throw ServiceException.badRequest("Role of user with identifier: " + userIdentifier + " cannot be changed.");
@@ -131,16 +131,16 @@ public class UserRestController {
   }
 
   @RequestMapping(value = PathConstants.IDENTIFIER_RESOURCE_STRING + "/password", method = RequestMethod.PUT,
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+          consumes = {MediaType.APPLICATION_JSON_VALUE},
+          produces = {MediaType.APPLICATION_JSON_VALUE})
   @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTITY_MANAGEMENT)
   @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.SELF_MANAGEMENT, permittedEndpoint = "/users/{useridentifier}/password")
   public @ResponseBody ResponseEntity<Void> changeUserPassword(
-      @PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String userIdentifier,
-      @RequestBody @Valid final Password password)
+          @PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String userIdentifier,
+          @RequestBody @Valid final Password password)
   {
     if (userIdentifier.equals(IdentityConstants.SU_NAME) && !UserContextHolder.checkedGetUser().equals(
-        IdentityConstants.SU_NAME))
+            IdentityConstants.SU_NAME))
       throw ServiceException.badRequest("Password of ''{0}'' can only be changed by themselves.", IdentityConstants.SU_NAME);
 
     checkIdentifier(userIdentifier);

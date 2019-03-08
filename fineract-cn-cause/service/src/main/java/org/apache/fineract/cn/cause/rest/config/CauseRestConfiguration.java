@@ -19,6 +19,7 @@
 package org.apache.fineract.cn.cause.rest.config;
 
 
+import org.apache.fineract.cn.accounting.api.v1.client.JournalManager;
 import org.apache.fineract.cn.anubis.config.EnableAnubis;
 import org.apache.fineract.cn.async.config.EnableAsync;
 import org.apache.fineract.cn.cassandra.config.EnableCassandra;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +53,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableAnubis
 @EnableServiceException
 @EnableApplicationName
+@EnableFeignClients(
+        clients = {
+                JournalManager.class
+        }
+)
 @ComponentScan({
         "org.apache.fineract.cn.cause.rest.controller"
 })

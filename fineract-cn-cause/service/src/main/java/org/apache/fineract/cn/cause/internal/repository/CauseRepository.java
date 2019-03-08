@@ -53,15 +53,15 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
     Page<CauseEntity> findByCreatedByAndCurrentStateNot(final String createdBy, final String state, final Pageable pageable);
 
     Page<CauseEntity> findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
-        final String createdBy, final String identifier, final String title, final String description, final Pageable pageable);
+            final String createdBy, final String identifier, final String title, final String description, final Pageable pageable);
 
     Page<CauseEntity> findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContainingAndCurrentStateNot(
-        final String createdBy, final String identifier, final String title, final String description, final String state, final Pageable pageable);
+            final String createdBy, final String identifier, final String title, final String description, final String state, final Pageable pageable);
 
     Page<CauseEntity> findByCurrentStateNotAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
             final String state, final String identifier, final String title, final String description, final Pageable pageable);
 
     Page<CauseEntity> findByCurrentStateAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
-        final String state, final String identifier, final String title, final String description, final Pageable pageable);
+            final String state, final String identifier, final String title, final String description, final Pageable pageable);
 }
 
