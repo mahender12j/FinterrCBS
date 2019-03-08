@@ -20,25 +20,16 @@ package org.apache.fineract.cn.cause.rest.controller;
 
 //import org.apache.fineract.cn.cause.catalog.internal.service.FieldValueValidator;
 
-import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.util.UserContextHolder;
-import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
-import org.apache.fineract.cn.cause.api.v1.domain.Address;
-import org.apache.fineract.cn.cause.api.v1.domain.Cause;
-import org.apache.fineract.cn.cause.api.v1.domain.CausePage;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
-import org.apache.fineract.cn.cause.api.v1.domain.Command;
-import org.apache.fineract.cn.cause.api.v1.domain.ContactDetail;
-import org.apache.fineract.cn.cause.api.v1.domain.ProcessStep;
-import org.apache.fineract.cn.cause.api.v1.domain.TaskDefinition;
 import org.apache.fineract.cn.cause.ServiceConstants;
+import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
+import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.repository.PortraitEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
-import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAdaptor;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.slf4j.Logger;
@@ -174,6 +165,26 @@ public class CauseRestController {
         }
     }
 
+
+//    -------------find cause for ngo by the ngo username ----------------
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/ngo/{identifier}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<CausePage> findCausebyCreatedBy(@PathVariable("identifier") final String createdBy,
+                                                   @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
+                                                   @RequestParam(value = "size", required = false) final Integer size,
+                                                   @RequestParam(value = "sortColumn", required = false) final String sortColumn,
+                                                   @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
+        return ResponseEntity.ok(this.causeService.fetchCauseByCreatedBy(createdBy, this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+    }
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/{identifier}",
@@ -186,9 +197,6 @@ public class CauseRestController {
     ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier,
                                      @RequestBody final Cause cause) {
         if (this.causeService.causeExists(identifier)) {
-/*      if (cause.getCustomValues() != null) {
-        this.fieldValueValidator.validateValues(cause.getCustomValues());
-      }*/
             this.commandGateway.process(new UpdateCauseCommand(cause));
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
@@ -798,18 +806,6 @@ public class CauseRestController {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
     }
-
-/*  private void throwIfIdentificationCardNotExists(final String number) {
-    if (!this.causeService.identificationCardExists(number)) {
-      throw ServiceException.notFound("Identification card {0} not found.", number);
-    }
-  }
-
-  private void throwIfIdentificationCardScanNotExists(final String number, final String identifier) {
-    if (!this.causeService.identificationCardScanExists(number, identifier)) {
-      throw ServiceException.notFound("Identification card scan {0} not found.", identifier);
-    }
-  }*/
 
     private void throwIfInvalidSize(final Long size) {
         final Long maxSize = this.environment.getProperty("upload.image.max-size", Long.class);
