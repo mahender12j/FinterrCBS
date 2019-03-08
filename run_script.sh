@@ -1,10 +1,30 @@
 #!/bin/bash
-# Run a command in the background.
-_evalBg() {
-    eval "$@" &>/tmp/run_log.out &disown;
-}
 
-cmd="java -Ddemoserver.persistent=true -Dcustom.cassandra.contactPoints=206.189.45.92:9042 -Dcassandra.cluster.user=cassandra -Dcassandra.cluster.pwd=cassandra -Dcustom.mariadb.host=68.183.191.246 -Dcustom.mariadb.user=root -Dcustom.mariadb.password=mysql -jar /usr/local/integration-tests/fineract-cn-demo-server/build/libs/demo-server-0.1.0-BUILD-SNAPSHOT.jar";
+cd core;
+echo "building fineract-cn-api"
+cd fineract-cn-lang; ./gradlew publishToMavenLocal;  cd ..;
+echo "building fineract-cn-api"
+cd fineract-cn-mariadb; ./gradlew publishToMavenLocal;  cd ..;
+echo "building fineract-cn-api"
+cd fineract-cn-cassandra; ./gradlew publishToMavenLocal;  cd ..;
 
-_evalBg "${cmd}";
+cd fineract-cn-api; ./gradlew publishToMavenLocal;  cd ..;
+
+cd fineract-cn-async; ./gradlew publishToMavenLocal;  cd ..;
+
+cd fineract-cn-data-jpa; ./gradlew publishToMavenLocal;  cd ..;
+
+cd fineract-cn-command; ./gradlew publishToMavenLocal;  cd ..;
+
+cd fineract-cn-test; ./gradlew publishToMavenLocal;  cd ..;
+
+cd fineract-cn-api; ./gradlew publishToMavenLocal;  cd ..;
+
+cd ..
+
+cd fineract-cn-anubis;  ./gradlew publishToMavenLocal;  cd ..;
+
+cd tools;
+
+cd fineract-cn-crypto; ./gradlew publishToMavenLocal;  cd ..;
 
