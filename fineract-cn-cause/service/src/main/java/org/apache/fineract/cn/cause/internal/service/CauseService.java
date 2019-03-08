@@ -106,6 +106,9 @@ public class CauseService {
                                         .map(CategoryMapper::map)
                                         .collect(Collectors.toList())
                         );
+                        final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                        cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+
                     }
 
                     final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
