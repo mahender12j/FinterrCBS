@@ -288,11 +288,12 @@ public class DocumentsRestController {
     }
 
     private void throwIfInvalidContentType(final String contentType) {
-        if (!contentType.contains(MediaType.IMAGE_JPEG_VALUE)
-                && !contentType.contains(MediaType.IMAGE_PNG_VALUE)) {
-            throw ServiceException.badRequest("Image has contentType ''{0}'', but only content types ''{1}'' and ''{2}'' allowed.",
-                    contentType, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE);
-        }
+        System.out.println("contentType :: "+ contentType);
+        // if (!contentType.contains(MediaType.IMAGE_JPEG_VALUE)
+        //         && !contentType.contains(MediaType.IMAGE_PNG_VALUE)) {
+        //     throw ServiceException.badRequest("Image has contentType ''{0}'', but only content types ''{1}'' and ''{2}'' allowed.",
+        //             contentType, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE);
+        // }
     }
 
     private void throwIfDocumentCompleted(final String causeIdentifier, final String documentIdentifier) {
