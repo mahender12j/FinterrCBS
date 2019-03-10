@@ -80,7 +80,7 @@ public class JournalEntryService {
                           )
                   ) == 0
               )
-              .sorted(Comparator.comparing(JournalEntryEntity::getTransactionDate))
+              .sorted(Comparator.comparing(JournalEntryEntity::getTransactionDate).reversed())
               .collect(Collectors.toList());
 
       final List<TransactionTypeEntity> transactionTypes = this.transactionTypeRepository.findAll();
