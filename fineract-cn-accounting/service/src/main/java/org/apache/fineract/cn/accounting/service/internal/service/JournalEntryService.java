@@ -71,7 +71,9 @@ public class JournalEntryService {
                     } else {
                         throw ServiceException.notFound("Creditors Account Account {0} not found in the system.", creditorsAccountNumber);
                     }
-                }).collect(Collectors.toList());
+                })
+                .sorted(Comparator.comparing(JournalEntryEntity::getTransactionDate).reversed())
+                .collect(Collectors.toList());
     }
 
 
