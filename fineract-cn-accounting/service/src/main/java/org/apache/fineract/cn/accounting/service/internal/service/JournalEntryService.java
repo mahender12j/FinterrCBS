@@ -63,7 +63,7 @@ public class JournalEntryService {
 
     public List<JournalEntry> fetchJournalEntriesForStatistics(final String creditorsAccountNumber) {
         final DateRange range = DateRange.fromIsoString(null);
-        return this.fetchJournalEntries(range, null, null)
+        List<JournalEntry> aJournalEntry = this.fetchJournalEntries(range, null, null)
                 .stream()
                 .filter(journalEntry -> {
                     Optional<Creditor> creditor = journalEntry.getCreditors().stream().findFirst();
@@ -75,6 +75,10 @@ public class JournalEntryService {
                 })
                 .sorted(Comparator.comparing(JournalEntry::getTransactionDate).reversed())
                 .collect(Collectors.toList());
+
+                System.out.println("fetchJournalEntriesForStatistics method .....");
+        System.out.println(aJournalEntry);
+        return aJournalEntry;
     }
 
 
