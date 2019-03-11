@@ -192,57 +192,25 @@ public class CauseService {
     }
 
 
-    public CausePage fetchCauseByCreatedBy(final String identifier, final Pageable pageable) {
-        final Page<CauseEntity> causeEntities = this.causeRepository.findByCreatedBy(identifier, pageable);
-        final CausePage causePage = new CausePage();
-        causePage.setTotalPages(causeEntities.getTotalPages());
-        causePage.setTotalElements(causeEntities.getTotalElements());
-        if (causeEntities.getSize() > 0) {
-            final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
-            causePage.setCauses(causes);
-            for (CauseEntity causeEntity : causeEntities) {
-                final Cause cause = CauseMapper.map(causeEntity);
-                final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
-                cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
-
-                final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
-                if (categoryEntities != null) {
-                    cause.setCauseCategories(
-                            categoryEntities
-                                    .stream()
-                                    .map(CategoryMapper::map)
-                                    .collect(toList())
-                    );
-                }
-
-                final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
-                if (avgRatingValue != null) {
-                    cause.setAvgRating(avgRatingValue.toString());
-                } else {
-                    cause.setAvgRating("0");
-                }
-
-                causes.add(cause);
-            }
+    public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
+        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedBy(identifier);
+        ArrayList<CauseStatistics> causeStatistics = new ArrayList<>(causeEntities.size());
+        for (CauseEntity causeEntity : causeEntities) {
+            final CauseStatistics causeStatistic = CauseStatisticsMapper.map(accountingAdaptor.fetchJournalEntriesJournalEntries(causeEntity.getAccountNumber()));
+            causeStatistics.add(causeStatistic);
         }
 
-        return causePage;
+        final NGOStatistics ngoStatistics = new NGOStatistics();
+        ngoStatistics.setTotalRaisedAmount(causeStatistics.stream().mapToDouble(d -> d.getTotalRaised()).sum());
+        ngoStatistics.setTotalSupporter(causeStatistics.stream().mapToInt(d -> d.getTotalSupporter()).sum());
+        ngoStatistics.setTotalCause(causeEntities.size());
+        return ngoStatistics;
     }
 
 
     public Boolean causeRatingExists(final String causeIdentifier, final String createdBy) {
-        System.out.println("causeRatingExists --- causeIdentifier :: " + causeIdentifier + "  createdBy :: " + createdBy);
-
+//        System.out.println("causeRatingExists --- causeIdentifier :: " + causeIdentifier + "  createdBy :: " + createdBy);
         return this.ratingRepository.existsByCreatedBy(causeIdentifier, createdBy);
-
-        // Stream<CauseRating> rEntity = causeRepository.findByIdentifier(identifier)
-        //             .map(causeEntity -> this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createdBy))
-        //             .orElse(Stream.empty())
-        //             .map(RatingMapper::map);
-        // System.out.println("causeRatingExists --- rEntity.count() :: " + rEntity.count());
-        // return (rEntity.count() > 0 ? Boolean.TRUE : Boolean.FALSE);
-        // return Boolean.FALSE;
     }
 
     public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {

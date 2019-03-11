@@ -177,12 +177,8 @@ public class CauseRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<CausePage> findCausebyCreatedBy(@PathVariable("identifier") final String createdBy,
-                                                   @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
-                                                   @RequestParam(value = "size", required = false) final Integer size,
-                                                   @RequestParam(value = "sortColumn", required = false) final String sortColumn,
-                                                   @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
-        return ResponseEntity.ok(this.causeService.fetchCauseByCreatedBy(createdBy, this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+    ResponseEntity<NGOStatistics> findCausebyCreatedBy(@PathVariable("identifier") final String createdBy) {
+        return ResponseEntity.ok(this.causeService.fetchCauseByCreatedBy(createdBy));
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)

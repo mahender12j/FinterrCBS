@@ -25,6 +25,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -49,6 +50,8 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
     Page<CauseEntity> findByCurrentState(final String state, final Pageable pageable);
 
     Page<CauseEntity> findByCreatedBy(final String createdBy, final Pageable pageable);
+
+    List<CauseEntity> findByCreatedBy(final String createdBy);
 
     Page<CauseEntity> findByCreatedByAndCurrentStateNot(final String createdBy, final String state, final Pageable pageable);
 
