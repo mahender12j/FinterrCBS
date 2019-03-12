@@ -28,104 +28,103 @@ import java.util.Objects;
 @Entity
 @Table(name = "maat_document_pages")
 public class DocumentPageEntity {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
-  @OneToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "document_id")
-  private DocumentEntity document;
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "document_id")
+    private DocumentEntryEntity documentEntry;
 
-  @Column(name = "page_number")
-  private Integer pageNumber;
+    @Column(name = "page_number")
+    private Integer pageNumber;
 
-  @Column(name = "content_type")
-  private String contentType;
+    @Column(name = "content_type")
+    private String contentType;
 
 
-  @Column(name = "size")
-  private Long size;
+    @Column(name = "size")
+    private Long size;
 
-  @Lob
-  @Column(name = "image")
-  private byte[] image;
+    @Lob
+    @Column(name = "image")
+    private byte[] image;
 
-  public DocumentPageEntity() {
-  }
+    public DocumentPageEntity() {
+    }
 
-  public Long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  @SuppressWarnings("unused")
-  public DocumentEntity getDocument() {
-    return document;
-  }
+    public DocumentEntryEntity getDocumentEntry() {
+        return documentEntry;
+    }
 
-  public void setDocument(DocumentEntity document) {
-    this.document = document;
-  }
+    public void setDocumentEntry(DocumentEntryEntity documentEntry) {
+        this.documentEntry = documentEntry;
+    }
 
-  public Integer getPageNumber() {
-    return pageNumber;
-  }
+    public Integer getPageNumber() {
+        return pageNumber;
+    }
 
-  public void setPageNumber(Integer pageNumber) {
-    this.pageNumber = pageNumber;
-  }
+    public void setPageNumber(Integer pageNumber) {
+        this.pageNumber = pageNumber;
+    }
 
-  public String getContentType() {
-    return contentType;
-  }
+    public String getContentType() {
+        return contentType;
+    }
 
-  public void setContentType(String contentType) {
-    this.contentType = contentType;
-  }
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
 
-  public Long getSize() {
-    return size;
-  }
+    public Long getSize() {
+        return size;
+    }
 
-  public void setSize(Long size) {
-    this.size = size;
-  }
+    public void setSize(Long size) {
+        this.size = size;
+    }
 
-  public byte[] getImage() {
-    return image;
-  }
+    public byte[] getImage() {
+        return image;
+    }
 
-  public void setImage(byte[] image) {
-    this.image = image;
-  }
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    DocumentPageEntity that = (DocumentPageEntity) o;
-    return Objects.equals(document, that.document) &&
-        Objects.equals(pageNumber, that.pageNumber);
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocumentPageEntity that = (DocumentPageEntity) o;
+        return Objects.equals(documentEntry, that.documentEntry) &&
+                Objects.equals(pageNumber, that.pageNumber);
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(document, pageNumber);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(documentEntry, pageNumber);
+    }
 
-  @Override
-  public String toString() {
-    return "DocumentPageEntity{" +
-        "id=" + id +
-        ", document=" + document +
-        ", pageNumber=" + pageNumber +
-        ", contentType='" + contentType + '\'' +
-        ", size=" + size +
-        ", image=" + Arrays.toString(image) +
-        '}';
-  }
+    @Override
+    public String toString() {
+        return "DocumentPageEntity{" +
+                "id=" + id +
+                ", document=" + documentEntry +
+                ", pageNumber=" + pageNumber +
+                ", contentType='" + contentType + '\'' +
+                ", size=" + size +
+                ", image=" + Arrays.toString(image) +
+                '}';
+    }
 }

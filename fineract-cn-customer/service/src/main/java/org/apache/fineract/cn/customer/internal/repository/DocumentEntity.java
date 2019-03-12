@@ -48,7 +48,7 @@ public class DocumentEntity {
   @JoinColumn(name = "customer_id")
   private CustomerEntity customer;
 
-  @Column(name = "identifier", nullable = false)
+  @Column(name = "identifier", nullable = false, unique = true)
   private String identifier;
 
   @SuppressWarnings("DefaultAnnotationParam")

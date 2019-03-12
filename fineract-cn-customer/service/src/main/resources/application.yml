@@ -23,6 +23,10 @@ spring:
       enabled: false
     config:
       enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+
 
 eureka:
   client:
@@ -71,3 +75,5 @@ flyway:
 upload:
   image:
     max-size: 524288
+
+

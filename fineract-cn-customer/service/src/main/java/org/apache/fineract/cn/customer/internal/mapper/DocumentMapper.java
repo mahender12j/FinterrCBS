@@ -19,12 +19,16 @@
 package org.apache.fineract.cn.customer.internal.mapper;
 
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.customer.internal.repository.DocumentEntity;
+import org.apache.fineract.cn.customer.internal.repository.DocumentEntryEntity;
 import org.apache.fineract.cn.customer.internal.repository.DocumentPageEntity;
+
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
+
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.lang.DateConverter;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,74 +37,85 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Myrle Krantz
  */
 public class DocumentMapper {
-  private DocumentMapper() {
-    super();
-  }
+    private DocumentMapper() {
+        super();
+    }
 
 
-  public static DocumentPageEntity map(
-      final MultipartFile multipartFile,
-      final int pageNumber,
-      final DocumentEntity documentEntity) throws IOException {
-    final DocumentPageEntity ret = new DocumentPageEntity();
-    ret.setDocument(documentEntity);
-    ret.setPageNumber(pageNumber);
-    ret.setImage(multipartFile.getBytes());
-    ret.setSize(multipartFile.getSize());
-    ret.setContentType(multipartFile.getContentType());
-    return ret;
-  }
+    public static DocumentPageEntity map(
+            final MultipartFile multipartFile,
+            final int pageNumber,
+            final DocumentEntity documentEntity, DocumentEntryEntity documentEntryEntity) throws IOException {
+        final DocumentPageEntity ret = new DocumentPageEntity();
+        ret.setDocumentEntry(documentEntryEntity);
+        ret.setPageNumber(pageNumber);
+        ret.setImage(multipartFile.getBytes());
+        ret.setSize(multipartFile.getSize());
+        ret.setContentType(multipartFile.getContentType());
+        return ret;
+    }
 
-  public static CustomerDocument map(final DocumentEntity documentEntity) {
-    final CustomerDocument ret = new CustomerDocument();
-    ret.setCompleted(documentEntity.getCompleted());
-    ret.setCreatedBy(documentEntity.getCreatedBy());
-    ret.setCreatedOn(DateConverter.toIsoString(documentEntity.getCreatedOn()));
-    ret.setIdentifier(documentEntity.getIdentifier());
-    ret.setDescription(documentEntity.getDescription());
-    if (documentEntity.getApprovedOn() != null) {
-      ret.setApprovedBy(documentEntity.getApprovedBy());
-      ret.setApprovedOn(DateConverter.toIsoString(documentEntity.getApprovedOn()));
-    }
-    if (documentEntity.getRejectedOn() != null) {
-      ret.setRejectedBy(documentEntity.getRejectedBy());
-      ret.setRejectedOn(DateConverter.toIsoString(documentEntity.getRejectedOn()));
-    }
-    if(documentEntity.getStatus() != null) {
-      ret.setStatus(documentEntity.getStatus());
-    } else {
-      ret.setStatus("NOTUPLOADED"); 
-    }
-    if (documentEntity.getReasonForReject() != null) {
-      ret.setReasonForReject(documentEntity.getReasonForReject());
-    }
-    return ret;
-  }
 
-  public static DocumentEntity map(final CustomerDocument customerDocument, final CustomerEntity customerEntity) {
-    final DocumentEntity ret = new DocumentEntity();
-    ret.setCustomer(customerEntity);
-    ret.setCompleted(false);
-    ret.setCreatedBy(UserContextHolder.checkedGetUser());
-    ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-    ret.setIdentifier(customerDocument.getIdentifier());
-    ret.setDescription(customerDocument.getDescription());
-    if (customerDocument.getApprovedOn() != null) {
-      ret.setApprovedBy(customerDocument.getApprovedBy());
-      ret.setApprovedOn(LocalDateTime.parse(customerDocument.getApprovedOn()));
+    public static DocumentEntryEntity map(final CustomerDocumentEntry customerDocumentEntry, final DocumentEntity documentEntity) {
+        final DocumentEntryEntity ret = new DocumentEntryEntity();
+        ret.setDescription(customerDocumentEntry.getDescription());
+        ret.setType(customerDocumentEntry.getType());
+        ret.setSubType(customerDocumentEntry.getSubType());
+        ret.setCreatedBy(documentEntity.getCreatedBy());
+        ret.setDocument(documentEntity);
+        return ret;
     }
-    if (customerDocument.getRejectedOn() != null) {
-      ret.setRejectedBy(customerDocument.getRejectedBy());
-      ret.setRejectedOn(LocalDateTime.parse(customerDocument.getRejectedOn()));
+
+    public static CustomerDocument map(final DocumentEntity documentEntity) {
+        final CustomerDocument ret = new CustomerDocument();
+        ret.setCompleted(documentEntity.getCompleted());
+        ret.setCreatedBy(documentEntity.getCreatedBy());
+        ret.setCreatedOn(DateConverter.toIsoString(documentEntity.getCreatedOn()));
+        ret.setIdentifier(documentEntity.getIdentifier());
+        ret.setDescription(documentEntity.getDescription());
+        if (documentEntity.getApprovedOn() != null) {
+            ret.setApprovedBy(documentEntity.getApprovedBy());
+            ret.setApprovedOn(DateConverter.toIsoString(documentEntity.getApprovedOn()));
+        }
+        if (documentEntity.getRejectedOn() != null) {
+            ret.setRejectedBy(documentEntity.getRejectedBy());
+            ret.setRejectedOn(DateConverter.toIsoString(documentEntity.getRejectedOn()));
+        }
+        if (documentEntity.getStatus() != null) {
+            ret.setStatus(documentEntity.getStatus());
+        } else {
+            ret.setStatus("NOTUPLOADED");
+        }
+        if (documentEntity.getReasonForReject() != null) {
+            ret.setReasonForReject(documentEntity.getReasonForReject());
+        }
+        return ret;
     }
-    if(customerDocument.getStatus() != null) {
-      ret.setStatus(customerDocument.getStatus());
-    } else {
-      ret.setStatus("NOTUPLOADED"); 
+
+    public static DocumentEntity map(final CustomerDocument customerDocument, final CustomerEntity customerEntity) {
+        final DocumentEntity ret = new DocumentEntity();
+        ret.setCustomer(customerEntity);
+        ret.setCompleted(false);
+        ret.setCreatedBy(UserContextHolder.checkedGetUser());
+        ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        ret.setIdentifier(customerDocument.getIdentifier());
+        ret.setDescription(customerDocument.getDescription());
+        if (customerDocument.getApprovedOn() != null) {
+            ret.setApprovedBy(customerDocument.getApprovedBy());
+            ret.setApprovedOn(LocalDateTime.parse(customerDocument.getApprovedOn()));
+        }
+        if (customerDocument.getRejectedOn() != null) {
+            ret.setRejectedBy(customerDocument.getRejectedBy());
+            ret.setRejectedOn(LocalDateTime.parse(customerDocument.getRejectedOn()));
+        }
+        if (customerDocument.getStatus() != null) {
+            ret.setStatus(customerDocument.getStatus());
+        } else {
+            ret.setStatus("NOTUPLOADED");
+        }
+        if (customerDocument.getReasonForReject() != null) {
+            ret.setReasonForReject(customerDocument.getReasonForReject());
+        }
+        return ret;
     }
-    if (customerDocument.getReasonForReject() != null) {
-      ret.setReasonForReject(customerDocument.getReasonForReject());
-    }
-    return ret;
-  }
 }
