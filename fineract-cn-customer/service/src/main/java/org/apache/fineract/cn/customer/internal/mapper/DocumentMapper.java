@@ -20,6 +20,8 @@ package org.apache.fineract.cn.customer.internal.mapper;
 
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
+import org.apache.fineract.cn.customer.api.v1.domain.DocumentsSubType;
+import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.customer.internal.repository.DocumentEntity;
 import org.apache.fineract.cn.customer.internal.repository.DocumentEntryEntity;
@@ -28,6 +30,9 @@ import org.apache.fineract.cn.customer.internal.repository.DocumentPageEntity;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.lang.DateConverter;
@@ -55,6 +60,33 @@ public class DocumentMapper {
         return ret;
     }
 
+    public static List<DocumentsType> map(Map<String, List<DocumentEntryEntity>> documentEntryEntity) {
+        final List<DocumentsType> ret = new ArrayList<>();
+        documentEntryEntity.forEach((key, val) -> {
+            final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
+            val.forEach(doc -> {
+                final DocumentsSubType documentsSubType = new DocumentsSubType();
+                documentsSubType.setId(doc.getId());
+                documentsSubType.setCreated_by(doc.getCreatedBy());
+                documentsSubType.setStatus(doc.getStatus());
+                documentsSubType.setType(doc.getType());
+                documentsSubType.setSubType(doc.getSubType());
+                documentsSubType.setApprovedBy(doc.getApprovedBy());
+//                documentsSubType.setApprovedOn(doc.getApprovedOn().toString());
+                documentsSubType.setRejectedBy(doc.getRejectedBy());
+                documentsSubType.setReasonForReject(doc.getReasonForReject());
+                documentsSubType.setDescription(doc.getDescription());
+                documentsSubType.setCreatedOn(doc.getCreatedOn().toString());
+                documentsSubTypeList.add(documentsSubType);
+            });
+            final DocumentsType d = new DocumentsType();
+            d.setType(key);
+            d.setDocumentsSubType(documentsSubTypeList);
+            ret.add(d);
+        });
+        return ret;
+    }
+
 
     public static DocumentEntryEntity map(final CustomerDocumentEntry customerDocumentEntry, final DocumentEntity documentEntity) {
         final DocumentEntryEntity ret = new DocumentEntryEntity();
@@ -73,22 +105,6 @@ public class DocumentMapper {
         ret.setCreatedOn(DateConverter.toIsoString(documentEntity.getCreatedOn()));
         ret.setIdentifier(documentEntity.getIdentifier());
         ret.setDescription(documentEntity.getDescription());
-        if (documentEntity.getApprovedOn() != null) {
-            ret.setApprovedBy(documentEntity.getApprovedBy());
-            ret.setApprovedOn(DateConverter.toIsoString(documentEntity.getApprovedOn()));
-        }
-        if (documentEntity.getRejectedOn() != null) {
-            ret.setRejectedBy(documentEntity.getRejectedBy());
-            ret.setRejectedOn(DateConverter.toIsoString(documentEntity.getRejectedOn()));
-        }
-        if (documentEntity.getStatus() != null) {
-            ret.setStatus(documentEntity.getStatus());
-        } else {
-            ret.setStatus("NOTUPLOADED");
-        }
-        if (documentEntity.getReasonForReject() != null) {
-            ret.setReasonForReject(documentEntity.getReasonForReject());
-        }
         return ret;
     }
 
@@ -100,22 +116,6 @@ public class DocumentMapper {
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setIdentifier(customerDocument.getIdentifier());
         ret.setDescription(customerDocument.getDescription());
-        if (customerDocument.getApprovedOn() != null) {
-            ret.setApprovedBy(customerDocument.getApprovedBy());
-            ret.setApprovedOn(LocalDateTime.parse(customerDocument.getApprovedOn()));
-        }
-        if (customerDocument.getRejectedOn() != null) {
-            ret.setRejectedBy(customerDocument.getRejectedBy());
-            ret.setRejectedOn(LocalDateTime.parse(customerDocument.getRejectedOn()));
-        }
-        if (customerDocument.getStatus() != null) {
-            ret.setStatus(customerDocument.getStatus());
-        } else {
-            ret.setStatus("NOTUPLOADED");
-        }
-        if (customerDocument.getReasonForReject() != null) {
-            ret.setReasonForReject(customerDocument.getReasonForReject());
-        }
         return ret;
     }
 }

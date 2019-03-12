@@ -18,7 +18,9 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
+import java.util.List;
 import java.util.Objects;
+
 import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
 import org.hibernate.validator.constraints.Length;
 
@@ -27,142 +29,98 @@ import org.hibernate.validator.constraints.Length;
  */
 public class CustomerDocument {
 
-  public enum Status {
-    NOTUPLOADED,
-    PENDING,
-    APPROVED,
-    REJECTED
-  }
+    public enum Status {
+        NOTUPLOADED,
+        PENDING,
+        APPROVED,
+        REJECTED
+    }
 
-  @ValidIdentifier
-  private String identifier;
+    @ValidIdentifier
+    private String identifier;
+    @Length(max = 4096)
+    private String description;
+    private boolean completed;
+    private String createdBy;
+    private String createdOn;
 
-  @Length(max = 4096)
-  private String description;
+    private List<DocumentsType> documentsTypes;
 
-  private boolean completed;
-  private String createdBy;
-  private String createdOn;
-  
-  private Status status;
-  private String approvedBy;
-  private String approvedOn;
-  private String reasonForReject;
-  private String rejectedBy;
-  private String rejectedOn;
 
-  public CustomerDocument() {
-  }
+    public CustomerDocument() {
+    }
 
-  public String getIdentifier() {
-    return identifier;
-  }
+    public String getIdentifier() {
+        return identifier;
+    }
 
-  public void setIdentifier(String identifier) {
-    this.identifier = identifier;
-  }
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public boolean isCompleted() {
-    return completed;
-  }
+    public boolean isCompleted() {
+        return completed;
+    }
 
-  public void setCompleted(boolean completed) {
-    this.completed = completed;
-  }
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
 
-  public String getCreatedBy() {
-    return createdBy;
-  }
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-  public String getCreatedOn() {
-    return createdOn;
-  }
+    public String getCreatedOn() {
+        return createdOn;
+    }
 
-  public void setCreatedOn(String createdOn) {
-    this.createdOn = createdOn;
-  }
-  
-  public String getStatus() {
-    return this.status != null ? this.status.name() : null;
-  }
+    public void setCreatedOn(String createdOn) {
+        this.createdOn = createdOn;
+    }
 
-  public void setStatus(final String status) {
-    this.status = Status.valueOf(status);
-  }
+    public List<DocumentsType> getDocumentsTypes() {
+        return documentsTypes;
+    }
 
-public String getApprovedBy() {
-	return approvedBy;
-  }
+    public void setDocumentsTypes(List<DocumentsType> documentsTypes) {
+        this.documentsTypes = documentsTypes;
+    }
 
-public void setApprovedBy(String approvedBy) {
-	this.approvedBy = approvedBy;
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomerDocument that = (CustomerDocument) o;
+        return completed == that.completed &&
+                Objects.equals(identifier, that.identifier) &&
+                Objects.equals(description, that.description);
+    }
 
-public String getApprovedOn() {
-	return approvedOn;
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, description, completed);
+    }
 
-public void setApprovedOn(String approvedOn) {
-	this.approvedOn = approvedOn;
-  }
-
-public String getReasonForReject() {
-	return reasonForReject;
-  }
-
-public void setReasonForReject(String reasonForReject) {
-	this.reasonForReject = reasonForReject;
-  }
-
-public String getRejectedBy() {
-	return rejectedBy;
-  }
-
-public void setRejectedBy(String rejectedBy) {
-	this.rejectedBy = rejectedBy;
-  }
-
-  public String getRejectedOn() {
-	return rejectedOn;
-  }
-
-  public void setRejectedOn(String rejectedOn) {
-	this.rejectedOn = rejectedOn;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    CustomerDocument that = (CustomerDocument) o;
-    return completed == that.completed &&
-        Objects.equals(identifier, that.identifier) &&
-        Objects.equals(description, that.description);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(identifier, description, completed);
-  }
-
-  @Override
-  public String toString() {
-	return "CustomerDocument [identifier=" + identifier + ", description=" + description + ", completed="
-				+ completed + ", createdBy=" + createdBy + ", createdOn=" + createdOn + ", status=" + status
-				+ ", approvedBy=" + approvedBy + ", approvedOn=" + approvedOn + ", reasonForReject=" + reasonForReject
-				+ ", rejectedBy=" + rejectedBy + ", rejectedOn=" + rejectedOn + ", toString()=" + super.toString()
-				+ "]";
-  }
+    @Override
+    public String toString() {
+        return "CustomerDocument{" +
+                "identifier='" + identifier + '\'' +
+                ", description='" + description + '\'' +
+                ", completed=" + completed +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdOn='" + createdOn + '\'' +
+                '}';
+    }
 }

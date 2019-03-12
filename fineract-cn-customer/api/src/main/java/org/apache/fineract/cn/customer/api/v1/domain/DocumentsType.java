@@ -16,21 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.customer.internal.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+package org.apache.fineract.cn.customer.api.v1.domain;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author Md Robiul Hassan
  */
-@Repository
-public interface DocumentEntryRepository extends JpaRepository<DocumentEntryEntity, Long> {
+public class DocumentsType {
 
+    private String type;
+    private List<DocumentsSubType> documentsSubType;
 
-    List<DocumentEntryEntity> findByDocument(final DocumentEntity documentEntity);
+    public DocumentsType() {
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<DocumentsSubType> getDocumentsSubType() {
+        return documentsSubType;
+    }
+
+    public void setDocumentsSubType(List<DocumentsSubType> documentsSubType) {
+        this.documentsSubType = documentsSubType;
+    }
+
+    @Override
+    public String toString() {
+        return "DocumentsType{" +
+                "type='" + type + '\'' +
+                ", documentsSubType=" + documentsSubType +
+                '}';
+    }
 }

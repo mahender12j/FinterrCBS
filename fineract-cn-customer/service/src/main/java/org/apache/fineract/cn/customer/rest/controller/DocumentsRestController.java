@@ -69,11 +69,12 @@ public class DocumentsRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-    public ResponseEntity<List<CustomerDocument>> getDocuments(
-            @PathVariable("customeridentifier") final String customerIdentifier) {
+    public ResponseEntity<CustomerDocument> getDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
 
-        return ResponseEntity.ok(documentService.find(customerIdentifier).collect(Collectors.toList()));
+//        documentService.findCustomerDocuments(customerIdentifier);
+
+        return ResponseEntity.ok(documentService.findCustomerDocuments(customerIdentifier));
     }
 
 
