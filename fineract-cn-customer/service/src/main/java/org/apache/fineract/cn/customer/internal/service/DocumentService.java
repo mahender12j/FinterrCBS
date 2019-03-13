@@ -64,11 +64,8 @@ public class DocumentService {
     }
 
 
-    public Optional<DocumentPageEntity> findPagebyDocumentID(final int documentIdentifier) {
-        final DocumentEntryEntity documentEntryEntity = this.documentEntryRepository.findById(documentIdentifier);
-        System.out.println("------documentEntryEntity-----------" + documentEntryEntity.toString());
-        Optional<DocumentPageEntity> documentPageEntity = this.documentPageRepository.findByDocumentEntry(documentEntryEntity);
-        System.out.println("------documentPageEntity-----------" + documentPageEntity.get().toString());
+    public Optional<DocumentPageEntity> findPagebyDocumentID(final Long documentIdentifier) {
+        Optional<DocumentPageEntity> documentPageEntity = this.documentPageRepository.findByDocumentEntryId(documentIdentifier);
         return documentPageEntity;
     }
 

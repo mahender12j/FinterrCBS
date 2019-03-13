@@ -266,10 +266,7 @@ public class DocumentsRestController {
             consumes = MediaType.ALL_VALUE
     )
     public ResponseEntity<byte[]> getDocumentById(@PathVariable("customeridentifier") final String customerIdentifier,
-                                                  @PathVariable("documentidentifier") final int documentIdentifier) {
-
-        System.out.println("----------------------------data is her-----------" + documentIdentifier);
-
+                                                  @PathVariable("documentidentifier") final Long documentIdentifier) {
         final DocumentPageEntity documentPageEntity = documentService.findPagebyDocumentID(documentIdentifier)
                 .orElseThrow(() -> ServiceException.notFound("document ''{0}'' for customer ''{1}'' not found.", documentIdentifier, customerIdentifier));
         return ResponseEntity

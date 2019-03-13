@@ -22,6 +22,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Md Robiul Hassan
@@ -32,5 +33,5 @@ public interface DocumentEntryRepository extends JpaRepository<DocumentEntryEnti
 
     List<DocumentEntryEntity> findByDocument(final DocumentEntity documentEntity);
 
-    DocumentEntryEntity findById(final int documentId);
+    Optional<DocumentEntryEntity> findById(final Long documentId);
 }

@@ -40,6 +40,7 @@ public interface DocumentPageRepository extends JpaRepository<DocumentPageEntity
     Stream<DocumentPageEntity> findByCustomerIdAndDocumentIdentifier(
             @Param("customerIdentifier") String customerIdentifier, @Param("documentIdentifier") String documentIdentifier);
 
-    Optional<DocumentPageEntity> findByDocumentEntry(final DocumentEntryEntity documentEntryEntity);
+    @Query("SELECT d FROM DocumentPageEntity d WHERE d.documentEntry.id = :documentIdentifier")
+    Optional<DocumentPageEntity> findByDocumentEntryId(@Param("documentIdentifier") Long documentIdentifier);
 
 }
