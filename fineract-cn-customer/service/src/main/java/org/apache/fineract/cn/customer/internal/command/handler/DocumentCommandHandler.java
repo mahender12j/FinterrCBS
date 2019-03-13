@@ -67,13 +67,12 @@ public class DocumentCommandHandler {
                 command.getCustomerIdentifier(),
                 command.getDocumentIdentifier())
                 .orElseThrow(() -> ServiceException.badRequest("Document not found"));
+
         final DocumentEntryEntity documentEntryEntity = DocumentMapper.map(command.getDocumentEntry(), documentEntity);
         documentEntryEntity.setStatus("PENDING");
-        documentEntryRepository.save(documentEntryEntity);
-
         final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getFile(), 1, documentEntity, documentEntryEntity);
+        documentEntryRepository.save(documentEntryEntity);
         documentPageRepository.save(documentPageEntity);
-
         return new DocumentPageEvent(command.getCustomerIdentifier(), command.getDocumentIdentifier(), 1);
     }
 
