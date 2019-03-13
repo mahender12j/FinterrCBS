@@ -32,11 +32,14 @@ import java.util.stream.Stream;
 @Repository
 public interface DocumentPageRepository extends JpaRepository<DocumentPageEntity, Long> {
 
-  @Query("SELECT d FROM DocumentPageEntity d WHERE d.documentEntry.document.customer.identifier = :customerIdentifier AND d.documentEntry.document.identifier = :documentIdentifier AND d.pageNumber = :pageNumber")
-  Optional<DocumentPageEntity> findByCustomerIdAndDocumentIdentifierAndPageNumber(
-      @Param("customerIdentifier") String customerIdentifier, @Param("documentIdentifier") String documentIdentifier, @Param("pageNumber") Integer pageNumber);
+    @Query("SELECT d FROM DocumentPageEntity d WHERE d.documentEntry.document.customer.identifier = :customerIdentifier AND d.documentEntry.document.identifier = :documentIdentifier AND d.pageNumber = :pageNumber")
+    Optional<DocumentPageEntity> findByCustomerIdAndDocumentIdentifierAndPageNumber(
+            @Param("customerIdentifier") String customerIdentifier, @Param("documentIdentifier") String documentIdentifier, @Param("pageNumber") Integer pageNumber);
 
-  @Query("SELECT d FROM DocumentPageEntity d WHERE d.documentEntry.document.customer.identifier = :customerIdentifier AND d.documentEntry.document.identifier = :documentIdentifier")
-  Stream<DocumentPageEntity> findByCustomerIdAndDocumentIdentifier(
-      @Param("customerIdentifier") String customerIdentifier, @Param("documentIdentifier") String documentIdentifier);
+    @Query("SELECT d FROM DocumentPageEntity d WHERE d.documentEntry.document.customer.identifier = :customerIdentifier AND d.documentEntry.document.identifier = :documentIdentifier")
+    Stream<DocumentPageEntity> findByCustomerIdAndDocumentIdentifier(
+            @Param("customerIdentifier") String customerIdentifier, @Param("documentIdentifier") String documentIdentifier);
+
+    Optional<DocumentPageEntity> findByDocumentEntry(final DocumentEntryEntity documentEntryEntity);
+
 }

@@ -116,6 +116,7 @@ public class DocumentMapper {
         final DocumentEntity ret = new DocumentEntity();
         ret.setCustomer(customerEntity);
         ret.setCompleted(false);
+        ret.setStatus("CREATED");
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setIdentifier(customerDocument.getIdentifier());

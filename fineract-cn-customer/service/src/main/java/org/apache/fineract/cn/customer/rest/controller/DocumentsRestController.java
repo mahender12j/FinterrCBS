@@ -131,8 +131,16 @@ public class DocumentsRestController {
             @PathVariable("customeridentifier") final String customerIdentifier,
             @RequestBody final @Valid CustomerDocument instance) {
         throwIfCustomerNotExists(customerIdentifier);
+        throwIfCustomerDocumentAlreadyExist(customerIdentifier, instance);
+
         commandGateway.process(new CreateDocumentCommand(customerIdentifier, instance));
         return ResponseEntity.accepted().build();
+    }
+
+    private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier, CustomerDocument instance) {
+        if (this.documentService.documentExists(customerIdentifier, instance.getIdentifier())) {
+            throw ServiceException.notFound("Customer ''{0}'' with Document identifier ''{1}'' already exist in the system", customerIdentifier, instance.getIdentifier());
+        }
     }
 
 
@@ -242,6 +250,28 @@ public class DocumentsRestController {
                 .orElseThrow(() -> ServiceException.notFound("Page ''{0}'' of document ''{1}'' for customer ''{2}'' not found.",
                         pageNumber, documentIdentifier, customerIdentifier));
 
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.parseMediaType(documentPageEntity.getContentType()))
+                .contentLength(documentPageEntity.getImage().length)
+                .body(documentPageEntity.getImage());
+    }
+
+
+    //    ---------------- get document -------------------
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(value = "/{documentidentifier}/file",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<byte[]> getDocumentById(@PathVariable("customeridentifier") final String customerIdentifier,
+                                                  @PathVariable("documentidentifier") final int documentIdentifier) {
+
+        System.out.println("----------------------------data is her-----------" + documentIdentifier);
+
+        final DocumentPageEntity documentPageEntity = documentService.findPagebyDocumentID(documentIdentifier)
+                .orElseThrow(() -> ServiceException.notFound("document ''{0}'' for customer ''{1}'' not found.", documentIdentifier, customerIdentifier));
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.parseMediaType(documentPageEntity.getContentType()))

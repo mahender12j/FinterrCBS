@@ -19,11 +19,9 @@
 package org.apache.fineract.cn.customer.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author Md Robiul Hassan
@@ -33,4 +31,6 @@ public interface DocumentEntryRepository extends JpaRepository<DocumentEntryEnti
 
 
     List<DocumentEntryEntity> findByDocument(final DocumentEntity documentEntity);
+
+    DocumentEntryEntity findById(final int documentId);
 }

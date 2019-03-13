@@ -63,6 +63,15 @@ public class DocumentService {
                 pageNumber);
     }
 
+
+    public Optional<DocumentPageEntity> findPagebyDocumentID(final int documentIdentifier) {
+        final DocumentEntryEntity documentEntryEntity = this.documentEntryRepository.findById(documentIdentifier);
+        System.out.println("------documentEntryEntity-----------" + documentEntryEntity.toString());
+        Optional<DocumentPageEntity> documentPageEntity = this.documentPageRepository.findByDocumentEntry(documentEntryEntity);
+        System.out.println("------documentPageEntity-----------" + documentPageEntity.get().toString());
+        return documentPageEntity;
+    }
+
     public Stream<CustomerDocument> find(final String customerIdentifier) {
         final Stream<DocumentEntity> preMappedRet = this.documentRepository.findByCustomerId(customerIdentifier);
         Stream<CustomerDocument> customerDocumentStream = preMappedRet.map(DocumentMapper::map);
@@ -103,11 +112,12 @@ public class DocumentService {
                 .map(DocumentPageEntity::getPageNumber);
     }
 
-    public boolean isDocumentCompleted(
-            final String customerIdentifier,
-            final String documentIdentifier) {
-        return documentRepository.findByCustomerIdAndDocumentIdentifier(customerIdentifier, documentIdentifier)
-                .map(DocumentEntity::getCompleted).orElse(true);
+    public boolean isDocumentCompleted(final String customerIdentifier,
+                                       final String documentIdentifier) {
+        final Optional<DocumentEntity> documentEntity = documentRepository.findByCustomerIdAndDocumentIdentifier(customerIdentifier, documentIdentifier);
+
+        System.out.println("---------------is doucument avaialbe---->" + documentEntity.get());
+        return documentEntity.map(DocumentEntity::getCompleted).orElse(true);
     }
 
     public boolean isDocumentMissingPages(
