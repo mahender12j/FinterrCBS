@@ -118,6 +118,24 @@ public class DocumentsRestController {
     }
 
 
+    //    ------------------ create document data --------------------------
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/create",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> createDocument(
+            @PathVariable("customeridentifier") final String customerIdentifier,
+            @RequestBody final @Valid CustomerDocument instance) {
+        throwIfCustomerNotExists(customerIdentifier);
+        commandGateway.process(new CreateDocumentCommand(customerIdentifier, instance));
+        return ResponseEntity.accepted().build();
+    }
+
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
             value = "/{documentidentifier}",
@@ -263,7 +281,7 @@ public class DocumentsRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
-            value = "/{documentidentifier}/uplaod",
+            value = "/{documentidentifier}/upload",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE

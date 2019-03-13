@@ -64,6 +64,8 @@ public class DocumentMapper {
         final List<DocumentsType> ret = new ArrayList<>();
         documentEntryEntity.forEach((key, val) -> {
             final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
+            final DocumentsType d = new DocumentsType();
+            d.setKYCVerified(false);
             val.forEach(doc -> {
                 final DocumentsSubType documentsSubType = new DocumentsSubType();
                 documentsSubType.setId(doc.getId());
@@ -72,14 +74,16 @@ public class DocumentMapper {
                 documentsSubType.setType(doc.getType());
                 documentsSubType.setSubType(doc.getSubType());
                 documentsSubType.setApprovedBy(doc.getApprovedBy());
-//                documentsSubType.setApprovedOn(doc.getApprovedOn().toString());
                 documentsSubType.setRejectedBy(doc.getRejectedBy());
                 documentsSubType.setReasonForReject(doc.getReasonForReject());
                 documentsSubType.setDescription(doc.getDescription());
                 documentsSubType.setCreatedOn(doc.getCreatedOn().toString());
+                if (doc.getStatus().equals("APPROVED")) {
+                    d.setKYCVerified(true);
+                }
                 documentsSubTypeList.add(documentsSubType);
             });
-            final DocumentsType d = new DocumentsType();
+
             d.setType(key);
             d.setDocumentsSubType(documentsSubTypeList);
             ret.add(d);

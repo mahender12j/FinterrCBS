@@ -26,6 +26,7 @@ import java.util.List;
 public class DocumentsType {
 
     private String type;
+    private boolean isKYCVerified;
     private List<DocumentsSubType> documentsSubType;
 
     public DocumentsType() {
@@ -45,6 +46,14 @@ public class DocumentsType {
 
     public void setDocumentsSubType(List<DocumentsSubType> documentsSubType) {
         this.documentsSubType = documentsSubType;
+    }
+
+    public boolean isKYCVerified() {
+        return isKYCVerified;
+    }
+
+    public void setKYCVerified(boolean KYCVerified) {
+        isKYCVerified = KYCVerified;
     }
 
     @Override

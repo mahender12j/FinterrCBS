@@ -43,6 +43,7 @@ public class CustomerDocument {
     private boolean completed;
     private String createdBy;
     private String createdOn;
+    private boolean kycStatus;
 
     private List<DocumentsType> documentsTypes;
 
@@ -96,6 +97,14 @@ public class CustomerDocument {
 
     public void setDocumentsTypes(List<DocumentsType> documentsTypes) {
         this.documentsTypes = documentsTypes;
+    }
+
+    public boolean isKycStatus() {
+        return kycStatus;
+    }
+
+    public void setKycStatus(boolean kycStatus) {
+        this.kycStatus = kycStatus;
     }
 
     @Override

@@ -79,7 +79,7 @@ public class DocumentService {
 
         List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
         customerDocument.setDocumentsTypes(documentsType);
-
+        customerDocument.setKycStatus(documentsType.stream().allMatch(d -> d.isKYCVerified()));
         return customerDocument;
     }
 

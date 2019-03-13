@@ -202,4 +202,6 @@ public class DocumentEntryEntity {
                 ", rejectedOn=" + rejectedOn +
                 '}';
     }
+
+
 }
