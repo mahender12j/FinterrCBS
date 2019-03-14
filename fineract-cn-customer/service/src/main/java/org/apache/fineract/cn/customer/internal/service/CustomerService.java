@@ -116,8 +116,7 @@ public class CustomerService {
 
                     socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
                     socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
-
-                    socialMatrix.setTotalTrees((int) Math.floor(totalDepositOfThisMonth / (socialMatrix.getGreenContribution() * 5)));
+                    socialMatrix.setTotalTrees((int) Math.floor(totalDepositOfThisMonth / 2000));
 
 
                     socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifier(customer.getRefferalCodeIdentifier()));
