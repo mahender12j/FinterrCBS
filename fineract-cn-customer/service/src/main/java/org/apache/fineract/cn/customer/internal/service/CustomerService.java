@@ -95,10 +95,7 @@ public class CustomerService {
     }
 
     public Optional<Customer> findCustomer(final String identifier) {
-
-
         Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifier(identifier);
-
         if (customerEntity.isPresent()) {
             return customerEntity.map(entity -> {
                 final Customer customer = CustomerMapper.map(entity);
@@ -113,10 +110,6 @@ public class CustomerService {
                             .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
                                     Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
                             .mapToDouble(d -> d.getAmount()).sum();
-
-
-                    System.out.println("----------------------total deposit-------------" + totalDepositOfThisMonth);
-
                     socialMatrix.setGoldenDonor((totalDepositOfThisMonth / 10) > 5 ? 5 : (int) (Math.floor(totalDepositOfThisMonth / 10)));
                     socialMatrix.setGreenContribution((totalDepositOfThisMonth / 400) > 5 ? 5 : (int) (Math.floor(totalDepositOfThisMonth / 400)));
                     socialMatrix.setMyPrower((totalDepositOfThisMonth / 20 > 5) ? 5 : (int) (Math.floor(totalDepositOfThisMonth / 20)));
@@ -134,15 +127,6 @@ public class CustomerService {
         } else {
             throw ServiceException.notFound("Customer with identifier {0} not found in this system", identifier);
         }
-//        return customerRepository.findByIdentifier(identifier).map(entity -> {
-//            final Customer customer = CustomerMapper.map(entity);
-//            customer.setAddress(AddressMapper.map(entity.getAddress()));
-//            final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
-//            if (contactDetailEntities != null) {
-//                customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
-//            }
-//            return customer;
-//        });
     }
 
     public CustomerPage fetchCustomer(final String term, final Boolean includeClosed, final Pageable pageable) {
@@ -180,10 +164,6 @@ public class CustomerService {
         final Page<CustomerEntity> customerEntities;
         Optional<CustomerEntity> customerEntity = customerRepository.findByRefferalCodeIdentifier(refferalcode);
         Customer customer = CustomerMapper.map(customerEntity.get());
-
-
-        System.out.println("__________________CUstomer --------------------" + customer.toString());
-
         if (includeClosed) {
             if (term != null) {
                 customerEntities =
@@ -208,22 +188,26 @@ public class CustomerService {
 
         if (customer.getRefAccountNumber() != null) {
             System.out.println("--------get account number" + customer.getRefAccountNumber());
-//            Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
-//            customerRefPage.setRefferalBalance(account.getBalance());
+            Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
+
+            System.out.println("------------------account-----------------------" + account.toString());
+            customerRefPage.setRefferalBalance(account.getBalance());
 //
-//            if (customerEntities.getSize() > 0) {
-//                final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
-//                customerRefPage.setCustomers(customers);
-//                customerEntities.forEach(customerEntity1 -> {
-//                    Account account1 = accountingAdaptor.findAccountByIdentifier(customerEntity1.getRefAccountNumber());
-//                    Customer tCustomer = CustomerMapper.map(customerEntity1);
-//                    tCustomer.setRefferalBalance(account1.getBalance());
-//                    customers.add(tCustomer);
-//                });
-//            }
+            if (customerEntities.getSize() > 0) {
+                final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
+                customerEntities.forEach(entity -> {
+                    Customer tCustomer = CustomerMapper.map(entity);
+                    if (entity.getAccountNumbers() != null) {
+                        Account acc = accountingAdaptor.findAccountByIdentifier(entity.getRefAccountNumber());
+                        tCustomer.setRefferalBalance(acc.getBalance());
+                    }
+                    customers.add(tCustomer);
+
+                });
+                customerRefPage.setCustomers(customers);
+            }
 
         }
-
 
         return customerRefPage;
     }
