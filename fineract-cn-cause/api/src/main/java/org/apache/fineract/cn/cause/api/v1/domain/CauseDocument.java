@@ -28,6 +28,7 @@ import java.util.Objects;
  */
 public class CauseDocument {
     @ValidIdentifier
+    @Length(max = 256)
     private String identifier;
 
     @Length(max = 4096)
