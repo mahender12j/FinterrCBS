@@ -107,13 +107,14 @@ public class CauseService {
                                         .map(CategoryMapper::map)
                                         .collect(Collectors.toList())
                         );
-                        final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                        cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+                        if (cause.getAccountNumber() != null) {
+                            final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                            cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+                        }
 
                     }
 
                     final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
-                    System.out.println("avgRatingValue :: " + avgRatingValue);
                     if (avgRatingValue != null) {
                         cause.setAvgRating(avgRatingValue.toString());
                     } else {
@@ -198,8 +199,10 @@ public class CauseService {
         final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedBy(identifier);
         ArrayList<CauseStatistics> causeStatistics = new ArrayList<>(causeEntities.size());
         for (CauseEntity causeEntity : causeEntities) {
-            final CauseStatistics causeStatistic = CauseStatisticsMapper.map(accountingAdaptor.fetchJournalEntriesJournalEntries(causeEntity.getAccountNumber()));
-            causeStatistics.add(causeStatistic);
+            if (causeEntity.getAccountNumber() != null) {
+                final CauseStatistics causeStatistic = CauseStatisticsMapper.map(accountingAdaptor.fetchJournalEntriesJournalEntries(causeEntity.getAccountNumber()));
+                causeStatistics.add(causeStatistic);
+            }
         }
 
         final NGOStatistics ngoStatistics = new NGOStatistics();
