@@ -18,10 +18,7 @@
  */
 package org.apache.fineract.cn.customer.internal.mapper;
 
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentsSubType;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
+import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.customer.internal.repository.DocumentEntity;
 import org.apache.fineract.cn.customer.internal.repository.DocumentEntryEntity;
@@ -123,4 +120,30 @@ public class DocumentMapper {
         ret.setDescription(customerDocument.getDescription());
         return ret;
     }
+
+
+    public static DocumentEntity map(final CustomerDocumentsBody customerDocumentsBody, final CustomerEntity customerEntity) {
+        final DocumentEntity ret = new DocumentEntity();
+        ret.setCustomer(customerEntity);
+        ret.setCompleted(false);
+        ret.setStatus("CREATED");
+        ret.setCreatedBy(UserContextHolder.checkedGetUser());
+        ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        ret.setIdentifier(customerEntity.getIdentifier());
+        ret.setDescription(customerDocumentsBody.getDescription());
+        return ret;
+    }
+
+    public static DocumentEntryEntity map(final CustomerDocumentsBody customerDocumentsBody, final DocumentEntity documentEntity) {
+        final DocumentEntryEntity ret = new DocumentEntryEntity();
+        ret.setDescription(customerDocumentsBody.getDescription());
+        ret.setType(customerDocumentsBody.getType());
+        ret.setSubType(customerDocumentsBody.getSubType());
+        ret.setCreatedBy(documentEntity.getCreatedBy());
+        ret.setDocument(documentEntity);
+        return ret;
+    }
+
+
+
 }

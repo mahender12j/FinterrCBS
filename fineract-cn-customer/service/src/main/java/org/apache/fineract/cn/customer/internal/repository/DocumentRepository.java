@@ -39,4 +39,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
     @Query("SELECT d FROM DocumentEntity d WHERE d.customer.identifier = :customerIdentifier")
     Stream<DocumentEntity> findByCustomerId(@Param("customerIdentifier") String customerIdentifier);
 
+    @Query("SELECT CASE WHEN COUNT(d) > 0 THEN 'true' ELSE 'false' END FROM DocumentEntity d WHERE d.customer.identifier = :customerIdentifier")
+    Boolean findByIdentifierAndCustomer(@Param("customerIdentifier") String customerIdentifier);
+
 }

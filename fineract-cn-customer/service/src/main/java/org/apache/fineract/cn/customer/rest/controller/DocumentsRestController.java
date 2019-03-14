@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentsBody;
 import org.apache.fineract.cn.customer.internal.command.*;
 import org.apache.fineract.cn.customer.internal.repository.DocumentPageEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
@@ -108,41 +109,11 @@ public class DocumentsRestController {
             @PathVariable("documentidentifier") final String documentIdentifier,
             @RequestBody final @Valid CustomerDocument instance) {
         throwIfCustomerNotExists(customerIdentifier);
-
         if (!instance.getIdentifier().equals(documentIdentifier))
             throw ServiceException.badRequest("Document identifier in request body must match document identifier in request path.");
-
-        commandGateway.process(new CreateDocumentCommand(customerIdentifier, instance));
-
-        return ResponseEntity.accepted().build();
-    }
-
-
-    //    ------------------ create document data --------------------------
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/create",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> createDocument(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @RequestBody final @Valid CustomerDocument instance) {
-        throwIfCustomerNotExists(customerIdentifier);
-        throwIfCustomerDocumentAlreadyExist(customerIdentifier, instance);
-
         commandGateway.process(new CreateDocumentCommand(customerIdentifier, instance));
         return ResponseEntity.accepted().build();
     }
-
-    private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier, CustomerDocument instance) {
-        if (this.documentService.documentExists(customerIdentifier, instance.getIdentifier())) {
-            throw ServiceException.notFound("Customer ''{0}'' with Document identifier ''{1}'' already exist in the system", customerIdentifier, instance.getIdentifier());
-        }
-    }
-
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
@@ -304,31 +275,90 @@ public class DocumentsRestController {
     }
 
 
-//  ------------------post the file -------------------------------- //
+////  ------------------post the file -------------------------------- //
+//
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/{documentidentifier}/upload",
+//            method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> UploadDocumentEntry(@PathVariable("customeridentifier") final String customerIdentifier,
+//                                             @PathVariable("documentidentifier") final String documentIdentifier,
+//                                             @RequestParam("data") String data,
+//                                             @RequestParam(value = "file") MultipartFile file) throws IOException {
+//        ObjectMapper mapper = new ObjectMapper();
+//        CustomerDocumentEntry documentEntry = mapper.readValue(data, CustomerDocumentEntry.class);
+//        if (file == null) {
+//            throw ServiceException.badRequest("Document not found");
+//        }
+//        throwIfCustomerNotExists(customerIdentifier);
+//        throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
+//        throwIfInvalidContentType(file.getContentType());
+//        commandGateway.process(new CreateDocumentEntryCommand(file, customerIdentifier, documentIdentifier, documentEntry));
+//        return ResponseEntity.accepted().build();
+//    }
+//
+//
+//    //    ------------------ create document data --------------------------
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/create",
+//            method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.APPLICATION_JSON_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> createDocument(
+//            @PathVariable("customeridentifier") final String customerIdentifier,
+//            @RequestBody final @Valid CustomerDocument instance) {
+//        throwIfCustomerNotExists(customerIdentifier);
+//        throwIfCustomerDocumentAlreadyExist(customerIdentifier, instance);
+//
+//        commandGateway.process(new CreateDocumentCommand(customerIdentifier, instance));
+//        return ResponseEntity.accepted().build();
+//    }
 
+
+    //    ------------------ create document data with data --------------------------
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
-            value = "/{documentidentifier}/upload",
+            value = "/upload",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> UploadDocumentEntry(@PathVariable("customeridentifier") final String customerIdentifier,
-                                             @PathVariable("documentidentifier") final String documentIdentifier,
-                                             @RequestParam("data") String data,
-                                             @RequestParam(value = "file") MultipartFile file) throws IOException {
+    ResponseEntity<Void> uploadKycDocuments(@PathVariable("customeridentifier") final String customerIdentifier,
+                                            @RequestParam("data") String data,
+                                            @RequestParam(value = "file") MultipartFile file) throws IOException {
+        throwIfCustomerNotExists(customerIdentifier);
+//        throwIfCustomerDocumentAlreadyExist(customerIdentifier);
+
         ObjectMapper mapper = new ObjectMapper();
-        CustomerDocumentEntry documentEntry = mapper.readValue(data, CustomerDocumentEntry.class);
+        CustomerDocumentsBody documentEntry = mapper.readValue(data, CustomerDocumentsBody.class);
         if (file == null) {
             throw ServiceException.badRequest("Document not found");
         }
-        throwIfCustomerNotExists(customerIdentifier);
-        throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
-        throwIfInvalidContentType(file.getContentType());
-        commandGateway.process(new CreateDocumentEntryCommand(file, customerIdentifier, documentIdentifier, documentEntry));
+        commandGateway.process(new CreateKYCDocumentCommand(customerIdentifier, file, documentEntry));
         return ResponseEntity.accepted().build();
     }
+
+    private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier, CustomerDocument instance) {
+        if (this.documentService.documentExists(customerIdentifier, instance.getIdentifier())) {
+            throw ServiceException.notFound("Customer ''{0}'' with Document identifier ''{1}'' already exist in the system", customerIdentifier, instance.getIdentifier());
+        }
+    }
+
+
+    private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier) {
+        if (this.documentService.isDocumentExistByCustomerIdentifier(customerIdentifier)) {
+            throw ServiceException.notFound("Customer Document identifier already exist in the system");
+        }
+    }
+
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(

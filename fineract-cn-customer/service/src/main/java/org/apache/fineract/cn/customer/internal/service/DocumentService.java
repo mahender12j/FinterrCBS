@@ -102,6 +102,10 @@ public class DocumentService {
         return findDocument(customerIdentifier, documentIdentifier).isPresent();
     }
 
+    public boolean isDocumentExistByCustomerIdentifier(final String identifier) {
+        return this.documentRepository.findByIdentifierAndCustomer(identifier);
+    }
+
     public Stream<Integer> findPageNumbers(
             final String customerIdentifier,
             final String documentIdentifier) {

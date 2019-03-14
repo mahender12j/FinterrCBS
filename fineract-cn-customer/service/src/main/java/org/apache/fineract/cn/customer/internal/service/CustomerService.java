@@ -31,9 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -187,12 +185,8 @@ public class CustomerService {
         customerRefPage.setRefAccountNumber(customer.getRefAccountNumber());
 
         if (customer.getRefAccountNumber() != null) {
-            System.out.println("--------get account number" + customer.getRefAccountNumber());
             Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
-
-            System.out.println("------------------account-----------------------" + account.toString());
             customerRefPage.setRefferalBalance(account.getBalance());
-//
             if (customerEntities.getSize() > 0) {
                 final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
                 customerEntities.forEach(entity -> {
@@ -202,13 +196,10 @@ public class CustomerService {
                         tCustomer.setRefferalBalance(acc.getBalance());
                     }
                     customers.add(tCustomer);
-
                 });
                 customerRefPage.setCustomers(customers);
             }
-
         }
-
         return customerRefPage;
     }
 

@@ -59,32 +59,55 @@ public class DocumentCommandHandler {
         this.documentEntryRepository = documentEntryRepository;
     }
 
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_PAGE)
-    public DocumentPageEvent process(final CreateDocumentEntryCommand command) throws IOException {
-        final DocumentEntity documentEntity = documentRepository.findByCustomerIdAndDocumentIdentifier(
-                command.getCustomerIdentifier(),
-                command.getDocumentIdentifier())
-                .orElseThrow(() -> ServiceException.badRequest("Document not found"));
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_PAGE)
+//    public DocumentPageEvent process(final CreateDocumentEntryCommand command) throws IOException {
+//        final DocumentEntity documentEntity = documentRepository.findByCustomerIdAndDocumentIdentifier(
+//                command.getCustomerIdentifier(),
+//                command.getDocumentIdentifier())
+//                .orElseThrow(() -> ServiceException.badRequest("Document not found"));
+//
+//        final DocumentEntryEntity documentEntryEntity = DocumentMapper.map(command.getDocumentEntry(), documentEntity);
+//        documentEntryEntity.setStatus("PENDING");
+//        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getFile(), 1, documentEntity, documentEntryEntity);
+//        documentEntryRepository.save(documentEntryEntity);
+//        documentPageRepository.save(documentPageEntity);
+//        return new DocumentPageEvent(command.getCustomerIdentifier(), command.getDocumentIdentifier(), 1);
+//    }
 
-        final DocumentEntryEntity documentEntryEntity = DocumentMapper.map(command.getDocumentEntry(), documentEntity);
-        documentEntryEntity.setStatus("PENDING");
-        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getFile(), 1, documentEntity, documentEntryEntity);
-        documentEntryRepository.save(documentEntryEntity);
-        documentPageRepository.save(documentPageEntity);
-        return new DocumentPageEvent(command.getCustomerIdentifier(), command.getDocumentIdentifier(), 1);
-    }
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT)
+//    public DocumentEvent process(final CreateDocumentCommand command) throws IOException {
+//        customerRepository.findByIdentifier(command.getCustomerIdentifier())
+//                .map(customerEntity -> DocumentMapper.map(command.getCustomerDocument(), customerEntity))
+//                .ifPresent(documentRepository::save);
+//
+//        return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocument().getIdentifier());
+//    }
+
 
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT)
-    public DocumentEvent process(final CreateDocumentCommand command) throws IOException {
-        customerRepository.findByIdentifier(command.getCustomerIdentifier())
-                .map(customerEntity -> DocumentMapper.map(command.getCustomerDocument(), customerEntity))
-                .ifPresent(documentRepository::save);
+    public DocumentEvent process(final CreateKYCDocumentCommand command) throws IOException {
 
-        return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocument().getIdentifier());
+        if (!documentRepository.findByIdentifierAndCustomer(command.getCustomerIdentifier())) {
+            customerRepository.findByIdentifier(command.getCustomerIdentifier())
+                    .map(customerEntity -> DocumentMapper.map(command.getCustomerDocumentsBody(), customerEntity))
+                    .ifPresent(documentRepository::save);
+        }
+        final DocumentEntity documentEntity = documentRepository.findByCustomerIdAndDocumentIdentifier(
+                command.getCustomerIdentifier(), command.getCustomerIdentifier())
+                .orElseThrow(() -> ServiceException.badRequest("Document not found"));
+
+        final DocumentEntryEntity documentEntryEntity = DocumentMapper.map(command.getCustomerDocumentsBody(), documentEntity);
+        documentEntryEntity.setStatus("PENDING");
+        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getFile(), 1, documentEntity, documentEntryEntity);
+        documentEntryRepository.save(documentEntryEntity);
+        documentPageRepository.save(documentPageEntity);
+        return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerIdentifier());
     }
 
     @Transactional
