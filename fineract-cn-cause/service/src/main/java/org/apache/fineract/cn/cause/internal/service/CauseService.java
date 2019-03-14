@@ -170,7 +170,7 @@ public class CauseService {
                 cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
 
                 final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
-                if (categoryEntities != null) {
+                if (categoryEntities.size() == 0) {
                     cause.setCauseCategories(
                             categoryEntities
                                     .stream()
