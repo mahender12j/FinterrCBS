@@ -29,6 +29,7 @@ import org.apache.fineract.cn.accounting.service.internal.repository.Transaction
 import org.apache.fineract.cn.accounting.service.internal.repository.TransactionTypeRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -62,7 +63,8 @@ public class JournalEntryService {
 
 
     public List<JournalEntry> fetchJournalEntriesForStatistics(final String creditorsAccountNumber) {
-        final DateRange range = DateRange.fromIsoString(null);
+        final DateRange range = new DateRange(LocalDate.of(2019, 02, 01), LocalDate.now());
+        System.out.println(range.toString());
         List<JournalEntry> aJournalEntry = this.fetchJournalEntries(range, null, null)
                 .stream()
                 .filter(journalEntry -> {
@@ -76,7 +78,7 @@ public class JournalEntryService {
                 .sorted(Comparator.comparing(JournalEntry::getTransactionDate).reversed())
                 .collect(Collectors.toList());
 
-                System.out.println("fetchJournalEntriesForStatistics method .....");
+        System.out.println("fetchJournalEntriesForStatistics method .....");
         System.out.println(aJournalEntry);
         return aJournalEntry;
     }
