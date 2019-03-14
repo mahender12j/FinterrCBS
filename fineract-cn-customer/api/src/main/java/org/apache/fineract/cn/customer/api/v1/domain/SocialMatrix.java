@@ -20,36 +20,57 @@ package org.apache.fineract.cn.customer.api.v1.domain;
 
 public final class SocialMatrix {
 
-    private int greenContribution;
-    private int goldenDonor;
-    private int myPrower;
+    private Double greenContribution; // leave 1-5
+    private int totalTrees; // 1 - n number
+    private Double goldenDonor; // 1-5
+    private Double goldenDonorPercentage; // percentage donar
+    private Double myPower; // 1-5
+    private Double myPowerPercentage; // percentage
     private int myInfluence;
 
     public SocialMatrix() {
     }
 
-    public int getGreenContribution() {
+
+    public Double getGreenContribution() {
         return greenContribution;
     }
 
-    public void setGreenContribution(int greenContribution) {
+    public void setGreenContribution(Double greenContribution) {
         this.greenContribution = greenContribution;
     }
 
-    public int getGoldenDonor() {
+
+    public Double getGoldenDonor() {
         return goldenDonor;
     }
 
-    public void setGoldenDonor(int goldenDonor) {
+    public void setGoldenDonor(Double goldenDonor) {
         this.goldenDonor = goldenDonor;
     }
 
-    public int getMyPrower() {
-        return myPrower;
+    public Double getGoldenDonorPercentage() {
+        return goldenDonorPercentage;
     }
 
-    public void setMyPrower(int myPrower) {
-        this.myPrower = myPrower;
+    public void setGoldenDonorPercentage(Double goldenDonorPercentage) {
+        this.goldenDonorPercentage = goldenDonorPercentage;
+    }
+
+    public Double getMyPower() {
+        return myPower;
+    }
+
+    public void setMyPower(Double myPower) {
+        this.myPower = myPower;
+    }
+
+    public Double getMyPowerPercentage() {
+        return myPowerPercentage;
+    }
+
+    public void setMyPowerPercentage(Double myPowerPercentage) {
+        this.myPowerPercentage = myPowerPercentage;
     }
 
     public int getMyInfluence() {
@@ -58,5 +79,13 @@ public final class SocialMatrix {
 
     public void setMyInfluence(int myInfluence) {
         this.myInfluence = myInfluence;
+    }
+
+    public int getTotalTrees() {
+        return totalTrees;
+    }
+
+    public void setTotalTrees(int totalTrees) {
+        this.totalTrees = totalTrees;
     }
 }

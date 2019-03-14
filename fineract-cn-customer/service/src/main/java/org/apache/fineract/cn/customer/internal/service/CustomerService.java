@@ -108,18 +108,24 @@ public class CustomerService {
                             .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
                                     Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
                             .mapToDouble(d -> d.getAmount()).sum();
-                    socialMatrix.setGoldenDonor((totalDepositOfThisMonth / 10) > 5 ? 5 : (int) (Math.floor(totalDepositOfThisMonth / 10)));
-                    socialMatrix.setGreenContribution((totalDepositOfThisMonth / 400) > 5 ? 5 : (int) (Math.floor(totalDepositOfThisMonth / 400)));
-                    socialMatrix.setMyPrower((totalDepositOfThisMonth / 20 > 5) ? 5 : (int) (Math.floor(totalDepositOfThisMonth / 20)));
+
+                    socialMatrix.setGoldenDonor((totalDepositOfThisMonth / 10) > 5 ? 5 : totalDepositOfThisMonth / 10);
+                    socialMatrix.setGreenContribution((totalDepositOfThisMonth / 400) > 5 ? 5 : totalDepositOfThisMonth / 400);
+                    socialMatrix.setMyPower((totalDepositOfThisMonth / 20 > 5) ? 5 : (totalDepositOfThisMonth / 20));
+
+
+                    socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
+                    socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
+
+                    socialMatrix.setTotalTrees((int) Math.floor(totalDepositOfThisMonth / (socialMatrix.getGreenContribution() * 5)));
+
+
                     socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifier(customer.getRefferalCodeIdentifier()));
                 }
 
                 customer.setSocialMatrix(socialMatrix);
                 if (customer.getRefAccountNumber() != null) {
-                    System.out.println("--------get account number" + customer.getRefAccountNumber());
                     Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
-        
-                    System.out.println("------------------account-----------------------" + account.toString());
                     customer.setRefferalBalance(account.getBalance());
                 }
                 final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
