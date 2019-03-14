@@ -98,6 +98,7 @@ public final class Customer {
     private String ngoRegistrationNumber;
     private String dateOfRegistration;
     private String refAccountNumber;
+    private String refferalBalance;
 
     public Customer() {
         super();
@@ -367,6 +368,14 @@ public final class Customer {
         this.refAccountNumber = refAccountNumber;
     }
 
+    public Double getRefferalBalance() {
+    return this.refferalBalance;
+    }
+
+    public void setRefferalBalance(final Double refferalBalance) {
+    this.refferalBalance = refferalBalance;
+    }
+
     @Override
     public String toString() {
         return "Customer [identifier=" + identifier + ", type=" + type + ", registrationType=" + registrationType
@@ -378,7 +387,7 @@ public final class Customer {
                 + ", lastModifiedOn=" + lastModifiedOn + ", refferalCodeIdentifier=" + refferalCodeIdentifier
                 + ", ethAddress=" + ethAddress + ", isDeposited=" + isDeposited + ", depositedOn=" + depositedOn + ", kycStatus=" + kycStatus
                 + ", accountNumbers=" + accountNumbers + ", avgMonthlyIncome=" + avgMonthlyIncome + ", ngoName=" + ngoName + ", designation=" + designation + ", ngoRegistrationNumber="
-                + ngoRegistrationNumber + ", dateOfRegistration=" + dateOfRegistration + ",  refAccountNumber=" + refAccountNumber
+                + ngoRegistrationNumber + ", dateOfRegistration=" + dateOfRegistration + ",  refAccountNumber=" + refAccountNumber + ", refferalBalance= " + refferalBalance
                 + ", toString()=" + super.toString() + "]";
     }
 }

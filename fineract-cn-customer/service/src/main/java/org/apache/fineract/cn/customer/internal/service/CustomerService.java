@@ -154,8 +154,14 @@ public class CustomerService {
         return customerPage;
     }
 
-    public CustomerPage fetchCustomerReferrals(final String refferalcode, final String term, final Boolean includeClosed, final Pageable pageable) {
+    public CustomerRefPage fetchCustomerReferrals(final String refferalcode, final String term, final Boolean includeClosed, final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
+        Customer customer = customerRepository.findByRefferalCodeIdentifier(refferalCode)
+            .map(customerEntity -> {
+                final Customer customer = CustomerMapper.map(customerEntity);
+                return customer;
+            });
+
         if (includeClosed) {
             if (term != null) {
                 customerEntities =
@@ -173,16 +179,25 @@ public class CustomerService {
             }
         }
 
-        final CustomerPage customerPage = new CustomerPage();
-        customerPage.setTotalPages(customerEntities.getTotalPages());
-        customerPage.setTotalElements(customerEntities.getTotalElements());
+        final CustomerRefPage customerRefPage = new CustomerRefPage();
+        customerRefPage.setTotalPages(customerEntities.getTotalPages());
+        customerRefPage.setTotalElements(customerEntities.getTotalElements());
+        customerRefPage.setRefAccountNumber(customer.getRefAccountNumber());
+        Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
+        customerRefPage.setRefferalBalance(account.getBalance());
+
         if (customerEntities.getSize() > 0) {
             final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
-            customerPage.setCustomers(customers);
-            customerEntities.forEach(customerEntity -> customers.add(CustomerMapper.map(customerEntity)));
+            customerRefPage.setCustomers(customers);
+            customerEntities.forEach(customerEntity -> {
+                Account account = accountingAdaptor.findAccountByIdentifier(customerEntity.getRefAccountNumber());
+                Customer tCustomer = CustomerMapper.map(customerEntity);
+                tCustomer.setRefferalBalance(customer.getRefAccountNumber());
+                customers.add(tCustomer);
+            });
         }
 
-        return customerPage;
+        return customerRefPage;
     }
 
     public Optional<Customer> fetchCustomerByReferralcode(final String refferalCode) {
