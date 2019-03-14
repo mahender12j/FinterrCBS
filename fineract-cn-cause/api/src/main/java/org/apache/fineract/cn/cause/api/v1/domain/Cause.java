@@ -84,7 +84,7 @@ public final class Cause {
     private String causeTxHash;
     private String accountNumber;
     private String ethAddress;
-    @Null
+
     private CauseStatistics causeStatistics;
 
     public Cause() {

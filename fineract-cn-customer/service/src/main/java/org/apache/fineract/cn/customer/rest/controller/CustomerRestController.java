@@ -204,13 +204,13 @@ public class CustomerRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<CustomerPage> fetchCustomerReferrals(@PathVariable("referralcode") final String referralcode,
-                                                        @RequestParam(value = "term", required = false) final String term,
-                                                        @RequestParam(value = "includeClosed", required = false) final Boolean includeClosed,
-                                                        @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
-                                                        @RequestParam(value = "size", required = false) final Integer size,
-                                                        @RequestParam(value = "sortColumn", required = false) final String sortColumn,
-                                                        @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
+    ResponseEntity<CustomerRefPage> fetchCustomerReferrals(@PathVariable("referralcode") final String referralcode,
+                                                           @RequestParam(value = "term", required = false) final String term,
+                                                           @RequestParam(value = "includeClosed", required = false) final Boolean includeClosed,
+                                                           @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
+                                                           @RequestParam(value = "size", required = false) final Integer size,
+                                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
+                                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
         return ResponseEntity.ok(this.customerService.fetchCustomerReferrals(
                 referralcode, term, (includeClosed != null ? includeClosed : Boolean.FALSE),
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));

@@ -19,12 +19,8 @@
 package org.apache.fineract.cn.accounting.service.internal.mapper;
 
 import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
-import org.apache.fineract.cn.accounting.api.v1.domain.SocialMatrix;
 import org.apache.fineract.cn.accounting.service.internal.repository.AccountEntryEntity;
 import org.apache.fineract.cn.lang.DateConverter;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 public class AccountEntryMapper {
 
@@ -43,23 +39,5 @@ public class AccountEntryMapper {
         entry.setTransactionDate(DateConverter.toIsoString(accountEntity.getTransactionDate()));
         return entry;
     }
-
-
-//    public static SocialMatrix map(final List<AccountEntryEntity> accountEntryEntities) {
-//        final SocialMatrix socialMatrix = new SocialMatrix();
-//        final LocalDateTime localDateTime = LocalDateTime.now();
-//        Double totalDepositOfthisMonth = accountEntryEntities.stream()
-//                .filter(d -> d.getTransactionDate().getMonth().equals(localDateTime.getMonth()) && d.getTransactionDate().getYear() == localDateTime.getYear())
-//                .mapToDouble(d -> d.getAmount()).sum();
-//
-//        socialMatrix.setGoldenDonor((int) Math.floor(totalDepositOfthisMonth % 10));
-//        socialMatrix.setGreenContribution((int) Math.floor(totalDepositOfthisMonth % 400));
-////        socialMatrix.setMyInfluence((int) Math.floor(totalDepositOfthisMonth % 10));
-//        socialMatrix.setMyPrower((int) Math.floor(totalDepositOfthisMonth % 20));
-//
-//
-//        return socialMatrix;
-//    }
-
 
 }

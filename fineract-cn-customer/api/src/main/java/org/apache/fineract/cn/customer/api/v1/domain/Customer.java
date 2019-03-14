@@ -98,7 +98,8 @@ public final class Customer {
     private String ngoRegistrationNumber;
     private String dateOfRegistration;
     private String refAccountNumber;
-    private String refferalBalance;
+    private Double refferalBalance;
+    private SocialMatrix socialMatrix;
 
     public Customer() {
         super();
@@ -374,6 +375,14 @@ public final class Customer {
 
     public void setRefferalBalance(final Double refferalBalance) {
     this.refferalBalance = refferalBalance;
+    }
+
+    public SocialMatrix getSocialMatrix() {
+        return socialMatrix;
+    }
+
+    public void setSocialMatrix(SocialMatrix socialMatrix) {
+        this.socialMatrix = socialMatrix;
     }
 
     @Override

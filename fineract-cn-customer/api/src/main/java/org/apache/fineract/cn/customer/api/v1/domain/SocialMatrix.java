@@ -16,13 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.accounting.api.v1.domain;
+package org.apache.fineract.cn.customer.api.v1.domain;
 
-import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
-
-import java.util.Objects;
-
-@SuppressWarnings({"unused"})
 public final class SocialMatrix {
 
     private int greenContribution;
@@ -31,9 +26,7 @@ public final class SocialMatrix {
     private int myInfluence;
 
     public SocialMatrix() {
-        super();
     }
-
 
     public int getGreenContribution() {
         return greenContribution;
@@ -65,15 +58,5 @@ public final class SocialMatrix {
 
     public void setMyInfluence(int myInfluence) {
         this.myInfluence = myInfluence;
-    }
-
-    @Override
-    public String toString() {
-        return "SocialMatrix{" +
-                "greenContribution=" + greenContribution +
-                ", goldenDonor=" + goldenDonor +
-                ", myPrower=" + myPrower +
-                ", myInfluence=" + myInfluence +
-                '}';
     }
 }
