@@ -136,14 +136,12 @@ public class CustomerRestController {
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
-    @RequestMapping(
-            value = "/customers/{identifier}",
+    @RequestMapping(value = "/customers/{identifier}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-    public
-    @ResponseBody
+    public @ResponseBody
     ResponseEntity<Customer> findCustomer(@PathVariable("identifier") final String identifier) {
         final Optional<Customer> customer = this.customerService.findCustomer(identifier);
         if (customer.isPresent()) {

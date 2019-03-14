@@ -25,7 +25,7 @@ buildscript {
     }
 
     dependencies {
-        classpath ("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 
@@ -45,6 +45,7 @@ springBoot {
 
 dependencies {
     compile(
+            [group: 'org.apache.fineract.cn.accounting', name: 'api', version: versions.fineractcnaccounting],
             [group: 'org.springframework.cloud', name: 'spring-cloud-starter-config'],
             [group: 'org.springframework.cloud', name: 'spring-cloud-starter-eureka'],
             [group: 'org.springframework.boot', name: 'spring-boot-starter-jetty'],
@@ -70,11 +71,11 @@ publishing {
             artifactId project.name
             version project.version
         }
-       bootService(MavenPublication) {
+        bootService(MavenPublication) {
             // "boot" jar
-            artifact ("$buildDir/libs/$project.name-$version-boot.jar")
+            artifact("$buildDir/libs/$project.name-$version-boot.jar")
             groupId project.group
-            artifactId ("$project.name-boot")
+            artifactId("$project.name-boot")
             version project.version
         }
     }

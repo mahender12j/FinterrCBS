@@ -18,13 +18,14 @@
  */
 package org.apache.fineract.cn.customer.rest.config;
 
-import org.apache.fineract.cn.customer.catalog.rest.config.CatalogRestConfiguration;
-import org.apache.fineract.cn.customer.ServiceConstants;
-import org.apache.fineract.cn.customer.internal.config.CustomerServiceConfiguration;
+import org.apache.fineract.cn.accounting.api.v1.client.AccountManager;
 import org.apache.fineract.cn.anubis.config.EnableAnubis;
 import org.apache.fineract.cn.async.config.EnableAsync;
 import org.apache.fineract.cn.cassandra.config.EnableCassandra;
 import org.apache.fineract.cn.command.config.EnableCommandProcessing;
+import org.apache.fineract.cn.customer.ServiceConstants;
+import org.apache.fineract.cn.customer.catalog.rest.config.CatalogRestConfiguration;
+import org.apache.fineract.cn.customer.internal.config.CustomerServiceConfiguration;
 import org.apache.fineract.cn.lang.ApplicationName;
 import org.apache.fineract.cn.lang.config.EnableApplicationName;
 import org.apache.fineract.cn.lang.config.EnableServiceException;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -51,27 +53,32 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableAnubis
 @EnableServiceException
 @EnableApplicationName
+@EnableFeignClients(
+        clients = {
+                AccountManager.class
+        }
+)
 @ComponentScan({
-    "org.apache.fineract.cn.customer.rest.controller"
+        "org.apache.fineract.cn.customer.rest.controller"
 })
 @Import({
-    CatalogRestConfiguration.class,
-    CustomerServiceConfiguration.class
+        CatalogRestConfiguration.class,
+        CustomerServiceConfiguration.class
 })
 @EnableConfigurationProperties({UploadProperties.class})
 public class CustomerRestConfiguration extends WebMvcConfigurerAdapter {
 
-  public CustomerRestConfiguration() {
-    super();
-  }
+    public CustomerRestConfiguration() {
+        super();
+    }
 
-  @Bean(name = ServiceConstants.LOGGER_NAME)
-  public Logger logger(final ApplicationName applicationName) {
-    return LoggerFactory.getLogger(applicationName.getServiceName());
-  }
+    @Bean(name = ServiceConstants.LOGGER_NAME)
+    public Logger logger(final ApplicationName applicationName) {
+        return LoggerFactory.getLogger(applicationName.getServiceName());
+    }
 
-  @Override
-  public void configurePathMatch(final PathMatchConfigurer configurer) {
-    configurer.setUseSuffixPatternMatch(Boolean.FALSE);
-  }
+    @Override
+    public void configurePathMatch(final PathMatchConfigurer configurer) {
+        configurer.setUseSuffixPatternMatch(Boolean.FALSE);
+    }
 }

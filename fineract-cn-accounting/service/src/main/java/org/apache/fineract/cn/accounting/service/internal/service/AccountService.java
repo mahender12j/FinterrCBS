@@ -115,28 +115,14 @@ public class AccountService {
     }
 
 
-    public SocialMatrix fetchSocialMatrixData(final String identifier,
-                                              final Double monthlySalary,
-                                              final String message) {
-        System.out.print("----------------Start Here --------------------");
-
+    public List<AccountEntry> findByAccountAndTransactionTypeAndType(final String identifier) {
         final AccountEntity accountEntity = this.accountRepository.findByIdentifier(identifier);
-        final List<AccountEntryEntity> accountEntryEntities = this.accountEntryRepository.findByAccountAndMessageEquals(accountEntity, message);
-        final Double donationAmount = accountEntryEntities.stream().mapToDouble(accountEntryEntitie -> accountEntryEntitie.getBalance()).sum();
-        final Double batteryPower = accountEntity.getBalance() / ((monthlySalary * 12) / 3);
-
-        System.err.print("-------------account balance---------------->" + accountEntity.getBalance());
-
-        final SocialMatrix socialMatrix = new SocialMatrix();
-        socialMatrix.setNumberOfTrees(Math.floor(donationAmount / 500));
-        socialMatrix.setBatteryPower((int) Math.round(batteryPower));
-        socialMatrix.setGoldenDonor(batteryPower / 3);
-        socialMatrix.setIdentifier(identifier);
-
-        System.out.print("-------------domation Amount---------------->" + donationAmount);
-
-        return socialMatrix;
+        final List<AccountEntryEntity> accountEntryEntities = this.accountEntryRepository.findByAccountAndTransactionTypeAndType(accountEntity, "BCDP", "CREDIT");
+        final List<AccountEntry> accountEntries = new ArrayList<>(accountEntryEntities.size());
+        accountEntryEntities.forEach(accountEntryEntity -> accountEntries.add(AccountEntryMapper.map(accountEntryEntity)));
+        return accountEntries;
     }
+
 
     public final List<AccountCommand> fetchCommandsByAccount(final String identifier) {
         final AccountEntity accountEntity = this.accountRepository.findByIdentifier(identifier);

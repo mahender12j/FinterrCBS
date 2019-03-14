@@ -25,60 +25,55 @@ import java.util.Objects;
 @SuppressWarnings({"unused"})
 public final class SocialMatrix {
 
-    @ValidIdentifier(maxLength = 34)
-    private String identifier;
-    private Double numberOfTrees;
-    private Double goldenDonor;
-    private int batteryPower;
+    private int greenContribution;
+    private int goldenDonor;
+    private int myPrower;
+    private int myInfluence;
 
     public SocialMatrix() {
         super();
     }
 
-    public String getIdentifier() {
-        return identifier;
+
+    public int getGreenContribution() {
+        return greenContribution;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setGreenContribution(int greenContribution) {
+        this.greenContribution = greenContribution;
     }
 
-    public Double getNumberOfTrees() {
-        return numberOfTrees;
-    }
-
-    public void setNumberOfTrees(Double numberOfTrees) {
-        this.numberOfTrees = numberOfTrees;
-    }
-
-    public Double getGoldenDonor() {
+    public int getGoldenDonor() {
         return goldenDonor;
     }
 
-    public void setGoldenDonor(Double goldenDonor) {
+    public void setGoldenDonor(int goldenDonor) {
         this.goldenDonor = goldenDonor;
     }
 
-    public int getBatteryPower() {
-        return batteryPower;
+    public int getMyPrower() {
+        return myPrower;
     }
 
-    public void setBatteryPower(int batteryPower) {
-        this.batteryPower = batteryPower;
+    public void setMyPrower(int myPrower) {
+        this.myPrower = myPrower;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(identifier, numberOfTrees, goldenDonor, batteryPower);
+    public int getMyInfluence() {
+        return myInfluence;
+    }
+
+    public void setMyInfluence(int myInfluence) {
+        this.myInfluence = myInfluence;
     }
 
     @Override
     public String toString() {
-        return "Account{" +
-                ", identifier='" + identifier + '\'' +
-                ", balance=" + numberOfTrees + '\'' +
-                ", totalDonation=" + goldenDonor + '\'' +
-                ", numberOfDonation=" + batteryPower +
+        return "SocialMatrix{" +
+                "greenContribution=" + greenContribution +
+                ", goldenDonor=" + goldenDonor +
+                ", myPrower=" + myPrower +
+                ", myInfluence=" + myInfluence +
                 '}';
     }
 }

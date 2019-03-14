@@ -20,6 +20,7 @@ version '0.1.0-BUILD-SNAPSHOT'
 
 ext.versions = [
         frameworkapi : '0.1.0-BUILD-SNAPSHOT',
+        fineractcnaccounting: '0.1.0-BUILD-SNAPSHOT',
         frameworklang : '0.1.0-BUILD-SNAPSHOT',
         frameworkasync : '0.1.0-BUILD-SNAPSHOT',
         frameworkcassandra : '0.1.0-BUILD-SNAPSHOT',

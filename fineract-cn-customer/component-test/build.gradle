@@ -25,7 +25,7 @@ buildscript {
     }
 
     dependencies {
-        classpath ("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.9.2")
     }
 }
@@ -37,6 +37,7 @@ plugins {
 
 apply from: '../shared.gradle'
 apply plugin: 'org.asciidoctor.convert'
+
 
 dependencies {
     compile(
@@ -55,8 +56,8 @@ asciidoctor {
     sourceDir 'build/doc/asciidoc/'
     outputDir 'build/doc/html5'
     options backend: "html", doctype: "book"
-    attributes "source-highlighter": "highlightjs", \
-                'snippets': file('build/doc/generated-snippets/')
+    attributes "source-highlighter": "highlightjs",  \
+                 'snippets': file('build/doc/generated-snippets/')
 }
 
 publishing {

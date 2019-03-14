@@ -45,10 +45,9 @@ public interface AccountEntryRepository extends JpaRepository<AccountEntryEntity
                                                                                   final String message,
                                                                                   final Pageable pageable);
 
-  List<AccountEntryEntity> findByAccountAndMessageEquals(final AccountEntity accountEntity,
-                                                         final String message);
-
 
   @Query("SELECT CASE WHEN count(a) > 0 THEN true ELSE false END FROM AccountEntryEntity a where a.account = :accountEntity")
   Boolean existsByAccount(@Param("accountEntity") final AccountEntity accountEntity);
+
+    List<AccountEntryEntity> findByAccountAndTransactionTypeAndType(AccountEntity accountEntity, String bcdp, String credit);
 }

@@ -23,6 +23,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.util.List;
 
 /**
@@ -83,6 +84,7 @@ public final class Cause {
     private String causeTxHash;
     private String accountNumber;
     private String ethAddress;
+    @Null
     private CauseStatistics causeStatistics;
 
     public Cause() {

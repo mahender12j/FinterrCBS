@@ -127,6 +127,35 @@ public class AccountRestController {
         }
     }
 
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.THOTH_ACCOUNT)
+    @RequestMapping(
+            value = "/{identifier}/find",
+            method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.ALL_VALUE}
+    )
+    @ResponseBody
+    List<AccountEntry> findByAccountAndTransactionTypeAndType(@PathVariable("identifier") final String identifier) {
+        return this.accountService.findByAccountAndTransactionTypeAndType(identifier);
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.THOTH_ACCOUNT)
+    @RequestMapping(value = "/user/{identifier}", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.ALL_VALUE}
+    )
+    @ResponseBody
+    Account findAccountByIdentifier(@PathVariable("identifier") final String identifier) {
+        final Optional<Account> optionalAccount = this.accountService.findAccount(identifier);
+        if (optionalAccount.isPresent()) {
+            return optionalAccount.get();
+        } else {
+            throw ServiceException.notFound("Account {0} not found.", identifier);
+        }
+    }
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.THOTH_ACCOUNT)
     @RequestMapping(
             value = "/{identifier}",
@@ -183,6 +212,9 @@ public class AccountRestController {
                 message,
                 PageableBuilder.create(pageIndex, size, sortColumn == null ? "transactionDate" : sortColumn, sortDirection)));
     }
+
+
+
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.THOTH_ACCOUNT)
     @RequestMapping(
@@ -293,30 +325,6 @@ public class AccountRestController {
         return ResponseEntity.ok(this.accountService.getActions(identifier));
     }
 
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.THOTH_ACCOUNT)
-    @RequestMapping(
-            value = "/{identifier}/socialmatrix/{message}/{monthlySalary}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<SocialMatrix> fetchAccount(
-            @PathVariable(value = "identifier") final String identifier,
-            @PathVariable(value = "monthlySalary") final Double monthlySalary,
-            @PathVariable(value = "message") final String message) {
-        Optional<Account> account = this.accountService.findAccount(identifier);
-
-        System.out.println("-------------social account matrix---------------->" + account);
-
-        if (account.isPresent()) {
-            return ResponseEntity.ok(accountService.fetchSocialMatrixData(identifier, monthlySalary, message));
-        } else {
-            throw ServiceException.notFound("Account {0} not found in this system.", identifier);
-        }
-    }
 
     private void validateLedger(final @RequestBody @Valid Account account) {
         final Optional<Ledger> optionalLedger = this.ledgerService.findLedger(account.getLedger());
