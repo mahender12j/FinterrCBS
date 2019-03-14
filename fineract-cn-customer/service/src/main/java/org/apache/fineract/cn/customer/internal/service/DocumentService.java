@@ -79,13 +79,15 @@ public class DocumentService {
 
     public CustomerDocument findCustomerDocuments(final String customerIdentifier) {
         final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).findFirst();
-        CustomerDocument customerDocument = DocumentMapper.map(documentEntity.get());
-        final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocument(documentEntity.get()).stream()
-                .collect(groupingBy(DocumentEntryEntity::getType, toList()));
-
-        List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
-        customerDocument.setDocumentsTypes(documentsType);
-        customerDocument.setKycStatus(documentsType.stream().allMatch(d -> d.isKYCVerified()));
+        CustomerDocument customerDocument = new CustomerDocument();
+        if (documentEntity.isPresent()) {
+            customerDocument = DocumentMapper.map(documentEntity.get());
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocument(documentEntity.get()).stream()
+                    .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+            List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
+            customerDocument.setDocumentsTypes(documentsType);
+            customerDocument.setKycStatus(documentsType.stream().allMatch(d -> d.isKYCVerified()));
+        }
         return customerDocument;
     }
 

@@ -28,6 +28,7 @@ import org.apache.fineract.cn.customer.internal.repository.*;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.command.annotation.Aggregate;
@@ -93,10 +94,11 @@ public class DocumentCommandHandler {
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT)
     public DocumentEvent process(final CreateKYCDocumentCommand command) throws IOException {
 
-        if (!documentRepository.findByIdentifierAndCustomer(command.getCustomerIdentifier())) {
-            customerRepository.findByIdentifier(command.getCustomerIdentifier())
-                    .map(customerEntity -> DocumentMapper.map(command.getCustomerDocumentsBody(), customerEntity))
-                    .ifPresent(documentRepository::save);
+        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifier(command.getCustomerIdentifier());
+
+        Boolean findDocument = documentRepository.findByIdentifierAndCustomer(command.getCustomerIdentifier());
+        if (!findDocument) {
+            documentRepository.save(DocumentMapper.map(command.getCustomerDocumentsBody(), customerEntity.get()));
         }
         final DocumentEntity documentEntity = documentRepository.findByCustomerIdAndDocumentIdentifier(
                 command.getCustomerIdentifier(), command.getCustomerIdentifier())
@@ -104,8 +106,8 @@ public class DocumentCommandHandler {
 
         final DocumentEntryEntity documentEntryEntity = DocumentMapper.map(command.getCustomerDocumentsBody(), documentEntity);
         documentEntryEntity.setStatus("PENDING");
-        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getFile(), 1, documentEntity, documentEntryEntity);
-        documentEntryRepository.save(documentEntryEntity);
+        DocumentEntryEntity doc = documentEntryRepository.save(documentEntryEntity);
+        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getFile(), 1, documentEntity, doc);
         documentPageRepository.save(documentPageEntity);
         return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerIdentifier());
     }
