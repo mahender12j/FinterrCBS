@@ -115,6 +115,13 @@ public class CustomerService {
                 }
 
                 customer.setSocialMatrix(socialMatrix);
+                if (customer.getRefAccountNumber() != null) {
+                    System.out.println("--------get account number" + customer.getRefAccountNumber());
+                    Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
+        
+                    System.out.println("------------------account-----------------------" + account.toString());
+                    customer.setRefferalBalance(account.getBalance());
+                }
                 final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
                 if (contactDetailEntities != null) {
                     customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
