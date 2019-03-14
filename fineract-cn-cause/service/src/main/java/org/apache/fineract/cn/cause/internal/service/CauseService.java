@@ -163,8 +163,10 @@ public class CauseService {
             causePage.setCauses(causes);
             for (CauseEntity causeEntity : causeEntities) {
                 final Cause cause = CauseMapper.map(causeEntity);
-                final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+                if (cause.getAccountNumber() != null) {
+                    final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                    cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+                }
                 cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
 
                 final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
