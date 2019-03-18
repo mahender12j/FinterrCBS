@@ -115,37 +115,40 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT)
-    public DocumentEvent process(final ChangeDocumentCommand command) throws IOException {
-        final DocumentEntity existingDocument = documentRepository.findByCustomerIdAndDocumentIdentifier(
-                command.getCustomerIdentifier(), command.getCustomerDocument().getIdentifier())
+    public DocumentEvent process(final ChangeDocumentStatusCommand command) throws IOException {
+
+        final DocumentEntryEntity existingDocument = documentEntryRepository.findByCustomerIdAndDocumentId(
+                command.getCustomerIdentifier(), command.getCustomerDocumentId())
                 .orElseThrow(() ->
                         ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found",
-                                command.getCustomerDocument().getIdentifier(), command.getCustomerIdentifier()));
+                                command.getCustomerDocumentId(), command.getCustomerIdentifier()));
 
-        customerRepository.findByIdentifier(command.getCustomerIdentifier())
-                .map(customerEntity -> DocumentMapper.map(command.getCustomerDocument(), customerEntity))
-                .ifPresent(documentEntity -> {
-                    documentEntity.setId(existingDocument.getId());
-                    documentRepository.save(documentEntity);
-                });
+        existingDocument.setStatus("APPROVED");
+        documentEntryRepository.save(existingDocument);
 
-        return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocument().getIdentifier());
+//        customerRepository.findByIdentifier(command.getCustomerIdentifier())
+//                .map(customerEntity -> DocumentMapper.map(command.getCustomerDocumentId(), customerEntity))
+//                .ifPresent(documentEntity -> {
+//                    documentEntity.setId(existingDocument.getId());
+//                    documentRepository.save(documentEntity);
+//                });
+
+        return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocumentId().toString());
     }
 
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.DELETE_DOCUMENT)
     public DocumentEvent process(final DeleteDocumentCommand command) throws IOException {
-        final DocumentEntity existingDocument = documentRepository.findByCustomerIdAndDocumentIdentifier(
-                command.getCustomerIdentifier(), command.getDocumentIdentifier())
+        final DocumentEntryEntity existingDocument = documentEntryRepository.findByCustomerIdAndDocumentId(command.getCustomerIdentifier(), command.getDocumentIdentifier())
                 .orElseThrow(() ->
                         ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found",
                                 command.getDocumentIdentifier(), command.getCustomerIdentifier()));
-        documentPageRepository.findByCustomerIdAndDocumentIdentifier(command.getCustomerIdentifier(), command.getDocumentIdentifier())
-                .forEach(documentPageRepository::delete);
-        documentRepository.delete(existingDocument);
+        existingDocument.setStatus("DELETED");
 
-        return new DocumentEvent(command.getCustomerIdentifier(), command.getDocumentIdentifier());
+        documentEntryRepository.save(existingDocument);
+
+        return new DocumentEvent(command.getCustomerIdentifier(), command.getDocumentIdentifier().toString());
     }
 
     @Transactional

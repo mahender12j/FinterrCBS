@@ -19,6 +19,7 @@
 package org.apache.fineract.cn.customer.internal.service;
 
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
 import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
 import org.apache.fineract.cn.customer.internal.mapper.DocumentMapper;
 import org.apache.fineract.cn.customer.internal.repository.*;
@@ -53,10 +54,9 @@ public class DocumentService {
         this.documentPageRepository = documentPageRepository;
     }
 
-    public Optional<DocumentPageEntity> findPage(
-            final String customerIdentifier,
-            final String documentIdentifier,
-            final Integer pageNumber) {
+    public Optional<DocumentPageEntity> findPage(final String customerIdentifier,
+                                                 final String documentIdentifier,
+                                                 final Integer pageNumber) {
         return this.documentPageRepository.findByCustomerIdAndDocumentIdentifierAndPageNumber(
                 customerIdentifier,
                 documentIdentifier,
@@ -82,7 +82,7 @@ public class DocumentService {
         CustomerDocument customerDocument = new CustomerDocument();
         if (documentEntity.isPresent()) {
             customerDocument = DocumentMapper.map(documentEntity.get());
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocument(documentEntity.get()).stream()
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity.get(), "DELETED").stream()
                     .collect(groupingBy(DocumentEntryEntity::getType, toList()));
             List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
             customerDocument.setDocumentsTypes(documentsType);
@@ -91,16 +91,13 @@ public class DocumentService {
         return customerDocument;
     }
 
-    public Optional<CustomerDocument> findDocument(
-            final String customerIdentifier,
-            final String documentIdentifier) {
-        return this.documentRepository.findByCustomerIdAndDocumentIdentifier(customerIdentifier, documentIdentifier)
+    public Optional<CustomerDocumentEntry> findDocument(final String customerIdentifier,
+                                                        final Long documentIdentifier) {
+        return this.documentEntryRepository.findByCustomerIdAndDocumentId(customerIdentifier, documentIdentifier)
                 .map(DocumentMapper::map);
     }
 
-    public boolean documentExists(
-            final String customerIdentifier,
-            final String documentIdentifier) {
+    public boolean documentExists(final String customerIdentifier, final Long documentIdentifier) {
         return findDocument(customerIdentifier, documentIdentifier).isPresent();
     }
 
@@ -108,24 +105,21 @@ public class DocumentService {
         return this.documentRepository.findByIdentifierAndCustomer(identifier);
     }
 
-    public Stream<Integer> findPageNumbers(
-            final String customerIdentifier,
-            final String documentIdentifier) {
+    public Stream<Integer> findPageNumbers(final String customerIdentifier,
+                                           final String documentIdentifier) {
         return documentPageRepository.findByCustomerIdAndDocumentIdentifier(customerIdentifier, documentIdentifier)
                 .map(DocumentPageEntity::getPageNumber);
     }
 
     public boolean isDocumentCompleted(final String customerIdentifier,
-                                       final String documentIdentifier) {
-        final Optional<DocumentEntity> documentEntity = documentRepository.findByCustomerIdAndDocumentIdentifier(customerIdentifier, documentIdentifier);
-
-        System.out.println("---------------is doucument avaialbe---->" + documentEntity.get());
-        return documentEntity.map(DocumentEntity::getCompleted).orElse(true);
+                                       final Long documentIdentifier) {
+        final Optional<DocumentEntryEntity> documentEntityOptional = documentEntryRepository.findByCustomerIdAndDocumentId(customerIdentifier, documentIdentifier);
+//        System.out.println("================documentEntityOptional.map(DocumentEntryEntity::getStatus)=============" + documentEntityOptional.map(DocumentEntryEntity::getStatus));
+        return documentEntityOptional.map(DocumentEntryEntity::getStatus).get().equals("APPROVED");
     }
 
-    public boolean isDocumentMissingPages(
-            final String customerIdentifier,
-            final String documentIdentifier) {
+    public boolean isDocumentMissingPages(final String customerIdentifier,
+                                          final String documentIdentifier) {
         final List<Integer> pageNumbers = findPageNumbers(customerIdentifier, documentIdentifier)
                 .sorted(Integer::compareTo)
                 .collect(Collectors.toList());

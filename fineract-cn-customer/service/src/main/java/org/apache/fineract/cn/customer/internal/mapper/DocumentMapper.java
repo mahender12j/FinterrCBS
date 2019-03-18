@@ -89,6 +89,17 @@ public class DocumentMapper {
     }
 
 
+    public static CustomerDocumentEntry map(DocumentEntryEntity documentEntryEntity) {
+        final CustomerDocumentEntry documentEntry = new CustomerDocumentEntry();
+        documentEntry.setId(documentEntryEntity.getId());
+        documentEntry.setDescription(documentEntryEntity.getDescription());
+        documentEntry.setStatus(documentEntryEntity.getStatus());
+        documentEntry.setSubType(documentEntryEntity.getSubType());
+        documentEntry.setType(documentEntryEntity.getType());
+        return documentEntry;
+    }
+
+
     public static DocumentEntryEntity map(final CustomerDocumentEntry customerDocumentEntry, final DocumentEntity documentEntity) {
         final DocumentEntryEntity ret = new DocumentEntryEntity();
         ret.setDescription(customerDocumentEntry.getDescription());
@@ -143,7 +154,6 @@ public class DocumentMapper {
         ret.setDocument(documentEntity);
         return ret;
     }
-
 
 
 }
