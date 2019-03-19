@@ -24,6 +24,7 @@ import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.cause.internal.mapper.*;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAdaptor;
+import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,10 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
 
 /*import org.apache.fineract.cn.cause.catalog.internal.repository.FieldEntity;
 import org.apache.fineract.cn.cause.catalog.internal.repository.FieldValueEntity;
@@ -99,20 +97,20 @@ public class CauseService {
                     final Cause cause = CauseMapper.map(causeEntity);
                     cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
 
-                    final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
-                    if (categoryEntities != null) {
-                        cause.setCauseCategories(
-                                categoryEntities
-                                        .stream()
-                                        .map(CategoryMapper::map)
-                                        .collect(Collectors.toList())
-                        );
-                        if (cause.getAccountNumber() != null) {
-                            final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                            cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
-                        }
-
-                    }
+//                    final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
+//                    if (categoryEntities != null) {
+//                        cause.setCauseCategories(
+//                                categoryEntities
+//                                        .stream()
+//                                        .map(CategoryMapper::map)
+//                                        .collect(Collectors.toList())
+//                        );
+//                        if (cause.getAccountNumber() != null) {
+//                            final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+//                            cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+//                        }
+//
+//                    }
 
                     final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
                     if (avgRatingValue != null) {
@@ -170,15 +168,15 @@ public class CauseService {
                 }
                 cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
 
-                final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
-                if (categoryEntities.size() == 0) {
-                    cause.setCauseCategories(
-                            categoryEntities
-                                    .stream()
-                                    .map(CategoryMapper::map)
-                                    .collect(toList())
-                    );
-                }
+//                final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
+//                if (categoryEntities.size() == 0) {
+//                    cause.setCauseCategories(
+//                            categoryEntities
+//                                    .stream()
+//                                    .map(CategoryMapper::map)
+//                                    .collect(toList())
+//                    );
+//                }
 
                 final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
                 if (avgRatingValue != null) {
@@ -192,6 +190,51 @@ public class CauseService {
         }
 
         return causePage;
+    }
+
+
+    public CausePage fetchCauseByCategory(final String categoryIdentifier, final Pageable pageable) {
+
+        final CausePage causePage = new CausePage();
+        final Page<CauseEntity> causeEntities;
+        Optional<CategoryEntity> categoryEntity;
+        CauseCategory causeCategory = new CauseCategory();
+
+        if (categoryIdentifier != null) {
+            categoryEntity = categoryRepository.findByIdentifier(categoryIdentifier);
+            causeEntities = this.causeRepository.findByCategory(categoryEntity.get(), pageable);
+            causeCategory = CategoryMapper.map(categoryEntity.get());
+        } else {
+            causeEntities = this.causeRepository.findAll(pageable);
+            if (causeEntities.getSize() > 0) {
+                final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
+                causePage.setCauses(causes);
+                for (CauseEntity causeEntity : causeEntities) {
+                    final Cause cause = CauseMapper.map(causeEntity);
+                    if (cause.getAccountNumber() != null) {
+                        final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                        cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+                    }
+                    cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+                    cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
+                    final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
+
+                    if (avgRatingValue != null) {
+                        cause.setAvgRating(avgRatingValue.toString());
+                    } else {
+                        cause.setAvgRating("0");
+                    }
+
+                    causes.add(cause);
+                }
+            }
+        }
+
+        causePage.setTotalPages(causeEntities.getTotalPages());
+        causePage.setTotalElements(causeEntities.getTotalElements());
+
+        return causePage;
+
     }
 
 

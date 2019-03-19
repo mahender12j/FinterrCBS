@@ -33,14 +33,21 @@ import java.util.List;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
-    @Query("SELECT d FROM CategoryEntity d WHERE d.cause.identifier = :causeIdentifier AND d.identifier = :categoryIdentifier")
-    Optional<CategoryEntity> findByCauseIdAndCategoryIdentifier(
-            @Param("causeIdentifier") String causeIdentifier, @Param("categoryIdentifier") String categoryIdentifier);
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CategoryEntity c WHERE c.identifier = :identifier")
+    Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
-    @Query("SELECT d FROM CategoryEntity d WHERE d.cause.identifier = :causeIdentifier")
-    Stream<CategoryEntity> findByCauseId(
-            @Param("causeIdentifier") String causeIdentifier);
+    Optional<CategoryEntity> findByIdentifier(final String id);
 
-    List<CategoryEntity> findByCause(final CauseEntity causeEntity);
+    //    @Query("SELECT d FROM CategoryEntity d WHERE d.cause.identifier = :causeIdentifier AND d.identifier = :categoryIdentifier")
+//    Optional<CategoryEntity> findByCauseIdAndCategoryIdentifier(
+
+//            @Param("causeIdentifier") String causeIdentifier, @Param("categoryIdentifier") String categoryIdentifier);
+//    @Query("SELECT d FROM CategoryEntity d WHERE d.cause.identifier = :causeIdentifier")
+//    Stream<CategoryEntity> findByCauseId(
+
+//            @Param("causeIdentifier") String causeIdentifier);
+
+
+//    List<CategoryEntity> findByCause(final CauseEntity causeEntity);
 }
 

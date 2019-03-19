@@ -64,8 +64,8 @@ public class CauseAggregate {
                           final IdentificationCardRepository identificationCardRepository,
                           final IdentificationCardScanRepository identificationCardScanRepository,
                           final PortraitRepository portraitRepository,
-                        final CategoryRepository categoryRepository,
-                        final RatingRepository ratingRepository,
+                          final CategoryRepository categoryRepository,
+                          final RatingRepository ratingRepository,
                           final CommandRepository commandRepository,
                           final TaskAggregate taskAggregate) {
         super();
@@ -85,27 +85,22 @@ public class CauseAggregate {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE)
     public String createCause(final CreateCauseCommand createCauseCommand) {
         final Cause cause = createCauseCommand.cause();
+        final CategoryEntity addressEntity;
+        if (!categoryRepository.existsByIdentifier(cause.getCauseCategories().getIdentifier())) {
+
+            addressEntity = this.categoryRepository.save(CategoryMapper.map(cause.getCauseCategories()));
+        }else {
+            addressEntity = this.categoryRepository.findByIdentifier(cause.getCauseCategories().getIdentifier()).get();
+        }
 
         final AddressEntity savedAddress = this.addressRepository.save(AddressMapper.map(cause.getAddress()));
-
         final CauseEntity causeEntity = CauseMapper.map(cause);
+        causeEntity.setCategory(addressEntity);
         causeEntity.setCurrentState(Cause.State.PENDING.name());
         causeEntity.setAddress(savedAddress);
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
-        if (cause.getCauseCategories() != null) {
-            this.categoryRepository.save(
-                cause.getCauseCategories()
-                    .stream()
-                    .map(category -> {
-                      final CategoryEntity categoryEntity = CategoryMapper.map(category);
-                      categoryEntity.setCause(savedCauseEntity);
-                      return categoryEntity;
-                    })
-                    .collect(Collectors.toList())
-            );
-        }
-        this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.ACTIVATE);
 
+        this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.ACTIVATE);
         return cause.getIdentifier();
     }
 
@@ -216,21 +211,21 @@ public class CauseAggregate {
     public String deleteCause(final DeleteCauseCommand deleteCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseCommand.getCauseIdentifier());
 
-        System.out.println("deleteCause --- CauseIndentifier :: "+deleteCauseCommand.getCauseIdentifier());
+        System.out.println("deleteCause --- CauseIndentifier :: " + deleteCauseCommand.getCauseIdentifier());
         causeEntity.setCurrentState(Cause.State.DELETED.name());
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
-        System.out.println("deleteCause --- savedCauseEntity :: "+savedCauseEntity);
-        
+        System.out.println("deleteCause --- savedCauseEntity :: " + savedCauseEntity);
+
 
         this.commandRepository.save(
                 CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), deleteCauseCommand.comment())
         );
 
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.UNLOCK);
-        System.out.println("deleteCause --- end :: "+ deleteCauseCommand.getCauseIdentifier());
+        System.out.println("deleteCause --- end :: " + deleteCauseCommand.getCauseIdentifier());
         return deleteCauseCommand.getCauseIdentifier();
     }
 

@@ -18,8 +18,15 @@
  */
 package org.apache.fineract.cn.cause.internal.repository;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.apache.fineract.cn.mariadb.util.LocalDateConverter;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -52,6 +59,11 @@ public class CauseEntity {
     @Column(name = "completed_date")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime completedDate;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private CategoryEntity category;
+
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private AddressEntity address;
@@ -113,6 +125,15 @@ public class CauseEntity {
     @Column(name = "eth_address")
     private String ethAddress;
 
+
+    public Boolean getTaxExamption() {
+        return isTaxExamption;
+    }
+
+    public void setTaxExamption(Boolean taxExamption) {
+        isTaxExamption = taxExamption;
+    }
+
     public CauseEntity() {
         super();
     }
@@ -134,45 +155,45 @@ public class CauseEntity {
     }
 
     public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public LocalDateTime getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(LocalDateTime startDate) {
-		this.startDate = startDate;
-	}
-
-	public LocalDateTime getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(LocalDateTime endDate) {
-		this.endDate = endDate;
-	}
-
-	public LocalDateTime getCompletedDate() {
-		return completedDate;
-	}
-
-	public void setCompletedDate(LocalDateTime completedDate) {
-		this.completedDate = completedDate;
+        return title;
     }
-    
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDateTime getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDateTime getCompletedDate() {
+        return completedDate;
+    }
+
+    public void setCompletedDate(LocalDateTime completedDate) {
+        this.completedDate = completedDate;
+    }
+
     public AddressEntity getAddress() {
         return this.address;
     }
@@ -190,93 +211,93 @@ public class CauseEntity {
     }
 
     public Double getSoftTarget() {
-		return softTarget;
-	}
-
-	public void setSoftTarget(Double softTarget) {
-		this.softTarget = softTarget;
-	}
-
-	public Double getHardTarget() {
-		return hardTarget;
-	}
-
-	public void setHardTarget(Double hardTarget) {
-		this.hardTarget = hardTarget;
-	}
-
-	public Boolean getIsTaxExamption() {
-		return isTaxExamption;
-	}
-
-	public void setIsTaxExamption(Boolean isTaxExamption) {
-		this.isTaxExamption = isTaxExamption;
-	}
-
-	public Double getActualRaisedFiat() {
-		return actualRaisedFiat;
-	}
-
-	public void setActualRaisedFiat(Double actualRaisedFiat) {
-		this.actualRaisedFiat = actualRaisedFiat;
-	}
-
-	public Double getActualRaisedFin() {
-		return actualRaisedFin;
-	}
-
-	public void setActualRaisedFin(Double actualRaisedFin) {
-		this.actualRaisedFin = actualRaisedFin;
-	}
-
-	public Double getMinAmount() {
-		return minAmount;
-	}
-
-	public void setMinAmount(Double minAmount) {
-		this.minAmount = minAmount;
-	}
-
-	public Double getMaxAmount() {
-		return maxAmount;
-	}
-
-	public void setMaxAmount(Double maxAmount) {
-		this.maxAmount = maxAmount;
-	}
-
-	public String getAcceptedDenominationAmounts() {
-		return acceptedDenominationAmounts;
-	}
-
-	public void setAcceptedDenominationAmounts(String acceptedDenominationAmounts) {
-		this.acceptedDenominationAmounts = acceptedDenominationAmounts;
-	}
-
-	public Double getManagementFee() {
-		return managementFee;
-	}
-
-	public void setManagementFee(Double managementFee) {
-		this.managementFee = managementFee;
-	}
-
-	public Double getFinCollLimit() {
-		return finCollLimit;
-	}
-
-	public void setFinCollLimit(Double finCollLimit) {
-		this.finCollLimit = finCollLimit;
-	}
-
-	public String getFinRate() {
-		return finRate;
-	}
-
-	public void setFinRate(String finRate) {
-		this.finRate = finRate;
+        return softTarget;
     }
-    
+
+    public void setSoftTarget(Double softTarget) {
+        this.softTarget = softTarget;
+    }
+
+    public Double getHardTarget() {
+        return hardTarget;
+    }
+
+    public void setHardTarget(Double hardTarget) {
+        this.hardTarget = hardTarget;
+    }
+
+    public Boolean getIsTaxExamption() {
+        return isTaxExamption;
+    }
+
+    public void setIsTaxExamption(Boolean isTaxExamption) {
+        this.isTaxExamption = isTaxExamption;
+    }
+
+    public Double getActualRaisedFiat() {
+        return actualRaisedFiat;
+    }
+
+    public void setActualRaisedFiat(Double actualRaisedFiat) {
+        this.actualRaisedFiat = actualRaisedFiat;
+    }
+
+    public Double getActualRaisedFin() {
+        return actualRaisedFin;
+    }
+
+    public void setActualRaisedFin(Double actualRaisedFin) {
+        this.actualRaisedFin = actualRaisedFin;
+    }
+
+    public Double getMinAmount() {
+        return minAmount;
+    }
+
+    public void setMinAmount(Double minAmount) {
+        this.minAmount = minAmount;
+    }
+
+    public Double getMaxAmount() {
+        return maxAmount;
+    }
+
+    public void setMaxAmount(Double maxAmount) {
+        this.maxAmount = maxAmount;
+    }
+
+    public String getAcceptedDenominationAmounts() {
+        return acceptedDenominationAmounts;
+    }
+
+    public void setAcceptedDenominationAmounts(String acceptedDenominationAmounts) {
+        this.acceptedDenominationAmounts = acceptedDenominationAmounts;
+    }
+
+    public Double getManagementFee() {
+        return managementFee;
+    }
+
+    public void setManagementFee(Double managementFee) {
+        this.managementFee = managementFee;
+    }
+
+    public Double getFinCollLimit() {
+        return finCollLimit;
+    }
+
+    public void setFinCollLimit(Double finCollLimit) {
+        this.finCollLimit = finCollLimit;
+    }
+
+    public String getFinRate() {
+        return finRate;
+    }
+
+    public void setFinRate(String finRate) {
+        this.finRate = finRate;
+    }
+
     public String getApprovedBy() {
         return this.approvedBy;
     }
@@ -326,60 +347,69 @@ public class CauseEntity {
     }
 
     public String getTaxExemptionPercentage() {
-		return taxExemptionPercentage;
-	}
-
-	public void setTaxExemptionPercentage(String taxExemptionPercentage) {
-		this.taxExemptionPercentage = taxExemptionPercentage;
-	}
-
-	public String getWebsiteUrl() {
-		return websiteUrl;
-	}
-
-	public void setWebsiteUrl(String websiteUrl) {
-		this.websiteUrl = websiteUrl;
-	}
-
-	public String getSmediaLinks() {
-		return smediaLinks;
-	}
-
-	public void setSmediaLinks(String smediaLinks) {
-		this.smediaLinks = smediaLinks;
-	}
-
-	public String getVideoUrls() {
-		return videoUrls;
-	}
-
-	public void setVideoUrls(String videoUrls) {
-		this.videoUrls = videoUrls;
+        return taxExemptionPercentage;
     }
-    
+
+    public void setTaxExemptionPercentage(String taxExemptionPercentage) {
+        this.taxExemptionPercentage = taxExemptionPercentage;
+    }
+
+    public String getWebsiteUrl() {
+        return websiteUrl;
+    }
+
+    public void setWebsiteUrl(String websiteUrl) {
+        this.websiteUrl = websiteUrl;
+    }
+
+    public String getSmediaLinks() {
+        return smediaLinks;
+    }
+
+    public void setSmediaLinks(String smediaLinks) {
+        this.smediaLinks = smediaLinks;
+    }
+
+    public String getVideoUrls() {
+        return videoUrls;
+    }
+
+    public void setVideoUrls(String videoUrls) {
+        this.videoUrls = videoUrls;
+    }
+
     public String getCauseTxHash() {
-		return causeTxHash;
-	}
-
-	public void setCauseTxHash(String causeTxHash) {
-		this.causeTxHash = causeTxHash;
+        return causeTxHash;
     }
-    
+
+    public void setCauseTxHash(String causeTxHash) {
+        this.causeTxHash = causeTxHash;
+    }
+
     public String getAccountNumber() {
-		return this.accountNumber;
-	}
-
-	public void setAccountNumber(final String accountNumber) {
-		this.accountNumber = accountNumber;
+        return this.accountNumber;
     }
-    
-    public String getEthAddress() {
-		return this.ethAddress;
-	}
 
-	public void setEthAddress(final String ethAddress) {
-		this.ethAddress = ethAddress;
-	}
+    public void setAccountNumber(final String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    public String getEthAddress() {
+        return this.ethAddress;
+    }
+
+    public void setEthAddress(final String ethAddress) {
+        this.ethAddress = ethAddress;
+    }
+
+
+    public CategoryEntity getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryEntity category) {
+        this.category = category;
+    }
 
     @Override
     public boolean equals(final Object o) {

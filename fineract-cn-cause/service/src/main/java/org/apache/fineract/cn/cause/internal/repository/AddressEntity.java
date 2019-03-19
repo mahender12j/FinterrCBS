@@ -110,4 +110,6 @@ public class AddressEntity {
     public void setCountry(final String country) {
         this.country = country;
     }
+
+
 }

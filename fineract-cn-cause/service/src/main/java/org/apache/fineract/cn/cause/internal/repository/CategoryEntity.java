@@ -36,9 +36,9 @@ public class CategoryEntity {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cause_id")
-    private CauseEntity cause;
+    //    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    //    @JoinColumn(name = "cause_id")
+    //    private List<CauseEntity> cause;
 
     @Column(name = "identifier", nullable = false)
     private String identifier;
@@ -68,13 +68,6 @@ public class CategoryEntity {
         this.id = id;
     }
 
-    public CauseEntity getCause() {
-        return cause;
-    }
-
-    public void setCause(CauseEntity cause) {
-        this.cause = cause;
-    }
 
     public String getIdentifier() {
         return identifier;
@@ -119,15 +112,19 @@ public class CategoryEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof CategoryEntity)) return false;
         CategoryEntity that = (CategoryEntity) o;
-        return Objects.equals(cause, that.cause) &&
-                Objects.equals(identifier, that.identifier);
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getIdentifier(), that.getIdentifier()) &&
+                Objects.equals(getDescription(), that.getDescription()) &&
+                Objects.equals(getActive(), that.getActive()) &&
+                Objects.equals(getCreatedBy(), that.getCreatedBy()) &&
+                Objects.equals(getCreatedOn(), that.getCreatedOn());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cause, identifier);
+        return Objects.hash(getId(), getIdentifier(), getDescription(), getActive(), getCreatedBy(), getCreatedOn());
     }
 }
 

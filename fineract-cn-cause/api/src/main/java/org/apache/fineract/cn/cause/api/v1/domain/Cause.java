@@ -18,13 +18,10 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.apache.fineract.cn.lang.DateOfBirth;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import java.util.List;
 
 /**
  * @author Padma Raju Sattineni
@@ -74,8 +71,9 @@ public final class Cause {
     private String lastModifiedBy;
     private String lastModifiedOn;
 
+
     @Valid
-    private List<CauseCategory> causeCategories;
+    private CauseCategory causeCategories;
     private String taxExemptionPercentage;
     private String websiteUrl;
     private String smediaLinks;
@@ -300,11 +298,19 @@ public final class Cause {
         this.lastModifiedOn = lastModifiedOn;
     }
 
-    public List<CauseCategory> getCauseCategories() {
-        return this.causeCategories;
+    public Boolean getTaxExamption() {
+        return isTaxExamption;
     }
 
-    public void setCauseCategories(final List<CauseCategory> causeCategories) {
+    public void setTaxExamption(Boolean taxExamption) {
+        isTaxExamption = taxExamption;
+    }
+
+    public CauseCategory getCauseCategories() {
+        return causeCategories;
+    }
+
+    public void setCauseCategories(CauseCategory causeCategories) {
         this.causeCategories = causeCategories;
     }
 

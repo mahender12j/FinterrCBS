@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.cn.cause.rest.controller;
 
-//import org.apache.fineract.cn.cause.catalog.internal.service.FieldValueValidator;
-
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.util.UserContextHolder;
@@ -56,7 +54,6 @@ public class CauseRestController {
     private final Logger logger;
     private final CommandGateway commandGateway;
     private final CauseService causeService;
-    //private final FieldValueValidator fieldValueValidator;
     private final TaskService taskService;
     private final Environment environment;
 
@@ -64,14 +61,12 @@ public class CauseRestController {
     public CauseRestController(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
                                final CommandGateway commandGateway,
                                final CauseService causeService,
-                               //final FieldValueValidator fieldValueValidator,
                                final TaskService taskService,
                                final Environment environment) {
         super();
         this.logger = logger;
         this.commandGateway = commandGateway;
         this.causeService = causeService;
-        //this.fieldValueValidator = fieldValueValidator;
         this.taskService = taskService;
         this.environment = environment;
     }
@@ -96,17 +91,12 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public
-    @ResponseBody
+    public @ResponseBody
     ResponseEntity<Void> createCause(@RequestBody @Valid final Cause cause) throws InterruptedException {
         if (this.causeService.causeExists(cause.getIdentifier())) {
             throw ServiceException.conflict("Cause {0} already exists.", cause.getIdentifier());
         }
 
-   /* if (cause.getCustomValues() != null) {
-      this.fieldValueValidator.validateValues(cause.getCustomValues());
-    }
-*/
         this.commandGateway.process(new CreateCauseCommand(cause));
         return ResponseEntity.accepted().build();
     }
@@ -131,6 +121,25 @@ public class CauseRestController {
         return ResponseEntity.ok(this.causeService.fetchCause(
                 term, (includeClosed != null ? includeClosed : Boolean.FALSE), (onlyActive != null ? onlyActive : Boolean.FALSE),
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/filter",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<CausePage> fetchCausesByCategory(
+            @RequestParam(value = "category", required = false) final String category,
+            @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
+            @RequestParam(value = "size", required = false) final Integer size,
+            @RequestParam(value = "sortColumn", required = false) final String sortColumn,
+            @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
+
+        return ResponseEntity.ok(this.causeService.fetchCauseByCategory(category, this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
@@ -288,7 +297,7 @@ public class CauseRestController {
             // if (this.causeService.causeRatingExists(identifier, rating.getCreatedBy())) {
             //     throw ServiceException.notFound("Already rating given for this Cause {0}.", identifier);
             // } else {
-                this.commandGateway.process(new CreateRatingCommand(identifier, rating));
+            this.commandGateway.process(new CreateRatingCommand(identifier, rating));
             //}
 
         } else {
