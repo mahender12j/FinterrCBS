@@ -104,30 +104,32 @@ public class CauseAggregate {
         causeEntity.setAddress(savedAddress);
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
         DocumentEntity documentEntity = documentRepository.save(DocumentMapper.map(savedCauseEntity));
+
+
+        System.out.println("------------------cause getFeature----------------------" + createCauseCommand.getFeature());
+        System.out.println("------------------cause getTerms----------------------" + createCauseCommand.getTerms());
+        System.out.println("------------------cause getCause----------------------" + createCauseCommand.getCause());
+
         List<DocumentPageEntity> documentPageEntityList = new ArrayList<>();
+        documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getFeature(), documentEntity, "Feature"));
+        documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getTerms(), documentEntity, "Terms"));
+
         for (MultipartFile d : createCauseCommand.getGallery()) {
             documentPageEntityList.add(DocumentMapper.map(d, documentEntity, "Gallary"));
         }
 
-        if (createCauseCommand.getFeature() != null) {
-            documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getFeature(), documentEntity, "Feature"));
-        }
-
-
-        if (createCauseCommand.getFeature() != null) {
+        if (createCauseCommand.getOther() != null) {
             documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getOther(), documentEntity, "Other"));
 
         }
 
-        if (createCauseCommand.getFeature() != null) {
+        if (createCauseCommand.getTax() != null) {
             documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getTax(), documentEntity, "Tax"));
         }
 
-        if (createCauseCommand.getFeature() != null) {
-            documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getTerms(), documentEntity, "Terms"));
-        }
 
         documentPageRepository.save(documentPageEntityList);
+
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.ACTIVATE);
         System.out.println("------------------cause identifier----------------------" + causeEntity.toString());
         System.out.println("-----------------------documentEntity--------------------" + documentEntity.toString());

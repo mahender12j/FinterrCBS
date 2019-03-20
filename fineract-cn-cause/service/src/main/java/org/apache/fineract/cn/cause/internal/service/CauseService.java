@@ -95,36 +95,19 @@ public class CauseService {
   }*/
 
     public Optional<Cause> findCause(final String identifier) {
-        return causeRepository.findByIdentifier(identifier)
-                .map(causeEntity -> {
-                    final Cause cause = CauseMapper.map(causeEntity);
-                    cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
-
-//                    final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
-//                    if (categoryEntities != null) {
-//                        cause.setCauseCategories(
-//                                categoryEntities
-//                                        .stream()
-//                                        .map(CategoryMapper::map)
-//                                        .collect(Collectors.toList())
-//                        );
-//                        if (cause.getAccountNumber() != null) {
-//                            final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-//                            cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
-//                        }
-//
-//                    }
-
-                    final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
-                    if (avgRatingValue != null) {
-                        cause.setAvgRating(avgRatingValue.toString());
-                    } else {
-                        cause.setAvgRating("0");
-                    }
+        return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
+            final Cause cause = CauseMapper.map(causeEntity);
+            cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+            final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
+            if (avgRatingValue != null) {
+                cause.setAvgRating(avgRatingValue.toString());
+            } else {
+                cause.setAvgRating("0");
+            }
 
 
-                    return cause;
-                });
+            return cause;
+        });
     }
 
     public CausePage fetchCause(final String term, final Boolean includeClosed, final Boolean onlyActive, final Pageable pageable) {

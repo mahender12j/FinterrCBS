@@ -24,12 +24,14 @@ import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
-import org.apache.fineract.cn.cause.internal.command.*;
+import org.apache.fineract.cn.cause.internal.command.ChangeDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.CompleteDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.CreateDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.DeleteDocumentCommand;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.DocumentService;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.lang.ServiceException;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -205,6 +207,8 @@ public class DocumentsRestController {
 //        return ResponseEntity.ok(documentService.findPageNumbers(causeIdentifier, documentIdentifier).collect(Collectors.toList()));
 //    }
 
+// todo
+
 
 //    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
 //    @RequestMapping(
@@ -226,55 +230,55 @@ public class DocumentsRestController {
 //                .contentType(MediaType.parseMediaType(documentPageEntity.getContentType()))
 //                .contentLength(documentPageEntity.getImage().length)
 //                .body(documentPageEntity.getImage());
+//}
+
+//
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/{documentidentifier}/pages/{pagenumber}",
+//            method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> createDocumentPage(
+//            @PathVariable("causeidentifier") final String causeIdentifier,
+//            @PathVariable("documentidentifier") final String documentIdentifier,
+//            @PathVariable("pagenumber") @Range(min = 0) final Integer pageNumber,
+//            @RequestBody final MultipartFile page) {
+//        if (page == null) {
+//            throw ServiceException.badRequest("Document not found");
+//        }
+//
+//        throwIfCauseNotExists(causeIdentifier);
+//        throwIfDocumentCompleted(causeIdentifier, documentIdentifier);
+//        throwIfInvalidContentType(page.getContentType());
+//
+//        commandGateway.process(new CreateDocumentPageCommand(causeIdentifier, documentIdentifier, pageNumber, page));
+//
+//        return ResponseEntity.accepted().build();
 //    }
 
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}/pages/{pagenumber}",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> createDocumentPage(
-            @PathVariable("causeidentifier") final String causeIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier,
-            @PathVariable("pagenumber") @Range(min = 0) final Integer pageNumber,
-            @RequestBody final MultipartFile page) {
-        if (page == null) {
-            throw ServiceException.badRequest("Document not found");
-        }
-
-        throwIfCauseNotExists(causeIdentifier);
-        throwIfDocumentCompleted(causeIdentifier, documentIdentifier);
-        throwIfInvalidContentType(page.getContentType());
-
-        commandGateway.process(new CreateDocumentPageCommand(causeIdentifier, documentIdentifier, pageNumber, page));
-
-        return ResponseEntity.accepted().build();
-    }
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}/pages/{pagenumber}",
-            method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> deleteDocumentPage(
-            @PathVariable("causeidentifier") final String causeIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier,
-            @PathVariable("pagenumber") final Integer pageNumber) {
-        throwIfCauseDocumentNotExists(causeIdentifier, documentIdentifier);
-
-        throwIfDocumentCompleted(causeIdentifier, documentIdentifier);
-
-        commandGateway.process(new DeleteDocumentPageCommand(causeIdentifier, documentIdentifier, pageNumber));
-
-        return ResponseEntity.accepted().build();
-    }
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/{documentidentifier}/pages/{pagenumber}",
+//            method = RequestMethod.DELETE,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.ALL_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> deleteDocumentPage(
+//            @PathVariable("causeidentifier") final String causeIdentifier,
+//            @PathVariable("documentidentifier") final String documentIdentifier,
+//            @PathVariable("pagenumber") final Integer pageNumber) {
+//        throwIfCauseDocumentNotExists(causeIdentifier, documentIdentifier);
+//
+//        throwIfDocumentCompleted(causeIdentifier, documentIdentifier);
+//
+//        commandGateway.process(new DeleteDocumentPageCommand(causeIdentifier, documentIdentifier, pageNumber));
+//
+//        return ResponseEntity.accepted().build();
+//    }
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
@@ -298,7 +302,7 @@ public class DocumentsRestController {
 //        if (feature == null) {
 //            throw ServiceException.badRequest("Document not found");
 //        }
-        System.out.println("----------------gallery---------------------" + gallery);
+//        System.out.println("----------------gallery---------------------" + gallery);
 
         commandGateway.process(new CreateDocumentCommand(causeIdentifier, cause, feature, gallery, tax, terms, other));
 
