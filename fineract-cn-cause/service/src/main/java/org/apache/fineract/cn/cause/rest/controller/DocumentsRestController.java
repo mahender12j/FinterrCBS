@@ -28,6 +28,7 @@ import org.apache.fineract.cn.cause.internal.command.ChangeDocumentCommand;
 import org.apache.fineract.cn.cause.internal.command.CompleteDocumentCommand;
 import org.apache.fineract.cn.cause.internal.command.CreateDocumentCommand;
 import org.apache.fineract.cn.cause.internal.command.DeleteDocumentCommand;
+import org.apache.fineract.cn.cause.internal.repository.DocumentPageEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.DocumentService;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
@@ -210,27 +211,26 @@ public class DocumentsRestController {
 // todo
 
 
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-//    @RequestMapping(
-//            value = "/{documentidentifier}/pages/{pagenumber}",
-//            method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.ALL_VALUE
-//    )
-//    public ResponseEntity<byte[]> getDocumentPage(
-//            @PathVariable("causeidentifier") final String causeIdentifier,
-//            @PathVariable("documentidentifier") final String documentIdentifier,
-//            @PathVariable("pagenumber") final Integer pageNumber) {
-//        final DocumentPageEntity documentPageEntity = documentService.findPage(causeIdentifier, documentIdentifier, pageNumber)
-//                .orElseThrow(() -> ServiceException.notFound("Page ''{0}'' of document ''{1}'' for cause ''{2}'' not found.",
-//                        pageNumber, documentIdentifier, causeIdentifier));
-//
-//        return ResponseEntity
-//                .ok()
-//                .contentType(MediaType.parseMediaType(documentPageEntity.getContentType()))
-//                .contentLength(documentPageEntity.getImage().length)
-//                .body(documentPageEntity.getImage());
-//}
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/{documentidentifier}/file",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<byte[]> getDocumentPage(
+            @PathVariable("causeidentifier") final String causeIdentifier,
+            @PathVariable("documentidentifier") final Long documentId) {
+
+        final DocumentPageEntity documentPageEntity = documentService.findPage(documentId)
+                .orElseThrow(() -> ServiceException.notFound("Page ''{0}'' of document id ''{1}'' for cause ''{2}'' not found.", documentId, causeIdentifier));
+
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.parseMediaType(documentPageEntity.getContentType()))
+                .contentLength(documentPageEntity.getImage().length)
+                .body(documentPageEntity.getImage());
+    }
 
 //
 //    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)

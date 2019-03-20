@@ -21,6 +21,7 @@ package org.apache.fineract.cn.cause.internal.mapper;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentPageEntity;
@@ -30,6 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Myrle Krantz
@@ -42,11 +45,9 @@ public class DocumentMapper {
 
     public static DocumentPageEntity map(
             final MultipartFile multipartFile,
-            final int pageNumber,
             final DocumentEntity documentEntity) throws IOException {
         final DocumentPageEntity ret = new DocumentPageEntity();
         ret.setDocument(documentEntity);
-//        ret.setPageNumber(pageNumber);
         ret.setImage(multipartFile.getBytes());
         ret.setSize(multipartFile.getSize());
         ret.setContentType(multipartFile.getContentType());
@@ -96,4 +97,20 @@ public class DocumentMapper {
         pageEntity.setType(type);
         return pageEntity;
     }
+
+
+    public static List<CauseDocumentPage> map(List<DocumentPageEntity> pageEntity) {
+        List<CauseDocumentPage> documentPages = new ArrayList<>();
+
+        pageEntity.forEach(d -> {
+            CauseDocumentPage causeDocumentPage = new CauseDocumentPage();
+            causeDocumentPage.setId(d.getId());
+            causeDocumentPage.setType(d.getType());
+            documentPages.add(causeDocumentPage);
+        });
+
+        return documentPages;
+    }
+
+
 }

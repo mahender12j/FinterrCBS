@@ -48,15 +48,9 @@ public class DocumentService {
         this.documentPageRepository = documentPageRepository;
     }
 
-//    public Optional<DocumentPageEntity> findPage(
-//            final String causeIdentifier,
-//            final String documentIdentifier,
-//            final Integer pageNumber) {
-//        return this.documentPageRepository.findByCauseIdAndDocumentIdentifierAndPageNumber(
-//                causeIdentifier,
-//                documentIdentifier,
-//                pageNumber);
-//    }
+    public Optional<DocumentPageEntity> findPage(final Long documentId) {
+        return this.documentPageRepository.findById(documentId);
+    }
 
     public Stream<CauseDocument> find(final String causeIdentifier) {
         final Stream<DocumentEntity> preMappedRet = this.documentRepository.findByCauseId(causeIdentifier);

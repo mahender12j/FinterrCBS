@@ -107,6 +107,8 @@ public class CauseRestController {
         }
 
         this.commandGateway.process(new CreateCauseCommand(cause, feature, gallery, tax, terms, other));
+
+
         return ResponseEntity.accepted().build();
     }
 

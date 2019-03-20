@@ -21,6 +21,7 @@ package org.apache.fineract.cn.cause.api.v1.domain;
 import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -40,6 +41,7 @@ public class CauseDocument {
     private boolean completed;
     private String createdBy;
     private String createdOn;
+    private List<CauseDocumentPage> causeDocumentPages;
 
 
     public CauseDocument() {
@@ -91,6 +93,14 @@ public class CauseDocument {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<CauseDocumentPage> getCauseDocumentPages() {
+        return causeDocumentPages;
+    }
+
+    public void setCauseDocumentPages(List<CauseDocumentPage> causeDocumentPages) {
+        this.causeDocumentPages = causeDocumentPages;
     }
 
     @Override

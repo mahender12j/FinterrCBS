@@ -30,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.Document;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +48,7 @@ public class CauseService {
 
     private final CauseRepository causeRepository;
     private final DocumentRepository documentRepository;
+    private final DocumentPageRepository documentPageRepository;
     private final PortraitRepository portraitRepository;
     private final ContactDetailRepository contactDetailRepository;
     private final CategoryRepository categoryRepository;
@@ -61,6 +63,7 @@ public class CauseService {
                         final PortraitRepository portraitRepository,
                         final ContactDetailRepository contactDetailRepository,
                         final CategoryRepository categoryRepository,
+                        final DocumentPageRepository documentPageRepository,
                         final RatingRepository ratingRepository,
                         final DocumentRepository documentRepository,
                         final CommandRepository commandRepository,
@@ -74,6 +77,7 @@ public class CauseService {
         this.categoryRepository = categoryRepository;
         this.ratingRepository = ratingRepository;
         this.commandRepository = commandRepository;
+        this.documentPageRepository = documentPageRepository;
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
         this.accountingAdaptor = accountingAdaptor;
@@ -208,7 +212,12 @@ public class CauseService {
             }
             cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
-            cause.setCauseDocument(DocumentMapper.map(this.documentRepository.findByIdentifier(causeEntity.getIdentifier())));
+
+            final DocumentEntity entity = this.documentRepository.findByIdentifier(causeEntity.getIdentifier());
+            final CauseDocument causeDocument = DocumentMapper.map(entity);
+            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocument(entity);
+            causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
+            cause.setCauseDocument(causeDocument);
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
 
             if (avgRatingValue != null) {

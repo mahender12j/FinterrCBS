@@ -58,20 +58,20 @@ public class DocumentCommandHandler {
         this.causeRepository = causeRepository;
     }
 
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_DOCUMENT_PAGE)
-    public DocumentPageEvent process(final CreateDocumentPageCommand command) throws IOException {
-        final DocumentEntity documentEntity = documentRepository.findByCauseIdAndDocumentIdentifier(
-                command.getCauseIdentifier(),
-                command.getDocumentIdentifier())
-                .orElseThrow(() -> ServiceException.badRequest("Document not found"));
-
-        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getDocument(), command.getPageNumber(), documentEntity);
-        documentPageRepository.save(documentPageEntity);
-
-        return new DocumentPageEvent(command.getCauseIdentifier(), command.getDocumentIdentifier(), command.getPageNumber());
-    }
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_DOCUMENT_PAGE)
+//    public DocumentPageEvent process(final CreateDocumentPageCommand command) throws IOException {
+//        final DocumentEntity documentEntity = documentRepository.findByCauseIdAndDocumentIdentifier(
+//                command.getCauseIdentifier(),
+//                command.getDocumentIdentifier())
+//                .orElseThrow(() -> ServiceException.badRequest("Document not found"));
+//
+//        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getDocument(), command.getPageNumber(), documentEntity);
+//        documentPageRepository.save(documentPageEntity);
+//
+//        return new DocumentPageEvent(command.getCauseIdentifier(), command.getDocumentIdentifier(), command.getPageNumber());
+//    }
 
 //    @Transactional
 //    @CommandHandler
