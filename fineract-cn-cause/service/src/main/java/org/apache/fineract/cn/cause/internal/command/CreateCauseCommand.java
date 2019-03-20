@@ -19,21 +19,20 @@
 package org.apache.fineract.cn.cause.internal.command;
 
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public class CreateCauseCommand {
 
-    private final CauseBody cause;
+    private final Cause cause;
     private final MultipartFile feature;
     private final List<MultipartFile> gallery;
     private final MultipartFile tax;
     private final MultipartFile terms;
     private final MultipartFile other;
 
-    public CreateCauseCommand(final CauseBody cause,
+    public CreateCauseCommand(final Cause cause,
                               final MultipartFile feature,
                               final List<MultipartFile> gallery,
                               final MultipartFile tax,
@@ -48,7 +47,7 @@ public class CreateCauseCommand {
         this.other = other;
     }
 
-    public CauseBody getCause() {
+    public Cause getCause() {
         return cause;
     }
 

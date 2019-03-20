@@ -101,7 +101,7 @@ public class CauseRestController {
             @RequestParam("terms") final MultipartFile terms,
             @RequestParam("other") final MultipartFile other) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        CauseBody cause = mapper.readValue(data, CauseBody.class);
+        Cause cause = mapper.readValue(data, Cause.class);
         if (this.causeService.causeExists(cause.getIdentifier())) {
             throw ServiceException.conflict("Cause {0} already exists in this system, Please try another name.", cause.getIdentifier());
         }

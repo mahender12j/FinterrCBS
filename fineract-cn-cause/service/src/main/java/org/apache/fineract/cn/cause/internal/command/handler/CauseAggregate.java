@@ -21,9 +21,7 @@ package org.apache.fineract.cn.cause.internal.command.handler;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseBody;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
-import org.apache.fineract.cn.cause.internal.repository.CategoryRepository;
 import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.mapper.*;
 import org.apache.fineract.cn.cause.internal.repository.*;
@@ -36,13 +34,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Padma Raju Sattineni
@@ -93,7 +88,7 @@ public class CauseAggregate {
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE)
     public String createCause(final CreateCauseCommand createCauseCommand) throws IOException {
-        final CauseBody cause = createCauseCommand.getCause();
+        final Cause cause = createCauseCommand.getCause();
         final CategoryEntity addressEntity;
         if (!categoryRepository.existsByIdentifier(cause.getCauseCategories().getIdentifier())) {
 

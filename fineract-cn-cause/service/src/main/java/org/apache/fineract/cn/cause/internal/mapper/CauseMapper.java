@@ -20,12 +20,9 @@ package org.apache.fineract.cn.cause.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseBody;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.lang.DateConverter;
-import org.apache.fineract.cn.lang.DateOfBirth;
 
-import java.sql.Date;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
@@ -86,53 +83,6 @@ public final class CauseMapper {
         return causeEntity;
     }
 
-
-    public static CauseEntity map(final CauseBody cause) {
-        final CauseEntity causeEntity = new CauseEntity();
-        causeEntity.setIdentifier(cause.getIdentifier());
-        causeEntity.setTitle(cause.getTitle());
-        causeEntity.setDescription(cause.getDescription());
-        if (cause.getStartDate() != null) {
-            causeEntity.setStartDate(LocalDateTime.parse(cause.getStartDate()));
-        }
-        if (cause.getEndDate() != null) {
-            causeEntity.setEndDate(LocalDateTime.parse(cause.getEndDate()));
-        }
-        if (cause.getCompletedDate() != null) {
-            causeEntity.setCompletedDate(LocalDateTime.parse(cause.getCompletedDate()));
-        }
-
-        causeEntity.setCurrentState(cause.getCurrentState());
-        causeEntity.setSoftTarget(cause.getSoftTarget());
-        causeEntity.setHardTarget(cause.getHardTarget());
-        causeEntity.setIsTaxExamption(cause.getIsTaxExamption());
-        causeEntity.setActualRaisedFiat(cause.getActualRaisedFiat());
-        causeEntity.setActualRaisedFin(cause.getActualRaisedFin());
-        causeEntity.setMinAmount(cause.getMinAmount());
-        causeEntity.setMaxAmount(cause.getMaxAmount());
-
-        causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
-        causeEntity.setManagementFee(cause.getManagementFee());
-        causeEntity.setFinCollLimit(cause.getFinCollLimit());
-        causeEntity.setFinRate(cause.getFinRate());
-        causeEntity.setApprovedBy(cause.getApprovedBy());
-
-        if (cause.getApprovedOn() != null) {
-            causeEntity.setApprovedOn(LocalDateTime.parse(cause.getApprovedOn()));
-        }
-        causeEntity.setCreatedBy(UserContextHolder.checkedGetUser());
-        causeEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-
-        causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
-        causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
-        causeEntity.setSmediaLinks(cause.getSmediaLinks());
-        causeEntity.setVideoUrls(cause.getVideoUrls());
-        causeEntity.setCauseTxHash(cause.getCauseTxHash());
-        causeEntity.setAccountNumber(cause.getAccountNumber());
-        causeEntity.setEthAddress(cause.getEthAddress());
-
-        return causeEntity;
-    }
 
     public static Cause map(final CauseEntity causeEntity) {
         final Cause cause = new Cause();

@@ -198,43 +198,55 @@ public class CauseService {
         final CausePage causePage = new CausePage();
         final Page<CauseEntity> causeEntities;
         Optional<CategoryEntity> categoryEntity;
-        CauseCategory causeCategory = new CauseCategory();
+//        CauseCategory causeCategory = new CauseCategory();
 
         if (categoryIdentifier != null) {
             categoryEntity = categoryRepository.findByIdentifier(categoryIdentifier);
-            causeEntities = this.causeRepository.findByCategory(categoryEntity.get(), pageable);
-            causeCategory = CategoryMapper.map(categoryEntity.get());
+            if (categoryEntity.isPresent()) {
+                causeEntities = this.causeRepository.findByCategory(categoryEntity.get(), pageable);
+                causePage.setCauses(causeArrayList(causeEntities));
+                causePage.setTotalPages(causeEntities.getTotalPages());
+                causePage.setTotalElements(causeEntities.getTotalElements());
+            } else {
+                causePage.setCauses(Collections.emptyList());
+                causePage.setTotalPages(1);
+                causePage.setTotalElements((long) 0);
+                System.out.println("No Cause Found in this identifier................");
+            }
         } else {
             causeEntities = this.causeRepository.findAll(pageable);
-            if (causeEntities.getSize() > 0) {
-                final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
-                causePage.setCauses(causes);
-                for (CauseEntity causeEntity : causeEntities) {
-                    final Cause cause = CauseMapper.map(causeEntity);
-                    if (cause.getAccountNumber() != null) {
-                        final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                        cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
-                    }
-                    cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
-                    cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
-                    final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
-
-                    if (avgRatingValue != null) {
-                        cause.setAvgRating(avgRatingValue.toString());
-                    } else {
-                        cause.setAvgRating("0");
-                    }
-
-                    causes.add(cause);
-                }
-            }
+            causePage.setCauses(causeArrayList(causeEntities));
+            causePage.setTotalPages(causeEntities.getTotalPages());
+            causePage.setTotalElements(causeEntities.getTotalElements());
         }
-
-        causePage.setTotalPages(causeEntities.getTotalPages());
-        causePage.setTotalElements(causeEntities.getTotalElements());
 
         return causePage;
 
+    }
+
+
+    public ArrayList<Cause> causeArrayList(Page<CauseEntity> causeEntities) {
+        final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
+        for (CauseEntity causeEntity : causeEntities) {
+            final Cause cause = CauseMapper.map(causeEntity);
+            if (cause.getAccountNumber() != null) {
+                final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+            }
+            cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+            cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
+            final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
+
+            if (avgRatingValue != null) {
+                cause.setAvgRating(avgRatingValue.toString());
+            } else {
+                cause.setAvgRating("0");
+            }
+
+            causes.add(cause);
+        }
+
+        return causes;
     }
 
 

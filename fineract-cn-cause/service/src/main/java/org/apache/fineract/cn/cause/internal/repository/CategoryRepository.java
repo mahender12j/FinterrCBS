@@ -36,7 +36,7 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CategoryEntity c WHERE c.identifier = :identifier")
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
-    Optional<CategoryEntity> findByIdentifier(final String id);
+    Optional<CategoryEntity> findByIdentifier(final String identifier);
 
     //    @Query("SELECT d FROM CategoryEntity d WHERE d.cause.identifier = :causeIdentifier AND d.identifier = :categoryIdentifier")
 //    Optional<CategoryEntity> findByCauseIdAndCategoryIdentifier(
