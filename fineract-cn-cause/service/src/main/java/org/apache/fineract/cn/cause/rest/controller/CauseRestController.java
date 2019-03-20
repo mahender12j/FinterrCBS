@@ -96,10 +96,10 @@ public class CauseRestController {
     ResponseEntity<Void> createCause(
             @RequestParam("data") final String data,
             @RequestParam("feature") final MultipartFile feature,
-            @RequestParam("gallery") final List<MultipartFile> gallery,
-            @RequestParam("tax") final MultipartFile tax,
+            @RequestParam(value = "gallery", required = false) final List<MultipartFile> gallery,
+            @RequestParam(value = "tax", required = false) final MultipartFile tax,
             @RequestParam("terms") final MultipartFile terms,
-            @RequestParam("other") final MultipartFile other) throws IOException {
+            @RequestParam(value = "other", required = false) final MultipartFile other) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         Cause cause = mapper.readValue(data, Cause.class);
         if (this.causeService.causeExists(cause.getIdentifier())) {

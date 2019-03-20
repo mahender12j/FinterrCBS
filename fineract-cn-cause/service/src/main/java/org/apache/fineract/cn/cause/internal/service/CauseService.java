@@ -198,8 +198,6 @@ public class CauseService {
         final CausePage causePage = new CausePage();
         final Page<CauseEntity> causeEntities;
         Optional<CategoryEntity> categoryEntity;
-//        CauseCategory causeCategory = new CauseCategory();
-
         if (categoryIdentifier != null) {
             categoryEntity = categoryRepository.findByIdentifier(categoryIdentifier);
             if (categoryEntity.isPresent()) {
