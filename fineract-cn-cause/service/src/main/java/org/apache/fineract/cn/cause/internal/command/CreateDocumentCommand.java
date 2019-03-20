@@ -18,35 +18,80 @@
  */
 package org.apache.fineract.cn.cause.internal.command;
 
+import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @author Myrle Krantz
  */
 public class CreateDocumentCommand {
     private final String causeIdentifier;
-    private final CauseDocument causeDocument;
+    private final Cause cause;
+    private final MultipartFile feature;
+    private final List<MultipartFile> gallery;
+    private final MultipartFile tax;
+    private final MultipartFile terms;
+    private final MultipartFile other;
 
     public CreateDocumentCommand(
             final String causeIdentifier,
-            final CauseDocument causeDocument) {
+            final Cause cause,
+            final MultipartFile feature,
+            final List<MultipartFile> gallery,
+            final MultipartFile tax,
+            final MultipartFile terms,
+            final MultipartFile other) {
         this.causeIdentifier = causeIdentifier;
-        this.causeDocument = causeDocument;
+        this.cause = cause;
+        this.feature = feature;
+        this.gallery = gallery;
+        this.tax = tax;
+        this.terms = terms;
+        this.other = other;
     }
+
 
     public String getCauseIdentifier() {
         return causeIdentifier;
     }
 
-    public CauseDocument getCauseDocument() {
-        return causeDocument;
+    public Cause getCause() {
+        return cause;
+    }
+
+    public MultipartFile getFeature() {
+        return feature;
+    }
+
+    public List<MultipartFile> getGallery() {
+        return gallery;
+    }
+
+    public MultipartFile getTax() {
+        return tax;
+    }
+
+    public MultipartFile getTerms() {
+        return terms;
+    }
+
+    public MultipartFile getOther() {
+        return other;
     }
 
     @Override
     public String toString() {
         return "CreateDocumentCommand{" +
                 "causeIdentifier='" + causeIdentifier + '\'' +
-                ", causeDocument=" + causeDocument.getIdentifier() +
+                ", cause=" + cause +
+                ", feature=" + feature +
+                ", gallery=" + gallery +
+                ", tax=" + tax +
+                ", terms=" + terms +
+                ", other=" + other +
                 '}';
     }
 }

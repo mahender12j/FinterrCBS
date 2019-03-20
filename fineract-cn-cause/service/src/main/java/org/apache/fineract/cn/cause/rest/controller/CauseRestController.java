@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.cause.rest.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.util.UserContextHolder;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -85,19 +87,26 @@ public class CauseRestController {
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
-            value = "/causes",
+    @RequestMapping(value = "/causes",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> createCause(@RequestBody @Valid final Cause cause) throws InterruptedException {
+    ResponseEntity<Void> createCause(
+            @RequestParam("data") final String data,
+            @RequestParam("feature") final MultipartFile feature,
+            @RequestParam("gallery") final List<MultipartFile> gallery,
+            @RequestParam("tax") final MultipartFile tax,
+            @RequestParam("terms") final MultipartFile terms,
+            @RequestParam("other") final MultipartFile other) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        CauseBody cause = mapper.readValue(data, CauseBody.class);
         if (this.causeService.causeExists(cause.getIdentifier())) {
-            throw ServiceException.conflict("Cause {0} already exists.", cause.getIdentifier());
+            throw ServiceException.conflict("Cause {0} already exists in this system, Please try another name.", cause.getIdentifier());
         }
 
-        this.commandGateway.process(new CreateCauseCommand(cause));
+        this.commandGateway.process(new CreateCauseCommand(cause, feature, gallery, tax, terms, other));
         return ResponseEntity.accepted().build();
     }
 

@@ -19,6 +19,7 @@
 package org.apache.fineract.cn.cause.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
+import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentEntity;
@@ -45,7 +46,7 @@ public class DocumentMapper {
             final DocumentEntity documentEntity) throws IOException {
         final DocumentPageEntity ret = new DocumentPageEntity();
         ret.setDocument(documentEntity);
-        ret.setPageNumber(pageNumber);
+//        ret.setPageNumber(pageNumber);
         ret.setImage(multipartFile.getBytes());
         ret.setSize(multipartFile.getSize());
         ret.setContentType(multipartFile.getContentType());
@@ -71,5 +72,27 @@ public class DocumentMapper {
         ret.setIdentifier(causeDocument.getIdentifier());
         ret.setDescription(causeDocument.getDescription());
         return ret;
+    }
+
+    public static DocumentEntity map(CauseEntity causeEntity) throws IOException {
+        DocumentEntity entity = new DocumentEntity();
+        entity.setCause(causeEntity);
+        entity.setCompleted(true);
+        entity.setCreatedBy(causeEntity.getCreatedBy());
+        entity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        entity.setDescription(causeEntity.getDescription());
+        entity.setIdentifier(causeEntity.getIdentifier());
+        return entity;
+    }
+
+
+    public static DocumentPageEntity map(final MultipartFile multipartFile, DocumentEntity documentEntity, final String type) throws IOException {
+        DocumentPageEntity pageEntity = new DocumentPageEntity();
+        pageEntity.setDocument(documentEntity);
+        pageEntity.setContentType(multipartFile.getContentType());
+        pageEntity.setImage(multipartFile.getBytes());
+        pageEntity.setSize(multipartFile.getSize());
+        pageEntity.setType(type);
+        return pageEntity;
     }
 }

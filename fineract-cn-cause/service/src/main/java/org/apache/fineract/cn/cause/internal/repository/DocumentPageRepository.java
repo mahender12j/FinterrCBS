@@ -31,11 +31,12 @@ import java.util.stream.Stream;
  */
 @Repository
 public interface DocumentPageRepository extends JpaRepository<DocumentPageEntity, Long> {
-    @Query("SELECT d FROM DocumentPageEntity d WHERE d.document.cause.identifier = :causeIdentifier AND d.document.identifier = :documentIdentifier AND d.pageNumber = :pageNumber")
-    Optional<DocumentPageEntity> findByCauseIdAndDocumentIdentifierAndPageNumber(
-            @Param("causeIdentifier") String causeIdentifier, @Param("documentIdentifier") String documentIdentifier, @Param("pageNumber") Integer pageNumber);
 
-    @Query("SELECT d FROM DocumentPageEntity d WHERE d.document.cause.identifier = :causeIdentifier AND d.document.identifier = :documentIdentifier")
-    Stream<DocumentPageEntity> findByCauseIdAndDocumentIdentifier(
-            @Param("causeIdentifier") String causeIdentifier, @Param("documentIdentifier") String documentIdentifier);
+//    @Query("SELECT d FROM DocumentPageEntity d WHERE d.document.cause.identifier = :causeIdentifier AND d.document.identifier = :documentIdentifier AND d.pageNumber = :pageNumber")
+//    Optional<DocumentPageEntity> findByCauseIdAndDocumentIdentifierAndPageNumber(
+//            @Param("causeIdentifier") String causeIdentifier, @Param("documentIdentifier") String documentIdentifier, @Param("pageNumber") Integer pageNumber);
+//
+//    @Query("SELECT d FROM DocumentPageEntity d WHERE d.document.cause.identifier = :causeIdentifier AND d.document.identifier = :documentIdentifier")
+//    Stream<DocumentPageEntity> findByCauseIdAndDocumentIdentifier(
+//            @Param("causeIdentifier") String causeIdentifier, @Param("documentIdentifier") String documentIdentifier);
 }

@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
  * @author Padma Raju Sattineni
  */
 
-public class Cause {
+public class CauseBody {
 
     public enum State {
         PENDING, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED
@@ -85,7 +85,7 @@ public class Cause {
 
     private CauseStatistics causeStatistics;
 
-    public Cause() {
+    public CauseBody() {
         super();
     }
 
