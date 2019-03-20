@@ -82,8 +82,9 @@ public class Cause {
     private String causeTxHash;
     private String accountNumber;
     private String ethAddress;
-
     private CauseStatistics causeStatistics;
+    private CauseDocument causeDocument;
+
 
     public Cause() {
         super();
@@ -376,6 +377,14 @@ public class Cause {
 
     public void setEthAddress(final String ethAddress) {
         this.ethAddress = ethAddress;
+    }
+
+    public CauseDocument getCauseDocument() {
+        return causeDocument;
+    }
+
+    public void setCauseDocument(CauseDocument causeDocument) {
+        this.causeDocument = causeDocument;
     }
 
     @Override

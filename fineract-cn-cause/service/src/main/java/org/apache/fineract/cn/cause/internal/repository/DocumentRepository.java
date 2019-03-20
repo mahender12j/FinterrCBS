@@ -39,4 +39,6 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
     @Query("SELECT d FROM DocumentEntity d WHERE d.cause.identifier = :causeIdentifier")
     Stream<DocumentEntity> findByCauseId(
             @Param("causeIdentifier") String causeIdentifier);
+
+    DocumentEntity findByIdentifier(final String identifier);
 }

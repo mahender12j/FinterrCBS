@@ -27,6 +27,9 @@ import java.util.Objects;
  * @author Myrle Krantz
  */
 public class CauseDocument {
+
+    private Long id;
+
     @ValidIdentifier
     @Length(max = 256)
     private String identifier;
@@ -37,6 +40,7 @@ public class CauseDocument {
     private boolean completed;
     private String createdBy;
     private String createdOn;
+
 
     public CauseDocument() {
     }
@@ -79,6 +83,14 @@ public class CauseDocument {
 
     public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override

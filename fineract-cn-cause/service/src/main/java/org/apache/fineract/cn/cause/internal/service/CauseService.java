@@ -46,6 +46,7 @@ import org.apache.fineract.cn.cause.catalog.internal.repository.FieldValueReposi
 public class CauseService {
 
     private final CauseRepository causeRepository;
+    private final DocumentRepository documentRepository;
     private final PortraitRepository portraitRepository;
     private final ContactDetailRepository contactDetailRepository;
     private final CategoryRepository categoryRepository;
@@ -61,6 +62,7 @@ public class CauseService {
                         final ContactDetailRepository contactDetailRepository,
                         final CategoryRepository categoryRepository,
                         final RatingRepository ratingRepository,
+                        final DocumentRepository documentRepository,
                         final CommandRepository commandRepository,
                         final AccountingAdaptor accountingAdaptor,
                         final TaskDefinitionRepository taskDefinitionRepository,
@@ -75,6 +77,7 @@ public class CauseService {
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
         this.accountingAdaptor = accountingAdaptor;
+        this.documentRepository = documentRepository;
     }
 
     public Boolean causeExists(final String identifier) {
@@ -157,44 +160,33 @@ public class CauseService {
         final CausePage causePage = new CausePage();
         causePage.setTotalPages(causeEntities.getTotalPages());
         causePage.setTotalElements(causeEntities.getTotalElements());
-        if (causeEntities.getSize() > 0) {
-            final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
-            causePage.setCauses(causes);
-            for (CauseEntity causeEntity : causeEntities) {
-                final Cause cause = CauseMapper.map(causeEntity);
-                if (cause.getAccountNumber() != null) {
-                    final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                    cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
-                }
-                cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
-
-//                final List<CategoryEntity> categoryEntities = this.categoryRepository.findByCause(causeEntity);
-//                if (categoryEntities.size() == 0) {
-//                    cause.setCauseCategories(
-//                            categoryEntities
-//                                    .stream()
-//                                    .map(CategoryMapper::map)
-//                                    .collect(toList())
-//                    );
+        causePage.setCauses(causeArrayList(causeEntities));
+//        if (causeEntities.getSize() > 0) {
+//            final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
+//            causePage.setCauses(causes);
+//            for (CauseEntity causeEntity : causeEntities) {
+//                final Cause cause = CauseMapper.map(causeEntity);
+//                if (cause.getAccountNumber() != null) {
+//                    final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+//                    cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
 //                }
-
-                final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
-                if (avgRatingValue != null) {
-                    cause.setAvgRating(avgRatingValue.toString());
-                } else {
-                    cause.setAvgRating("0");
-                }
-
-                causes.add(cause);
-            }
-        }
+//                cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+//                final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
+//                if (avgRatingValue != null) {
+//                    cause.setAvgRating(avgRatingValue.toString());
+//                } else {
+//                    cause.setAvgRating("0");
+//                }
+//
+//                causes.add(cause);
+//            }
+//        }
 
         return causePage;
     }
 
 
     public CausePage fetchCauseByCategory(final String categoryIdentifier, final Pageable pageable) {
-
         final CausePage causePage = new CausePage();
         final Page<CauseEntity> causeEntities;
         Optional<CategoryEntity> categoryEntity;
@@ -233,6 +225,7 @@ public class CauseService {
             }
             cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
+            cause.setCauseDocument(DocumentMapper.map(this.documentRepository.findByIdentifier(causeEntity.getIdentifier())));
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
 
             if (avgRatingValue != null) {

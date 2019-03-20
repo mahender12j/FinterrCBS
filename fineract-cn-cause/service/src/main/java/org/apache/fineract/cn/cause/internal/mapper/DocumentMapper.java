@@ -55,6 +55,7 @@ public class DocumentMapper {
 
     public static CauseDocument map(final DocumentEntity documentEntity) {
         final CauseDocument ret = new CauseDocument();
+        ret.setId(documentEntity.getId());
         ret.setCompleted(documentEntity.getCompleted());
         ret.setCreatedBy(documentEntity.getCreatedBy());
         ret.setCreatedOn(DateConverter.toIsoString(documentEntity.getCreatedOn()));
