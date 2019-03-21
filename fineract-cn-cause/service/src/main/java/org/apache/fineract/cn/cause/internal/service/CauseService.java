@@ -158,7 +158,7 @@ public class CauseService {
         final Page<CauseEntity> causeEntities;
         Optional<CategoryEntity> categoryEntity;
         if (categoryIdentifier != null) {
-            categoryEntity = categoryRepository.findByIdentifier(categoryIdentifier);
+            categoryEntity = categoryRepository.findByIdentifier(categoryIdentifier.toLowerCase());
             if (categoryEntity.isPresent()) {
                 causeEntities = this.causeRepository.findByCategoryAndCurrentState(categoryEntity.get(), Cause.State.ACTIVE.name(), pageable);
                 causePage.setCauses(causeArrayList(causeEntities));
