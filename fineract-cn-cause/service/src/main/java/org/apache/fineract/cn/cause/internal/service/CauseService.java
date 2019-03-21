@@ -102,6 +102,12 @@ public class CauseService {
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
             final Cause cause = CauseMapper.map(causeEntity);
             cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+
+            final DocumentEntity entity = this.documentRepository.findByIdentifier(causeEntity.getIdentifier());
+            final CauseDocument causeDocument = DocumentMapper.map(entity);
+            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocument(entity);
+            causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
+            cause.setCauseDocument(causeDocument);
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
             if (avgRatingValue != null) {
                 cause.setAvgRating(avgRatingValue.toString());
