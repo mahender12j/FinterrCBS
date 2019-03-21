@@ -136,8 +136,8 @@ public class AccountRestController {
             consumes = {MediaType.ALL_VALUE}
     )
     @ResponseBody
-    List<AccountEntry> findByAccountAndTransactionTypeAndType(@PathVariable("identifier") final String identifier) {
-        return this.accountService.findByAccountAndTransactionTypeAndType(identifier);
+    List<AccountEntry> findByAccountIdentifier(@PathVariable("identifier") final String identifier) {
+        return this.accountService.findByAccount(identifier);
     }
 
 

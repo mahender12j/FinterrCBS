@@ -32,11 +32,13 @@ import java.util.List;
 @SuppressWarnings("unused")
 @FeignClient(value = "accounting-v1", path = "/accounting-v1", configuration = CustomFeignClientsConfiguration.class)
 public interface AccountManager {
-    @RequestMapping(value = "/accounts/{holder}/find", method = RequestMethod.GET,
+    @RequestMapping(
+            value = "/accounts/{identifier}/find",
+            method = RequestMethod.GET,
             produces = {MediaType.ALL_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     )
-    List<AccountEntry> findByAccountAndTransactionTypeAndType(@PathVariable("holder") final String holder);
+    List<AccountEntry> findByAccountIdentifier(@PathVariable("identifier") final String holder);
 
 
     @RequestMapping(value = "accounts/user/{identifier}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.ALL_VALUE})

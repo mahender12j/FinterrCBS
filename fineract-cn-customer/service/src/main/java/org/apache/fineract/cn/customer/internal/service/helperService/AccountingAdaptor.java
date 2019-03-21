@@ -46,7 +46,7 @@ public class AccountingAdaptor {
 
 
     public List<AccountEntry> fetchAccountEntries(final String identifier) {
-        return this.accountManager.findByAccountAndTransactionTypeAndType(identifier);
+        return this.accountManager.findByAccountIdentifier(identifier);
     }
 
 

@@ -120,60 +120,34 @@ public class CauseService {
         });
     }
 
-    public CausePage fetchCause(final String term, final Boolean includeClosed, final Boolean onlyActive, final Pageable pageable) {
+    public CausePage fetchCause(final Boolean includeClosed, final String param, final Pageable pageable) {
         final Page<CauseEntity> causeEntities;
+        CausePage causePage = new CausePage();
         if (includeClosed) {
             final String userIdentifier = UserContextHolder.checkedGetUser();
-            System.out.println("fetchCause --- userIdentifier ::: " + userIdentifier);
-
-            if (term != null) {
-                causeEntities =
-                        this.causeRepository.findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContainingAndCurrentStateNot(userIdentifier, term, term, term, Cause.State.ACTIVE.DELETED.name(), pageable);
-            } else {
+            if (param != null) {
                 causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(userIdentifier, Cause.State.ACTIVE.DELETED.name(), pageable);
-            }
-        } else if (onlyActive) {
-            if (term != null) {
-                causeEntities =
-                        this.causeRepository.findByCurrentStateAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
-                                Cause.State.ACTIVE.name(), term, term, term, pageable);
+                causePage.setTotalPages(causeEntities.getTotalPages());
+                causePage.setTotalElements(causeEntities.getTotalElements());
+                causePage.setCauses(causeArrayList(causeEntities));
             } else {
-                causeEntities = this.causeRepository.findByCurrentState(Cause.State.ACTIVE.name(), pageable);
+                causeEntities = this.causeRepository.findByCreatedByAndCurrentState(userIdentifier, param, pageable);
+                causePage.setTotalPages(causeEntities.getTotalPages());
+                causePage.setTotalElements(causeEntities.getTotalElements());
+                causePage.setCauses(causeArrayList(causeEntities));
             }
         } else {
-            if (term != null) {
-                causeEntities =
-                        this.causeRepository.findByCurrentStateNotAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
-                                Cause.State.CLOSED.name(), term, term, term, pageable);
+            if (param == null) {
+                causeEntities = this.causeRepository.findByCurrentState(Cause.State.ACTIVE.name(), pageable);
+                causePage.setTotalPages(causeEntities.getTotalPages());
+                causePage.setTotalElements(causeEntities.getTotalElements());
+                causePage.setCauses(causeArrayList(causeEntities));
             } else {
-                causeEntities = this.causeRepository.findByCurrentStateNot(Cause.State.CLOSED.name(), pageable);
+                causePage = fetchCauseByCategory(param, pageable);
+
             }
         }
 
-        final CausePage causePage = new CausePage();
-        causePage.setTotalPages(causeEntities.getTotalPages());
-        causePage.setTotalElements(causeEntities.getTotalElements());
-        causePage.setCauses(causeArrayList(causeEntities));
-//        if (causeEntities.getSize() > 0) {
-//            final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
-//            causePage.setCauses(causes);
-//            for (CauseEntity causeEntity : causeEntities) {
-//                final Cause cause = CauseMapper.map(causeEntity);
-//                if (cause.getAccountNumber() != null) {
-//                    final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-//                    cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
-//                }
-//                cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
-//                final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
-//                if (avgRatingValue != null) {
-//                    cause.setAvgRating(avgRatingValue.toString());
-//                } else {
-//                    cause.setAvgRating("0");
-//                }
-//
-//                causes.add(cause);
-//            }
-//        }
 
         return causePage;
     }
@@ -186,7 +160,7 @@ public class CauseService {
         if (categoryIdentifier != null) {
             categoryEntity = categoryRepository.findByIdentifier(categoryIdentifier);
             if (categoryEntity.isPresent()) {
-                causeEntities = this.causeRepository.findByCategory(categoryEntity.get(), pageable);
+                causeEntities = this.causeRepository.findByCategoryAndCurrentState(categoryEntity.get(), Cause.State.ACTIVE.name(), pageable);
                 causePage.setCauses(causeArrayList(causeEntities));
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
@@ -194,7 +168,6 @@ public class CauseService {
                 causePage.setCauses(Collections.emptyList());
                 causePage.setTotalPages(1);
                 causePage.setTotalElements((long) 0);
-                System.out.println("No Cause Found in this identifier................");
             }
         } else {
             causeEntities = this.causeRepository.findAll(pageable);
