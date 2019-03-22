@@ -124,10 +124,10 @@ public class CauseService {
         final Page<CauseEntity> causeEntities;
         CausePage causePage = new CausePage();
         if (includeClosed) {
-
             final String userIdentifier = UserContextHolder.checkedGetUser();
-            if (param != null) {
+            if (param == null) {
                 causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(userIdentifier, Cause.State.ACTIVE.DELETED.name(), pageable);
+                System.out.println("-----------1----------------"+causeEntities.toString());
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
@@ -136,16 +136,18 @@ public class CauseService {
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
+                System.out.println("-----------2----------------"+causeEntities.toString());
             }
-
         } else {
             if (param == null) {
                 causeEntities = this.causeRepository.findByCurrentState(Cause.State.ACTIVE.name(), pageable);
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
+                System.out.println("-----------3----------------"+causeEntities.toString());
             } else {
                 causePage = fetchCauseByCategory(param, pageable);
+                System.out.println("-----------4----------------");
 
             }
         }
