@@ -124,6 +124,7 @@ public class CauseService {
         final Page<CauseEntity> causeEntities;
         CausePage causePage = new CausePage();
         if (includeClosed) {
+
             final String userIdentifier = UserContextHolder.checkedGetUser();
             if (param != null) {
                 causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(userIdentifier, Cause.State.ACTIVE.DELETED.name(), pageable);
@@ -136,6 +137,7 @@ public class CauseService {
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
             }
+
         } else {
             if (param == null) {
                 causeEntities = this.causeRepository.findByCurrentState(Cause.State.ACTIVE.name(), pageable);
