@@ -37,8 +37,8 @@ public class DocumentPageEntity {
     @JoinColumn(name = "document_id")
     private DocumentEntity document;
 
-    @Column(name = "page_number")
-    private Integer pageNumber;
+    @Column(name = "type")
+    private String type;
 
     @Column(name = "content_type")
     private String contentType;
@@ -71,13 +71,13 @@ public class DocumentPageEntity {
         this.document = document;
     }
 
-    public Integer getPageNumber() {
-        return pageNumber;
-    }
-
-    public void setPageNumber(Integer pageNumber) {
-        this.pageNumber = pageNumber;
-    }
+//    public Integer getPageNumber() {
+//        return pageNumber;
+//    }
+//
+//    public void setPageNumber(Integer pageNumber) {
+//        this.pageNumber = pageNumber;
+//    }
 
     public String getContentType() {
         return contentType;
@@ -103,18 +103,25 @@ public class DocumentPageEntity {
         this.image = image;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DocumentPageEntity that = (DocumentPageEntity) o;
-        return Objects.equals(document, that.document) &&
-                Objects.equals(pageNumber, that.pageNumber);
+        return Objects.equals(document, that.document);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(document, pageNumber);
+        return Objects.hash(document);
     }
 
     @Override
@@ -122,7 +129,6 @@ public class DocumentPageEntity {
         return "DocumentPageEntity{" +
                 "id=" + id +
                 ", document=" + document +
-                ", pageNumber=" + pageNumber +
                 ", contentType='" + contentType + '\'' +
                 ", size=" + size +
                 ", image=" + Arrays.toString(image) +

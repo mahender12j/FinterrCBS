@@ -31,9 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,26 +100,48 @@ public class CustomerService {
                 customer.setAddress(AddressMapper.map(entity.getAddress()));
                 SocialMatrix socialMatrix = new SocialMatrix();
                 String accountNumber = customerEntity.get().getAccountNumbers();
+
                 if (accountNumber != null) {
                     List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(accountNumber);
                     final LocalDateTime localDateTime = LocalDateTime.now();
-
-                    Double totalDepositOfThisMonth = accountEntryList.stream()
+                    Double totalDepositOfThisMonth = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
                             .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
                                     Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
                             .mapToDouble(d -> d.getAmount()).sum();
-                    socialMatrix.setGoldenDonor((totalDepositOfThisMonth / 10) > 5 ? 5 : (int) (Math.floor(totalDepositOfThisMonth / 10)));
-                    socialMatrix.setGreenContribution((totalDepositOfThisMonth / 400) > 5 ? 5 : (int) (Math.floor(totalDepositOfThisMonth / 400)));
-                    socialMatrix.setMyPrower((totalDepositOfThisMonth / 20 > 5) ? 5 : (int) (Math.floor(totalDepositOfThisMonth / 20)));
-                    socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifier(customer.getRefferalCodeIdentifier()));
+
+                    socialMatrix.setMyPower((totalDepositOfThisMonth / 20 > 5) ? 5 : (totalDepositOfThisMonth / 20));
+                    socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
+                    socialMatrix.setTotalTrees((int) Math.floor(totalDepositOfThisMonth / 2000));
+                } else {
+                    socialMatrix.setMyPower(0.0);
+                    socialMatrix.setMyPowerPercentage(0.0);
+                    socialMatrix.setTotalTrees(0);
                 }
 
+
+                String refferalNumber = customerEntity.get().getRefAccountNumber();
+                if (refferalNumber != null) {
+                    List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(refferalNumber);
+                    final LocalDateTime localDateTime = LocalDateTime.now();
+
+                    Double totalDepositOfThisMonth = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
+                            .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
+                                    Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
+                            .mapToDouble(d -> d.getAmount()).sum();
+
+                    socialMatrix.setGoldenDonor((totalDepositOfThisMonth / 10) > 5 ? 5 : totalDepositOfThisMonth / 10);
+                    socialMatrix.setGreenContribution((totalDepositOfThisMonth / 400) > 5 ? 5 : totalDepositOfThisMonth / 400);
+                }else {
+                    socialMatrix.setGoldenDonor(0.0);
+                    socialMatrix.setGreenContribution(0.0);
+                }
+
+
+                socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
+                socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifier(customer.getRefferalCodeIdentifier()));
                 customer.setSocialMatrix(socialMatrix);
                 if (customer.getRefAccountNumber() != null) {
-                    System.out.println("--------get account number" + customer.getRefAccountNumber());
                     Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
-        
-                    System.out.println("------------------account-----------------------" + account.toString());
                     customer.setRefferalBalance(account.getBalance());
                 }
                 final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
@@ -194,12 +214,8 @@ public class CustomerService {
         customerRefPage.setRefAccountNumber(customer.getRefAccountNumber());
 
         if (customer.getRefAccountNumber() != null) {
-            System.out.println("--------get account number" + customer.getRefAccountNumber());
             Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
-
-            System.out.println("------------------account-----------------------" + account.toString());
             customerRefPage.setRefferalBalance(account.getBalance());
-//
             if (customerEntities.getSize() > 0) {
                 final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
                 customerEntities.forEach(entity -> {
@@ -209,13 +225,10 @@ public class CustomerService {
                         tCustomer.setRefferalBalance(acc.getBalance());
                     }
                     customers.add(tCustomer);
-
                 });
                 customerRefPage.setCustomers(customers);
             }
-
         }
-
         return customerRefPage;
     }
 

@@ -38,18 +38,11 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CauseEntity c WHERE c.identifier = :identifier")
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
-    Page<CauseEntity> findByIdentifierContainingOrTitleContainingOrDescriptionContaining(
-            final String identifier, final String title, final String description, final Pageable pageable);
-
     Optional<CauseEntity> findByIdentifier(final String identifier);
-
-    Optional<CauseEntity> findByIdentifierAndCurrentState(final String identifier, final String state);
 
     Page<CauseEntity> findByCurrentStateNot(final String state, final Pageable pageable);
 
     Page<CauseEntity> findByCurrentState(final String state, final Pageable pageable);
-
-    Page<CauseEntity> findByCreatedBy(final String createdBy, final Pageable pageable);
 
     List<CauseEntity> findByCreatedBy(final String createdBy);
 
@@ -57,8 +50,7 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     Page<CauseEntity> findByCreatedByAndCurrentStateNot(final String createdBy, final String state, final Pageable pageable);
 
-    Page<CauseEntity> findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
-            final String createdBy, final String identifier, final String title, final String description, final Pageable pageable);
+    Page<CauseEntity> findByCreatedByAndCurrentState(final String createdBy, final String state, final Pageable pageable);
 
     Page<CauseEntity> findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContainingAndCurrentStateNot(
             final String createdBy, final String identifier, final String title, final String description, final String state, final Pageable pageable);
@@ -68,5 +60,24 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     Page<CauseEntity> findByCurrentStateAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
             final String state, final String identifier, final String title, final String description, final Pageable pageable);
+
+
+    Page<CauseEntity> findByCategoryAndCurrentState(CategoryEntity entity, final String state, Pageable pageable);
+
+    Page<CauseEntity> findAll(Pageable pageable);
+
+
+    //    Page<CauseEntity> findByIdentifierContainingOrTitleContainingOrDescriptionContaining(
+
+//            final String identifier, final String title, final String description, final Pageable pageable);
+
+//    Optional<CauseEntity> findByIdentifierAndCurrentState(final String identifier, final String state);
+
+//    Page<CauseEntity> findByCreatedBy(final String createdBy, final Pageable pageable);
+
+//    Page<CauseEntity> findByCategoryEntity(CategoryEntity entity, Pageable pageable);
+//    Page<CauseEntity> findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
+
+//            final String createdBy, final String identifier, final String title, final String description, final Pageable pageable);
 }
 

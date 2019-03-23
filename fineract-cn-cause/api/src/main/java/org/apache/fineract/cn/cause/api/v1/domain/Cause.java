@@ -18,19 +18,16 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.apache.fineract.cn.lang.DateOfBirth;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import java.util.List;
 
 /**
  * @author Padma Raju Sattineni
  */
 
-public final class Cause {
+public class Cause {
 
     public enum State {
         PENDING, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED
@@ -74,8 +71,9 @@ public final class Cause {
     private String lastModifiedBy;
     private String lastModifiedOn;
 
+
     @Valid
-    private List<CauseCategory> causeCategories;
+    private CauseCategory causeCategories;
     private String taxExemptionPercentage;
     private String websiteUrl;
     private String smediaLinks;
@@ -84,8 +82,9 @@ public final class Cause {
     private String causeTxHash;
     private String accountNumber;
     private String ethAddress;
-
     private CauseStatistics causeStatistics;
+    private CauseDocument causeDocument;
+
 
     public Cause() {
         super();
@@ -300,11 +299,19 @@ public final class Cause {
         this.lastModifiedOn = lastModifiedOn;
     }
 
-    public List<CauseCategory> getCauseCategories() {
-        return this.causeCategories;
+    public Boolean getTaxExamption() {
+        return isTaxExamption;
     }
 
-    public void setCauseCategories(final List<CauseCategory> causeCategories) {
+    public void setTaxExamption(Boolean taxExamption) {
+        isTaxExamption = taxExamption;
+    }
+
+    public CauseCategory getCauseCategories() {
+        return causeCategories;
+    }
+
+    public void setCauseCategories(CauseCategory causeCategories) {
         this.causeCategories = causeCategories;
     }
 
@@ -370,6 +377,14 @@ public final class Cause {
 
     public void setEthAddress(final String ethAddress) {
         this.ethAddress = ethAddress;
+    }
+
+    public CauseDocument getCauseDocument() {
+        return causeDocument;
+    }
+
+    public void setCauseDocument(CauseDocument causeDocument) {
+        this.causeDocument = causeDocument;
     }
 
     @Override

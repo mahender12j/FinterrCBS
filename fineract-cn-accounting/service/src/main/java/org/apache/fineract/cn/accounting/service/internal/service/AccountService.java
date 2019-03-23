@@ -115,9 +115,9 @@ public class AccountService {
     }
 
 
-    public List<AccountEntry> findByAccountAndTransactionTypeAndType(final String identifier) {
+    public List<AccountEntry> findByAccount(final String identifier) {
         final AccountEntity accountEntity = this.accountRepository.findByIdentifier(identifier);
-        final List<AccountEntryEntity> accountEntryEntities = this.accountEntryRepository.findByAccountAndTransactionTypeAndType(accountEntity, "BCDP", "CREDIT");
+        final List<AccountEntryEntity> accountEntryEntities = this.accountEntryRepository.findByAccount(accountEntity);
         final List<AccountEntry> accountEntries = new ArrayList<>(accountEntryEntities.size());
         accountEntryEntities.forEach(accountEntryEntity -> accountEntries.add(AccountEntryMapper.map(accountEntryEntity)));
         return accountEntries;

@@ -129,15 +129,12 @@ public class TaskAggregate {
 
     @Transactional
     public void onCauseCommand(final CauseEntity causeEntity, Command.Action action) {
-        final List<TaskDefinitionEntity> predefinedTasks =
-                this.taskDefinitionRepository.findByAssignedCommandsContaining(action.name());
+        final List<TaskDefinitionEntity> predefinedTasks = this.taskDefinitionRepository.findByAssignedCommandsContaining(action.name());
         if (predefinedTasks != null && predefinedTasks.size() > 0) {
-            this.taskInstanceRepository.save(
-                    predefinedTasks
-                            .stream()
-                            .filter(TaskDefinitionEntity::isPredefined)
-                            .map(taskDefinitionEntity -> TaskInstanceMapper.create(taskDefinitionEntity, causeEntity))
-                            .collect(Collectors.toList())
+            this.taskInstanceRepository.save(predefinedTasks.stream()
+                    .filter(TaskDefinitionEntity::isPredefined)
+                    .map(taskDefinitionEntity -> TaskInstanceMapper.create(taskDefinitionEntity, causeEntity))
+                    .collect(Collectors.toList())
             );
         }
     }

@@ -22,7 +22,10 @@ import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.events.DocumentEvent;
 import org.apache.fineract.cn.cause.api.v1.events.DocumentPageEvent;
-import org.apache.fineract.cn.cause.internal.command.*;
+import org.apache.fineract.cn.cause.internal.command.ChangeDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.CompleteDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.CreateDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.CreateDocumentPageCommand;
 import org.apache.fineract.cn.cause.internal.mapper.DocumentMapper;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.command.annotation.Aggregate;
@@ -55,30 +58,59 @@ public class DocumentCommandHandler {
         this.causeRepository = causeRepository;
     }
 
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_DOCUMENT_PAGE)
-    public DocumentPageEvent process(final CreateDocumentPageCommand command) throws IOException {
-        final DocumentEntity documentEntity = documentRepository.findByCauseIdAndDocumentIdentifier(
-                command.getCauseIdentifier(),
-                command.getDocumentIdentifier())
-                .orElseThrow(() -> ServiceException.badRequest("Document not found"));
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_DOCUMENT_PAGE)
+//    public DocumentPageEvent process(final CreateDocumentPageCommand command) throws IOException {
+//        final DocumentEntity documentEntity = documentRepository.findByCauseIdAndDocumentIdentifier(
+//                command.getCauseIdentifier(),
+//                command.getDocumentIdentifier())
+//                .orElseThrow(() -> ServiceException.badRequest("Document not found"));
+//
+//        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getDocument(), command.getPageNumber(), documentEntity);
+//        documentPageRepository.save(documentPageEntity);
+//
+//        return new DocumentPageEvent(command.getCauseIdentifier(), command.getDocumentIdentifier(), command.getPageNumber());
+//    }
 
-        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getDocument(), command.getPageNumber(), documentEntity);
-        documentPageRepository.save(documentPageEntity);
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_DOCUMENT)
+//    public DocumentEvent process(final CreateDocumentCommand command) throws IOException {
+//        causeRepository.findByIdentifier(command.getCauseIdentifier())
+//                .map(causeEntity -> DocumentMapper.map(command.getCauseDocument(), causeEntity))
+//                .ifPresent(documentRepository::save);
+//
+//        return new DocumentEvent(command.getCauseIdentifier(), command.getCauseDocument().getIdentifier());
+//    }
 
-        return new DocumentPageEvent(command.getCauseIdentifier(), command.getDocumentIdentifier(), command.getPageNumber());
-    }
 
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_DOCUMENT)
     public DocumentEvent process(final CreateDocumentCommand command) throws IOException {
-        causeRepository.findByIdentifier(command.getCauseIdentifier())
-                .map(causeEntity -> DocumentMapper.map(command.getCauseDocument(), causeEntity))
-                .ifPresent(documentRepository::save);
+        CauseEntity causeEntity = causeRepository.findByIdentifier(command.getCauseIdentifier()).get();
+        System.out.println("------------------cause identifier----------------------" + causeEntity.toString());
 
-        return new DocumentEvent(command.getCauseIdentifier(), command.getCauseDocument().getIdentifier());
+        DocumentEntity documentEntity = documentRepository.save(DocumentMapper.map(causeEntity));
+
+        System.out.println("-----------------------documentEntity--------------------" + documentEntity.toString());
+
+        DocumentPageEntity FeaturePageEntity = DocumentMapper.map(command.getFeature(), documentEntity, "Feature");
+//        DocumentPageEntity FeaturePageEntity = DocumentMapper.map(command.getFeature(), documentEntity, "Gallary");
+        DocumentPageEntity TaxPageEntity = DocumentMapper.map(command.getTax(), documentEntity, "Tax");
+        DocumentPageEntity TermsPageEntity = DocumentMapper.map(command.getTerms(), documentEntity, "Terms");
+        DocumentPageEntity OtherPageEntity = DocumentMapper.map(command.getOther(), documentEntity, "Other");
+
+
+        documentPageRepository.save(FeaturePageEntity);
+//        documentPageRepository.save(FeaturePageEntity);
+        documentPageRepository.save(TaxPageEntity);
+        documentPageRepository.save(TermsPageEntity);
+        documentPageRepository.save(OtherPageEntity);
+
+
+        return new DocumentEvent(command.getCauseIdentifier(), command.getCauseIdentifier());
     }
 
     @Transactional
@@ -101,21 +133,21 @@ public class DocumentCommandHandler {
         return new DocumentEvent(command.getCauseIdentifier(), command.getCauseDocument().getIdentifier());
     }
 
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_DOCUMENT)
-    public DocumentEvent process(final DeleteDocumentCommand command) throws IOException {
-        final DocumentEntity existingDocument = documentRepository.findByCauseIdAndDocumentIdentifier(
-                command.getCauseIdentifier(), command.getDocumentIdentifier())
-                .orElseThrow(() ->
-                        ServiceException.notFound("Document ''{0}'' for cause ''{1}'' not found",
-                                command.getDocumentIdentifier(), command.getCauseIdentifier()));
-        documentPageRepository.findByCauseIdAndDocumentIdentifier(command.getCauseIdentifier(), command.getDocumentIdentifier())
-                .forEach(documentPageRepository::delete);
-        documentRepository.delete(existingDocument);
-
-        return new DocumentEvent(command.getCauseIdentifier(), command.getDocumentIdentifier());
-    }
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_DOCUMENT)
+//    public DocumentEvent process(final DeleteDocumentCommand command) throws IOException {
+//        final DocumentEntity existingDocument = documentRepository.findByCauseIdAndDocumentIdentifier(
+//                command.getCauseIdentifier(), command.getDocumentIdentifier())
+//                .orElseThrow(() ->
+//                        ServiceException.notFound("Document ''{0}'' for cause ''{1}'' not found",
+//                                command.getDocumentIdentifier(), command.getCauseIdentifier()));
+//        documentPageRepository.findByCauseIdAndDocumentIdentifier(command.getCauseIdentifier(), command.getDocumentIdentifier())
+//                .forEach(documentPageRepository::delete);
+//        documentRepository.delete(existingDocument);
+//
+//        return new DocumentEvent(command.getCauseIdentifier(), command.getDocumentIdentifier());
+//    }
 
     @Transactional
     @CommandHandler
@@ -135,18 +167,18 @@ public class DocumentCommandHandler {
         return new DocumentEvent(command.getCauseIdentifier(), command.getDocumentIdentifier());
     }
 
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_DOCUMENT_PAGE)
-    public DocumentPageEvent process(final DeleteDocumentPageCommand command) throws IOException {
-        documentPageRepository.findByCauseIdAndDocumentIdentifierAndPageNumber(
-                command.getCauseIdentifier(),
-                command.getDocumentIdentifier(),
-                command.getPageNumber())
-                .ifPresent(documentPageRepository::delete);
-
-        //No exception if it's not present, because why bother.  It's not present.  That was the goal.
-
-        return new DocumentPageEvent(command.getCauseIdentifier(), command.getDocumentIdentifier(), command.getPageNumber());
-    }
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_DOCUMENT_PAGE)
+//    public DocumentPageEvent process(final DeleteDocumentPageCommand command) throws IOException {
+//        documentPageRepository.findByCauseIdAndDocumentIdentifierAndPageNumber(
+//                command.getCauseIdentifier(),
+//                command.getDocumentIdentifier(),
+//                command.getPageNumber())
+//                .ifPresent(documentPageRepository::delete);
+//
+//        //No exception if it's not present, because why bother.  It's not present.  That was the goal.
+//
+//        return new DocumentPageEvent(command.getCauseIdentifier(), command.getDocumentIdentifier(), command.getPageNumber());
+//    }
 }

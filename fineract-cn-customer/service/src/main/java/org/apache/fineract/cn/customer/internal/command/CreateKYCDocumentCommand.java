@@ -18,31 +18,43 @@
  */
 package org.apache.fineract.cn.customer.internal.command;
 
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentsBody;
+import org.springframework.web.multipart.MultipartFile;
+
 /**
  * @author Myrle Krantz
  */
-public class DeleteDocumentCommand {
+public class CreateKYCDocumentCommand {
     private final String customerIdentifier;
-    private final Long documentIdentifier;
+    private final CustomerDocumentsBody customerDocumentsBody;
+    private final MultipartFile file;
 
-    public DeleteDocumentCommand(String customerIdentifier, Long documentIdentifier) {
+    public CreateKYCDocumentCommand(final String customerIdentifier,
+                                    final MultipartFile file,
+                                    final CustomerDocumentsBody customerDocumentsBody) {
         this.customerIdentifier = customerIdentifier;
-        this.documentIdentifier = documentIdentifier;
+        this.customerDocumentsBody = customerDocumentsBody;
+        this.file = file;
     }
 
     public String getCustomerIdentifier() {
         return customerIdentifier;
     }
 
-    public Long getDocumentIdentifier() {
-        return documentIdentifier;
+    public CustomerDocumentsBody getCustomerDocumentsBody() {
+        return customerDocumentsBody;
+    }
+
+    public MultipartFile getFile() {
+        return file;
     }
 
     @Override
     public String toString() {
-        return "DeleteDocumentCommand{" +
+        return "CreateDocumentCommand{" +
                 "customerIdentifier='" + customerIdentifier + '\'' +
-                ", documentIdentifier='" + documentIdentifier + '\'' +
+                ", customerDocument=" + customerDocumentsBody.toString() +
                 '}';
     }
 }

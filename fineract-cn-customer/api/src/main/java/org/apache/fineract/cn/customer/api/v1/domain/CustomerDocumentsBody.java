@@ -16,24 +16,48 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.repository;
+package org.apache.fineract.cn.customer.api.v1.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.Objects;
 
 /**
  * @author Myrle Krantz
  */
-@Repository
-public interface DocumentPageRepository extends JpaRepository<DocumentPageEntity, Long> {
+public class CustomerDocumentsBody {
 
-    Optional<DocumentPageEntity> findById(Long Id);
+    @Length(max = 4096)
+    private String description;
+    private String type;
+    private String subType;
 
-    List<DocumentPageEntity> findByDocument(DocumentEntity entity);
+    public CustomerDocumentsBody() {
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getSubType() {
+        return subType;
+    }
+
+    public void setSubType(String subType) {
+        this.subType = subType;
+    }
 }

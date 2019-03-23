@@ -18,31 +18,35 @@
  */
 package org.apache.fineract.cn.customer.internal.command;
 
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+
 /**
  * @author Myrle Krantz
  */
-public class DeleteDocumentCommand {
+public class ChangeDocumentStatusCommand {
     private final String customerIdentifier;
-    private final Long documentIdentifier;
+    private final Long customerDocumentId;
 
-    public DeleteDocumentCommand(String customerIdentifier, Long documentIdentifier) {
+
+    public ChangeDocumentStatusCommand(String customerIdentifier, Long customerDocumentId) {
         this.customerIdentifier = customerIdentifier;
-        this.documentIdentifier = documentIdentifier;
+        this.customerDocumentId = customerDocumentId;
     }
+
 
     public String getCustomerIdentifier() {
         return customerIdentifier;
     }
 
-    public Long getDocumentIdentifier() {
-        return documentIdentifier;
+    public Long getCustomerDocumentId() {
+        return customerDocumentId;
     }
 
     @Override
     public String toString() {
-        return "DeleteDocumentCommand{" +
+        return "ChangeDocumentStatusCommand{" +
                 "customerIdentifier='" + customerIdentifier + '\'' +
-                ", documentIdentifier='" + documentIdentifier + '\'' +
+                ", customerDocumentId=" + customerDocumentId +
                 '}';
     }
 }

@@ -22,9 +22,7 @@ import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.lang.DateConverter;
-import org.apache.fineract.cn.lang.DateOfBirth;
 
-import java.sql.Date;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
@@ -49,7 +47,7 @@ public final class CauseMapper {
         if (cause.getEndDate() != null) {
             causeEntity.setEndDate(LocalDateTime.parse(cause.getEndDate()));
         }
-        if (cause.getCompletedDate()!= null) {
+        if (cause.getCompletedDate() != null) {
             causeEntity.setCompletedDate(LocalDateTime.parse(cause.getCompletedDate()));
         }
 
@@ -85,13 +83,14 @@ public final class CauseMapper {
         return causeEntity;
     }
 
+
     public static Cause map(final CauseEntity causeEntity) {
         final Cause cause = new Cause();
 
         cause.setIdentifier(causeEntity.getIdentifier());
         cause.setTitle(causeEntity.getTitle());
         cause.setDescription(causeEntity.getDescription());
-        if (causeEntity.getStartDate()!=null) {
+        if (causeEntity.getStartDate() != null) {
             cause.setStartDate(DateConverter.toIsoString(causeEntity.getStartDate()));
         }
         if (causeEntity.getEndDate() != null) {

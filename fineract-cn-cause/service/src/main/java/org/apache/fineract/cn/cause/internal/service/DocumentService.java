@@ -48,14 +48,8 @@ public class DocumentService {
         this.documentPageRepository = documentPageRepository;
     }
 
-    public Optional<DocumentPageEntity> findPage(
-            final String causeIdentifier,
-            final String documentIdentifier,
-            final Integer pageNumber) {
-        return this.documentPageRepository.findByCauseIdAndDocumentIdentifierAndPageNumber(
-                causeIdentifier,
-                documentIdentifier,
-                pageNumber);
+    public Optional<DocumentPageEntity> findPage(final Long documentId) {
+        return this.documentPageRepository.findById(documentId);
     }
 
     public Stream<CauseDocument> find(final String causeIdentifier) {
@@ -76,12 +70,12 @@ public class DocumentService {
         return findDocument(causeIdentifier, documentIdentifier).isPresent();
     }
 
-    public Stream<Integer> findPageNumbers(
-            final String causeIdentifier,
-            final String documentIdentifier) {
-        return documentPageRepository.findByCauseIdAndDocumentIdentifier(causeIdentifier, documentIdentifier)
-                .map(DocumentPageEntity::getPageNumber);
-    }
+//    public Stream<Integer> findPageNumbers(
+//            final String causeIdentifier,
+//            final String documentIdentifier) {
+//        return documentPageRepository.findByCauseIdAndDocumentIdentifier(causeIdentifier, documentIdentifier)
+//                .map(DocumentPageEntity::);
+//    }
 
     public boolean isDocumentCompleted(
             final String causeIdentifier,
@@ -90,17 +84,17 @@ public class DocumentService {
                 .map(DocumentEntity::getCompleted).orElse(true);
     }
 
-    public boolean isDocumentMissingPages(
-            final String causeIdentifier,
-            final String documentIdentifier) {
-        final List<Integer> pageNumbers = findPageNumbers(causeIdentifier, documentIdentifier)
-                .sorted(Integer::compareTo)
-                .collect(Collectors.toList());
-        for (int i = 0; i < pageNumbers.size(); i++) {
-            if (i != pageNumbers.get(i))
-                return true;
-        }
-
-        return false;
-    }
+//    public boolean isDocumentMissingPages(
+//            final String causeIdentifier,
+//            final String documentIdentifier) {
+//        final List<Integer> pageNumbers = findPageNumbers(causeIdentifier, documentIdentifier)
+//                .sorted(Integer::compareTo)
+//                .collect(Collectors.toList());
+//        for (int i = 0; i < pageNumbers.size(); i++) {
+//            if (i != pageNumbers.get(i))
+//                return true;
+//        }
+//
+//        return false;
+//    }
 }

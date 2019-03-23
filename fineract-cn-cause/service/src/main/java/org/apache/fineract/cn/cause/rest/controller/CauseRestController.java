@@ -18,8 +18,7 @@
  */
 package org.apache.fineract.cn.cause.rest.controller;
 
-//import org.apache.fineract.cn.cause.catalog.internal.service.FieldValueValidator;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.util.UserContextHolder;
@@ -45,6 +44,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,7 +56,6 @@ public class CauseRestController {
     private final Logger logger;
     private final CommandGateway commandGateway;
     private final CauseService causeService;
-    //private final FieldValueValidator fieldValueValidator;
     private final TaskService taskService;
     private final Environment environment;
 
@@ -64,14 +63,12 @@ public class CauseRestController {
     public CauseRestController(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
                                final CommandGateway commandGateway,
                                final CauseService causeService,
-                               //final FieldValueValidator fieldValueValidator,
                                final TaskService taskService,
                                final Environment environment) {
         super();
         this.logger = logger;
         this.commandGateway = commandGateway;
         this.causeService = causeService;
-        //this.fieldValueValidator = fieldValueValidator;
         this.taskService = taskService;
         this.environment = environment;
     }
@@ -90,24 +87,28 @@ public class CauseRestController {
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
-            value = "/causes",
+    @RequestMapping(value = "/causes",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public
-    @ResponseBody
-    ResponseEntity<Void> createCause(@RequestBody @Valid final Cause cause) throws InterruptedException {
+    public @ResponseBody
+    ResponseEntity<Void> createCause(
+            @RequestParam("data") final String data,
+            @RequestParam("feature") final MultipartFile feature,
+            @RequestParam(value = "gallery", required = false) final List<MultipartFile> gallery,
+            @RequestParam(value = "tax", required = false) final MultipartFile tax,
+            @RequestParam("terms") final MultipartFile terms,
+            @RequestParam(value = "other", required = false) final MultipartFile other) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Cause cause = mapper.readValue(data, Cause.class);
         if (this.causeService.causeExists(cause.getIdentifier())) {
-            throw ServiceException.conflict("Cause {0} already exists.", cause.getIdentifier());
+            throw ServiceException.conflict("Cause {0} already exists in this system, Please try another name.", cause.getIdentifier());
         }
 
-   /* if (cause.getCustomValues() != null) {
-      this.fieldValueValidator.validateValues(cause.getCustomValues());
-    }
-*/
-        this.commandGateway.process(new CreateCauseCommand(cause));
+        this.commandGateway.process(new CreateCauseCommand(cause, feature, gallery, tax, terms, other));
+
+
         return ResponseEntity.accepted().build();
     }
 
@@ -120,18 +121,35 @@ public class CauseRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<CausePage> fetchCauses(@RequestParam(value = "term", required = false) final String term,
+    ResponseEntity<CausePage> fetchCauses(@RequestParam(value = "param", required = false) final String param,
                                           @RequestParam(value = "includeClosed", required = false) final Boolean includeClosed,
-                                          @RequestParam(value = "onlyActive", required = false) final Boolean onlyActive,
                                           @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
                                           @RequestParam(value = "size", required = false) final Integer size,
                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
 
-        return ResponseEntity.ok(this.causeService.fetchCause(
-                term, (includeClosed != null ? includeClosed : Boolean.FALSE), (onlyActive != null ? onlyActive : Boolean.FALSE),
+        return ResponseEntity.ok(this.causeService.fetchCause((includeClosed != null ? includeClosed : Boolean.FALSE), param,
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
+
+
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+//    @RequestMapping(
+//            value = "/causes/filter",
+//            method = RequestMethod.GET,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.ALL_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<CausePage> fetchCausesByCategory(
+//            @RequestParam(value = "category", required = false) final String category,
+//            @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
+//            @RequestParam(value = "size", required = false) final Integer size,
+//            @RequestParam(value = "sortColumn", required = false) final String sortColumn,
+//            @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
+//
+//        return ResponseEntity.ok(this.causeService.fetchCauseByCategory(category, this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+//    }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
     @RequestMapping(
@@ -288,7 +306,7 @@ public class CauseRestController {
             // if (this.causeService.causeRatingExists(identifier, rating.getCreatedBy())) {
             //     throw ServiceException.notFound("Already rating given for this Cause {0}.", identifier);
             // } else {
-                this.commandGateway.process(new CreateRatingCommand(identifier, rating));
+            this.commandGateway.process(new CreateRatingCommand(identifier, rating));
             //}
 
         } else {

@@ -19,29 +19,32 @@
 package org.apache.fineract.cn.customer.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.fineract.cn.customer.PermittableGroupIds;
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
-import org.apache.fineract.cn.customer.internal.command.*;
-import org.apache.fineract.cn.customer.internal.repository.DocumentPageEntity;
-import org.apache.fineract.cn.customer.internal.service.CustomerService;
-import org.apache.fineract.cn.customer.internal.service.DocumentService;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
-
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
+import org.apache.fineract.cn.customer.PermittableGroupIds;
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentsBody;
+import org.apache.fineract.cn.customer.internal.command.ChangeDocumentStatusCommand;
+import org.apache.fineract.cn.customer.internal.command.CreateDocumentCommand;
+import org.apache.fineract.cn.customer.internal.command.CreateKYCDocumentCommand;
+import org.apache.fineract.cn.customer.internal.command.DeleteDocumentCommand;
+import org.apache.fineract.cn.customer.internal.repository.DocumentEntryEntity;
+import org.apache.fineract.cn.customer.internal.repository.DocumentPageEntity;
+import org.apache.fineract.cn.customer.internal.service.CustomerService;
+import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.lang.ServiceException;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Myrle Krantz
@@ -71,9 +74,6 @@ public class DocumentsRestController {
     )
     public ResponseEntity<CustomerDocument> getDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
-
-//        documentService.findCustomerDocuments(customerIdentifier);
-
         return ResponseEntity.ok(documentService.findCustomerDocuments(customerIdentifier));
     }
 
@@ -85,9 +85,9 @@ public class DocumentsRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-    public ResponseEntity<CustomerDocument> getDocument(
+    public ResponseEntity<CustomerDocumentEntry> getDocument(
             @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier) {
+            @PathVariable("documentidentifier") final Long documentIdentifier) {
         return ResponseEntity
                 .ok(documentService.findDocument(customerIdentifier, documentIdentifier)
                         .orElseThrow(() -> ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found.",
@@ -108,64 +108,27 @@ public class DocumentsRestController {
             @PathVariable("documentidentifier") final String documentIdentifier,
             @RequestBody final @Valid CustomerDocument instance) {
         throwIfCustomerNotExists(customerIdentifier);
-
         if (!instance.getIdentifier().equals(documentIdentifier))
             throw ServiceException.badRequest("Document identifier in request body must match document identifier in request path.");
-
-        commandGateway.process(new CreateDocumentCommand(customerIdentifier, instance));
-
-        return ResponseEntity.accepted().build();
-    }
-
-
-    //    ------------------ create document data --------------------------
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/create",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> createDocument(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @RequestBody final @Valid CustomerDocument instance) {
-        throwIfCustomerNotExists(customerIdentifier);
-        throwIfCustomerDocumentAlreadyExist(customerIdentifier, instance);
-
         commandGateway.process(new CreateDocumentCommand(customerIdentifier, instance));
         return ResponseEntity.accepted().build();
     }
 
-    private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier, CustomerDocument instance) {
-        if (this.documentService.documentExists(customerIdentifier, instance.getIdentifier())) {
-            throw ServiceException.notFound("Customer ''{0}'' with Document identifier ''{1}'' already exist in the system", customerIdentifier, instance.getIdentifier());
-        }
-    }
-
-
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}",
+    @RequestMapping(value = "/{documentidentifier}",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> changeDocument(
+    ResponseEntity<Void> changeDocumentStatus(
             @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier,
-            @RequestBody final @Valid CustomerDocument instance) {
+            @PathVariable("documentidentifier") final Long documentIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
         throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
-
         throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
 
-        if (!instance.getIdentifier().equals(documentIdentifier))
-            throw ServiceException.badRequest("Document identifier in request body must match document identifier in request path.");
-
-        commandGateway.process(new ChangeDocumentCommand(customerIdentifier, instance));
-
+        commandGateway.process(new ChangeDocumentStatusCommand(customerIdentifier, documentIdentifier));
         return ResponseEntity.accepted().build();
     }
 
@@ -180,10 +143,9 @@ public class DocumentsRestController {
     public @ResponseBody
     ResponseEntity<Void> deleteDocument(
             @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier) {
+            @PathVariable("documentidentifier") final Long documentIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
         throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
-
         throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
 
         commandGateway.process(new DeleteDocumentCommand(customerIdentifier, documentIdentifier));
@@ -192,30 +154,30 @@ public class DocumentsRestController {
     }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}/completed",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> completeDocument(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier,
-            @RequestBody final @Valid Boolean completed) {
-        throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
-
-        if (!completed)
-            throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
-
-        throwIfPagesMissing(customerIdentifier, documentIdentifier);
-
-        if (completed)
-            commandGateway.process(new CompleteDocumentCommand(customerIdentifier, documentIdentifier));
-
-        return ResponseEntity.accepted().build();
-    }
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/{documentidentifier}/completed",
+//            method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.APPLICATION_JSON_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> completeDocument(
+//            @PathVariable("customeridentifier") final String customerIdentifier,
+//            @PathVariable("documentidentifier") final Long documentIdentifier,
+//            @RequestBody final @Valid Boolean completed) {
+////        throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
+//
+//        if (!completed)
+//            throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
+//
+//        throwIfPagesMissing(customerIdentifier, documentIdentifier);
+//
+//        if (completed)
+//            commandGateway.process(new CompleteDocumentCommand(customerIdentifier, documentIdentifier));
+//
+//        return ResponseEntity.accepted().build();
+//    }
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
@@ -229,7 +191,7 @@ public class DocumentsRestController {
     ResponseEntity<List<Integer>> getDocumentPageNumbers(
             @PathVariable("customeridentifier") final String customerIdentifier,
             @PathVariable("documentidentifier") final String documentIdentifier) {
-        throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
+//        throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
 
         return ResponseEntity.ok(documentService.findPageNumbers(customerIdentifier, documentIdentifier).collect(Collectors.toList()));
     }
@@ -277,79 +239,90 @@ public class DocumentsRestController {
     }
 
 
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/{documentidentifier}/pages/{pagenumber}",
+//            method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> createDocumentPage(
+//            @PathVariable("customeridentifier") final String customerIdentifier,
+//            @PathVariable("documentidentifier") final String documentIdentifier,
+//            @PathVariable("pagenumber") @Range(min = 0) final Integer pageNumber,
+//            @RequestBody final MultipartFile page) {
+//        if (page == null) {
+//            throw ServiceException.badRequest("Document not found");
+//        }
+//
+//        throwIfCustomerNotExists(customerIdentifier);
+//        throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
+//        throwIfInvalidContentType(page.getContentType());
+//
+//        commandGateway.process(new CreateDocumentPageCommand(customerIdentifier, documentIdentifier, pageNumber, page));
+//
+//        return ResponseEntity.accepted().build();
+//    }
+
+    //    ------------------ create document data with data --------------------------
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
-            value = "/{documentidentifier}/pages/{pagenumber}",
+            value = "/upload",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> createDocumentPage(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier,
-            @PathVariable("pagenumber") @Range(min = 0) final Integer pageNumber,
-            @RequestBody final MultipartFile page) {
-        if (page == null) {
-            throw ServiceException.badRequest("Document not found");
-        }
-
+    ResponseEntity<Void> uploadKycDocuments(@PathVariable("customeridentifier") final String customerIdentifier,
+                                            @RequestParam("data") String data,
+                                            @RequestParam(value = "file") MultipartFile file) throws IOException {
         throwIfCustomerNotExists(customerIdentifier);
-        throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
-        throwIfInvalidContentType(page.getContentType());
+//        throwIfCustomerDocumentAlreadyExist(customerIdentifier);
 
-        commandGateway.process(new CreateDocumentPageCommand(customerIdentifier, documentIdentifier, pageNumber, page));
-
-        return ResponseEntity.accepted().build();
-    }
-
-
-//  ------------------post the file -------------------------------- //
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}/upload",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> UploadDocumentEntry(@PathVariable("customeridentifier") final String customerIdentifier,
-                                             @PathVariable("documentidentifier") final String documentIdentifier,
-                                             @RequestParam("data") String data,
-                                             @RequestParam(value = "file") MultipartFile file) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        CustomerDocumentEntry documentEntry = mapper.readValue(data, CustomerDocumentEntry.class);
+        CustomerDocumentsBody documentEntry = mapper.readValue(data, CustomerDocumentsBody.class);
         if (file == null) {
             throw ServiceException.badRequest("Document not found");
         }
-        throwIfCustomerNotExists(customerIdentifier);
-        throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
-        throwIfInvalidContentType(file.getContentType());
-        commandGateway.process(new CreateDocumentEntryCommand(file, customerIdentifier, documentIdentifier, documentEntry));
+        commandGateway.process(new CreateKYCDocumentCommand(customerIdentifier, file, documentEntry));
         return ResponseEntity.accepted().build();
     }
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}/pages/{pagenumber}",
-            method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> deleteDocumentPage(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier,
-            @PathVariable("pagenumber") final Integer pageNumber) {
-        throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
+//    private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier, CustomerDocument instance) {
+//        if (this.documentService.documentExists(customerIdentifier, instance.getIdentifier())) {
+//            throw ServiceException.notFound("Customer ''{0}'' with Document identifier ''{1}'' already exist in the system", customerIdentifier, instance.getIdentifier());
+//        }
+//    }
 
-        throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
 
-        commandGateway.process(new DeleteDocumentPageCommand(customerIdentifier, documentIdentifier, pageNumber));
-
-        return ResponseEntity.accepted().build();
+    private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier) {
+        if (this.documentService.isDocumentExistByCustomerIdentifier(customerIdentifier)) {
+            throw ServiceException.notFound("Customer Document identifier already exist in the system");
+        }
     }
+
+
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/{documentidentifier}/pages/{pagenumber}",
+//            method = RequestMethod.DELETE,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.ALL_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> deleteDocumentPage(
+//            @PathVariable("customeridentifier") final String customerIdentifier,
+//            @PathVariable("documentidentifier") final Long documentIdentifier,
+//            @PathVariable("pagenumber") final Integer pageNumber) {
+//        throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
+//
+//        throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
+//
+//        commandGateway.process(new DeleteDocumentPageCommand(customerIdentifier, documentIdentifier, pageNumber));
+//
+//        return ResponseEntity.accepted().build();
+//    }
 
     private void throwIfCustomerNotExists(final String customerIdentifier) {
         if (!this.customerService.customerExists(customerIdentifier)) {
@@ -357,7 +330,7 @@ public class DocumentsRestController {
         }
     }
 
-    private void throwIfCustomerDocumentNotExists(final String customerIdentifier, final String documentIdentifier) {
+    private void throwIfCustomerDocumentNotExists(final String customerIdentifier, final Long documentIdentifier) {
         if (!this.documentService.documentExists(customerIdentifier, documentIdentifier)) {
             throw ServiceException.notFound("Customer ''{0}'' not found.", customerIdentifier);
         }
@@ -371,7 +344,9 @@ public class DocumentsRestController {
     }*/
     }
 
-    private void throwIfDocumentCompleted(final String customerIdentifier, final String documentIdentifier) {
+    private void throwIfDocumentCompleted(final String customerIdentifier, final Long documentIdentifier) {
+
+        System.out.println("-----------------------documentEntityOptional------------------------" + documentService.isDocumentCompleted(customerIdentifier, documentIdentifier));
         if (documentService.isDocumentCompleted(customerIdentifier, documentIdentifier))
             throw ServiceException.conflict("The document ''{0}'' for customer ''{1}'' is completed and cannot be uncompleted.",
                     documentIdentifier, customerIdentifier);

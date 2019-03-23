@@ -16,24 +16,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.repository;
+package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
+import org.hibernate.validator.constraints.Length;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.Objects;
 
 /**
  * @author Myrle Krantz
  */
-@Repository
-public interface DocumentPageRepository extends JpaRepository<DocumentPageEntity, Long> {
+public class CauseDocumentPage {
 
-    Optional<DocumentPageEntity> findById(Long Id);
+    private Long id;
+    private String type;
 
-    List<DocumentPageEntity> findByDocument(DocumentEntity entity);
+
+    public CauseDocumentPage() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "CauseDocumentPage{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }
