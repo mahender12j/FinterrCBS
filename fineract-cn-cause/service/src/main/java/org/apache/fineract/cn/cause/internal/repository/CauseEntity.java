@@ -60,6 +60,12 @@ public class CauseEntity {
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime completedDate;
 
+    @Column(name = "publish_date")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime publishDate;
+
+
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
@@ -431,6 +437,14 @@ public class CauseEntity {
 
     public void setRejectedBy(String rejectedBy) {
         this.rejectedBy = rejectedBy;
+    }
+
+    public LocalDateTime getPublishDate() {
+        return publishDate;
+    }
+
+    public void setPublishDate(LocalDateTime publishDate) {
+        this.publishDate = publishDate;
     }
 
     @Override

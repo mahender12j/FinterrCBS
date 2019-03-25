@@ -31,6 +31,7 @@ public interface CauseEventConstants {
     String PUT_CAUSE = "put-cause";
     String PUBLISH_CAUSE = "publish-cause";
     String REJECT_CAUSE = "reject-cause";
+    String APPROVE_CAUSE = "approve-cause";
     String PUT_ADDRESS = "put-address";
     String PUT_CONTACT_DETAILS = "put-contact-details";
     String POST_IDENTIFICATION_CARD = "post-identification-card";
@@ -52,7 +53,7 @@ public interface CauseEventConstants {
 
     String POST_PORTRAIT = "post-portrait";
     String DELETE_PORTRAIT = "delete-portrait";
-    
+
     String POST_CATEGORY = "post-category";
     String PUT_CATEGORY = "put-category";
     String DELETE_CATEGORY = "delete-category";

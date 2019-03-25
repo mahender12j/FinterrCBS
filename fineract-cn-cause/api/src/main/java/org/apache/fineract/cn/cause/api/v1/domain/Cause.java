@@ -22,6 +22,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 /**
  * @author Padma Raju Sattineni
@@ -88,6 +89,8 @@ public class Cause {
     private String ethAddress;
     private CauseStatistics causeStatistics;
     private CauseDocument causeDocument;
+
+    private LocalDateTime publishDate;
 
 
     public Cause() {
@@ -385,6 +388,14 @@ public class Cause {
 
     public CauseDocument getCauseDocument() {
         return causeDocument;
+    }
+
+    public LocalDateTime getPublishDate() {
+        return publishDate;
+    }
+
+    public void setPublishDate(LocalDateTime publishDate) {
+        this.publishDate = publishDate;
     }
 
     public void setCauseDocument(CauseDocument causeDocument) {

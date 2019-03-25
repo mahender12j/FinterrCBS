@@ -46,6 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -235,6 +236,32 @@ public class CauseRestController {
         if (causeEntity.isPresent()) {
             if (causeEntity.get().getCurrentState().toLowerCase().equals(Cause.State.APPROVED.name().toLowerCase())) {
                 this.commandGateway.process(new PublishCauseCommand(identifier));
+            } else {
+                throw ServiceException.conflict("Cause {0} not APPROVED state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
+            }
+
+        } else {
+            throw ServiceException.notFound("Cause {0} not found.", identifier);
+        }
+
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/approve",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
+                                      @RequestBody final Cause cause) {
+        Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
+        if (causeEntity.isPresent()) {
+            if (causeEntity.get().getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
+                this.commandGateway.process(new ApproveCauseCommand(identifier, Double.parseDouble(cause.getFinRate()), cause.getManagementFee(), cause.getPublishDate()));
             } else {
                 throw ServiceException.conflict("Cause {0} not APPROVED state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
             }

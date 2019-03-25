@@ -59,7 +59,6 @@ public class CategoryMapper {
 
     public static CategoryEntity map(final CauseCategory category, final CauseEntity causeEntity) {
         final CategoryEntity ret = new CategoryEntity();
-//        ret.setCause(causeEntity);
         ret.setActive(true);
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));

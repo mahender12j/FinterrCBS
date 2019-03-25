@@ -98,6 +98,7 @@ public class CauseService {
             final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocument(entity);
             causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
             cause.setCauseDocument(causeDocument);
+            cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
             if (avgRatingValue != null) {
                 cause.setAvgRating(avgRatingValue.toString());
