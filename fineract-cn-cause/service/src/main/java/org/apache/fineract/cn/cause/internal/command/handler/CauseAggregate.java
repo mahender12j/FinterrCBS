@@ -245,6 +245,11 @@ public class CauseAggregate {
     public String deleteCause(final DeleteCauseCommand deleteCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseCommand.getCauseIdentifier());
 
+        Boolean isAllowed = isRemovableState(causeEntity.getCurrentState());
+        if (isAllowed == false) {
+            throw ServiceException.conflict("Unable to delete this cause!");
+        } 
+
         System.out.println("deleteCause --- CauseIndentifier :: " + deleteCauseCommand.getCauseIdentifier());
         causeEntity.setCurrentState(Cause.State.DELETED.name());
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
@@ -634,5 +639,15 @@ public class CauseAggregate {
         return this.causeRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> ServiceException.notFound("Cause ''{0}'' not found", identifier));
     }
+
+    public static boolean isRemovableState(String val) {
+        for (Cause.RemovableCauseState c : Cause.RemovableCauseState.values()) {
+            if (c.name().equals(val)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
 

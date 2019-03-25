@@ -33,6 +33,10 @@ public class Cause {
         PENDING, APPROVED, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED
     }
 
+    public enum RemovableCauseState {
+        APPROVED, PENDING, REJECTED, INACTIVE
+    }
+
     @NotBlank
     private String identifier;
     @NotBlank
