@@ -125,6 +125,12 @@ public class CauseEntity {
     @Column(name = "eth_address")
     private String ethAddress;
 
+    @Column(name = "rejected_reason")
+    private String rejectedReason;
+    @Column(name = "rejected_by")
+    private String rejectedBy;
+
+
 
     public Boolean getTaxExamption() {
         return isTaxExamption;
@@ -409,6 +415,22 @@ public class CauseEntity {
 
     public void setCategory(CategoryEntity category) {
         this.category = category;
+    }
+
+    public String getRejectedReason() {
+        return rejectedReason;
+    }
+
+    public void setRejectedReason(String rejectedReason) {
+        this.rejectedReason = rejectedReason;
+    }
+
+    public String getRejectedBy() {
+        return rejectedBy;
+    }
+
+    public void setRejectedBy(String rejectedBy) {
+        this.rejectedBy = rejectedBy;
     }
 
     @Override

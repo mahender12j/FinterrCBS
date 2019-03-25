@@ -22,13 +22,20 @@ public class RejectCauseCommand {
 
 
     private final String identifier;
+    private final String reason;
 
-    public RejectCauseCommand(final String identifier) {
+    public RejectCauseCommand(final String identifier,
+                              final String reason) {
         super();
         this.identifier = identifier;
+        this.reason = reason;
     }
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    public String getReason() {
+        return reason;
     }
 }

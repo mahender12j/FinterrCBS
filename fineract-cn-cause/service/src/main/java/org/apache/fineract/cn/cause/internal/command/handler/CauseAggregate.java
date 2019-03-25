@@ -246,6 +246,8 @@ public class CauseAggregate {
     public String RejectCause(final RejectCauseCommand rejectCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(rejectCauseCommand.getIdentifier());
         causeEntity.setCurrentState(Cause.State.REJECTED.name());
+        causeEntity.setRejectedReason(rejectCauseCommand.getReason());
+        causeEntity.setRejectedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
         return rejectCauseCommand.getIdentifier();
     }
