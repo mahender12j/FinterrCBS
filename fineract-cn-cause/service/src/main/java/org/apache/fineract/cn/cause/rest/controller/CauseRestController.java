@@ -234,7 +234,7 @@ public class CauseRestController {
             if (causeEntity.get().getCurrentState().toLowerCase().equals(Cause.State.APPROVED.name().toLowerCase())) {
                 this.commandGateway.process(new PublishCauseCommand(identifier));
             } else {
-                throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
+                throw ServiceException.conflict("Cause {0} not APPROVED state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
             }
 
         } else {
