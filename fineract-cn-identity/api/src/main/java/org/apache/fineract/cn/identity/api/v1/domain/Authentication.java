@@ -28,107 +28,124 @@ import java.util.Objects;
  */
 @SuppressWarnings("unused")
 public class Authentication {
-  @NotBlank
-  private String tokenType;
+    @NotBlank
+    private String tokenType;
 
-  @NotBlank
-  private String accessToken;
+    @NotBlank
+    private String accessToken;
 
-  @NotBlank
-  private String accessTokenExpiration;
+    @NotBlank
+    private String refreshToken;
 
-  @NotBlank
-  private String refreshTokenExpiration;
+    @NotBlank
+    private String accessTokenExpiration;
 
-  /**
-   * If password expiration is in the past, then the tokens provided only allow the user to change his/her password.
-   * If password expiration is null then password will never expire.
-   */
-  @Nullable
-  private String passwordExpiration;
+    @NotBlank
+    private String refreshTokenExpiration;
 
-  public Authentication()
-  {
-  }
+    /**
+     * If password expiration is in the past, then the tokens provided only allow the user to change his/her password.
+     * If password expiration is null then password will never expire.
+     */
+    @Nullable
+    private String passwordExpiration;
 
-  public Authentication(
-      final String accessToken,
-      final String accessTokenExpiration,
-      final String refreshTokenExpiration,
-      final String passwordExpiration) {
-    this.tokenType = "bearer";
-    this.accessToken = accessToken;
-    this.accessTokenExpiration = accessTokenExpiration;
-    this.refreshTokenExpiration = refreshTokenExpiration;
-    this.passwordExpiration = passwordExpiration;
-  }
+    public Authentication() {
+    }
 
-  public String getTokenType() {
-    return tokenType;
-  }
+    public Authentication(
+            final String accessToken,
+            final String refreshToken,
+            final String accessTokenExpiration,
+            final String refreshTokenExpiration,
+            final String passwordExpiration) {
+        this.tokenType = "bearer";
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.accessTokenExpiration = accessTokenExpiration;
+        this.refreshTokenExpiration = refreshTokenExpiration;
+        this.passwordExpiration = passwordExpiration;
+    }
 
-  public void setTokenType(String tokenType) {
-    this.tokenType = tokenType;
-  }
+    public String getTokenType() {
+        return tokenType;
+    }
 
-  public String getAccessToken() {
-    return accessToken;
-  }
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
+    }
 
-  public void setAccessToken(String accessToken) {
-    this.accessToken = accessToken;
-  }
+    public String getAccessToken() {
+        return accessToken;
+    }
 
-  public String getAccessTokenExpiration() {
-    return accessTokenExpiration;
-  }
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
 
-  public void setAccessTokenExpiration(String accessTokenExpiration) {
-    this.accessTokenExpiration = accessTokenExpiration;
-  }
+    public String getAccessTokenExpiration() {
+        return accessTokenExpiration;
+    }
 
-  public String getRefreshTokenExpiration() {
-    return refreshTokenExpiration;
-  }
+    public void setAccessTokenExpiration(String accessTokenExpiration) {
+        this.accessTokenExpiration = accessTokenExpiration;
+    }
 
-  public void setRefreshTokenExpiration(String refreshTokenExpiration) {
-    this.refreshTokenExpiration = refreshTokenExpiration;
-  }
+    public String getRefreshTokenExpiration() {
+        return refreshTokenExpiration;
+    }
 
-  public String getPasswordExpiration() {
-    return passwordExpiration;
-  }
+    public void setRefreshTokenExpiration(String refreshTokenExpiration) {
+        this.refreshTokenExpiration = refreshTokenExpiration;
+    }
 
-  public void setPasswordExpiration(String passwordExpiration) {
-    this.passwordExpiration = passwordExpiration;
-  }
+    public String getRefreshToken() {
+        return refreshToken;
+    }
 
-  @Override public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (!(o instanceof Authentication))
-      return false;
-    Authentication that = (Authentication) o;
-    return Objects.equals(tokenType, that.tokenType) &&
-        Objects.equals(accessToken, that.accessToken) &&
-        Objects.equals(accessTokenExpiration, that.accessTokenExpiration) &&
-        Objects.equals(refreshTokenExpiration, that.refreshTokenExpiration) &&
-        Objects.equals(passwordExpiration, that.passwordExpiration);
-  }
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 
-  @Override public int hashCode() {
-    return Objects
-        .hash(tokenType, accessToken, accessTokenExpiration, refreshTokenExpiration,
-            passwordExpiration);
-  }
+    public String getPasswordExpiration() {
+        return passwordExpiration;
+    }
 
-  @Override public String toString() {
-    return "Authentication{" +
-        "tokenType='" + tokenType + '\'' +
-        ", accessToken='" + accessToken + '\'' +
-        ", accessTokenExpiration='" + accessTokenExpiration + '\'' +
-        ", refreshTokenExpiration='" + refreshTokenExpiration + '\'' +
-        ", passwordExpiration='" + passwordExpiration + '\'' +
-        '}';
-  }
+    public void setPasswordExpiration(String passwordExpiration) {
+        this.passwordExpiration = passwordExpiration;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Authentication))
+            return false;
+        Authentication that = (Authentication) o;
+        return Objects.equals(tokenType, that.tokenType) &&
+                Objects.equals(accessToken, that.accessToken) &&
+                Objects.equals(refreshToken, that.refreshToken) &&
+                Objects.equals(accessTokenExpiration, that.accessTokenExpiration) &&
+                Objects.equals(refreshTokenExpiration, that.refreshTokenExpiration) &&
+                Objects.equals(passwordExpiration, that.passwordExpiration);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects
+                .hash(tokenType, accessToken, refreshToken, accessTokenExpiration, refreshTokenExpiration,
+                        passwordExpiration);
+    }
+
+    @Override
+    public String toString() {
+        return "Authentication{" +
+                "tokenType='" + tokenType + '\'' +
+                ", accessToken='" + accessToken + '\'' +
+                ", refreshToken='" + refreshToken + '\'' +
+                ", accessTokenExpiration='" + accessTokenExpiration + '\'' +
+                ", refreshTokenExpiration='" + refreshTokenExpiration + '\'' +
+                ", passwordExpiration='" + passwordExpiration + '\'' +
+                '}';
+    }
 }
