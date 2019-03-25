@@ -30,18 +30,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.Document;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-/*import org.apache.fineract.cn.cause.catalog.internal.repository.FieldEntity;
-import org.apache.fineract.cn.cause.catalog.internal.repository.FieldValueEntity;
-import org.apache.fineract.cn.cause.catalog.internal.repository.FieldValueRepository;*/
-
-//import org.apache.fineract.cn.cause.catalog.api.v1.domain.Value;
 
 @Service
 public class CauseService {
@@ -50,7 +43,6 @@ public class CauseService {
     private final DocumentRepository documentRepository;
     private final DocumentPageRepository documentPageRepository;
     private final PortraitRepository portraitRepository;
-    private final ContactDetailRepository contactDetailRepository;
     private final CategoryRepository categoryRepository;
     private final RatingRepository ratingRepository;
     private final CommandRepository commandRepository;
@@ -61,7 +53,6 @@ public class CauseService {
     @Autowired
     public CauseService(final CauseRepository causeRepository,
                         final PortraitRepository portraitRepository,
-                        final ContactDetailRepository contactDetailRepository,
                         final CategoryRepository categoryRepository,
                         final DocumentPageRepository documentPageRepository,
                         final RatingRepository ratingRepository,
@@ -73,7 +64,6 @@ public class CauseService {
         super();
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
-        this.contactDetailRepository = contactDetailRepository;
         this.categoryRepository = categoryRepository;
         this.ratingRepository = ratingRepository;
         this.commandRepository = commandRepository;
@@ -120,6 +110,12 @@ public class CauseService {
         });
     }
 
+
+    public Optional<CauseEntity> findCauseEntity(String identifier) {
+        return causeRepository.findByIdentifier(identifier);
+    }
+
+
     public CausePage fetchCause(final Boolean includeClosed, final String param, final Pageable pageable) {
         final Page<CauseEntity> causeEntities;
         CausePage causePage = new CausePage();
@@ -127,7 +123,6 @@ public class CauseService {
             final String userIdentifier = UserContextHolder.checkedGetUser();
             if (param == null) {
                 causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(userIdentifier, Cause.State.ACTIVE.DELETED.name(), pageable);
-                System.out.println("-----------1----------------"+causeEntities.toString());
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
@@ -136,7 +131,6 @@ public class CauseService {
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
-                System.out.println("-----------2----------------"+causeEntities.toString());
             }
         } else {
             if (param == null) {
@@ -144,11 +138,8 @@ public class CauseService {
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
-                System.out.println("-----------3----------------"+causeEntities.toString());
             } else {
                 causePage = fetchCauseByCategory(param, pageable);
-                System.out.println("-----------4----------------");
-
             }
         }
 
@@ -235,7 +226,6 @@ public class CauseService {
 
 
     public Boolean causeRatingExists(final String causeIdentifier, final String createdBy) {
-//        System.out.println("causeRatingExists --- causeIdentifier :: " + causeIdentifier + "  createdBy :: " + createdBy);
         return this.ratingRepository.existsByCreatedBy(causeIdentifier, createdBy);
     }
 

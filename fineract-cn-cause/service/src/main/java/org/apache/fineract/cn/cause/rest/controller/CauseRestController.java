@@ -26,6 +26,7 @@ import org.apache.fineract.cn.cause.ServiceConstants;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.cause.internal.command.*;
+import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.PortraitEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
@@ -206,10 +207,8 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public
-    @ResponseBody
-    ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier,
-                                     @RequestBody final Cause cause) {
+    public @ResponseBody
+    ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier, @RequestBody final Cause cause) {
         if (this.causeService.causeExists(identifier)) {
             this.commandGateway.process(new UpdateCauseCommand(cause));
         } else {
@@ -217,6 +216,34 @@ public class CauseRestController {
         }
         return ResponseEntity.accepted().build();
     }
+
+
+    //    publish cause
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/publish",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> publishCause(@PathVariable("identifier") final String identifier) {
+        Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
+        if (causeEntity.isPresent()) {
+            if (causeEntity.get().getCurrentState().toLowerCase().equals(Cause.State.APPROVED.name().toLowerCase())) {
+                this.commandGateway.process(new PublishCauseCommand(identifier));
+            } else {
+                throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
+            }
+
+        } else {
+            throw ServiceException.notFound("Cause {0} not found.", identifier);
+        }
+
+        return ResponseEntity.accepted().build();
+    }
+
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(

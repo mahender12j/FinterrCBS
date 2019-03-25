@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull;
 public class Cause {
 
     public enum State {
-        PENDING, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED
+        PENDING, APPROVED, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED
     }
 
     @NotBlank

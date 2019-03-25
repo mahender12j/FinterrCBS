@@ -104,12 +104,6 @@ public class CauseAggregate {
         causeEntity.setAddress(savedAddress);
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
         DocumentEntity documentEntity = documentRepository.save(DocumentMapper.map(savedCauseEntity));
-
-
-        System.out.println("------------------cause getFeature----------------------" + createCauseCommand.getFeature());
-        System.out.println("------------------cause getTerms----------------------" + createCauseCommand.getTerms());
-        System.out.println("------------------cause getCause----------------------" + createCauseCommand.getCause());
-
         List<DocumentPageEntity> documentPageEntityList = new ArrayList<>();
         documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getFeature(), documentEntity, "Feature"));
         documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getTerms(), documentEntity, "Terms"));
@@ -129,11 +123,7 @@ public class CauseAggregate {
 
 
         documentPageRepository.save(documentPageEntityList);
-
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.ACTIVATE);
-        System.out.println("------------------cause identifier----------------------" + causeEntity.toString());
-        System.out.println("-----------------------documentEntity--------------------" + documentEntity.toString());
-
         return cause.getIdentifier();
     }
 
@@ -236,6 +226,17 @@ public class CauseAggregate {
         this.causeRepository.save(causeEntity);
 
         return cause.getIdentifier();
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.PUBLISH_CAUSE)
+    public String publishCause(final PublishCauseCommand publishCauseCommand) {
+        final CauseEntity causeEntity = findCauseEntityOrThrow(publishCauseCommand.getIdentifier());
+        causeEntity.setCurrentState(Cause.State.ACTIVE.name());
+        this.causeRepository.save(causeEntity);
+        return publishCauseCommand.getIdentifier();
     }
 
     @Transactional

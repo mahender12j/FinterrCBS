@@ -29,6 +29,7 @@ public interface CauseEventConstants {
 
     String POST_CAUSE = "post-cause";
     String PUT_CAUSE = "put-cause";
+    String PUBLISH_CAUSE = "publish-cause";
     String PUT_ADDRESS = "put-address";
     String PUT_CONTACT_DETAILS = "put-contact-details";
     String POST_IDENTIFICATION_CARD = "post-identification-card";
