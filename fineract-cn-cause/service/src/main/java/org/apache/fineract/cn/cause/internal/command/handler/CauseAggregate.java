@@ -239,6 +239,17 @@ public class CauseAggregate {
         return publishCauseCommand.getIdentifier();
     }
 
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.REJECT_CAUSE)
+    public String RejectCause(final RejectCauseCommand rejectCauseCommand) {
+        final CauseEntity causeEntity = findCauseEntityOrThrow(rejectCauseCommand.getIdentifier());
+        causeEntity.setCurrentState(Cause.State.REJECTED.name());
+        this.causeRepository.save(causeEntity);
+        return rejectCauseCommand.getIdentifier();
+    }
+
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_CAUSE)
@@ -248,7 +259,7 @@ public class CauseAggregate {
         Boolean isAllowed = isRemovableState(causeEntity.getCurrentState());
         if (isAllowed == false) {
             throw ServiceException.conflict("Unable to delete this cause!");
-        } 
+        }
 
         System.out.println("deleteCause --- CauseIndentifier :: " + deleteCauseCommand.getCauseIdentifier());
         causeEntity.setCurrentState(Cause.State.DELETED.name());

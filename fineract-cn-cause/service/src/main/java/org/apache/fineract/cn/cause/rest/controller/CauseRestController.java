@@ -50,6 +50,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.apache.fineract.cn.cause.api.v1.domain.Cause.State.PENDING;
+
 @RestController
 @RequestMapping("/")
 public class CauseRestController {
@@ -247,6 +249,31 @@ public class CauseRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
+            value = "/causes/{identifier}/reject",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> RejectCause(@PathVariable("identifier") final String identifier) {
+        Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
+        if (causeEntity.isPresent()) {
+            if (PENDING.name().toLowerCase().equals(causeEntity.get().getCurrentState().toLowerCase())) {
+                this.commandGateway.process(new RejectCauseCommand(identifier));
+            } else {
+                throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
+            }
+
+        } else {
+            throw ServiceException.notFound("Cause {0} not found.", identifier);
+        }
+
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
             value = "/causes/{identifier}/commands",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -263,7 +290,7 @@ public class CauseRestController {
             final String currentState = cause.getCurrentState();
             switch (action) {
                 case ACTIVATE:
-                    if (Cause.State.PENDING.name().equals(currentState)) {
+                    if (PENDING.name().equals(currentState)) {
                         this.commandGateway.process(new ActivateCauseCommand(identifier, command.getComment()));
                     }
                     break;
@@ -280,7 +307,7 @@ public class CauseRestController {
                 case CLOSE:
                     if (Cause.State.ACTIVE.name().equals(currentState)
                             || Cause.State.LOCKED.name().equals(currentState)
-                            || Cause.State.PENDING.name().equals(currentState)) {
+                            || PENDING.name().equals(currentState)) {
                         this.commandGateway.process(new CloseCauseCommand(identifier, command.getComment()));
                     }
                     break;
@@ -329,13 +356,7 @@ public class CauseRestController {
                                      @RequestBody final CauseRating rating) {
 
         if (this.causeService.causeExists(identifier)) {
-
-            // if (this.causeService.causeRatingExists(identifier, rating.getCreatedBy())) {
-            //     throw ServiceException.notFound("Already rating given for this Cause {0}.", identifier);
-            // } else {
             this.commandGateway.process(new CreateRatingCommand(identifier, rating));
-            //}
-
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
@@ -403,10 +424,6 @@ public class CauseRestController {
                 final TaskDefinition taskDefinition = optionalTaskDefinition.get();
                 switch (TaskDefinition.Type.valueOf(taskDefinition.getType())) {
                     case ID_CARD:
-                        /*  final Stream<IdentificationCard> identificationCards = this.causeService.fetchIdentificationCardsByCause(identifier);*/
-/*            if (!identificationCards.findAny().isPresent()) {
-              throw ServiceException.conflict("No identification cards for cause found.");
-            }*/
                         break;
                     case FOUR_EYES:
                         if (cause.getCreatedBy().equals(UserContextHolder.checkedGetUser())) {
