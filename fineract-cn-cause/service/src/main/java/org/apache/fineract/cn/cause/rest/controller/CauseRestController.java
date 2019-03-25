@@ -164,8 +164,20 @@ public class CauseRestController {
     )
     public @ResponseBody
     ResponseEntity<Void> deleteCause(@PathVariable("identifier") final String identifier) {
-        this.commandGateway.process(new DeleteCauseCommand(identifier, "DELETING CAUSE"));
+        final Optional<Cause> cause = this.causeService.findCause(identifier);
+        if (cause.isPresent()) {
+            System.out.println("Cause is present");
+        } else {
+            throw ServiceException.notFound("Cause {0} not found.", identifier);
+        }
 
+        System.out.println(cause.get().getCurrentState());
+        Boolean isAllowed = this.causeService.isRemovableState(cause.get().getCurrentState());
+        if (isAllowed == false) {
+            throw ServiceException.conflict("Unable to delete this cause!");
+        }
+
+        this.commandGateway.process(new DeleteCauseCommand(identifier, "DELETING CAUSE"));
         return ResponseEntity.accepted().build();
     }
 
