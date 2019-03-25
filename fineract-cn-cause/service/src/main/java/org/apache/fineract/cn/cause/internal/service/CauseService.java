@@ -217,7 +217,7 @@ public class CauseService {
 
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
-        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedBy(identifier);
+        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(identifier, Cause.State.ACTIVE.DELETED.name());
         ArrayList<CauseStatistics> causeStatistics = new ArrayList<>(causeEntities.size());
         for (CauseEntity causeEntity : causeEntities) {
             if (causeEntity.getAccountNumber() != null) {
