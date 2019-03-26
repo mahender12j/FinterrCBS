@@ -104,25 +104,27 @@ public class CustomerService {
                 if (accountNumber != null) {
                     List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(accountNumber);
                     final LocalDateTime localDateTime = LocalDateTime.now();
-                    Double totalDepositOfThisMonth = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
+                    Double totalBCDP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
                             .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
                                     Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
                             .mapToDouble(d -> d.getAmount()).sum();
 
 
-
-                    Double totalDepositOfThisMonthForCHRP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
+                    Double totalCHRP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
                             .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
                                     Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
                             .mapToDouble(d -> d.getAmount()).sum();
 
 
-                    socialMatrix.setGoldenDonor((totalDepositOfThisMonthForCHRP / 10) > 5 ? 5 : totalDepositOfThisMonthForCHRP / 10);
-                    socialMatrix.setGreenContribution((totalDepositOfThisMonthForCHRP / 400) > 5 ? 5 : totalDepositOfThisMonthForCHRP / 400);
-
-                    socialMatrix.setMyPower((totalDepositOfThisMonthForCHRP / 20 > 5) ? 5 : (totalDepositOfThisMonthForCHRP / 20));
+                    socialMatrix.setMyPower((totalBCDP / 20 > 5) ? 5 : (totalBCDP / 20));
                     socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
-                    socialMatrix.setTotalTrees((int) Math.floor(totalDepositOfThisMonthForCHRP / 2000));
+                    socialMatrix.setTotalTrees((int) Math.floor(totalBCDP / 2000));
+
+
+                    socialMatrix.setGoldenDonor((totalCHRP / 10) > 5 ? 5 : totalCHRP / 10);
+                    socialMatrix.setGreenContribution((totalCHRP / 400) > 5 ? 5 : totalCHRP / 400);
+
+
                 } else {
                     socialMatrix.setMyPower(0.0);
                     socialMatrix.setMyPowerPercentage(0.0);
@@ -130,25 +132,7 @@ public class CustomerService {
                     socialMatrix.setGoldenDonor(0.0);
                     socialMatrix.setGreenContribution(0.0);
                 }
-
-
-//                String refferalNumber = customerEntity.get().getRefAccountNumber();
-//                if (refferalNumber != null) {
-//                    List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(refferalNumber);
-//                    final LocalDateTime localDateTime = LocalDateTime.now();
-//
-//                    Double totalDepositOfThisMonth = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
-//                            .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
-//                                    Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
-//                            .mapToDouble(d -> d.getAmount()).sum();
-//
-//                    socialMatrix.setGoldenDonor((totalDepositOfThisMonth / 10) > 5 ? 5 : totalDepositOfThisMonth / 10);
-//                    socialMatrix.setGreenContribution((totalDepositOfThisMonth / 400) > 5 ? 5 : totalDepositOfThisMonth / 400);
-//                }else {
-//                    socialMatrix.setGoldenDonor(0.0);
-//                    socialMatrix.setGreenContribution(0.0);
-//                }
-
+                
 
                 socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
                 socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifier(customer.getRefferalCodeIdentifier()));
