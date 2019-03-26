@@ -261,6 +261,15 @@ public class CauseService {
                 .map(portraitRepository::findByCause);
     }
 
+    public static boolean isRemovableState(String val) {
+        for (Cause.RemovableCauseState c : Cause.RemovableCauseState.values()) {
+            if (c.name().equals(val)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 /*  public final Stream<IdentificationCard> fetchIdentificationCardsByCause(final String identifier) {
     return causeRepository.findByIdentifier(identifier)
         .map(identificationCardRepository::findByCause)
