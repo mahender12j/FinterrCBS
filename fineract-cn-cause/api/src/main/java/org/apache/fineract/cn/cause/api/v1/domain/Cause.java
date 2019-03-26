@@ -23,6 +23,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author Padma Raju Sattineni
@@ -91,6 +92,7 @@ public class Cause {
     private CauseDocument causeDocument;
 
     private LocalDateTime publishDate;
+    private List<CauseRating> causeRatingList;
 
 
     public Cause() {
@@ -400,6 +402,14 @@ public class Cause {
 
     public void setCauseDocument(CauseDocument causeDocument) {
         this.causeDocument = causeDocument;
+    }
+
+    public List<CauseRating> getCauseRatingList() {
+        return causeRatingList;
+    }
+
+    public void setCauseRatingList(List<CauseRating> causeRatingList) {
+        this.causeRatingList = causeRatingList;
     }
 
     @Override

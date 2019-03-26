@@ -27,6 +27,9 @@ import org.apache.fineract.cn.lang.DateConverter;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author Padma Raju Sattineni
@@ -65,6 +68,14 @@ public class RatingMapper {
         ret.setIdentifier(rating.getIdentifier());
         ret.setDescription(rating.getDescription());
         return ret;
+    }
+
+    public static List<CauseRating> map(Stream<RatingEntity> byCause) {
+        List<CauseRating> causeRatings = new ArrayList<>();
+        byCause.forEach(d -> {
+            causeRatings.add(map(d));
+        });
+        return causeRatings;
     }
 }
 

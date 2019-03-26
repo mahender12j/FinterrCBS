@@ -91,14 +91,19 @@ public class CauseService {
     public Optional<Cause> findCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
             final Cause cause = CauseMapper.map(causeEntity);
-            cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
-
             final DocumentEntity entity = this.documentRepository.findByIdentifier(causeEntity.getIdentifier());
             final CauseDocument causeDocument = DocumentMapper.map(entity);
             final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocument(entity);
+
             causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
             cause.setCauseDocument(causeDocument);
+            cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
+            if (cause.getAccountNumber() != null) {
+                final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+            }
+            cause.setCauseRatingList(RatingMapper.map( ratingRepository.findByCause(causeEntity)));
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
             if (avgRatingValue != null) {
                 cause.setAvgRating(avgRatingValue.toString());
