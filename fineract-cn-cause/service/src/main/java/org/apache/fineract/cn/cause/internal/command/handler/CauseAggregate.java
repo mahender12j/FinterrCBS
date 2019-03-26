@@ -35,9 +35,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Padma Raju Sattineni
@@ -240,6 +242,19 @@ public class CauseAggregate {
         return publishCauseCommand.getIdentifier();
     }
 
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.EXPIRE_CAUSE)
+    public String expireCause(final ExpiredCauseCommand expiredCauseCommand) {
+        List<CauseEntity> causes = causeRepository.findByEndDateAndCurrentState(Cause.State.ACTIVE.name(), Cause.State.EXTENDED.name());
+        causes.forEach(causeEntity -> {
+            causeEntity.setCurrentState(Cause.State.CLOSED.name());
+            causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
+        });
+        causeRepository.save(causes);
+        return causes.toString();
+    }
 
     @Transactional
     @CommandHandler

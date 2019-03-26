@@ -25,6 +25,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,11 +42,7 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     Optional<CauseEntity> findByIdentifier(final String identifier);
 
-    Page<CauseEntity> findByCurrentStateNot(final String state, final Pageable pageable);
-
     Page<CauseEntity> findByCurrentState(final String state, final Pageable pageable);
-
-    List<CauseEntity> findByCreatedBy(final String createdBy);
 
     List<CauseEntity> findByCreatedByAndCurrentStateNot(final String createdBy, final String state);
 
@@ -52,32 +50,12 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     Page<CauseEntity> findByCreatedByAndCurrentState(final String createdBy, final String state, final Pageable pageable);
 
-    Page<CauseEntity> findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContainingAndCurrentStateNot(
-            final String createdBy, final String identifier, final String title, final String description, final String state, final Pageable pageable);
-
-    Page<CauseEntity> findByCurrentStateNotAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
-            final String state, final String identifier, final String title, final String description, final Pageable pageable);
-
-    Page<CauseEntity> findByCurrentStateAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
-            final String state, final String identifier, final String title, final String description, final Pageable pageable);
-
 
     Page<CauseEntity> findByCategoryAndCurrentState(CategoryEntity entity, final String state, Pageable pageable);
 
     Page<CauseEntity> findAll(Pageable pageable);
 
-
-    //    Page<CauseEntity> findByIdentifierContainingOrTitleContainingOrDescriptionContaining(
-
-//            final String identifier, final String title, final String description, final Pageable pageable);
-
-//    Optional<CauseEntity> findByIdentifierAndCurrentState(final String identifier, final String state);
-
-//    Page<CauseEntity> findByCreatedBy(final String createdBy, final Pageable pageable);
-
-//    Page<CauseEntity> findByCategoryEntity(CategoryEntity entity, Pageable pageable);
-//    Page<CauseEntity> findByCreatedByAndIdentifierContainingOrTitleContainingOrDescriptionContaining(
-
-//            final String createdBy, final String identifier, final String title, final String description, final Pageable pageable);
+    @Query("select c from CauseEntity c where c.endDate <= current_date and (c.currentState = :active or c.currentState = :extended)")
+    List<CauseEntity> findByEndDateAndCurrentState(@Param("active") final String active, @Param("extended") final String extended);
 }
 

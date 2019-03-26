@@ -30,6 +30,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -103,7 +105,7 @@ public class CauseService {
                 final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
             }
-            cause.setCauseRatingList(RatingMapper.map( ratingRepository.findByCause(causeEntity)));
+            cause.setCauseRatingList(RatingMapper.map(ratingRepository.findByCause(causeEntity)));
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
             if (avgRatingValue != null) {
                 cause.setAvgRating(avgRatingValue.toString());

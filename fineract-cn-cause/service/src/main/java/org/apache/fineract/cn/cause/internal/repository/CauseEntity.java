@@ -56,14 +56,18 @@ public class CauseEntity {
     @Column(name = "end_date")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime endDate;
+
     @Column(name = "completed_date")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime completedDate;
 
+    @Column(name = "closed_date")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime closedDate;
+
     @Column(name = "publish_date")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime publishDate;
-
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -112,6 +116,7 @@ public class CauseEntity {
     private LocalDateTime createdOn;
     @Column(name = "last_modified_by")
     private String lastModifiedBy;
+
     @Column(name = "last_modified_on")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime lastModifiedOn;
@@ -135,7 +140,6 @@ public class CauseEntity {
     private String rejectedReason;
     @Column(name = "rejected_by")
     private String rejectedBy;
-
 
 
     public Boolean getTaxExamption() {
@@ -445,6 +449,15 @@ public class CauseEntity {
 
     public void setPublishDate(LocalDateTime publishDate) {
         this.publishDate = publishDate;
+    }
+
+
+    public LocalDateTime getClosedDate() {
+        return closedDate;
+    }
+
+    public void setClosedDate(LocalDateTime closedDate) {
+        this.closedDate = closedDate;
     }
 
     @Override
