@@ -16,12 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.repository;
+package org.apache.fineract.cn.cause.internal.command;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.apache.fineract.cn.lang.validation.constraints.ValidLocalDateTimeString;
 
-@Repository
-public interface AddressRepository extends JpaRepository<AddressEntity, Long> {
-    AddressEntity findByCause(CauseEntity causeEntity);
+import java.time.LocalDateTime;
+
+public class ExtendCauseCommand {
+
+
+    private final String identifier;
+    @ValidLocalDateTimeString
+    private final LocalDateTime extend_date;
+
+
+    public ExtendCauseCommand(String identifier, LocalDateTime extend_date) {
+        super();
+        this.identifier = identifier;
+        this.extend_date = extend_date;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public LocalDateTime getExtend_date() {
+        return extend_date;
+    }
 }

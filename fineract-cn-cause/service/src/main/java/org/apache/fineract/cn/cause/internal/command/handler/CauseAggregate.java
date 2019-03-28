@@ -51,6 +51,7 @@ public class CauseAggregate {
     private final AddressRepository addressRepository;
     private final CauseRepository causeRepository;
     private final DocumentRepository documentRepository;
+    private final CauseStateRepository causeStateRepository;
     private final DocumentPageRepository documentPageRepository;
     private final IdentificationCardRepository identificationCardRepository;
     private final IdentificationCardScanRepository identificationCardScanRepository;
@@ -67,6 +68,7 @@ public class CauseAggregate {
                           final IdentificationCardRepository identificationCardRepository,
                           final IdentificationCardScanRepository identificationCardScanRepository,
                           final PortraitRepository portraitRepository,
+                          final CauseStateRepository causeStateRepository,
                           final CategoryRepository categoryRepository,
                           final RatingRepository ratingRepository,
                           final CommandRepository commandRepository,
@@ -81,6 +83,7 @@ public class CauseAggregate {
         this.categoryRepository = categoryRepository;
         this.ratingRepository = ratingRepository;
         this.commandRepository = commandRepository;
+        this.causeStateRepository = causeStateRepository;
         this.taskAggregate = taskAggregate;
         this.documentRepository = documentRepository;
         this.documentPageRepository = documentPageRepository;
@@ -91,20 +94,25 @@ public class CauseAggregate {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE)
     public String createCause(final CreateCauseCommand createCauseCommand) throws IOException {
         final Cause cause = createCauseCommand.getCause();
-        final CategoryEntity addressEntity;
+        final CategoryEntity categoryEntity;
+
         if (!categoryRepository.existsByIdentifier(cause.getCauseCategories().getIdentifier())) {
 
-            addressEntity = this.categoryRepository.save(CategoryMapper.map(cause.getCauseCategories()));
+            categoryEntity = this.categoryRepository.save(CategoryMapper.map(cause.getCauseCategories()));
         } else {
-            addressEntity = this.categoryRepository.findByIdentifier(cause.getCauseCategories().getIdentifier()).get();
+            categoryEntity = this.categoryRepository.findByIdentifier(cause.getCauseCategories().getIdentifier()).get();
         }
-
-        final AddressEntity savedAddress = this.addressRepository.save(AddressMapper.map(cause.getAddress()));
         final CauseEntity causeEntity = CauseMapper.map(cause);
-        causeEntity.setCategory(addressEntity);
+
+        causeEntity.setResubmited(false);
+        causeEntity.setExtended(false);
+        causeEntity.setCategory(categoryEntity);
         causeEntity.setCurrentState(Cause.State.PENDING.name());
-        causeEntity.setAddress(savedAddress);
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
+        AddressEntity addressEntity = AddressMapper.map(cause.getAddress());
+        addressEntity.setCause(causeEntity);
+        this.addressRepository.save(addressEntity);
+
         DocumentEntity documentEntity = documentRepository.save(DocumentMapper.map(savedCauseEntity));
         List<DocumentPageEntity> documentPageEntityList = new ArrayList<>();
         documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getFeature(), documentEntity, "Feature"));
@@ -136,95 +144,7 @@ public class CauseAggregate {
         final Cause cause = updateCauseCommand.cause();
 
         final CauseEntity causeEntity = findCauseEntityOrThrow(cause.getIdentifier());
-
         causeEntity.setIdentifier(cause.getIdentifier());
-
-        if (cause.getTitle() != null) {
-            causeEntity.setTitle(cause.getTitle());
-        }
-        if (cause.getDescription() != null) {
-            causeEntity.setDescription(cause.getDescription());
-        }
-        if (cause.getStartDate() != null) {
-            causeEntity.setStartDate(LocalDateTime.parse(cause.getStartDate()));
-        }
-        if (cause.getEndDate() != null) {
-            causeEntity.setEndDate(LocalDateTime.parse(cause.getEndDate()));
-        }
-        if (cause.getCompletedDate() != null) {
-            causeEntity.setCompletedDate(LocalDateTime.parse(cause.getCompletedDate()));
-        }
-        if (cause.getCurrentState() != null) {
-            causeEntity.setCurrentState(cause.getCurrentState());
-        }
-        if (cause.getSoftTarget() != null) {
-            causeEntity.setSoftTarget(cause.getSoftTarget());
-        }
-        if (cause.getHardTarget() != null) {
-            causeEntity.setHardTarget(cause.getHardTarget());
-        }
-        if (cause.getIsTaxExamption() != null) {
-            causeEntity.setIsTaxExamption(cause.getIsTaxExamption());
-        }
-        if (cause.getActualRaisedFiat() != null) {
-            causeEntity.setActualRaisedFiat(cause.getActualRaisedFiat());
-        }
-
-        if (cause.getActualRaisedFin() != null) {
-            causeEntity.setActualRaisedFin(cause.getActualRaisedFin());
-        }
-        if (cause.getMinAmount() != null) {
-            causeEntity.setMinAmount(cause.getMinAmount());
-        }
-        if (cause.getMaxAmount() != null) {
-            causeEntity.setMaxAmount(cause.getMaxAmount());
-        }
-        if (cause.getAcceptedDenominationAmounts() != null) {
-            causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
-        }
-        if (cause.getManagementFee() != null) {
-            causeEntity.setManagementFee(cause.getManagementFee());
-        }
-        if (cause.getFinCollLimit() != null) {
-            causeEntity.setFinCollLimit(cause.getFinCollLimit());
-        }
-        if (cause.getFinRate() != null) {
-            causeEntity.setFinRate(cause.getFinRate());
-        }
-        if (cause.getApprovedBy() != null) {
-            causeEntity.setApprovedBy(cause.getApprovedBy());
-        }
-        if (cause.getApprovedOn() != null) {
-            causeEntity.setApprovedOn(LocalDateTime.parse(cause.getApprovedOn()));
-        }
-        if (cause.getAddress() != null) {
-            this.updateAddress(new UpdateAddressCommand(cause.getIdentifier(), cause.getAddress()));
-        }
-
-        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
-        if (cause.getTaxExemptionPercentage() != null) {
-            causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
-        }
-        if (cause.getWebsiteUrl() != null) {
-            causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
-        }
-        if (cause.getSmediaLinks() != null) {
-            causeEntity.setSmediaLinks(cause.getSmediaLinks());
-        }
-        if (cause.getVideoUrls() != null) {
-            causeEntity.setVideoUrls(cause.getVideoUrls());
-        }
-        if (cause.getCauseTxHash() != null) {
-            causeEntity.setCauseTxHash(cause.getCauseTxHash());
-        }
-        if (cause.getAccountNumber() != null) {
-            causeEntity.setAccountNumber(cause.getAccountNumber());
-        }
-        if (cause.getEthAddress() != null) {
-            causeEntity.setEthAddress(cause.getEthAddress());
-        }
         this.causeRepository.save(causeEntity);
 
         return cause.getIdentifier();
@@ -266,6 +186,23 @@ public class CauseAggregate {
         causeEntity.setRejectedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
         return rejectCauseCommand.getIdentifier();
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.EXTEND_CAUSE)
+    public String ExtendCause(final ExtendCauseCommand extendCauseCommand) {
+        final CauseEntity causeEntity = findCauseEntityOrThrow(extendCauseCommand.getIdentifier());
+        causeEntity.setExtended(true);
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, extendCauseCommand.getExtend_date());
+
+        System.out.println("-----------state----------" + stateEntity);
+        System.out.println("-----------cause----------" + causeEntity.getExtended());
+        this.causeRepository.save(causeEntity);
+        this.causeStateRepository.save(stateEntity);
+        return extendCauseCommand.getIdentifier();
     }
 
 
@@ -423,18 +360,18 @@ public class CauseAggregate {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.PUT_ADDRESS)
     public String updateAddress(final UpdateAddressCommand updateAddressCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(updateAddressCommand.identifier());
+
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
-        final AddressEntity oldAddressEntity = causeEntity.getAddress();
-
-        final AddressEntity newAddressEntity = this.addressRepository.save(AddressMapper.map(updateAddressCommand.address()));
-
-        causeEntity.setAddress(newAddressEntity);
-        this.causeRepository.save(causeEntity);
-
-        this.addressRepository.delete(oldAddressEntity);
-
+        final AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
+        addressEntity.setCity(updateAddressCommand.address().getCity());
+        addressEntity.setCountry(updateAddressCommand.address().getCountry());
+        addressEntity.setPostalCode(updateAddressCommand.address().getPostalCode());
+        addressEntity.setRegion(updateAddressCommand.address().getRegion());
+        addressEntity.setState(updateAddressCommand.address().getState());
+        addressEntity.setCountryCode(updateAddressCommand.address().getCountryCode());
+        addressEntity.setStreet(updateAddressCommand.address().getStreet());
+        this.addressRepository.save(addressEntity);
         return updateAddressCommand.identifier();
     }
 

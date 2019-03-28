@@ -46,7 +46,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -250,6 +252,42 @@ public class CauseRestController {
                 this.commandGateway.process(new PublishCauseCommand(identifier));
             } else {
                 throw ServiceException.conflict("Cause {0} not APPROVED state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
+            }
+
+        } else {
+            throw ServiceException.notFound("Cause {0} not found.", identifier);
+        }
+
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/extended",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> extendCause(@PathVariable("identifier") final String identifier,
+                                     @RequestBody CauseState causeState) {
+
+        Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
+        if (causeEntity.isPresent()) {
+
+            if (causeEntity.get().getCurrentState().toLowerCase().equals(Cause.State.ACTIVE.name().toLowerCase())) {
+
+                if (causeEntity.get().getEndDate().compareTo(LocalDateTime.now(Clock.systemUTC())) < 2) {
+                    throw ServiceException.conflict("Cause {0} required minimum two days at least. Current end date: {1}", identifier, causeEntity.get().getEndDate());
+                } else {
+                    LocalDateTime localDateTime = LocalDateTime.parse(causeState.getNewDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+//                    System.out.println("local date time: " + localDateTime);
+                    this.commandGateway.process(new ExtendCauseCommand(identifier, localDateTime));
+                }
+
+            } else {
+                throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
             }
 
         } else {

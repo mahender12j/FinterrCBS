@@ -36,9 +36,13 @@ public class CategoryEntity {
     @Column(name = "id")
     private Long id;
 
-    //    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    //    @JoinColumn(name = "cause_id")
-    //    private List<CauseEntity> cause;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "cause_id")
+    private CauseEntity cause;
+
+//    @Column(name = "cause_id")
+//    private String causeId;
 
     @Column(name = "identifier", nullable = false)
     private String identifier;

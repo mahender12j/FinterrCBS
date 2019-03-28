@@ -28,6 +28,12 @@ public class AddressEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "cause_id")
+    private CauseEntity cause;
+
+
     @Column(name = "street")
     private String street;
     @Column(name = "city")
@@ -111,5 +117,11 @@ public class AddressEntity {
         this.country = country;
     }
 
+    public CauseEntity getCause() {
+        return cause;
+    }
 
+    public void setCause(CauseEntity cause) {
+        this.cause = cause;
+    }
 }

@@ -62,6 +62,9 @@ public class Cause {
     private Double hardTarget;
 
     private Boolean isTaxExamption;
+    private Boolean isResubmited;
+    private Boolean isExtended;
+
     private Double actualRaisedFiat;
     private Double actualRaisedFin;
     private Double minAmount;
@@ -410,6 +413,22 @@ public class Cause {
 
     public void setCauseRatingList(List<CauseRating> causeRatingList) {
         this.causeRatingList = causeRatingList;
+    }
+
+    public Boolean getResubmited() {
+        return isResubmited;
+    }
+
+    public void setResubmited(Boolean resubmited) {
+        isResubmited = resubmited;
+    }
+
+    public Boolean getExtended() {
+        return isExtended;
+    }
+
+    public void setExtended(Boolean extended) {
+        isExtended = extended;
     }
 
     @Override

@@ -21,6 +21,7 @@ package org.apache.fineract.cn.cause.internal.mapper;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
+import org.apache.fineract.cn.cause.internal.repository.CauseStateEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 
 import java.time.Clock;
@@ -79,6 +80,8 @@ public final class CauseMapper {
         causeEntity.setCauseTxHash(cause.getCauseTxHash());
         causeEntity.setAccountNumber(cause.getAccountNumber());
         causeEntity.setEthAddress(cause.getEthAddress());
+        causeEntity.setExtended(cause.getExtended());
+        causeEntity.setResubmited(cause.getResubmited());
 
         return causeEntity;
     }
@@ -132,7 +135,22 @@ public final class CauseMapper {
         cause.setCauseTxHash(causeEntity.getCauseTxHash());
         cause.setAccountNumber(causeEntity.getAccountNumber());
         cause.setEthAddress(causeEntity.getEthAddress());
+        causeEntity.setExtended(cause.getExtended());
+        causeEntity.setResubmited(cause.getResubmited());
         return cause;
+    }
+
+
+    public static CauseStateEntity map(CauseEntity causeEntity, LocalDateTime extended_date) {
+        CauseStateEntity stateEntity = new CauseStateEntity();
+        stateEntity.setCause(causeEntity);
+        stateEntity.setCreatedBy(UserContextHolder.checkedGetUser());
+        stateEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        stateEntity.setModifiedAt(LocalDateTime.now(Clock.systemUTC()));
+        stateEntity.setNewDate(extended_date);
+        stateEntity.setType(Cause.State.EXTENDED.name());
+        stateEntity.setStatus(Cause.State.PENDING.name());
+        return stateEntity;
     }
 }
 

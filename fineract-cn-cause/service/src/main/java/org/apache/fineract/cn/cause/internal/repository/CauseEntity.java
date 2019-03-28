@@ -18,18 +18,9 @@
  */
 package org.apache.fineract.cn.cause.internal.repository;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import org.apache.fineract.cn.mariadb.util.LocalDateConverter;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -52,6 +43,7 @@ public class CauseEntity {
     private String description;
     @Column(name = "start_date")
     @Convert(converter = LocalDateTimeConverter.class)
+
     private LocalDateTime startDate;
     @Column(name = "end_date")
     @Convert(converter = LocalDateTimeConverter.class)
@@ -74,9 +66,6 @@ public class CauseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
-    private AddressEntity address;
 
     @Column(name = "current_state")
     private String currentState;
@@ -87,6 +76,13 @@ public class CauseEntity {
 
     @Column(name = "is_tax_examption", nullable = false)
     private Boolean isTaxExamption;
+
+    @Column(name = "is_resubmited", nullable = false)
+    private Boolean isResubmited;
+    @Column(name = "is_extended", nullable = false)
+    private Boolean isExtended;
+
+
     @Column(name = "actual_raised_fiat")
     private Double actualRaisedFiat;
     @Column(name = "actual_raised_fin")
@@ -109,11 +105,14 @@ public class CauseEntity {
     @Column(name = "approved_on")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime approvedOn;
+
     @Column(name = "created_by")
     private String createdBy;
+
     @Column(name = "created_on")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime createdOn;
+
     @Column(name = "last_modified_by")
     private String lastModifiedBy;
 
@@ -138,6 +137,7 @@ public class CauseEntity {
 
     @Column(name = "rejected_reason")
     private String rejectedReason;
+
     @Column(name = "rejected_by")
     private String rejectedBy;
 
@@ -208,14 +208,6 @@ public class CauseEntity {
 
     public void setCompletedDate(LocalDateTime completedDate) {
         this.completedDate = completedDate;
-    }
-
-    public AddressEntity getAddress() {
-        return this.address;
-    }
-
-    public void setAddress(final AddressEntity address) {
-        this.address = address;
     }
 
     public String getCurrentState() {
@@ -454,6 +446,22 @@ public class CauseEntity {
 
     public LocalDateTime getClosedDate() {
         return closedDate;
+    }
+
+    public Boolean getResubmited() {
+        return isResubmited;
+    }
+
+    public void setResubmited(Boolean resubmited) {
+        isResubmited = resubmited;
+    }
+
+    public Boolean getExtended() {
+        return isExtended;
+    }
+
+    public void setExtended(Boolean extended) {
+        isExtended = extended;
     }
 
     public void setClosedDate(LocalDateTime closedDate) {

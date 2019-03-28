@@ -19,9 +19,20 @@
 package org.apache.fineract.cn.cause.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
+/**
+ * @author Padma Raju Sattineni
+ */
 @Repository
-public interface AddressRepository extends JpaRepository<AddressEntity, Long> {
-    AddressEntity findByCause(CauseEntity causeEntity);
+public interface CauseStateRepository extends JpaRepository<CauseStateEntity, Long> {
+
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CauseStateEntity c WHERE c.id = :identifier")
+    Boolean existsByIdentifier(@Param("identifier") final String identifier);
+
 }
+

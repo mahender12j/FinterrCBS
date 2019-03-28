@@ -16,53 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.repository;
+package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
  * @author Padma Raju Sattineni
  */
 
-@Entity
-@Table(name = "cass_causes_state")
-public class CauseStateEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+
+public class CauseState {
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "cause_id")
-    private CauseEntity cause;
-
-
-    @Column(name = "created_by", nullable = false)
     private String createdBy;
-
-    @Convert(converter = LocalDateTimeConverter.class)
-    @Column(name = "new_date", nullable = false)
-    private LocalDateTime newDate;
-
-    @Column(name = "type", nullable = false)
+    private String newDate;
     private String type;
-
-
-    @Column(name = "status", nullable = false)
     private String status;
-
-    @Convert(converter = LocalDateTimeConverter.class)
-    @Column(name = "created_on", nullable = false)
     private LocalDateTime createdOn;
-
-    @Convert(converter = LocalDateTimeConverter.class)
-    @Column(name = "modified_at", nullable = false)
     private LocalDateTime modifiedAt;
 
-    public CauseStateEntity() {
+    public CauseState() {
     }
 
     public Long getId() {
@@ -73,14 +45,6 @@ public class CauseStateEntity {
         this.id = id;
     }
 
-    public CauseEntity getCause() {
-        return cause;
-    }
-
-    public void setCause(CauseEntity cause) {
-        this.cause = cause;
-    }
-
     public String getCreatedBy() {
         return createdBy;
     }
@@ -89,11 +53,11 @@ public class CauseStateEntity {
         this.createdBy = createdBy;
     }
 
-    public LocalDateTime getNewDate() {
+    public String getNewDate() {
         return newDate;
     }
 
-    public void setNewDate(LocalDateTime newDate) {
+    public void setNewDate(String newDate) {
         this.newDate = newDate;
     }
 
@@ -127,20 +91,6 @@ public class CauseStateEntity {
 
     public void setModifiedAt(LocalDateTime modifiedAt) {
         this.modifiedAt = modifiedAt;
-    }
-
-    @Override
-    public String toString() {
-        return "CauseStateEntity{" +
-                "id=" + id +
-                ", cause=" + cause +
-                ", createdBy='" + createdBy + '\'' +
-                ", newDate=" + newDate +
-                ", type='" + type + '\'' +
-                ", status='" + status + '\'' +
-                ", createdOn=" + createdOn +
-                ", modifiedAt=" + modifiedAt +
-                '}';
     }
 }
 

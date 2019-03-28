@@ -43,6 +43,7 @@ public class CauseService {
 
     private final CauseRepository causeRepository;
     private final DocumentRepository documentRepository;
+    private final AddressRepository addressRepository;
     private final DocumentPageRepository documentPageRepository;
     private final PortraitRepository portraitRepository;
     private final CategoryRepository categoryRepository;
@@ -56,6 +57,7 @@ public class CauseService {
     public CauseService(final CauseRepository causeRepository,
                         final PortraitRepository portraitRepository,
                         final CategoryRepository categoryRepository,
+                        final AddressRepository addressRepository,
                         final DocumentPageRepository documentPageRepository,
                         final RatingRepository ratingRepository,
                         final DocumentRepository documentRepository,
@@ -69,6 +71,7 @@ public class CauseService {
         this.categoryRepository = categoryRepository;
         this.ratingRepository = ratingRepository;
         this.commandRepository = commandRepository;
+        this.addressRepository = addressRepository;
         this.documentPageRepository = documentPageRepository;
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
@@ -99,7 +102,8 @@ public class CauseService {
 
             causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
             cause.setCauseDocument(causeDocument);
-            cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+            AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
+            cause.setAddress(AddressMapper.map(addressEntity));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
             if (cause.getAccountNumber() != null) {
                 final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
@@ -192,7 +196,9 @@ public class CauseService {
                 final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
             }
-            cause.setAddress(AddressMapper.map(causeEntity.getAddress()));
+
+
+            cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
 
             final DocumentEntity entity = this.documentRepository.findByIdentifier(causeEntity.getIdentifier());
