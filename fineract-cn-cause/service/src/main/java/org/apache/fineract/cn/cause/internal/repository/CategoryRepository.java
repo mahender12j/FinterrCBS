@@ -37,17 +37,5 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
     Optional<CategoryEntity> findByIdentifier(final String identifier);
-
-    //    @Query("SELECT d FROM CategoryEntity d WHERE d.cause.identifier = :causeIdentifier AND d.identifier = :categoryIdentifier")
-//    Optional<CategoryEntity> findByCauseIdAndCategoryIdentifier(
-
-//            @Param("causeIdentifier") String causeIdentifier, @Param("categoryIdentifier") String categoryIdentifier);
-//    @Query("SELECT d FROM CategoryEntity d WHERE d.cause.identifier = :causeIdentifier")
-//    Stream<CategoryEntity> findByCauseId(
-
-//            @Param("causeIdentifier") String causeIdentifier);
-
-
-//    List<CategoryEntity> findByCause(final CauseEntity causeEntity);
 }
 

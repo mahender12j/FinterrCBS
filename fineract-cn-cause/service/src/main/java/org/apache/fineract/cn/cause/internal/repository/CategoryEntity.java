@@ -36,13 +36,12 @@ public class CategoryEntity {
     @Column(name = "id")
     private Long id;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "cause_id")
+//    private CauseEntity cause;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "cause_id")
-    private CauseEntity cause;
-
-//    @Column(name = "cause_id")
-//    private String causeId;
+    @Column(name = "cause_id")
+    private String causeId;
 
     @Column(name = "identifier", nullable = false)
     private String identifier;
@@ -111,6 +110,22 @@ public class CategoryEntity {
 
     public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
+    }
+
+//    public CauseEntity getCause() {
+//        return cause;
+//    }
+//
+//    public void setCause(CauseEntity cause) {
+//        this.cause = cause;
+//    }
+
+    public String getCauseId() {
+        return causeId;
+    }
+
+    public void setCauseId(String causeId) {
+        this.causeId = causeId;
     }
 
     @Override
