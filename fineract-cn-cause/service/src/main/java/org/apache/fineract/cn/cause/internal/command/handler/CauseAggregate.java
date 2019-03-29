@@ -197,9 +197,6 @@ public class CauseAggregate {
         causeEntity.setExtended(true);
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
         CauseStateEntity stateEntity = CauseMapper.map(causeEntity, extendCauseCommand.getExtend_date());
-
-        System.out.println("-----------state----------" + stateEntity);
-        System.out.println("-----------cause----------" + causeEntity.getExtended());
         this.causeRepository.save(causeEntity);
         this.causeStateRepository.save(stateEntity);
         return extendCauseCommand.getIdentifier();

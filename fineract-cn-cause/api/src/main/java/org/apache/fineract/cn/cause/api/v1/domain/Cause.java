@@ -94,6 +94,8 @@ public class Cause {
     private CauseStatistics causeStatistics;
     private CauseDocument causeDocument;
 
+    private String rejectedReason;
+
     private LocalDateTime publishDate;
     private List<CauseRating> causeRatingList;
 
@@ -429,6 +431,14 @@ public class Cause {
 
     public void setExtended(Boolean extended) {
         isExtended = extended;
+    }
+
+    public String getRejectedReason() {
+        return rejectedReason;
+    }
+
+    public void setRejectedReason(String rejectedReason) {
+        this.rejectedReason = rejectedReason;
     }
 
     @Override

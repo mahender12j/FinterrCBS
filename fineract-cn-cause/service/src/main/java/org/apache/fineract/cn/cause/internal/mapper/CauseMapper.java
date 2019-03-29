@@ -60,7 +60,6 @@ public final class CauseMapper {
         causeEntity.setActualRaisedFin(cause.getActualRaisedFin());
         causeEntity.setMinAmount(cause.getMinAmount());
         causeEntity.setMaxAmount(cause.getMaxAmount());
-
         causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
         causeEntity.setManagementFee(cause.getManagementFee());
         causeEntity.setFinCollLimit(cause.getFinCollLimit());
@@ -115,6 +114,7 @@ public final class CauseMapper {
         cause.setFinCollLimit(causeEntity.getFinCollLimit());
         cause.setFinRate(causeEntity.getFinRate());
         cause.setApprovedBy(causeEntity.getApprovedBy());
+        cause.setRejectedReason(causeEntity.getRejectedReason());
 
         if (causeEntity.getApprovedOn() != null) {
             cause.setApprovedOn(DateConverter.toIsoString(causeEntity.getApprovedOn()));

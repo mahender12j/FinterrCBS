@@ -134,7 +134,7 @@ public class CauseRestController {
                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
 
-        return ResponseEntity.ok(this.causeService.fetchCause((includeClosed != null ? includeClosed : Boolean.FALSE), param,
+        return ResponseEntity.ok(this.causeService.fetchCause((includeClosed != null ? includeClosed : Boolean.TRUE), param,
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
@@ -346,11 +346,11 @@ public class CauseRestController {
     public @ResponseBody
     ResponseEntity<Void> RejectCause(
             @PathVariable("identifier") final String identifier,
-            @RequestBody final String reason) {
+            @RequestBody final Cause cause) {
         Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
         if (causeEntity.isPresent()) {
             if (PENDING.name().toLowerCase().equals(causeEntity.get().getCurrentState().toLowerCase())) {
-                this.commandGateway.process(new RejectCauseCommand(identifier, reason));
+                this.commandGateway.process(new RejectCauseCommand(identifier, cause.getRejectedReason()));
             } else {
                 throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
             }
