@@ -115,14 +115,13 @@ public class CustomerService {
                                     Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
                             .mapToDouble(d -> d.getAmount()).sum();
 
-
                     socialMatrix.setMyPower((totalBCDP / 20 > 5) ? 5 : (totalBCDP / 20));
                     socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
-                    socialMatrix.setTotalTrees((int) Math.floor(totalBCDP / 2000));
 
 
+                    socialMatrix.setTotalTrees((int) Math.floor(totalCHRP / 200));
                     socialMatrix.setGoldenDonor((totalCHRP / 10) > 5 ? 5 : totalCHRP / 10);
-                    socialMatrix.setGreenContribution((totalCHRP / 400) > 5 ? 5 : totalCHRP / 400);
+                    socialMatrix.setGreenContribution((totalCHRP / 40) > 5 ? 5 : totalCHRP / 40);
 
 
                 } else {
@@ -132,11 +131,14 @@ public class CustomerService {
                     socialMatrix.setGoldenDonor(0.0);
                     socialMatrix.setGreenContribution(0.0);
                 }
-                
+
 
                 socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
                 socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifier(customer.getRefferalCodeIdentifier()));
                 customer.setSocialMatrix(socialMatrix);
+
+                System.out.println("----------------------social matrix---------------------" + socialMatrix.toString());
+
                 if (customer.getRefAccountNumber() != null) {
                     Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
                     customer.setRefferalBalance(account.getBalance());

@@ -88,4 +88,17 @@ public final class SocialMatrix {
     public void setTotalTrees(int totalTrees) {
         this.totalTrees = totalTrees;
     }
+
+    @Override
+    public String toString() {
+        return "SocialMatrix{" +
+                "greenContribution=" + greenContribution +
+                ", totalTrees=" + totalTrees +
+                ", goldenDonor=" + goldenDonor +
+                ", goldenDonorPercentage=" + goldenDonorPercentage +
+                ", myPower=" + myPower +
+                ", myPowerPercentage=" + myPowerPercentage +
+                ", myInfluence=" + myInfluence +
+                '}';
+    }
 }
