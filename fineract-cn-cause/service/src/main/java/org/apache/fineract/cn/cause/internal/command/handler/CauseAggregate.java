@@ -176,6 +176,19 @@ public class CauseAggregate {
         return causes.toString();
     }
 
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.INACTIVE_CAUSE)
+    public String expireCause(final InactiveCauseCommand inactiveCauseCommand) {
+        List<CauseEntity> causes = causeRepository.findByApproveDate(LocalDateTime.now(Clock.systemUTC()).minusDays(12), Cause.State.APPROVED.name());
+        causes.forEach(causeEntity -> {
+            causeEntity.setCurrentState(Cause.State.INACTIVE.name());
+        });
+        causeRepository.save(causes);
+        return causes.toString();
+    }
+
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.REJECT_CAUSE)

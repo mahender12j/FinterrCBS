@@ -337,6 +337,18 @@ public class CauseRestController {
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(value = "/causes/inactive", method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public
+    @ResponseBody
+    ResponseEntity<Void> inactiveCause() {
+        this.commandGateway.process(new InactiveCauseCommand());
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/{identifier}/rejected",
             method = RequestMethod.PUT,

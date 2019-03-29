@@ -57,5 +57,10 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     @Query("select c from CauseEntity c where c.endDate <= current_date and (c.currentState = :active or c.currentState = :extended)")
     List<CauseEntity> findByEndDateAndCurrentState(@Param("active") final String active, @Param("extended") final String extended);
+
+    @Query("select c from CauseEntity c where c.approvedOn <= :calculated_date and c.currentState = :approve")
+    List<CauseEntity> findByApproveDate(@Param("calculated_date") final LocalDateTime calculated_date, @Param("approve") String approve);
+
+//    select * from cass_causes where DATE_ADD(approved_on, interval 12 DAY) <= now()
 }
 
