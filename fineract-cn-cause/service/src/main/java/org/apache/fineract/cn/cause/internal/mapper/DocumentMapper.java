@@ -49,7 +49,7 @@ public class DocumentMapper {
         final DocumentPageEntity ret = new DocumentPageEntity();
         ret.setDocument(documentEntity);
         ret.setImage(multipartFile.getBytes());
-        ret.setDocumentName(multipartFile.getName());
+        ret.setDocumentName(multipartFile.getOriginalFilename());
         ret.setSize(multipartFile.getSize());
         ret.setContentType(multipartFile.getContentType());
         return ret;
@@ -95,7 +95,7 @@ public class DocumentMapper {
         pageEntity.setContentType(multipartFile.getContentType());
         pageEntity.setImage(multipartFile.getBytes());
         pageEntity.setSize(multipartFile.getSize());
-        pageEntity.setDocumentName(multipartFile.getName());
+        pageEntity.setDocumentName(multipartFile.getOriginalFilename());
         pageEntity.setType(type);
         pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
         return pageEntity;
