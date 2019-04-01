@@ -105,7 +105,6 @@ public interface CustomerManager {
   @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CustomerNotFoundException.class)
   Map<String, Boolean> findValidCustomer(@PathVariable("identifier") final String identifier);
 
-
   @RequestMapping(
       value = "/customers/{identifier}",
       method = RequestMethod.PUT,
@@ -141,7 +140,15 @@ public interface CustomerManager {
     )
     @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CustomerNotFoundException.class)
     CustomerPage fetchCustomerByReferralcode(@PathVariable("referralcode") final String referralcode);
-
+    
+    @RequestMapping(
+      value = "/customers/{identifier}/ngo",
+      method = RequestMethod.GET,
+      produces = MediaType.ALL_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CustomerNotFoundException.class)
+    Customer findNgo(@PathVariable("identifier") final String identifier);
                                                                             
   @RequestMapping(
       value = "/customers/{identifier}/commands",

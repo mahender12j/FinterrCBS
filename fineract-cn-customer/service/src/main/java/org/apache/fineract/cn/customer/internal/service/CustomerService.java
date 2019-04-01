@@ -252,6 +252,24 @@ public class CustomerService {
                 });
     }
 
+    public Optional<Customer> findNgo(final String identifier) {
+        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifierAndAType(identifier, "BUSINESS");
+        if (customerEntity.isPresent()) {
+            return customerEntity.map(entity -> {
+                final Customer customerNgo = CustomerMapper.map(entity);
+                
+                // final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
+                // if (contactDetailEntities != null) {
+                //     customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
+                // }
+                return customerNgo;
+            });
+
+        } else {
+            throw ServiceException.notFound("Oops! We cant find you...");
+        }
+    }
+
     public final Stream<Command> fetchCommandsByCustomer(final String identifier) {
         return customerRepository.findByIdentifier(identifier)
                 .map(commandRepository::findByCustomer)
