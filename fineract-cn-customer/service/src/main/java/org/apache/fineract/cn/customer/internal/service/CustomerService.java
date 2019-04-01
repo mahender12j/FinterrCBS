@@ -253,7 +253,7 @@ public class CustomerService {
     }
 
     public Optional<Customer> findNgo(final String identifier) {
-        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifierAndAType(identifier, "BUSINESS");
+        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifierAndType(identifier, "BUSINESS");
         if (customerEntity.isPresent()) {
             return customerEntity.map(entity -> {
                 final Customer customerNgo = CustomerMapper.map(entity);
