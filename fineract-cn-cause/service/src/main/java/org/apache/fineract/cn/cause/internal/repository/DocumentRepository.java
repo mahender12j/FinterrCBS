@@ -37,8 +37,11 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
             @Param("causeIdentifier") String causeIdentifier, @Param("documentIdentifier") String documentIdentifier);
 
     @Query("SELECT d FROM DocumentEntity d WHERE d.cause.identifier = :causeIdentifier")
-    Stream<DocumentEntity> findByCauseId(
-            @Param("causeIdentifier") String causeIdentifier);
+    Stream<DocumentEntity> findByCauseId(@Param("causeIdentifier") String causeIdentifier);
+
+    DocumentEntity findByCause(CauseEntity causeEntity);
+
+    DocumentEntity findByCauseAndCreatedBy(CauseEntity causeEntity, final String createdBy);
 
     DocumentEntity findByIdentifier(final String identifier);
 }

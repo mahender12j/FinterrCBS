@@ -28,8 +28,15 @@ import java.util.Objects;
  */
 public class CauseDocumentPage {
 
+    public enum MappedState {
+        ACTIVE, DELETED, UPLOADED
+    }
+
+
     private Long id;
     private String type;
+    private MappedState isMapped;
+    private String documentName;
 
 
     public CauseDocumentPage() {
@@ -49,6 +56,22 @@ public class CauseDocumentPage {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getDocumentName() {
+        return documentName;
+    }
+
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
+    }
+
+    public MappedState getIsMapped() {
+        return isMapped;
+    }
+
+    public void setIsMapped(MappedState isMapped) {
+        this.isMapped = isMapped;
     }
 
     @Override

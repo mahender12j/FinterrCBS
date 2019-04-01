@@ -30,12 +30,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -98,7 +97,7 @@ public class CauseService {
             final Cause cause = CauseMapper.map(causeEntity);
             final DocumentEntity entity = this.documentRepository.findByIdentifier(causeEntity.getIdentifier());
             final CauseDocument causeDocument = DocumentMapper.map(entity);
-            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocument(entity);
+            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocumentAndIsMapped(entity, CauseDocumentPage.MappedState.ACTIVE.name());
 
             causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
             cause.setCauseDocument(causeDocument);
@@ -120,6 +119,18 @@ public class CauseService {
 
             return cause;
         });
+    }
+
+
+    public List<CauseDocumentPage> causeDocumentPages(final String identifier) {
+        Optional<CauseEntity> causeEntity = causeRepository.findByIdentifier(identifier);
+
+        if (causeEntity.isPresent()) {
+            DocumentEntity entity = documentRepository.findByCauseAndCreatedBy(causeEntity.get(), UserContextHolder.checkedGetUser());
+            return documentPageRepository.findByDocumentAndIsMapped(entity, CauseDocumentPage.MappedState.UPLOADED.name()).stream().map(DocumentMapper::map).collect(Collectors.toList());
+        } else {
+            throw ServiceException.notFound("Cause not found");
+        }
     }
 
 
@@ -188,7 +199,7 @@ public class CauseService {
     }
 
 
-    public ArrayList<Cause> causeArrayList(Page<CauseEntity> causeEntities) {
+    private ArrayList<Cause> causeArrayList(Page<CauseEntity> causeEntities) {
         final ArrayList<Cause> causes = new ArrayList<>(causeEntities.getSize());
         for (CauseEntity causeEntity : causeEntities) {
             final Cause cause = CauseMapper.map(causeEntity);
@@ -203,7 +214,7 @@ public class CauseService {
 
             final DocumentEntity entity = this.documentRepository.findByIdentifier(causeEntity.getIdentifier());
             final CauseDocument causeDocument = DocumentMapper.map(entity);
-            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocument(entity);
+            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocumentAndIsMapped(entity, CauseDocumentPage.MappedState.ACTIVE.name());
             causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
             cause.setCauseDocument(causeDocument);
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());

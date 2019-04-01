@@ -21,6 +21,7 @@ package org.apache.fineract.cn.cause.internal.command.handler;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
 import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.mapper.*;
@@ -131,6 +132,10 @@ public class CauseAggregate {
             documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getTax(), documentEntity, "Tax"));
         }
 
+
+        documentPageEntityList.stream().forEach(d -> {
+            d.setIsMapped(CauseDocumentPage.MappedState.ACTIVE.name());
+        });
 
         documentPageRepository.save(documentPageEntityList);
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.ACTIVATE);

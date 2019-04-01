@@ -40,6 +40,15 @@ public class DocumentPageEntity {
     @Column(name = "type")
     private String type;
 
+
+    @Column(name = "is_mapped")
+    private String isMapped;
+
+    @Column(name = "document_name")
+    private String documentName;
+
+
+
     @Column(name = "content_type")
     private String contentType;
 
@@ -71,14 +80,6 @@ public class DocumentPageEntity {
         this.document = document;
     }
 
-//    public Integer getPageNumber() {
-//        return pageNumber;
-//    }
-//
-//    public void setPageNumber(Integer pageNumber) {
-//        this.pageNumber = pageNumber;
-//    }
-
     public String getContentType() {
         return contentType;
     }
@@ -109,6 +110,22 @@ public class DocumentPageEntity {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getIsMapped() {
+        return isMapped;
+    }
+
+    public void setIsMapped(String isMapped) {
+        this.isMapped = isMapped;
+    }
+
+    public String getDocumentName() {
+        return documentName;
+    }
+
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
     }
 
     @Override

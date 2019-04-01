@@ -24,6 +24,7 @@ import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
 import org.apache.fineract.cn.cause.internal.command.ChangeDocumentCommand;
 import org.apache.fineract.cn.cause.internal.command.CompleteDocumentCommand;
 import org.apache.fineract.cn.cause.internal.command.CreateDocumentCommand;
@@ -75,6 +76,19 @@ public class DocumentsRestController {
         throwIfCauseNotExists(causeIdentifier);
 
         return ResponseEntity.ok(documentService.find(causeIdentifier).collect(Collectors.toList()));
+    }
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/inactive",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<List<CauseDocumentPage>> fetchCauses(@PathVariable("causeidentifier") final String causeidentifier) {
+        return ResponseEntity.ok(this.causeService.causeDocumentPages(causeidentifier));
     }
 
 

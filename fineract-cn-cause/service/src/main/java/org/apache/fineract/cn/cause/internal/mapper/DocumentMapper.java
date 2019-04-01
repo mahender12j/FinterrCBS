@@ -49,6 +49,7 @@ public class DocumentMapper {
         final DocumentPageEntity ret = new DocumentPageEntity();
         ret.setDocument(documentEntity);
         ret.setImage(multipartFile.getBytes());
+        ret.setDocumentName(multipartFile.getName());
         ret.setSize(multipartFile.getSize());
         ret.setContentType(multipartFile.getContentType());
         return ret;
@@ -94,7 +95,9 @@ public class DocumentMapper {
         pageEntity.setContentType(multipartFile.getContentType());
         pageEntity.setImage(multipartFile.getBytes());
         pageEntity.setSize(multipartFile.getSize());
+        pageEntity.setDocumentName(multipartFile.getName());
         pageEntity.setType(type);
+        pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
         return pageEntity;
     }
 
@@ -106,10 +109,23 @@ public class DocumentMapper {
             CauseDocumentPage causeDocumentPage = new CauseDocumentPage();
             causeDocumentPage.setId(d.getId());
             causeDocumentPage.setType(d.getType());
+            causeDocumentPage.setIsMapped(CauseDocumentPage.MappedState.valueOf(d.getIsMapped()));
+            causeDocumentPage.setDocumentName(d.getDocumentName());
             documentPages.add(causeDocumentPage);
         });
 
         return documentPages;
+    }
+
+
+    public static CauseDocumentPage map(DocumentPageEntity pageEntity) {
+        CauseDocumentPage causeDocumentPage = new CauseDocumentPage();
+        causeDocumentPage.setType(pageEntity.getType());
+        causeDocumentPage.setId(pageEntity.getId());
+        causeDocumentPage.setIsMapped(CauseDocumentPage.MappedState.valueOf(pageEntity.getIsMapped()));
+        causeDocumentPage.setDocumentName(pageEntity.getDocumentName());
+
+        return causeDocumentPage;
     }
 
 
