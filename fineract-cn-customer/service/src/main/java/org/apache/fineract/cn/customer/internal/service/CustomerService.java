@@ -104,16 +104,16 @@ public class CustomerService {
                 if (accountNumber != null) {
                     List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(accountNumber);
                     final LocalDateTime localDateTime = LocalDateTime.now();
-                    Double totalBCDP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
+                    double totalBCDP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
                             .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
                                     Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
-                            .mapToDouble(d -> d.getAmount()).sum();
+                            .mapToDouble(AccountEntry::getAmount).sum();
 
 
-                    Double totalCHRP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
+                    double totalCHRP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
                             .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
                                     Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
-                            .mapToDouble(d -> d.getAmount()).sum();
+                            .mapToDouble(AccountEntry::getAmount).sum();
 
                     socialMatrix.setMyPower((totalBCDP / 20 > 5) ? 5 : (totalBCDP / 20));
                     socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
@@ -137,7 +137,7 @@ public class CustomerService {
                 socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifier(customer.getRefferalCodeIdentifier()));
                 customer.setSocialMatrix(socialMatrix);
 
-                System.out.println("----------------------social matrix---------------------" + socialMatrix.toString());
+//                System.out.println("----------------------social matrix---------------------" + socialMatrix.toString());
 
                 if (customer.getRefAccountNumber() != null) {
                     Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
