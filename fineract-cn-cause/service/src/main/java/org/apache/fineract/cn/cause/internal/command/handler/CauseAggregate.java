@@ -142,16 +142,33 @@ public class CauseAggregate {
         return cause.getIdentifier();
     }
 
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE)
+    public String createCause(final CreateCauseDocumentCommand createCauseDocumentCommand) throws IOException {
+        final CauseEntity causeEntity = this.findCauseEntityOrThrow(createCauseDocumentCommand.getCauseIdentifier());
+        DocumentEntity entity = documentRepository.findByCause(causeEntity);
+        DocumentPageEntity pageEntity = DocumentMapper.map(createCauseDocumentCommand.getDoc(), entity, createCauseDocumentCommand.getDocType());
+        pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
+        documentPageRepository.save(pageEntity);
+        return causeEntity.getIdentifier();
+    }
+
+
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.PUT_CAUSE)
     public String updateCause(final UpdateCauseCommand updateCauseCommand) {
-        final Cause cause = updateCauseCommand.cause();
+        final Cause cause = updateCauseCommand.getCause();
+        final CauseEntity causeEntity = findCauseEntityOrThrow(updateCauseCommand.getIdentifier());
 
-        final CauseEntity causeEntity = findCauseEntityOrThrow(cause.getIdentifier());
-        causeEntity.setIdentifier(cause.getIdentifier());
+        causeEntity.setTitle(cause.getTitle());
+
+//        todo
+
+
         this.causeRepository.save(causeEntity);
-
         return cause.getIdentifier();
     }
 

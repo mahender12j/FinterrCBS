@@ -138,25 +138,6 @@ public class CauseRestController {
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
-
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-//    @RequestMapping(
-//            value = "/causes/filter",
-//            method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.ALL_VALUE
-//    )
-//    public @ResponseBody
-//    ResponseEntity<CausePage> fetchCausesByCategory(
-//            @RequestParam(value = "category", required = false) final String category,
-//            @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
-//            @RequestParam(value = "size", required = false) final Integer size,
-//            @RequestParam(value = "sortColumn", required = false) final String sortColumn,
-//            @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
-//
-//        return ResponseEntity.ok(this.causeService.fetchCauseByCategory(category, this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
-//    }
-
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
     @RequestMapping(
             value = "/causes/{identifier}",
@@ -201,9 +182,6 @@ public class CauseRestController {
         }
     }
 
-
-//    -------------find cause for ngo by the ngo username ----------------
-
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/ngo/{identifier}",
@@ -227,7 +205,7 @@ public class CauseRestController {
     public @ResponseBody
     ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier, @RequestBody final Cause cause) {
         if (this.causeService.causeExists(identifier)) {
-            this.commandGateway.process(new UpdateCauseCommand(cause));
+            this.commandGateway.process(new UpdateCauseCommand(identifier, cause));
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
@@ -698,120 +676,6 @@ public class CauseRestController {
 
         return ResponseEntity.accepted().build();
     }
-/*
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
-  @RequestMapping(
-          value = "/causes/{identifier}/identifications/{number}/scans",
-          method = RequestMethod.GET,
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.ALL_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<List<IdentificationCardScan>> fetchIdentificationCardScans(@PathVariable("identifier") final String identifier,
-                                                                            @PathVariable("number") final String number) {
-    this.throwIfCauseNotExists(identifier);
-    this.throwIfIdentificationCardNotExists(number);
-
-    final List<IdentificationCardScan> identificationCardScans = this.causeService.fetchScansByIdentificationCard(number);
-
-    return ResponseEntity.ok(identificationCardScans);
-  }
-
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
-  @RequestMapping(
-          value = "/causes/{identifier}/identifications/{number}/scans/{scanIdentifier}",
-          method = RequestMethod.GET,
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.ALL_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<IdentificationCardScan> findIdentificationCardScan(@PathVariable("identifier") final String identifier,
-                                                                     @PathVariable("number") final String number,
-                                                                     @PathVariable("scanIdentifier") final String scanIdentifier) {
-    this.throwIfCauseNotExists(identifier);
-    this.throwIfIdentificationCardNotExists(number);
-
-    final Optional<IdentificationCardScan> identificationCardScan = this.causeService.findIdentificationCardScan(number, scanIdentifier);
-
-    return identificationCardScan
-            .map(ResponseEntity::ok)
-            .orElseThrow(() -> ServiceException.notFound("Identification card scan {0} not found.", number));
-  }
-
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
-  @RequestMapping(
-          value = "/causes/{identifier}/identifications/{number}/scans/{scanIdentifier}/image",
-          method = RequestMethod.GET,
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.ALL_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<byte[]> fetchIdentificationCardScanImage(@PathVariable("identifier") final String identifier,
-                                          @PathVariable("number") final String number,
-                                          @PathVariable("scanIdentifier") final String scanIdentifier) {
-    this.throwIfCauseNotExists(identifier);
-    this.throwIfIdentificationCardNotExists(number);
-    this.throwIfIdentificationCardScanNotExists(number, scanIdentifier);
-
-    final Optional<byte[]> image = this.causeService.findIdentificationCardScanImage(number, scanIdentifier);
-
-    return image.map(ResponseEntity::ok)
-            .orElseThrow(() -> ServiceException.notFound("Identification card scan {0} not found.", number));
-  }
-
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
-  @RequestMapping(
-          value = "/causes/{identifier}/identifications/{number}/scans",
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<Void> postIdentificationCardScan(@PathVariable("identifier") final String identifier,
-                                  @PathVariable("number") final String number,
-                                  @RequestParam("scanIdentifier") @ValidIdentifier final String scanIdentifier,
-                                  @RequestParam("description") @Size(max = 4096) final String description,
-                                  @RequestBody final MultipartFile image) throws Exception {
-    this.throwIfCauseNotExists(identifier);
-    this.throwIfIdentificationCardNotExists(number);
-    this.throwIfInvalidSize(image.getSize());
-    this.throwIfInvalidContentType(image.getContentType());
-
-    if (this.causeService.identificationCardScanExists(number, scanIdentifier)) {
-      throw ServiceException.conflict("Scan {0} already exists.", scanIdentifier);
-    }
-
-    final IdentificationCardScan scan = new IdentificationCardScan();
-    scan.setIdentifier(scanIdentifier);
-    scan.setDescription(description);
-
-    this.commandGateway.process(new CreateIdentificationCardScanCommand(number, scan, image));
-
-    return ResponseEntity.accepted().build();
-  }
-
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
-  @RequestMapping(
-          value = "/causes/{identifier}/identifications/{number}/scans/{scanIdentifier}",
-          method = RequestMethod.DELETE,
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.ALL_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<Void> deleteScan(@PathVariable("identifier") final String identifier,
-                  @PathVariable("number") final String number,
-                  @PathVariable("scanIdentifier") final String scanIdentifier) {
-    throwIfCauseNotExists(identifier);
-    throwIfIdentificationCardNotExists(number);
-
-    this.commandGateway.process(new DeleteIdentificationCardScanCommand(number, scanIdentifier));
-
-    return ResponseEntity.accepted().build();
-  }*/
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
     @RequestMapping(

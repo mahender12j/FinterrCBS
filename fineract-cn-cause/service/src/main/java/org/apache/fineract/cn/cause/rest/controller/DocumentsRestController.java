@@ -25,10 +25,7 @@ import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
-import org.apache.fineract.cn.cause.internal.command.ChangeDocumentCommand;
-import org.apache.fineract.cn.cause.internal.command.CompleteDocumentCommand;
-import org.apache.fineract.cn.cause.internal.command.CreateDocumentCommand;
-import org.apache.fineract.cn.cause.internal.command.DeleteDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.repository.DocumentPageEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.DocumentService;
@@ -77,6 +74,27 @@ public class DocumentsRestController {
 
         return ResponseEntity.ok(documentService.find(causeIdentifier).collect(Collectors.toList()));
     }
+
+
+//    post cause document in uploaded state
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/upload",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> postCauseDocument(
+            @PathVariable("causeidentifier") final String causeIdentifier,
+            @RequestParam("docType") final String docType,
+            @RequestParam("doc") final MultipartFile doc) {
+        throwIfCauseNotExists(causeIdentifier);
+        this.commandGateway.process(new CreateCauseDocumentCommand(docType, doc, causeIdentifier));
+        return ResponseEntity.accepted().build();
+    }
+
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
@@ -206,25 +224,6 @@ public class DocumentsRestController {
     }
 
 
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-//    @RequestMapping(
-//            value = "/{documentidentifier}/pages",
-//            method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.ALL_VALUE
-//    )
-//    public @ResponseBody
-//    ResponseEntity<List<Integer>> getDocumentPageNumbers(
-//            @PathVariable("causeidentifier") final String causeIdentifier,
-//            @PathVariable("documentidentifier") final String documentIdentifier) {
-//        throwIfCauseDocumentNotExists(causeIdentifier, documentIdentifier);
-//
-//        return ResponseEntity.ok(documentService.findPageNumbers(causeIdentifier, documentIdentifier).collect(Collectors.toList()));
-//    }
-
-// todo
-
-
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
             value = "/{documentidentifier}/file",
@@ -246,55 +245,6 @@ public class DocumentsRestController {
                 .body(documentPageEntity.getImage());
     }
 
-//
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-//    @RequestMapping(
-//            value = "/{documentidentifier}/pages/{pagenumber}",
-//            method = RequestMethod.POST,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-//    )
-//    public @ResponseBody
-//    ResponseEntity<Void> createDocumentPage(
-//            @PathVariable("causeidentifier") final String causeIdentifier,
-//            @PathVariable("documentidentifier") final String documentIdentifier,
-//            @PathVariable("pagenumber") @Range(min = 0) final Integer pageNumber,
-//            @RequestBody final MultipartFile page) {
-//        if (page == null) {
-//            throw ServiceException.badRequest("Document not found");
-//        }
-//
-//        throwIfCauseNotExists(causeIdentifier);
-//        throwIfDocumentCompleted(causeIdentifier, documentIdentifier);
-//        throwIfInvalidContentType(page.getContentType());
-//
-//        commandGateway.process(new CreateDocumentPageCommand(causeIdentifier, documentIdentifier, pageNumber, page));
-//
-//        return ResponseEntity.accepted().build();
-//    }
-
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-//    @RequestMapping(
-//            value = "/{documentidentifier}/pages/{pagenumber}",
-//            method = RequestMethod.DELETE,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.ALL_VALUE
-//    )
-//    public @ResponseBody
-//    ResponseEntity<Void> deleteDocumentPage(
-//            @PathVariable("causeidentifier") final String causeIdentifier,
-//            @PathVariable("documentidentifier") final String documentIdentifier,
-//            @PathVariable("pagenumber") final Integer pageNumber) {
-//        throwIfCauseDocumentNotExists(causeIdentifier, documentIdentifier);
-//
-//        throwIfDocumentCompleted(causeIdentifier, documentIdentifier);
-//
-//        commandGateway.process(new DeleteDocumentPageCommand(causeIdentifier, documentIdentifier, pageNumber));
-//
-//        return ResponseEntity.accepted().build();
-//    }
-
-
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -309,17 +259,9 @@ public class DocumentsRestController {
             @RequestParam("tax") final MultipartFile tax,
             @RequestParam("terms") final MultipartFile terms,
             @RequestParam("other") final MultipartFile other) throws IOException {
-
         ObjectMapper mapper = new ObjectMapper();
         Cause cause = mapper.readValue(data, Cause.class);
-
-//        if (feature == null) {
-//            throw ServiceException.badRequest("Document not found");
-//        }
-//        System.out.println("----------------gallery---------------------" + gallery);
-
         commandGateway.process(new CreateDocumentCommand(causeIdentifier, cause, feature, gallery, tax, terms, other));
-
         return ResponseEntity.accepted().build();
     }
 

@@ -18,24 +18,29 @@
  */
 package org.apache.fineract.cn.cause.internal.command;
 
-import org.apache.fineract.cn.cause.api.v1.domain.Cause;
+import org.springframework.web.multipart.MultipartFile;
 
-public class UpdateCauseCommand {
+public class CreateCauseDocumentCommand {
 
-    private final Cause cause;
-    private final String identifier;
+    private final String docType;
+    private final MultipartFile doc;
+    private final String causeIdentifier;
 
-    public UpdateCauseCommand(final String identifier, final Cause cause) {
-        super();
-        this.cause = cause;
-        this.identifier = identifier;
+    public CreateCauseDocumentCommand(final String docType,final MultipartFile doc, final String causeIdentifier) {
+        this.docType = docType;
+        this.doc = doc;
+        this.causeIdentifier = causeIdentifier;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getDocType() {
+        return docType;
     }
 
-    public Cause getCause() {
-        return cause;
+    public MultipartFile getDoc() {
+        return doc;
+    }
+
+    public String getCauseIdentifier() {
+        return causeIdentifier;
     }
 }
