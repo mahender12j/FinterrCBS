@@ -162,12 +162,31 @@ public class CauseAggregate {
     public String updateCause(final UpdateCauseCommand updateCauseCommand) {
         final Cause cause = updateCauseCommand.getCause();
         final CauseEntity causeEntity = findCauseEntityOrThrow(updateCauseCommand.getIdentifier());
+        final AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
+
+        addressEntity.setStreet(cause.getAddress().getStreet());
+        addressEntity.setCountryCode(cause.getAddress().getCountryCode());
+        addressEntity.setState(cause.getAddress().getState());
+        addressEntity.setRegion(cause.getAddress().getRegion());
+        addressEntity.setPostalCode(cause.getAddress().getPostalCode());
+        addressEntity.setCity(cause.getAddress().getCity());
+        this.addressRepository.save(addressEntity);
 
         causeEntity.setTitle(cause.getTitle());
-
-//        todo
-
-
+        causeEntity.setStartDate(LocalDateTime.parse(cause.getStartDate()));
+        causeEntity.setEndDate(LocalDateTime.parse(cause.getEndDate()));
+        causeEntity.setDescription(cause.getDescription());
+        causeEntity.setWebsiteUrl(cause.getWebsiteUrl());
+        causeEntity.setVideoUrls(cause.getVideoUrls());
+        causeEntity.setSmediaLinks(cause.getSmediaLinks());
+        causeEntity.setTaxExamption(cause.getTaxExamption());
+        causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
+        causeEntity.setFinRate(cause.getFinRate());
+        causeEntity.setActualRaisedFiat(cause.getActualRaisedFiat());
+        causeEntity.setActualRaisedFin(cause.getActualRaisedFiat());
+        causeEntity.setHardTarget(cause.getHardTarget());
+        causeEntity.setSoftTarget(cause.getSoftTarget());
+        causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
         this.causeRepository.save(causeEntity);
         return cause.getIdentifier();
     }
