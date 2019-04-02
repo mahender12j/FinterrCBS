@@ -20,10 +20,7 @@ package org.apache.fineract.cn.cause.internal.service;
 
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
 import org.apache.fineract.cn.cause.internal.mapper.DocumentMapper;
-import org.apache.fineract.cn.cause.internal.repository.DocumentEntity;
-import org.apache.fineract.cn.cause.internal.repository.DocumentPageEntity;
-import org.apache.fineract.cn.cause.internal.repository.DocumentPageRepository;
-import org.apache.fineract.cn.cause.internal.repository.DocumentRepository;
+import org.apache.fineract.cn.cause.internal.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,14 +35,17 @@ import java.util.stream.Stream;
 @Service
 public class DocumentService {
     private final DocumentRepository documentRepository;
+    private final CauseRepository causeRepository;
     private final DocumentPageRepository documentPageRepository;
 
     @Autowired
     public DocumentService(
             final DocumentRepository documentRepository,
+            final CauseRepository causeRepository,
             final DocumentPageRepository documentPageRepository) {
         this.documentRepository = documentRepository;
         this.documentPageRepository = documentPageRepository;
+        this.causeRepository = causeRepository;
     }
 
     public Optional<DocumentPageEntity> findPage(final Long documentId) {
@@ -70,12 +70,10 @@ public class DocumentService {
         return findDocument(causeIdentifier, documentIdentifier).isPresent();
     }
 
-//    public Stream<Integer> findPageNumbers(
-//            final String causeIdentifier,
-//            final String documentIdentifier) {
-//        return documentPageRepository.findByCauseIdAndDocumentIdentifier(causeIdentifier, documentIdentifier)
-//                .map(DocumentPageEntity::);
-//    }
+    public boolean documentPageExists(final Long pageId) {
+        final Optional<DocumentPageEntity> pageEntity = documentPageRepository.findById(pageId);
+        return pageEntity.isPresent();
+    }
 
     public boolean isDocumentCompleted(
             final String causeIdentifier,
@@ -83,18 +81,4 @@ public class DocumentService {
         return documentRepository.findByCauseIdAndDocumentIdentifier(causeIdentifier, documentIdentifier)
                 .map(DocumentEntity::getCompleted).orElse(true);
     }
-
-//    public boolean isDocumentMissingPages(
-//            final String causeIdentifier,
-//            final String documentIdentifier) {
-//        final List<Integer> pageNumbers = findPageNumbers(causeIdentifier, documentIdentifier)
-//                .sorted(Integer::compareTo)
-//                .collect(Collectors.toList());
-//        for (int i = 0; i < pageNumbers.size(); i++) {
-//            if (i != pageNumbers.get(i))
-//                return true;
-//        }
-//
-//        return false;
-//    }
 }

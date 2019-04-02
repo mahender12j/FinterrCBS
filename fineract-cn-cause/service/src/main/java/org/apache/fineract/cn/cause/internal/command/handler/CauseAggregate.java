@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -145,7 +146,7 @@ public class CauseAggregate {
 
     @Transactional
     @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE)
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE_DOCUMENT)
     public String createCause(final CreateCauseDocumentCommand createCauseDocumentCommand) throws IOException {
         final CauseEntity causeEntity = this.findCauseEntityOrThrow(createCauseDocumentCommand.getCauseIdentifier());
         DocumentEntity entity = documentRepository.findByCause(causeEntity);
@@ -153,6 +154,21 @@ public class CauseAggregate {
         pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
         documentPageRepository.save(pageEntity);
         return causeEntity.getIdentifier();
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_CAUSE_DOCUMENT)
+    public String deleteCauseDocument(final DeleteCauseDocumentCommand deleteCauseDocumentCommand) {
+        final Optional<DocumentPageEntity> pageEntity = documentPageRepository.findById(deleteCauseDocumentCommand.getPageId());
+        if (pageEntity.isPresent()) {
+            pageEntity.get().setIsMapped(CauseDocumentPage.MappedState.DELETED.name());
+            documentPageRepository.save(pageEntity.get());
+        } else {
+            System.out.println("this document id is not available");
+        }
+        return deleteCauseDocumentCommand.getCauseIdentifier();
     }
 
 

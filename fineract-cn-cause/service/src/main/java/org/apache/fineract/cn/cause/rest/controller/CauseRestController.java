@@ -195,6 +195,9 @@ public class CauseRestController {
         return ResponseEntity.ok(this.causeService.fetchCauseByCreatedBy(createdBy));
     }
 
+
+//    cause update by cause ID
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/{identifier}",

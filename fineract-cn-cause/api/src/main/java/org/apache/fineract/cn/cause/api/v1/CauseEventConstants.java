@@ -28,6 +28,8 @@ public interface CauseEventConstants {
     String INITIALIZE = "initialize";
 
     String POST_CAUSE = "post-cause";
+    String POST_CAUSE_DOCUMENT = "post-cause-document";
+    String DELETE_CAUSE_DOCUMENT = "delete-cause-document";
     String PUT_CAUSE = "put-cause";
     String PUBLISH_CAUSE = "publish-cause";
     String EXPIRE_CAUSE = "expire-cause";

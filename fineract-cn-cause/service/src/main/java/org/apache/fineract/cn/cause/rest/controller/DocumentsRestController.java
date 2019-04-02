@@ -96,6 +96,25 @@ public class DocumentsRestController {
     }
 
 
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/{pageidentifier}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> deleteCauseDocument(
+            @PathVariable("causeidentifier") final String causeIdentifier,
+            @PathVariable("pageidentifier") final Long pageId) {
+        throwIfCauseNotExists(causeIdentifier);
+        throwIfCauseDocumentPageNotExists(causeIdentifier, pageId);
+
+        this.commandGateway.process(new DeleteCauseDocumentCommand(pageId, causeIdentifier));
+        return ResponseEntity.accepted().build();
+    }
+
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/inactive",
@@ -275,6 +294,12 @@ public class DocumentsRestController {
     private void throwIfCauseDocumentNotExists(final String causeIdentifier, final String documentIdentifier) {
         if (!this.documentService.documentExists(causeIdentifier, documentIdentifier)) {
             throw ServiceException.notFound("Cause ''{0}'' not found.", causeIdentifier);
+        }
+    }
+
+    private void throwIfCauseDocumentPageNotExists(final String causeIdentifier, final Long documentId) {
+        if (!this.documentService.documentPageExists(documentId)) {
+            throw ServiceException.notFound("Cause ''{0}'' with document ''{1}'' not found.", causeIdentifier, documentId);
         }
     }
 
