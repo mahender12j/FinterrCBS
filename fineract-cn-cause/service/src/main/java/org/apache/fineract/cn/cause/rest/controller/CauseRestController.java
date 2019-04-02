@@ -147,16 +147,13 @@ public class CauseRestController {
     )
     public @ResponseBody
     ResponseEntity<Void> deleteCause(@PathVariable("identifier") final String identifier) {
+
         final Optional<Cause> cause = this.causeService.findCause(identifier);
-        if (cause.isPresent()) {
-            System.out.println("Cause is present");
-        } else {
+        if (!cause.isPresent()) {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
 
-        System.out.println(cause.get().getCurrentState());
-        Boolean isAllowed = this.causeService.isRemovableState(cause.get().getCurrentState());
-        if (isAllowed == false) {
+        if (!CauseService.isRemovableState(cause.get().getCurrentState())) {
             throw ServiceException.conflict("Unable to delete this cause!");
         }
 
@@ -581,87 +578,6 @@ public class CauseRestController {
         return ResponseEntity.accepted().build();
     }
 
- /* @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
-  @RequestMapping(
-          value = "/causes/{identifier}/identifications",
-          method = RequestMethod.GET,
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.ALL_VALUE
-  )
-  public @ResponseBody ResponseEntity<List<IdentificationCard>> fetchIdentificationCards(@PathVariable("identifier") final String identifier) {
-    this.throwIfCauseNotExists(identifier);
-    return ResponseEntity.ok(this.causeService.fetchIdentificationCardsByCause(identifier).collect(Collectors.toList()));
-  }*/
-
-/*  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
-  @RequestMapping(
-          value = "/causes/{identifier}/identifications/{number}",
-          method = RequestMethod.GET,
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.ALL_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<IdentificationCard> findIdentificationCard(@PathVariable("identifier") final String identifier,
-                                            @PathVariable("number") final String number) {
-    this.throwIfCauseNotExists(identifier);
-
-    final Optional<IdentificationCard> identificationCard = this.causeService.findIdentificationCard(number);
-    if (identificationCard.isPresent()) {
-      return ResponseEntity.ok(identificationCard.get());
-    } else {
-      throw ServiceException.notFound("Identification card {0} not found.", number);
-    }
-  }*/
-
- /* @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
-  @RequestMapping(
-          value = "/causes/{identifier}/identifications",
-          method = RequestMethod.POST,
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.APPLICATION_JSON_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<Void> createIdentificationCard(@PathVariable("identifier") final String identifier,
-                                @RequestBody @Valid final IdentificationCard identificationCard) {
-    if (this.causeService.causeExists(identifier)) {
-      if (this.causeService.identificationCardExists(identificationCard.getNumber())) {
-        throw ServiceException.conflict("IdentificationCard {0} already exists.", identificationCard.getNumber());
-      }
-
-      this.commandGateway.process(new CreateIdentificationCardCommand(identifier, identificationCard));
-    } else {
-      throw ServiceException.notFound("Cause {0} not found.", identifier);
-    }
-
-    return ResponseEntity.accepted().build();
-  }*/
-
-/*  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
-  @RequestMapping(
-      value = "/causes/{identifier}/identifications/{number}",
-      method = RequestMethod.PUT,
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      consumes = MediaType.APPLICATION_JSON_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<Void> updateIdentificationCard(@PathVariable("identifier") final String identifier,
-                                                @PathVariable("number") final String number,
-                                                @RequestBody @Valid final IdentificationCard identificationCard) {
-    this.throwIfCauseNotExists(identifier);
-    this.throwIfIdentificationCardNotExists(number);
-
-    if(!number.equals(identificationCard.getNumber())) {
-      throw ServiceException.badRequest("Number in path is different from number in request body");
-    }
-
-    this.commandGateway.process(new UpdateIdentificationCardCommand(identifier, identificationCard.getNumber(), identificationCard));
-
-    return ResponseEntity.accepted().build();
-  }*/
-
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
     @RequestMapping(
             value = "/causes/{identifier}/identifications/{number}",
@@ -822,8 +738,8 @@ public class CauseRestController {
     }
 
     private Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
-        final Integer pageIndexToUse = pageIndex != null ? pageIndex : 0;
-        final Integer sizeToUse = size != null ? size : 20;
+        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
+        final int sizeToUse = size != null ? size : 20;
         final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
         final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
         return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);

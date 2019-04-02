@@ -98,7 +98,7 @@ public class DocumentsRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
-            value = "/{pageidentifier}",
+            value = "/{pageId}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
@@ -106,7 +106,7 @@ public class DocumentsRestController {
     public @ResponseBody
     ResponseEntity<Void> deleteCauseDocument(
             @PathVariable("causeidentifier") final String causeIdentifier,
-            @PathVariable("pageidentifier") final Long pageId) {
+            @PathVariable("pageId") final Long pageId) {
         throwIfCauseNotExists(causeIdentifier);
         throwIfCauseDocumentPageNotExists(causeIdentifier, pageId);
 
