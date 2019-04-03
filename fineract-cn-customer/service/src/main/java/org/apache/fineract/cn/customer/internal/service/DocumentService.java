@@ -105,7 +105,7 @@ public class DocumentService {
         CustomerDocument customerDocument = new CustomerDocument();
         if (documentEntity.isPresent()) {
             customerDocument = DocumentMapper.map(documentEntity.get());
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity.get(), "DELETED").stream()
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatusNotAndStatusNot(documentEntity.get(), "DELETED", "UPLOADED").stream()
                     .collect(groupingBy(DocumentEntryEntity::getType, toList()));
             List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
             customerDocument.setDocumentsTypes(documentsType);
