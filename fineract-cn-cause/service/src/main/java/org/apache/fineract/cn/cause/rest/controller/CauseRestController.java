@@ -203,7 +203,8 @@ public class CauseRestController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier, @RequestBody final Cause cause) {
+    ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier,
+                                     @RequestBody final Cause cause) {
         if (this.causeService.causeExists(identifier)) {
             this.commandGateway.process(new UpdateCauseCommand(identifier, cause));
         } else {

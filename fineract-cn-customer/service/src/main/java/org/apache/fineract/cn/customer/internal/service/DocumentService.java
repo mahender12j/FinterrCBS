@@ -20,12 +20,16 @@ package org.apache.fineract.cn.customer.internal.service;
 
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
+import org.apache.fineract.cn.customer.api.v1.domain.DocumentStorage;
 import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
 import org.apache.fineract.cn.customer.internal.mapper.DocumentMapper;
 import org.apache.fineract.cn.customer.internal.repository.*;
+import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,15 +47,18 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentPageRepository documentPageRepository;
     private final DocumentEntryRepository documentEntryRepository;
+    private final DocumentStorageRepository documentStorageRepository;
 
     @Autowired
     public DocumentService(
             final DocumentRepository documentRepository,
             final DocumentEntryRepository documentEntryRepository,
+            final DocumentStorageRepository documentStorageRepository,
             final DocumentPageRepository documentPageRepository) {
         this.documentRepository = documentRepository;
         this.documentEntryRepository = documentEntryRepository;
         this.documentPageRepository = documentPageRepository;
+        this.documentStorageRepository = documentStorageRepository;
     }
 
     public Optional<DocumentPageEntity> findPage(final String customerIdentifier,
@@ -64,16 +71,32 @@ public class DocumentService {
     }
 
 
+    public DocumentStorage addNewDocument(final MultipartFile multipartFile, final String customeridentifier) throws IOException {
+        DocumentStorageEntity storageEntity = DocumentMapper.map(multipartFile, customeridentifier);
+
+        DocumentStorageEntity entity = this.documentStorageRepository.save(storageEntity);
+        return DocumentMapper.map(entity);
+    }
+
+
+    public DocumentStorage findDocumentStorage(final String uuid) {
+
+        Optional<DocumentStorageEntity> documentEntity = this.documentStorageRepository.findByUuid(uuid);
+        if (documentEntity.isPresent()) {
+            return DocumentMapper.map(documentEntity.get());
+        } else {
+            throw ServiceException.notFound("Document {0} not found.", uuid);
+        }
+    }
+
+
     public Optional<DocumentPageEntity> findPagebyDocumentID(final Long documentIdentifier) {
-        Optional<DocumentPageEntity> documentPageEntity = this.documentPageRepository.findByDocumentEntryId(documentIdentifier);
-        return documentPageEntity;
+        return this.documentPageRepository.findByDocumentEntryId(documentIdentifier);
     }
 
     public Stream<CustomerDocument> find(final String customerIdentifier) {
         final Stream<DocumentEntity> preMappedRet = this.documentRepository.findByCustomerId(customerIdentifier);
-        Stream<CustomerDocument> customerDocumentStream = preMappedRet.map(DocumentMapper::map);
-
-        return customerDocumentStream;
+        return preMappedRet.map(DocumentMapper::map);
     }
 
 
@@ -86,7 +109,7 @@ public class DocumentService {
                     .collect(groupingBy(DocumentEntryEntity::getType, toList()));
             List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
             customerDocument.setDocumentsTypes(documentsType);
-            customerDocument.setKycStatus(documentsType.stream().allMatch(d -> d.isKYCVerified()));
+            customerDocument.setKycStatus(documentsType.stream().allMatch(DocumentsType::isKYCVerified));
         }
         return customerDocument;
     }
@@ -114,7 +137,6 @@ public class DocumentService {
     public boolean isDocumentCompleted(final String customerIdentifier,
                                        final Long documentIdentifier) {
         final Optional<DocumentEntryEntity> documentEntityOptional = documentEntryRepository.findByCustomerIdAndDocumentId(customerIdentifier, documentIdentifier);
-//        System.out.println("================documentEntityOptional.map(DocumentEntryEntity::getStatus)=============" + documentEntityOptional.map(DocumentEntryEntity::getStatus));
         return documentEntityOptional.map(DocumentEntryEntity::getStatus).get().equals("APPROVED");
     }
 

@@ -104,12 +104,10 @@ public class DocumentsRestController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> deleteCauseDocument(
-            @PathVariable("causeidentifier") final String causeIdentifier,
-            @PathVariable("pageId") final Long pageId) {
+    ResponseEntity<Void> deleteCauseDocument(@PathVariable("causeidentifier") final String causeIdentifier,
+                                             @PathVariable("pageId") final Long pageId) {
         throwIfCauseNotExists(causeIdentifier);
         throwIfCauseDocumentPageNotExists(causeIdentifier, pageId);
-
         this.commandGateway.process(new DeleteCauseDocumentCommand(pageId, causeIdentifier));
         return ResponseEntity.accepted().build();
     }
@@ -183,7 +181,6 @@ public class DocumentsRestController {
             @RequestBody final @Valid CauseDocument instance) {
         throwIfCauseNotExists(causeIdentifier);
         throwIfCauseDocumentNotExists(causeIdentifier, documentIdentifier);
-
         throwIfDocumentCompleted(causeIdentifier, documentIdentifier);
 
         if (!instance.getIdentifier().equals(documentIdentifier))
@@ -287,6 +284,7 @@ public class DocumentsRestController {
 
     private void throwIfCauseNotExists(final String causeIdentifier) {
         if (!this.causeService.causeExists(causeIdentifier)) {
+            System.out.println("Cause not found from here------------------------->");
             throw ServiceException.notFound("Cause ''{0}'' not found.", causeIdentifier);
         }
     }

@@ -153,10 +153,10 @@ public class CustomerRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
     @RequestMapping(
-      value = "/customers/{identifier}/ngo",
-      method = RequestMethod.GET,
-      produces = MediaType.ALL_VALUE,
-      consumes = MediaType.APPLICATION_JSON_VALUE
+            value = "/customers/{identifier}/ngo",
+            method = RequestMethod.GET,
+            produces = MediaType.ALL_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
     ResponseEntity<Customer> findNgo(@PathVariable("identifier") final String identifier) {
@@ -661,8 +661,7 @@ public class CustomerRestController {
             consumes = MediaType.ALL_VALUE
     )
     public ResponseEntity<byte[]> getPortrait(@PathVariable("identifier") final String identifier) {
-        final PortraitEntity portrait = this.customerService.findPortrait(identifier)
-                .orElseThrow(() -> ServiceException.notFound("Portrait for Customer ''{0}'' not found.", identifier));
+        final PortraitEntity portrait = this.customerService.findPortrait(identifier).orElseThrow(() -> ServiceException.notFound("Portrait for Customer ''{0}'' not found.", identifier));
 
         return ResponseEntity
                 .ok()

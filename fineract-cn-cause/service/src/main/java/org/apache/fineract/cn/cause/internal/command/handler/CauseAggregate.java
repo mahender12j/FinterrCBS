@@ -161,6 +161,7 @@ public class CauseAggregate {
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_CAUSE_DOCUMENT)
     public String deleteCauseDocument(final DeleteCauseDocumentCommand deleteCauseDocumentCommand) {
+
         final Optional<DocumentPageEntity> pageEntity = documentPageRepository.findById(deleteCauseDocumentCommand.getPageId());
         if (pageEntity.isPresent()) {
             pageEntity.get().setIsMapped(CauseDocumentPage.MappedState.DELETED.name());
@@ -467,162 +468,6 @@ public class CauseAggregate {
         return ratingEntity.getIdentifier();
     }
 
-    // @Transactional
-    // @CommandHandler
-    // @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.PUT_CONTACT_DETAILS)
-    // public String updateContactDetails(final UpdateContactDetailsCommand updateContactDetailsCommand) {
-    //     final CauseEntity causeEntity = findCauseEntityOrThrow(updateContactDetailsCommand.identifier());
-    //     causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-    //     causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
-    //     final List<ContactDetailEntity> oldContactDetails = this.contactDetailRepository.findByCause(causeEntity);
-    //     this.contactDetailRepository.delete(oldContactDetails);
-
-    //     if (updateContactDetailsCommand.contactDetails() != null) {
-    //         this.contactDetailRepository.save(
-    //                 updateContactDetailsCommand.contactDetails()
-    //                         .stream()
-    //                         .map(contact -> {
-    //                             final ContactDetailEntity newContactDetail = ContactDetailMapper.map(contact);
-    //                             newContactDetail.setCause(causeEntity);
-    //                             return newContactDetail;
-    //                         })
-    //                         .collect(Collectors.toList())
-    //         );
-    //     }
-
-    //     return updateContactDetailsCommand.identifier();
-    // }
-
-  /*@Transactional
-  @CommandHandler
-  @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_IDENTIFICATION_CARD)
-  public String createIdentificationCard(final CreateIdentificationCardCommand createIdentificationCardCommand) {
-    final CauseEntity causeEntity = findCauseEntityOrThrow(createIdentificationCardCommand.identifier());
-
-    final IdentificationCardEntity identificationCardEntity = IdentificationCardMapper.map(createIdentificationCardCommand.identificationCard());
-
-    identificationCardEntity.setCause(causeEntity);
-    identificationCardEntity.setCreatedBy(UserContextHolder.checkedGetUser());
-    identificationCardEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-
-    this.identificationCardRepository.save(identificationCardEntity);
-
-    causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-    causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
-    this.causeRepository.save(causeEntity);
-
-    return identificationCardEntity.getNumber();
-  }
-
-  @Transactional
-  @CommandHandler
-  @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.PUT_IDENTIFICATION_CARD)
-  public String updateIdentificationCard(final UpdateIdentificationCardCommand updateIdentificationCardCommand) {
-    final Optional<IdentificationCardEntity> optionalIdentificationCardEntity = this.identificationCardRepository.findByNumber(updateIdentificationCardCommand.number());
-
-    final IdentificationCardEntity identificationCard = IdentificationCardMapper.map(updateIdentificationCardCommand.identificationCard());
-
-    optionalIdentificationCardEntity.ifPresent(identificationCardEntity -> {
-      identificationCardEntity.setIssuer(identificationCard.getIssuer());
-      identificationCardEntity.setType(identificationCard.getType());
-      identificationCardEntity.setExpirationDate(identificationCard.getExpirationDate());
-      identificationCardEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-      identificationCardEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
-      this.identificationCardRepository.save(identificationCardEntity);
-
-      final CauseEntity causeEntity = identificationCardEntity.getCause();
-
-      causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-      causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
-      this.causeRepository.save(causeEntity);
-    });
-
-    return updateIdentificationCardCommand.number();
-  }
-
-  @Transactional
-  @CommandHandler
-  @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_IDENTIFICATION_CARD)
-  public String deleteIdentificationCard(final DeleteIdentificationCardCommand deleteIdentificationCardCommand) throws IOException {
-    final Optional<IdentificationCardEntity> optionalIdentificationCardEntity = this.identificationCardRepository.findByNumber(deleteIdentificationCardCommand.number());
-
-    optionalIdentificationCardEntity.ifPresent(identificationCardEntity -> {
-
-      final List<IdentificationCardScanEntity> cardScanEntities = this.identificationCardScanRepository.findByIdentificationCard(identificationCardEntity);
-
-      this.identificationCardScanRepository.delete(cardScanEntities);
-
-      this.identificationCardRepository.delete(identificationCardEntity);
-
-      final CauseEntity causeEntity = identificationCardEntity.getCause();
-
-      causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-      causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
-      this.causeRepository.save(causeEntity);
-    });
-
-    return deleteIdentificationCardCommand.number();
-  }
-
-  @Transactional
-  @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
-  @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_IDENTIFICATION_CARD_SCAN)
-  public ScanEvent createIdentificationCardScan(final CreateIdentificationCardScanCommand command) throws Exception {
-    final Optional<IdentificationCardEntity> identificationCardEntity = this.identificationCardRepository.findByNumber(command.number());
-
-    final IdentificationCardEntity cardEntity = identificationCardEntity.orElseThrow(() -> ServiceException.notFound("Identification card {0} not found.", command.number()));
-
-    final IdentificationCardScanEntity identificationCardScanEntity = IdentificationCardScanMapper.map(command.scan());
-
-    final MultipartFile image = command.image();
-
-    final LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
-
-    identificationCardScanEntity.setImage(image.getBytes());
-    identificationCardScanEntity.setContentType(image.getContentType());
-    identificationCardScanEntity.setSize(image.getSize());
-    identificationCardScanEntity.setIdentificationCard(cardEntity);
-    identificationCardScanEntity.setCreatedBy(UserContextHolder.checkedGetUser());
-    identificationCardScanEntity.setCreatedOn(now);
-
-    identificationCardScanRepository.save(identificationCardScanEntity);
-
-    cardEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-    cardEntity.setLastModifiedOn(now);
-
-    identificationCardRepository.save(cardEntity);
-
-    return new ScanEvent(command.number(), command.scan().getIdentifier());
-  }
-
-  @Transactional
-  @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
-  @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_IDENTIFICATION_CARD_SCAN)
-  public ScanEvent deleteIdentificationCardScan(final DeleteIdentificationCardScanCommand command) {
-    final Optional<IdentificationCardEntity> cardEntity = this.identificationCardRepository.findByNumber(command.number());
-    final Optional<IdentificationCardScanEntity> scanEntity = cardEntity
-            .flatMap(entity -> this.identificationCardScanRepository.findByIdentifierAndIdentificationCard(command.scanIdentifier(), entity));
-
-    scanEntity.ifPresent(identificationCardScanEntity -> {
-
-      this.identificationCardScanRepository.delete(identificationCardScanEntity);
-
-      final IdentificationCardEntity identificationCard = identificationCardScanEntity.getIdentificationCard();
-
-      identificationCard.setLastModifiedBy(UserContextHolder.checkedGetUser());
-      identificationCard.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
-      this.identificationCardRepository.save(identificationCard);
-    });
-
-    return new ScanEvent(command.number(), command.scanIdentifier());
-  }*/
-
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_PORTRAIT)
@@ -660,27 +505,6 @@ public class CauseAggregate {
 
         return deletePortraitCommand.identifier();
     }
-
-/*  private void setCustomValues(final Customer customer, final CauseEntity savedCauseEntity) {
-    this.fieldValueRepository.save(
-        customer.getCustomValues()
-            .stream()
-            .map(value -> {
-              final Optional<CatalogEntity> catalog =
-                  this.catalogRepository.findByIdentifier(value.getCatalogIdentifier());
-              final Optional<FieldEntity> field =
-                  this.fieldRepository.findByCatalogAndIdentifier(
-                      catalog.orElseThrow(() -> ServiceException.notFound("Catalog {0} not found.", value.getCatalogIdentifier())),
-                      value.getFieldIdentifier());
-              final FieldValueEntity fieldValueEntity = FieldValueMapper.map(value);
-              fieldValueEntity.setCustomer(savedCauseEntity);
-              fieldValueEntity.setField(
-                  field.orElseThrow(() -> ServiceException.notFound("Field {0} not found.", value.getFieldIdentifier())));
-              return fieldValueEntity;
-            })
-            .collect(Collectors.toList())
-    );
-  }*/
 
     private CauseEntity findCauseEntityOrThrow(String identifier) {
         return this.causeRepository.findByIdentifier(identifier)

@@ -135,8 +135,8 @@ public final class CauseMapper {
         cause.setCauseTxHash(causeEntity.getCauseTxHash());
         cause.setAccountNumber(causeEntity.getAccountNumber());
         cause.setEthAddress(causeEntity.getEthAddress());
-        causeEntity.setExtended(cause.getExtended());
-        causeEntity.setResubmited(cause.getResubmited());
+        cause.setExtended(cause.getExtended());
+        cause.setResubmited(cause.getResubmited());
         return cause;
     }
 

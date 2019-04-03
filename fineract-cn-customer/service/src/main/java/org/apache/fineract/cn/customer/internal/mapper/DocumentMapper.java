@@ -19,10 +19,7 @@
 package org.apache.fineract.cn.customer.internal.mapper;
 
 import org.apache.fineract.cn.customer.api.v1.domain.*;
-import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
-import org.apache.fineract.cn.customer.internal.repository.DocumentEntity;
-import org.apache.fineract.cn.customer.internal.repository.DocumentEntryEntity;
-import org.apache.fineract.cn.customer.internal.repository.DocumentPageEntity;
+import org.apache.fineract.cn.customer.internal.repository.*;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -155,5 +152,27 @@ public class DocumentMapper {
         return ret;
     }
 
+
+    public static DocumentStorage map(final DocumentStorageEntity documentStorageEntity) {
+        DocumentStorage documentStorage = new DocumentStorage();
+
+        documentStorage.setContentType(documentStorageEntity.getContentType());
+        documentStorage.setDocumentName(documentStorageEntity.getDocumentName());
+        documentStorage.setUuid(documentStorageEntity.getUuid());
+        documentStorage.setSize(documentStorageEntity.getSize());
+        documentStorage.setCreatedBy(documentStorageEntity.getCreatedBy());
+
+        return documentStorage;
+    }
+
+    public static DocumentStorageEntity map(final MultipartFile multipartFile, final String createdBy) throws IOException {
+        DocumentStorageEntity storageEntity = new DocumentStorageEntity();
+        storageEntity.setContentType(multipartFile.getContentType());
+        storageEntity.setDocumentName(multipartFile.getOriginalFilename());
+        storageEntity.setImage(multipartFile.getBytes());
+        storageEntity.setSize(multipartFile.getSize());
+        storageEntity.setCreatedBy(createdBy);
+        return storageEntity;
+    }
 
 }

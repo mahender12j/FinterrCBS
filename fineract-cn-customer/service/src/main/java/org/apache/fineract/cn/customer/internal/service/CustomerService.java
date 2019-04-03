@@ -257,7 +257,7 @@ public class CustomerService {
         if (customerEntity.isPresent()) {
             return customerEntity.map(entity -> {
                 final Customer customerNgo = CustomerMapper.map(entity);
-                
+
                 // final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
                 // if (contactDetailEntities != null) {
                 //     customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
@@ -278,8 +278,11 @@ public class CustomerService {
     }
 
     public final Optional<PortraitEntity> findPortrait(final String identifier) {
-        return customerRepository.findByIdentifier(identifier)
-                .map(portraitRepository::findByCustomer);
+        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifier(identifier);
+        if (customerEntity.isPresent()) {
+            throw ServiceException.notFound("Customer {0} not found.", identifier);
+        } else return customerEntity.map(portraitRepository::findByCustomer);
+
     }
 
     public final Stream<IdentificationCard> fetchIdentificationCardsByCustomer(final String identifier) {
