@@ -68,11 +68,23 @@ public class DocumentsRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
+            value = "/uploaded",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
     public ResponseEntity<CustomerDocument> getDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
+        throwIfCustomerNotExists(customerIdentifier);
+        return ResponseEntity.ok(documentService.findCustomerUploadedDocuments(customerIdentifier));
+    }
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<CustomerDocument> getUploadedDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
         return ResponseEntity.ok(documentService.findCustomerDocuments(customerIdentifier));
     }

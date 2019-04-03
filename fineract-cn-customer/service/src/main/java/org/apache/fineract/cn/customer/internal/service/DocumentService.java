@@ -114,6 +114,20 @@ public class DocumentService {
         return customerDocument;
     }
 
+    public CustomerDocument findCustomerUploadedDocuments(final String customerIdentifier) {
+        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).findFirst();
+        CustomerDocument customerDocument = new CustomerDocument();
+        if (documentEntity.isPresent()) {
+            customerDocument = DocumentMapper.map(documentEntity.get());
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatus(documentEntity.get(), "UPLOADED").stream()
+                    .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+            List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
+            customerDocument.setDocumentsTypes(documentsType);
+            customerDocument.setKycStatus(documentsType.stream().allMatch(d -> d.isKYCVerified()));
+        }
+        return customerDocument;
+    }
+
     public List<DocumentEntryEntity> findUploadedDocumentEntries(final String customerIdentifier) {
         final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).findFirst();
         List<DocumentEntryEntity> entries = this.documentEntryRepository.findByDocumentAndStatus(documentEntity.get(), "UPLOADED");
