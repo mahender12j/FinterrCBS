@@ -105,7 +105,8 @@ public class DocumentCommandHandler {
                 .orElseThrow(() -> ServiceException.badRequest("Document not found"));
 
         final DocumentEntryEntity documentEntryEntity = DocumentMapper.map(command.getCustomerDocumentsBody(), documentEntity);
-        documentEntryEntity.setStatus("PENDING");
+        // documentEntryEntity.setStatus("PENDING");
+        documentEntryEntity.setStatus("UPLOADED");
         DocumentEntryEntity doc = documentEntryRepository.save(documentEntryEntity);
         final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getFile(), 1, documentEntity, doc);
         documentPageRepository.save(documentPageEntity);
