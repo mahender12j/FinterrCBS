@@ -228,6 +228,22 @@ public class DocumentsRestController {
                 .body(documentPageEntity.getImage());
     }
 
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/submit",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> submitKycDocuments(@PathVariable("customeridentifier") final String customerIdentifier) throws IOException {
+        throwIfCustomerNotExists(customerIdentifier);
+
+        documentService.submitDocuments(customerIdentifier);
+        System.out.println("Okay");
+        return ResponseEntity.accepted().build();
+    }
+
     //    ------------------ create document data with data --------------------------
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(

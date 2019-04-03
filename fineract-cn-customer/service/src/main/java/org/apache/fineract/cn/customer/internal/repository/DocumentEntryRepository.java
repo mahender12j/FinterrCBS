@@ -37,6 +37,8 @@ public interface DocumentEntryRepository extends JpaRepository<DocumentEntryEnti
 
     List<DocumentEntryEntity> findByDocumentAndStatusNotAndStatusNot(final DocumentEntity documentEntity, final String documentStatus, final String dcStatus);
 
+    List<DocumentEntryEntity> findByDocumentAndStatus(final DocumentEntity documentEntity, final String documentStatus);
+
     Optional<DocumentEntryEntity> findById(final Long documentId);
 
 

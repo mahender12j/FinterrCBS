@@ -114,6 +114,12 @@ public class DocumentService {
         return customerDocument;
     }
 
+    public List<DocumentEntryEntity> findUploadedDocumentEntries(final String customerIdentifier) {
+        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).findFirst();
+        List<DocumentEntryEntity> entries = this.documentEntryRepository.findByDocumentAndStatus(documentEntity.get(), "UPLOADED");
+        return entries;
+    }
+
     public Optional<CustomerDocumentEntry> findDocument(final String customerIdentifier,
                                                         final Long documentIdentifier) {
         return this.documentEntryRepository.findByCustomerIdAndDocumentId(customerIdentifier, documentIdentifier)
@@ -132,6 +138,14 @@ public class DocumentService {
                                            final String documentIdentifier) {
         return documentPageRepository.findByCustomerIdAndDocumentIdentifier(customerIdentifier, documentIdentifier)
                 .map(DocumentPageEntity::getPageNumber);
+    }
+
+    public void submitDocuments(final String customerIdentifier) {
+        List<DocumentEntryEntity> entries = this.findUploadedDocumentEntries(customerIdentifier);
+        entries.forEach(e -> {
+            e.setStatus("PENDING");
+        });
+        documentEntryRepository.save(entries);
     }
 
     public boolean isDocumentCompleted(final String customerIdentifier,
