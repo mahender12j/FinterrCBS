@@ -32,6 +32,7 @@ import org.apache.fineract.cn.customer.internal.command.CreateDocumentCommand;
 import org.apache.fineract.cn.customer.internal.command.CreateKYCDocumentCommand;
 import org.apache.fineract.cn.customer.internal.command.DeleteDocumentCommand;
 import org.apache.fineract.cn.customer.internal.repository.DocumentPageEntity;
+import org.apache.fineract.cn.customer.internal.repository.DocumentStorageEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.lang.ServiceException;
@@ -166,6 +167,7 @@ public class DocumentsRestController {
     }
 
 
+//    upload document on each and return the document from the storage
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
             value = "/new",
@@ -179,6 +181,29 @@ public class DocumentsRestController {
             @RequestParam(value = "file") final MultipartFile file) throws IOException {
 
         return this.documentService.addNewDocument(file, customeridentifier);
+    }
+
+
+//    receive the storage file
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/file/{uuid}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+
+    public ResponseEntity<byte[]> getStorageDocument(
+            @PathVariable("customeridentifier") final String customerIdentifier,
+            @PathVariable("uuid") final String uuid) {
+
+        final DocumentStorageEntity storageEntity = documentService.findDocumentStorageByUUID(uuid)
+                .orElseThrow(() -> ServiceException.notFound("document ''{0}'' not found.", uuid));
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.parseMediaType(storageEntity.getContentType()))
+                .contentLength(storageEntity.getImage().length)
+                .body(storageEntity.getImage());
     }
 
 

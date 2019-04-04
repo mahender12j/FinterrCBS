@@ -155,7 +155,7 @@ public class DocumentMapper {
 
     public static DocumentStorage map(final DocumentStorageEntity documentStorageEntity) {
         DocumentStorage documentStorage = new DocumentStorage();
-
+        documentStorage.setId(documentStorageEntity.getId());
         documentStorage.setContentType(documentStorageEntity.getContentType());
         documentStorage.setDocumentName(documentStorageEntity.getDocumentName());
         documentStorage.setUuid(documentStorageEntity.getUuid());

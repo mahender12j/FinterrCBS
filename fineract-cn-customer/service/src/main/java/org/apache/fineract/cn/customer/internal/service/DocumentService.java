@@ -73,7 +73,6 @@ public class DocumentService {
 
     public DocumentStorage addNewDocument(final MultipartFile multipartFile, final String customeridentifier) throws IOException {
         DocumentStorageEntity storageEntity = DocumentMapper.map(multipartFile, customeridentifier);
-
         DocumentStorageEntity entity = this.documentStorageRepository.save(storageEntity);
         return DocumentMapper.map(entity);
     }
@@ -87,6 +86,11 @@ public class DocumentService {
         } else {
             throw ServiceException.notFound("Document {0} not found.", uuid);
         }
+    }
+
+
+    public Optional<DocumentStorageEntity> findDocumentStorageByUUID(final String uuid) {
+        return this.documentStorageRepository.findByUuid(uuid);
     }
 
 
