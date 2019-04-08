@@ -286,11 +286,11 @@ public class CauseRestController {
     )
     public @ResponseBody
     ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
-                                      @RequestBody final Cause cause) {
+                                      @RequestBody final CauseApprove cause) {
         Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
         if (causeEntity.isPresent()) {
             if (causeEntity.get().getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
-                this.commandGateway.process(new ApproveCauseCommand(identifier, Double.parseDouble(cause.getFinRate()), cause.getManagementFee()));
+                this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate(), cause.getSuccessFees()));
             } else {
                 throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
             }
