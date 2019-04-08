@@ -290,9 +290,9 @@ public class CauseRestController {
         Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
         if (causeEntity.isPresent()) {
             if (causeEntity.get().getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
-                this.commandGateway.process(new ApproveCauseCommand(identifier, Double.parseDouble(cause.getFinRate()), cause.getManagementFee(), cause.getPublishDate()));
+                this.commandGateway.process(new ApproveCauseCommand(identifier, Double.parseDouble(cause.getFinRate()), cause.getManagementFee()));
             } else {
-                throw ServiceException.conflict("Cause {0} not APPROVED state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
+                throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
             }
 
         } else {

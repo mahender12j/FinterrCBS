@@ -26,18 +26,15 @@ public class ApproveCauseCommand {
     private final String identifier;
     private final Double finRate;
     private final Double successFees;
-    private final LocalDateTime publishDate;
 
 
     public ApproveCauseCommand(final String identifier,
                                final Double finRate,
-                               final Double successFees,
-                               final LocalDateTime publishDate) {
+                               final Double successFees) {
         super();
         this.identifier = identifier;
         this.finRate = finRate;
         this.successFees = successFees;
-        this.publishDate = publishDate;
     }
 
     public String getIdentifier() {
@@ -50,9 +47,5 @@ public class ApproveCauseCommand {
 
     public Double getSuccessFees() {
         return successFees;
-    }
-
-    public LocalDateTime getPublishDate() {
-        return publishDate;
     }
 }
