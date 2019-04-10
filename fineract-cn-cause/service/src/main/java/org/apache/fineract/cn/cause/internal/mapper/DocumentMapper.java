@@ -106,7 +106,7 @@ public class DocumentMapper {
         pageEntity.forEach(d -> {
             CauseDocumentPage causeDocumentPage = new CauseDocumentPage();
             causeDocumentPage.setId(d.getId());
-            causeDocumentPage.setType(d.getType());
+            causeDocumentPage.setType(d.getType().toLowerCase());
             causeDocumentPage.setIsMapped(CauseDocumentPage.MappedState.valueOf(d.getIsMapped()));
             causeDocumentPage.setDocumentName(d.getDocumentName());
             causeDocumentPage.setDocRef(d.getDocRef());
@@ -119,7 +119,7 @@ public class DocumentMapper {
 
     public static CauseDocumentPage map(DocumentPageEntity pageEntity) {
         CauseDocumentPage causeDocumentPage = new CauseDocumentPage();
-        causeDocumentPage.setType(pageEntity.getType());
+        causeDocumentPage.setType(pageEntity.getType().toLowerCase());
         causeDocumentPage.setId(pageEntity.getId());
         causeDocumentPage.setDocRef(pageEntity.getDocRef());
         causeDocumentPage.setIsMapped(CauseDocumentPage.MappedState.valueOf(pageEntity.getIsMapped()));
@@ -134,7 +134,7 @@ public class DocumentMapper {
             DocumentPageEntity pageEntity = new DocumentPageEntity();
             pageEntity.setDocRef(causeFiles.getUuid());
             pageEntity.setIsMapped(CauseDocumentPage.MappedState.ACTIVE.name());
-            pageEntity.setType(causeFiles.getType());
+            pageEntity.setType(causeFiles.getType().toLowerCase());
             pageEntity.setDocumentName(causeFiles.getDocName());
             pageEntity.setDocument(documentEntity);
             documentPageEntityList.add(pageEntity);
