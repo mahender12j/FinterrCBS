@@ -23,23 +23,13 @@ package org.apache.fineract.cn.identity.internal.command;
  */
 @SuppressWarnings("unused")
 public class AccessTokenAuthenticationCommand {
-    private String useridentifier;
     private String accessToken;
 
     AccessTokenAuthenticationCommand() {
     }
 
-    public AccessTokenAuthenticationCommand(String useridentifier, String accessToken) {
-        this.useridentifier = useridentifier;
+    public AccessTokenAuthenticationCommand(String accessToken) {
         this.accessToken = accessToken;
-    }
-
-    public String getUseridentifier() {
-        return useridentifier;
-    }
-
-    public void setUseridentifier(String useridentifier) {
-        this.useridentifier = useridentifier;
     }
 
     public String getAccessToken() {

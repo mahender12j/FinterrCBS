@@ -136,10 +136,9 @@ public class AuthorizationRestController {
     @ResponseBody
     ResponseEntity<Authentication> renewToken(final HttpServletResponse response,
                                               final HttpServletRequest request,
-                                              @RequestHeader(value = "userIdentifier") final String useridentifier,
                                               @RequestHeader(value = "accessToken") final String accessToken) throws InterruptedException {
         try {
-            final Authentication ret = map(getAuthenticationCommandResponse(new AccessTokenAuthenticationCommand(useridentifier, accessToken)), response);
+            final Authentication ret = map(getAuthenticationCommandResponse(new AccessTokenAuthenticationCommand(accessToken)), response);
             return new ResponseEntity<>(ret, HttpStatus.OK);
         } catch (final AmitAuthenticationException e) {
             System.out.println("access in catch block for token");
