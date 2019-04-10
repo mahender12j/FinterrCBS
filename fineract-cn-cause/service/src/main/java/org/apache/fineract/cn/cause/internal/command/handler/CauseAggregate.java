@@ -181,7 +181,9 @@ public class CauseAggregate {
         causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
         this.causeRepository.save(causeEntity);
 
-        List<DocumentPageEntity> pageEntities = this.documentPageRepository.findByDocumentAndIsMapped(documentRepository.findByCause(causeEntity), CauseDocumentPage.MappedState.UPLOADED.name());
+        List<DocumentPageEntity> pageEntities = this.documentPageRepository
+                .findByDocumentAndIsMapped(documentRepository
+                        .findByCause(causeEntity), CauseDocumentPage.MappedState.UPLOADED.name());
         pageEntities.forEach(pageEntity -> pageEntity.setIsMapped(CauseDocumentPage.MappedState.ACTIVE.name()));
         this.documentPageRepository.save(pageEntities);
         return cause.getIdentifier();

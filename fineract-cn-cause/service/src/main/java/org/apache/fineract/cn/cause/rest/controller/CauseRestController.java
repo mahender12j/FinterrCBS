@@ -100,10 +100,9 @@ public class CauseRestController {
     )
     public @ResponseBody
     ResponseEntity<Void> createCause(@RequestBody final Cause cause) {
-        if (this.causeService.causeExists(cause.getIdentifier()))
-            throw ServiceException.conflict("Cause {0} already exists in this system, Please try another name.", cause.getIdentifier());
-        System.out.println("the cause data:" + cause.toString());
-        System.out.println("the cause file:" + cause.getCauseFiles().toString());
+        throwIfCauseExists(cause.getIdentifier());
+        throwIfDocumentNotValid(cause);
+
         this.commandGateway.process(new CreateCauseCommand(cause));
         return ResponseEntity.accepted().build();
     }
@@ -737,9 +736,28 @@ public class CauseRestController {
         return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);
     }
 
+
     private void throwIfCauseNotExists(final String identifier) {
         if (!this.causeService.causeExists(identifier)) {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
+        }
+    }
+
+
+    private void throwIfCauseExists(final String identifier) {
+        if (this.causeService.causeExists(identifier)) {
+            throw ServiceException.notFound("Cause {0} already exist.", identifier);
+        }
+    }
+
+
+    private void throwIfDocumentNotValid(Cause cause) {
+        if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("terms"))) {
+            throw ServiceException.badRequest("Terms document is required");
+        } else if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("feature"))) {
+            throw ServiceException.badRequest("Feature document is required");
+        } else if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("Tax")) && cause.getTaxExamption()) {
+            throw ServiceException.badRequest("Tax document is required when Tax exemption is false");
         }
     }
 
