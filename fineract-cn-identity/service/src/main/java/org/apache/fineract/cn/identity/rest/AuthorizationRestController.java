@@ -138,7 +138,7 @@ public class AuthorizationRestController {
                                               final HttpServletRequest request,
                                               @RequestHeader(value = "accessToken") final String accessToken) throws InterruptedException {
         try {
-            final Authentication ret = map(getAuthenticationCommandResponse(new AccessTokenAuthenticationCommand(accessToken)), response);
+            final Authentication ret = mapAccess(getAuthenticationCommandResponse(new AccessTokenAuthenticationCommand(accessToken)), response);
             return new ResponseEntity<>(ret, HttpStatus.OK);
         } catch (final AmitAuthenticationException e) {
             System.out.println("access in catch block for token");
@@ -210,6 +210,19 @@ public class AuthorizationRestController {
         return new Authentication(
                 commandResponse.getAccessToken(),
                 commandResponse.getRefreshToken(),
+                commandResponse.getAccessTokenExpiration(),
+                commandResponse.getRefreshTokenExpiration(),
+                commandResponse.getPasswordExpiration());
+    }
+
+    private Authentication mapAccess(
+            final AuthenticationCommandResponse commandResponse,
+            final HttpServletResponse httpServletResponse) {
+        httpServletResponse.addCookie(bakeRefreshTokenCookie(commandResponse.getRefreshToken()));
+
+        return new Authentication(
+                commandResponse.getRefreshToken(),
+                commandResponse.getAccessToken(),
                 commandResponse.getAccessTokenExpiration(),
                 commandResponse.getRefreshTokenExpiration(),
                 commandResponse.getPasswordExpiration());
