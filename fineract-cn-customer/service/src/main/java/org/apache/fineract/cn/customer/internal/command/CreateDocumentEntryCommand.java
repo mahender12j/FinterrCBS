@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.customer.internal.command;
 
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,35 +26,20 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Myrle Krantz
  */
 public class CreateDocumentEntryCommand {
-    private final String customerIdentifier;
-    private final String documentIdentifier;
-    private final CustomerDocumentEntry documentEntry;
-    private final MultipartFile file;
 
-    public CreateDocumentEntryCommand(
-            final MultipartFile file,
-            final String customerIdentifier,
-            final String documentIdentifier,
-            final CustomerDocumentEntry customerDocumentStatus) {
-        this.customerIdentifier = customerIdentifier;
-        this.documentIdentifier = documentIdentifier;
-        this.documentEntry = customerDocumentStatus;
-        this.file = file;
+    private final CustomerDocument customerDocument;
+    private final String customeridentifier;
+
+    public CreateDocumentEntryCommand(CustomerDocument customerDocument, String customeridentifier) {
+        this.customerDocument = customerDocument;
+        this.customeridentifier = customeridentifier;
     }
 
-    public String getCustomerIdentifier() {
-        return customerIdentifier;
+    public CustomerDocument getCustomerDocument() {
+        return customerDocument;
     }
 
-    public String getDocumentIdentifier() {
-        return documentIdentifier;
-    }
-
-    public CustomerDocumentEntry getDocumentEntry() {
-        return documentEntry;
-    }
-
-    public MultipartFile getFile() {
-        return this.file;
+    public String getCustomeridentifier() {
+        return customeridentifier;
     }
 }

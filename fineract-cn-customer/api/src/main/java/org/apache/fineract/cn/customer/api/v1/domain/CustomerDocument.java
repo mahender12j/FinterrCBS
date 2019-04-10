@@ -46,6 +46,7 @@ public class CustomerDocument {
     private boolean kycStatus;
 
     private List<DocumentsType> documentsTypes;
+    private List<KycDocuments> kycDocuments;
 
 
     public CustomerDocument() {
@@ -101,6 +102,15 @@ public class CustomerDocument {
 
     public boolean isKycStatus() {
         return kycStatus;
+    }
+
+
+    public List<KycDocuments> getKycDocuments() {
+        return kycDocuments;
+    }
+
+    public void setKycDocuments(List<KycDocuments> kycDocuments) {
+        this.kycDocuments = kycDocuments;
     }
 
     public void setKycStatus(boolean kycStatus) {

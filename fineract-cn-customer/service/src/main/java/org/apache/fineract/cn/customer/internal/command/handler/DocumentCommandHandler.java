@@ -28,6 +28,7 @@ import org.apache.fineract.cn.customer.internal.repository.*;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
@@ -60,22 +61,18 @@ public class DocumentCommandHandler {
         this.documentEntryRepository = documentEntryRepository;
     }
 
-//    @Transactional
-//    @CommandHandler
-//    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_PAGE)
-//    public DocumentPageEvent process(final CreateDocumentEntryCommand command) throws IOException {
-//        final DocumentEntity documentEntity = documentRepository.findByCustomerIdAndDocumentIdentifier(
-//                command.getCustomerIdentifier(),
-//                command.getDocumentIdentifier())
-//                .orElseThrow(() -> ServiceException.badRequest("Document not found"));
-//
-//        final DocumentEntryEntity documentEntryEntity = DocumentMapper.map(command.getDocumentEntry(), documentEntity);
-//        documentEntryEntity.setStatus("PENDING");
-//        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getFile(), 1, documentEntity, documentEntryEntity);
-//        documentEntryRepository.save(documentEntryEntity);
-//        documentPageRepository.save(documentPageEntity);
-//        return new DocumentPageEvent(command.getCustomerIdentifier(), command.getDocumentIdentifier(), 1);
-//    }
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_PAGE)
+    public DocumentPageEvent process(final CreateDocumentEntryCommand command) {
+        DocumentEntity documentEntity = documentRepository.findByCustomerId(command.getCustomeridentifier())
+                .findFirst().orElseThrow(() -> ServiceException.notFound("Customer not found"));
+
+        List<DocumentEntryEntity> documentEntryEntityList = DocumentMapper.map(command.getCustomerDocument().getKycDocuments(), documentEntity);
+        this.documentEntryRepository.save(documentEntryEntityList);
+        return new DocumentPageEvent(command.getCustomeridentifier(), command.getCustomeridentifier(), 1);
+
+    }
 
 //    @Transactional
 //    @CommandHandler

@@ -195,11 +195,9 @@ public class CauseRestController {
     public @ResponseBody
     ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier,
                                      @RequestBody final Cause cause) {
-        if (this.causeService.causeExists(identifier)) {
-            this.commandGateway.process(new UpdateCauseCommand(identifier, cause));
-        } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
-        }
+        throwIfCauseNotExists(cause.getIdentifier());
+        throwIfDocumentNotValid(cause);
+        this.commandGateway.process(new UpdateCauseCommand(identifier, cause));
         return ResponseEntity.accepted().build();
     }
 

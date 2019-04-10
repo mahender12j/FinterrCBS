@@ -185,6 +185,8 @@ public class CauseAggregate {
                 .findByDocumentAndIsMapped(documentRepository
                         .findByCause(causeEntity), CauseDocumentPage.MappedState.UPLOADED.name());
         pageEntities.forEach(pageEntity -> pageEntity.setIsMapped(CauseDocumentPage.MappedState.ACTIVE.name()));
+
+
         this.documentPageRepository.save(pageEntities);
         return cause.getIdentifier();
     }

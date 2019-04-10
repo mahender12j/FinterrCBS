@@ -175,4 +175,21 @@ public class DocumentMapper {
         return storageEntity;
     }
 
+    public static List<DocumentEntryEntity> map(List<KycDocuments> kycDocuments, DocumentEntity documentEntity) {
+        List<DocumentEntryEntity> documentEntryEntityList = new ArrayList<>();
+        kycDocuments.forEach(doc -> {
+            DocumentEntryEntity documents = new DocumentEntryEntity();
+            documents.setDescription(doc.getDescription());
+            documents.setDocumentName(doc.getDocName());
+            documents.setSubType(doc.getSubType());
+            documents.setType(doc.getType());
+            documents.setDocRef(doc.getUuid());
+            documents.setCreatedBy(UserContextHolder.checkedGetUser());
+            documents.setStatus("PENDING");
+            documents.setDocument(documentEntity);
+            documentEntryEntityList.add(documents);
+        });
+        return documentEntryEntityList;
+    }
+
 }

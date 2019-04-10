@@ -39,6 +39,13 @@ public class DocumentEntryEntity {
     @JoinColumn(name = "document_id")
     private DocumentEntity document;
 
+
+    @Column(name = "document_name")
+    private String documentName;
+
+    @Column(name = "uuid")
+    private String docRef;
+
     @Column(name = "created_by")
     private String createdBy;
 
@@ -177,6 +184,22 @@ public class DocumentEntryEntity {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getDocumentName() {
+        return documentName;
+    }
+
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
+    }
+
+    public String getDocRef() {
+        return docRef;
+    }
+
+    public void setDocRef(String docRef) {
+        this.docRef = docRef;
     }
 
     public void setDescription(String description) {

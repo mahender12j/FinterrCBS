@@ -27,10 +27,7 @@ import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentsBody;
 import org.apache.fineract.cn.customer.api.v1.domain.DocumentStorage;
-import org.apache.fineract.cn.customer.internal.command.ChangeDocumentStatusCommand;
-import org.apache.fineract.cn.customer.internal.command.CreateDocumentCommand;
-import org.apache.fineract.cn.customer.internal.command.CreateKYCDocumentCommand;
-import org.apache.fineract.cn.customer.internal.command.DeleteDocumentCommand;
+import org.apache.fineract.cn.customer.internal.command.*;
 import org.apache.fineract.cn.customer.internal.repository.DocumentPageEntity;
 import org.apache.fineract.cn.customer.internal.repository.DocumentStorageEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
@@ -167,7 +164,7 @@ public class DocumentsRestController {
     }
 
 
-//    upload document on each and return the document from the storage
+    //    upload document on each and return the document from the storage
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
             value = "/new",
@@ -184,7 +181,7 @@ public class DocumentsRestController {
     }
 
 
-//    receive the storage file
+    //    receive the storage file
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
             value = "/file/{uuid}",
@@ -272,12 +269,13 @@ public class DocumentsRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-    public @ResponseBody
-    ResponseEntity<Void> submitKycDocuments(@PathVariable("customeridentifier") final String customerIdentifier) throws IOException {
+    public
+    @ResponseBody
+    ResponseEntity<Void> submitKycDocuments(
+            @PathVariable("customeridentifier") final String customerIdentifier,
+            @RequestBody CustomerDocument customerDocument) {
         throwIfCustomerNotExists(customerIdentifier);
-
-        documentService.submitDocuments(customerIdentifier);
-        System.out.println("Okay");
+        commandGateway.process(new CreateDocumentEntryCommand(customerDocument, customerIdentifier));
         return ResponseEntity.accepted().build();
     }
 
