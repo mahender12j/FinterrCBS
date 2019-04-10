@@ -85,33 +85,33 @@ public class DocumentCommandHandler {
 //    }
 
 
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_DOCUMENT)
-    public DocumentEvent process(final CreateDocumentCommand command) throws IOException {
-        CauseEntity causeEntity = causeRepository.findByIdentifier(command.getCauseIdentifier()).get();
-        System.out.println("------------------cause identifier----------------------" + causeEntity.toString());
-
-        DocumentEntity documentEntity = documentRepository.save(DocumentMapper.map(causeEntity));
-
-        System.out.println("-----------------------documentEntity--------------------" + documentEntity.toString());
-
-        DocumentPageEntity FeaturePageEntity = DocumentMapper.map(command.getFeature(), documentEntity, "Feature");
-//        DocumentPageEntity FeaturePageEntity = DocumentMapper.map(command.getFeature(), documentEntity, "Gallary");
-        DocumentPageEntity TaxPageEntity = DocumentMapper.map(command.getTax(), documentEntity, "Tax");
-        DocumentPageEntity TermsPageEntity = DocumentMapper.map(command.getTerms(), documentEntity, "Terms");
-        DocumentPageEntity OtherPageEntity = DocumentMapper.map(command.getOther(), documentEntity, "Other");
-
-
-        documentPageRepository.save(FeaturePageEntity);
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_DOCUMENT)
+//    public DocumentEvent process(final CreateDocumentCommand command) throws IOException {
+//        CauseEntity causeEntity = causeRepository.findByIdentifier(command.getCauseIdentifier()).get();
+//        System.out.println("------------------cause identifier----------------------" + causeEntity.toString());
+//
+//        DocumentEntity documentEntity = documentRepository.save(DocumentMapper.map(causeEntity));
+//
+//        System.out.println("-----------------------documentEntity--------------------" + documentEntity.toString());
+//
+//        DocumentPageEntity FeaturePageEntity = DocumentMapper.map(command.getFeature(), documentEntity, "Feature");
+////        DocumentPageEntity FeaturePageEntity = DocumentMapper.map(command.getFeature(), documentEntity, "Gallary");
+//        DocumentPageEntity TaxPageEntity = DocumentMapper.map(command.getTax(), documentEntity, "Tax");
+//        DocumentPageEntity TermsPageEntity = DocumentMapper.map(command.getTerms(), documentEntity, "Terms");
+//        DocumentPageEntity OtherPageEntity = DocumentMapper.map(command.getOther(), documentEntity, "Other");
+//
+//
 //        documentPageRepository.save(FeaturePageEntity);
-        documentPageRepository.save(TaxPageEntity);
-        documentPageRepository.save(TermsPageEntity);
-        documentPageRepository.save(OtherPageEntity);
-
-
-        return new DocumentEvent(command.getCauseIdentifier(), command.getCauseIdentifier());
-    }
+////        documentPageRepository.save(FeaturePageEntity);
+//        documentPageRepository.save(TaxPageEntity);
+//        documentPageRepository.save(TermsPageEntity);
+//        documentPageRepository.save(OtherPageEntity);
+//
+//
+//        return new DocumentEvent(command.getCauseIdentifier(), command.getCauseIdentifier());
+//    }
 
     @Transactional
     @CommandHandler

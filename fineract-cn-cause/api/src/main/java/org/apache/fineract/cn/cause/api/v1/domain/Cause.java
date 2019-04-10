@@ -98,6 +98,7 @@ public class Cause {
 
     private LocalDateTime publishDate;
     private List<CauseRating> causeRatingList;
+    private List<CauseFiles> causeFiles;
 
 
     public Cause() {
@@ -439,6 +440,14 @@ public class Cause {
 
     public void setRejectedReason(String rejectedReason) {
         this.rejectedReason = rejectedReason;
+    }
+
+    public List<CauseFiles> getCauseFiles() {
+        return causeFiles;
+    }
+
+    public void setCauseFiles(List<CauseFiles> causeFiles) {
+        this.causeFiles = causeFiles;
     }
 
     @Override

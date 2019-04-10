@@ -26,7 +26,6 @@ import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentPageEntity;
 import org.apache.fineract.cn.lang.DateConverter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -43,17 +42,17 @@ public class DocumentMapper {
     }
 
 
-    public static DocumentPageEntity map(
-            final MultipartFile multipartFile,
-            final DocumentEntity documentEntity) throws IOException {
-        final DocumentPageEntity ret = new DocumentPageEntity();
-        ret.setDocument(documentEntity);
-        ret.setImage(multipartFile.getBytes());
-        ret.setDocumentName(multipartFile.getOriginalFilename());
-        ret.setSize(multipartFile.getSize());
-        ret.setContentType(multipartFile.getContentType());
-        return ret;
-    }
+//    public static DocumentPageEntity map(
+//            final MultipartFile multipartFile,
+//            final DocumentEntity documentEntity) throws IOException {
+//        final DocumentPageEntity ret = new DocumentPageEntity();
+//        ret.setDocument(documentEntity);
+//        ret.setImage(multipartFile.getBytes());
+//        ret.setDocumentName(multipartFile.getOriginalFilename());
+//        ret.setSize(multipartFile.getSize());
+//        ret.setContentType(multipartFile.getContentType());
+//        return ret;
+//    }
 
     public static CauseDocument map(final DocumentEntity documentEntity) {
         final CauseDocument ret = new CauseDocument();
@@ -89,28 +88,28 @@ public class DocumentMapper {
     }
 
 
-    public static DocumentPageEntity map(final MultipartFile multipartFile, DocumentEntity documentEntity, final String type) throws IOException {
-        DocumentPageEntity pageEntity = new DocumentPageEntity();
-        pageEntity.setDocument(documentEntity);
-        pageEntity.setContentType(multipartFile.getContentType());
-        pageEntity.setImage(multipartFile.getBytes());
-        pageEntity.setSize(multipartFile.getSize());
-        pageEntity.setDocumentName(multipartFile.getOriginalFilename());
-        pageEntity.setType(type);
-        pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
-        return pageEntity;
-    }
+//    public static DocumentPageEntity map(final MultipartFile multipartFile, DocumentEntity documentEntity, final String type) throws IOException {
+//        DocumentPageEntity pageEntity = new DocumentPageEntity();
+//        pageEntity.setDocument(documentEntity);
+//        pageEntity.setContentType(multipartFile.getContentType());
+//        pageEntity.setImage(multipartFile.getBytes());
+//        pageEntity.setSize(multipartFile.getSize());
+//        pageEntity.setDocumentName(multipartFile.getOriginalFilename());
+//        pageEntity.setType(type);
+//        pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
+//        return pageEntity;
+//    }
 
 
     public static List<CauseDocumentPage> map(List<DocumentPageEntity> pageEntity) {
         List<CauseDocumentPage> documentPages = new ArrayList<>();
-
         pageEntity.forEach(d -> {
             CauseDocumentPage causeDocumentPage = new CauseDocumentPage();
             causeDocumentPage.setId(d.getId());
             causeDocumentPage.setType(d.getType());
             causeDocumentPage.setIsMapped(CauseDocumentPage.MappedState.valueOf(d.getIsMapped()));
             causeDocumentPage.setDocumentName(d.getDocumentName());
+            causeDocumentPage.setDocRef(d.getDocRef());
             documentPages.add(causeDocumentPage);
         });
 
@@ -122,10 +121,26 @@ public class DocumentMapper {
         CauseDocumentPage causeDocumentPage = new CauseDocumentPage();
         causeDocumentPage.setType(pageEntity.getType());
         causeDocumentPage.setId(pageEntity.getId());
+        causeDocumentPage.setDocRef(pageEntity.getDocRef());
         causeDocumentPage.setIsMapped(CauseDocumentPage.MappedState.valueOf(pageEntity.getIsMapped()));
         causeDocumentPage.setDocumentName(pageEntity.getDocumentName());
 
         return causeDocumentPage;
+    }
+
+    public static List<DocumentPageEntity> map(Cause cause, DocumentEntity documentEntity) {
+        List<DocumentPageEntity> documentPageEntityList = new ArrayList<>();
+        cause.getCauseFiles().forEach(causeFiles -> {
+            DocumentPageEntity pageEntity = new DocumentPageEntity();
+            pageEntity.setDocRef(causeFiles.getUuid());
+            pageEntity.setIsMapped(CauseDocumentPage.MappedState.ACTIVE.name());
+            pageEntity.setType(causeFiles.getType());
+            pageEntity.setDocumentName(causeFiles.getDocName());
+            pageEntity.setDocument(documentEntity);
+            documentPageEntityList.add(pageEntity);
+        });
+
+        return documentPageEntityList;
     }
 
 

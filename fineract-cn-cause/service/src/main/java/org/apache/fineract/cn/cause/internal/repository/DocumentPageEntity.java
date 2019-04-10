@@ -19,8 +19,6 @@
 package org.apache.fineract.cn.cause.internal.repository;
 
 import javax.persistence.*;
-import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * @author Myrle Krantz
@@ -40,6 +38,8 @@ public class DocumentPageEntity {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "doc_ref")
+    private String docRef;
 
     @Column(name = "is_mapped")
     private String isMapped;
@@ -47,18 +47,6 @@ public class DocumentPageEntity {
     @Column(name = "document_name")
     private String documentName;
 
-
-
-    @Column(name = "content_type")
-    private String contentType;
-
-
-    @Column(name = "size")
-    private Long size;
-
-    @Lob
-    @Column(name = "image")
-    private byte[] image;
 
     public DocumentPageEntity() {
     }
@@ -78,30 +66,6 @@ public class DocumentPageEntity {
 
     public void setDocument(DocumentEntity document) {
         this.document = document;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
-    public Long getSize() {
-        return size;
-    }
-
-    public void setSize(Long size) {
-        this.size = size;
-    }
-
-    public byte[] getImage() {
-        return image;
-    }
-
-    public void setImage(byte[] image) {
-        this.image = image;
     }
 
     public String getType() {
@@ -124,31 +88,29 @@ public class DocumentPageEntity {
         return documentName;
     }
 
+    public String getDocRef() {
+        return docRef;
+    }
+
+    public void setDocRef(String docRef) {
+        this.docRef = docRef;
+    }
+
+
     public void setDocumentName(String documentName) {
         this.documentName = documentName;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DocumentPageEntity that = (DocumentPageEntity) o;
-        return Objects.equals(document, that.document);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(document);
-    }
 
     @Override
     public String toString() {
         return "DocumentPageEntity{" +
                 "id=" + id +
                 ", document=" + document +
-                ", contentType='" + contentType + '\'' +
-                ", size=" + size +
-                ", image=" + Arrays.toString(image) +
+                ", type='" + type + '\'' +
+                ", docRef='" + docRef + '\'' +
+                ", isMapped='" + isMapped + '\'' +
+                ", documentName='" + documentName + '\'' +
                 '}';
     }
 }

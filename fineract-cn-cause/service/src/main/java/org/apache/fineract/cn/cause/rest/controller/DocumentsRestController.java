@@ -18,14 +18,15 @@
  */
 package org.apache.fineract.cn.cause.rest.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
-import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
-import org.apache.fineract.cn.cause.internal.command.*;
+import org.apache.fineract.cn.cause.internal.command.ChangeDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.CompleteDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.DeleteCauseDocumentCommand;
+import org.apache.fineract.cn.cause.internal.command.DeleteDocumentCommand;
 import org.apache.fineract.cn.cause.internal.repository.DocumentPageEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.DocumentService;
@@ -35,10 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,23 +76,23 @@ public class DocumentsRestController {
 
 
 //    post cause document in uploaded state
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/upload",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> postCauseDocument(
-            @PathVariable("causeidentifier") final String causeIdentifier,
-            @RequestParam("docType") final String docType,
-            @RequestParam("doc") final MultipartFile doc) {
-        throwIfCauseNotExists(causeIdentifier);
-        this.commandGateway.process(new CreateCauseDocumentCommand(docType, doc, causeIdentifier));
-        return ResponseEntity.accepted().build();
-    }
+//
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/upload",
+//            method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> postCauseDocument(
+//            @PathVariable("causeidentifier") final String causeIdentifier,
+//            @RequestParam("docType") final String docType,
+//            @RequestParam("doc") final MultipartFile doc) {
+//        throwIfCauseNotExists(causeIdentifier);
+//        this.commandGateway.process(new CreateCauseDocumentCommand(docType, doc, causeIdentifier));
+//        return ResponseEntity.accepted().build();
+//    }
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
@@ -240,46 +239,46 @@ public class DocumentsRestController {
     }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}/file",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public ResponseEntity<byte[]> getDocumentPage(
-            @PathVariable("causeidentifier") final String causeIdentifier,
-            @PathVariable("documentidentifier") final Long documentId) {
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/{documentidentifier}/file",
+//            method = RequestMethod.GET,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.ALL_VALUE
+//    )
+//    public ResponseEntity<byte[]> getDocumentPage(
+//            @PathVariable("causeidentifier") final String causeIdentifier,
+//            @PathVariable("documentidentifier") final Long documentId) {
+//
+//        final DocumentPageEntity documentPageEntity = documentService.findPage(documentId)
+//                .orElseThrow(() -> ServiceException.notFound("Page ''{0}'' of document id ''{1}'' for cause ''{2}'' not found.", documentId, causeIdentifier));
+//
+//        return ResponseEntity
+//                .ok()
+//                .contentType(MediaType.parseMediaType(documentPageEntity.getContentType()))
+//                .contentLength(documentPageEntity.getImage().length)
+//                .body(documentPageEntity.getImage());
+//    }
 
-        final DocumentPageEntity documentPageEntity = documentService.findPage(documentId)
-                .orElseThrow(() -> ServiceException.notFound("Page ''{0}'' of document id ''{1}'' for cause ''{2}'' not found.", documentId, causeIdentifier));
-
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.parseMediaType(documentPageEntity.getContentType()))
-                .contentLength(documentPageEntity.getImage().length)
-                .body(documentPageEntity.getImage());
-    }
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> createCauseDocuments(
-            @PathVariable("causeidentifier") final String causeIdentifier,
-            @RequestParam("data") final String data,
-            @RequestParam("feature") final MultipartFile feature,
-            @RequestParam("gallery") final List<MultipartFile> gallery,
-            @RequestParam("tax") final MultipartFile tax,
-            @RequestParam("terms") final MultipartFile terms,
-            @RequestParam("other") final MultipartFile other) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        Cause cause = mapper.readValue(data, Cause.class);
-        commandGateway.process(new CreateDocumentCommand(causeIdentifier, cause, feature, gallery, tax, terms, other));
-        return ResponseEntity.accepted().build();
-    }
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> createCauseDocuments(
+//            @PathVariable("causeidentifier") final String causeIdentifier,
+//            @RequestParam("data") final String data,
+//            @RequestParam("feature") final MultipartFile feature,
+//            @RequestParam("gallery") final List<MultipartFile> gallery,
+//            @RequestParam("tax") final MultipartFile tax,
+//            @RequestParam("terms") final MultipartFile terms,
+//            @RequestParam("other") final MultipartFile other) throws IOException {
+//        ObjectMapper mapper = new ObjectMapper();
+//        Cause cause = mapper.readValue(data, Cause.class);
+//        commandGateway.process(new CreateDocumentCommand(causeIdentifier, cause, feature, gallery, tax, terms, other));
+//        return ResponseEntity.accepted().build();
+//    }
 
 
     private void throwIfCauseNotExists(final String causeIdentifier) {

@@ -18,37 +18,32 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
-import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 
-import java.util.Objects;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * @author Myrle Krantz
+ * @author Padma Raju Sattineni
  */
-public class CauseDocumentPage {
 
-    public enum MappedState {
-        ACTIVE, DELETED, UPLOADED
-    }
-
-
-    private Long id;
+public class CauseFiles {
+    private String uuid;
     private String type;
-    private MappedState isMapped;
-    private String documentName;
-    private String docRef;
+    private String docName;
 
-
-    public CauseDocumentPage() {
+    public CauseFiles() {
+        super();
     }
 
-    public Long getId() {
-        return id;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getType() {
@@ -59,35 +54,21 @@ public class CauseDocumentPage {
         this.type = type;
     }
 
-    public String getDocumentName() {
-        return documentName;
+    public String getDocName() {
+        return docName;
     }
 
-    public void setDocumentName(String documentName) {
-        this.documentName = documentName;
-    }
-
-    public MappedState getIsMapped() {
-        return isMapped;
-    }
-
-    public void setIsMapped(MappedState isMapped) {
-        this.isMapped = isMapped;
-    }
-
-    public String getDocRef() {
-        return docRef;
-    }
-
-    public void setDocRef(String docRef) {
-        this.docRef = docRef;
+    public void setDocName(String docName) {
+        this.docName = docName;
     }
 
     @Override
     public String toString() {
-        return "CauseDocumentPage{" +
-                "id=" + id +
+        return "CauseFiles{" +
+                "uuid='" + uuid + '\'' +
                 ", type='" + type + '\'' +
+                ", docName='" + docName + '\'' +
                 '}';
     }
 }
+

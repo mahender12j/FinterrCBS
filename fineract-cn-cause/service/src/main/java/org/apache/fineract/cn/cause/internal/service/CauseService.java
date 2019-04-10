@@ -95,10 +95,9 @@ public class CauseService {
     public Optional<Cause> findCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
             final Cause cause = CauseMapper.map(causeEntity);
-            final DocumentEntity entity = this.documentRepository.findByIdentifier(causeEntity.getIdentifier());
-            final CauseDocument causeDocument = DocumentMapper.map(entity);
-            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocumentAndIsMapped(entity, CauseDocumentPage.MappedState.ACTIVE.name());
-
+            final DocumentEntity documentEntity = this.documentRepository.findByCause(causeEntity);
+            final CauseDocument causeDocument = DocumentMapper.map(documentEntity);
+            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocumentAndIsMapped(documentEntity, CauseDocumentPage.MappedState.ACTIVE.name());
             causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
             cause.setCauseDocument(causeDocument);
             AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
@@ -208,11 +207,10 @@ public class CauseService {
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
             }
 
-
             cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
 
-            final DocumentEntity entity = this.documentRepository.findByIdentifier(causeEntity.getIdentifier());
+            final DocumentEntity entity = this.documentRepository.findByCause(causeEntity);
             final CauseDocument causeDocument = DocumentMapper.map(entity);
             final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocumentAndIsMapped(entity, CauseDocumentPage.MappedState.ACTIVE.name());
             causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));

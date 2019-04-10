@@ -32,16 +32,12 @@ import org.apache.fineract.cn.command.annotation.EventEmitter;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author Padma Raju Sattineni
@@ -105,56 +101,35 @@ public class CauseAggregate {
             categoryEntity = this.categoryRepository.findByIdentifier(cause.getCauseCategories().getIdentifier()).get();
         }
         final CauseEntity causeEntity = CauseMapper.map(cause);
-
         causeEntity.setResubmited(false);
         causeEntity.setExtended(false);
         causeEntity.setCategory(categoryEntity);
         causeEntity.setCurrentState(Cause.State.PENDING.name());
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
+
         AddressEntity addressEntity = AddressMapper.map(cause.getAddress());
         addressEntity.setCause(causeEntity);
         this.addressRepository.save(addressEntity);
 
         DocumentEntity documentEntity = documentRepository.save(DocumentMapper.map(savedCauseEntity));
-        List<DocumentPageEntity> documentPageEntityList = new ArrayList<>();
-        documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getFeature(), documentEntity, "Feature"));
-        documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getTerms(), documentEntity, "Terms"));
+        documentPageRepository.save(DocumentMapper.map(cause, documentEntity));
 
-        for (MultipartFile d : createCauseCommand.getGallery()) {
-            documentPageEntityList.add(DocumentMapper.map(d, documentEntity, "Gallary"));
-        }
-
-        if (createCauseCommand.getOther() != null) {
-            documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getOther(), documentEntity, "Other"));
-
-        }
-
-        if (createCauseCommand.getTax() != null) {
-            documentPageEntityList.add(DocumentMapper.map(createCauseCommand.getTax(), documentEntity, "Tax"));
-        }
-
-
-        documentPageEntityList.stream().forEach(d -> {
-            d.setIsMapped(CauseDocumentPage.MappedState.ACTIVE.name());
-        });
-
-        documentPageRepository.save(documentPageEntityList);
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.ACTIVATE);
         return cause.getIdentifier();
     }
 
 
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE_DOCUMENT)
-    public String createCause(final CreateCauseDocumentCommand createCauseDocumentCommand) throws IOException {
-        final CauseEntity causeEntity = this.findCauseEntityOrThrow(createCauseDocumentCommand.getCauseIdentifier());
-        DocumentEntity entity = documentRepository.findByCause(causeEntity);
-        DocumentPageEntity pageEntity = DocumentMapper.map(createCauseDocumentCommand.getDoc(), entity, createCauseDocumentCommand.getDocType());
-        pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
-        documentPageRepository.save(pageEntity);
-        return causeEntity.getIdentifier();
-    }
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE_DOCUMENT)
+//    public String createCause(final CreateCauseDocumentCommand createCauseDocumentCommand) throws IOException {
+//        final CauseEntity causeEntity = this.findCauseEntityOrThrow(createCauseDocumentCommand.getCauseIdentifier());
+//        DocumentEntity entity = documentRepository.findByCause(causeEntity);
+//        DocumentPageEntity pageEntity = DocumentMapper.map(createCauseDocumentCommand.getDoc(), entity, createCauseDocumentCommand.getDocType());
+//        pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
+//        documentPageRepository.save(pageEntity);
+//        return causeEntity.getIdentifier();
+//    }
 
 
     @Transactional
@@ -297,22 +272,12 @@ public class CauseAggregate {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_CAUSE)
     public String deleteCause(final DeleteCauseCommand deleteCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseCommand.getCauseIdentifier());
-
-        System.out.println("deleteCause --- CauseIndentifier :: " + deleteCauseCommand.getCauseIdentifier());
         causeEntity.setCurrentState(Cause.State.DELETED.name());
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
-        System.out.println("deleteCause --- savedCauseEntity :: " + savedCauseEntity);
-
-
-        this.commandRepository.save(
-                CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), deleteCauseCommand.comment())
-        );
-
+        this.commandRepository.save(CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), deleteCauseCommand.comment()));
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.UNLOCK);
-        System.out.println("deleteCause --- end :: " + deleteCauseCommand.getCauseIdentifier());
         return deleteCauseCommand.getCauseIdentifier();
     }
 
