@@ -28,6 +28,7 @@ import org.apache.fineract.cn.anubis.security.AmitAuthenticationException;
 import org.apache.fineract.cn.command.domain.CommandCallback;
 import org.apache.fineract.cn.command.domain.CommandProcessingException;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
+import org.apache.fineract.cn.identity.internal.command.AccessTokenAuthenticationCommand;
 import org.apache.fineract.cn.identity.internal.command.AuthenticationCommandResponse;
 import org.apache.fineract.cn.identity.internal.command.PasswordAuthenticationCommand;
 import org.apache.fineract.cn.identity.internal.command.RefreshTokenAuthenticationCommand;
@@ -122,6 +123,27 @@ public class AuthorizationRestController {
             }
             default:
                 throw ServiceException.badRequest("invalid grant type: " + grantType);
+        }
+    }
+
+
+    @RequestMapping(value = "/token/renew", method = RequestMethod.POST,
+            consumes = {MediaType.ALL_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    @Permittable(value = AcceptedTokenType.GUEST)
+    public
+    @ResponseBody
+    ResponseEntity<Authentication> renewToken(final HttpServletResponse response,
+                                              final HttpServletRequest request,
+                                              @RequestHeader(value = "userIdentifier") final String useridentifier,
+                                              @RequestHeader(value = "accessToken") final String accessToken) throws InterruptedException {
+        try {
+            final Authentication ret = map(getAuthenticationCommandResponse(new AccessTokenAuthenticationCommand(useridentifier, accessToken)), response);
+            return new ResponseEntity<>(ret, HttpStatus.OK);
+        } catch (final AmitAuthenticationException e) {
+            System.out.println("access in catch block for token");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

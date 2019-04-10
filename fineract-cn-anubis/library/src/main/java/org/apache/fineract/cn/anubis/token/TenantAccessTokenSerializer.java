@@ -19,17 +19,21 @@
 package org.apache.fineract.cn.anubis.token;
 
 import com.google.gson.Gson;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.apache.fineract.cn.anubis.api.v1.TokenConstants;
 import org.apache.fineract.cn.anubis.api.v1.domain.TokenContent;
+import org.apache.fineract.cn.anubis.provider.InvalidKeyTimestampException;
+import org.apache.fineract.cn.anubis.provider.TenantRsaKeyProvider;
+import org.apache.fineract.cn.anubis.security.AmitAuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
+import java.security.Key;
 import java.security.PrivateKey;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,85 +43,147 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class TenantAccessTokenSerializer {
 
-  final private Gson gson;
+    final private Gson gson;
 
-  @Autowired
-  public TenantAccessTokenSerializer(final @Qualifier("anubisGson") Gson gson) {
-    this.gson = gson;
-  }
-
-
-  public static class Specification {
-    private String keyTimestamp;
-    private PrivateKey privateKey;
-    private String user;
-    private TokenContent tokenContent;
-    private long secondsToLive;
-    private String sourceApplication;
-
-    public Specification setKeyTimestamp(final String keyTimestamp) {
-      this.keyTimestamp = keyTimestamp;
-      return this;
+    @Autowired
+    public TenantAccessTokenSerializer(final @Qualifier("anubisGson") Gson gson) {
+        this.gson = gson;
     }
 
-    public Specification setPrivateKey(final PrivateKey privateKey) {
-      this.privateKey = privateKey;
-      return this;
+
+    public static class Specification {
+        private String keyTimestamp;
+        private PrivateKey privateKey;
+        private String user;
+        private TokenContent tokenContent;
+        private long secondsToLive;
+        private String sourceApplication;
+
+        public Specification setKeyTimestamp(final String keyTimestamp) {
+            this.keyTimestamp = keyTimestamp;
+            return this;
+        }
+
+        public Specification setPrivateKey(final PrivateKey privateKey) {
+            this.privateKey = privateKey;
+            return this;
+        }
+
+        public Specification setUser(final String user) {
+            this.user = user;
+            return this;
+        }
+
+        public Specification setSourceApplication(final String applicationIdentifier) {
+            this.sourceApplication = applicationIdentifier;
+            return this;
+        }
+
+        public Specification setTokenContent(final TokenContent tokenContent) {
+            this.tokenContent = tokenContent;
+            return this;
+        }
+
+        public Specification setSecondsToLive(final long secondsToLive) {
+            this.secondsToLive = secondsToLive;
+            return this;
+        }
     }
 
-    public Specification setUser(final String user) {
-      this.user = user;
-      return this;
+    public TokenDeserializationResult deserialize(final TenantRsaKeyProvider tenantRsaKeyProvider, final String accessToken) {
+        final Optional<String> tokenString = getJwtTokenString(accessToken);
+        final String token = tokenString.orElseThrow(AmitAuthenticationException::invalidToken);
+        try {
+            @SuppressWarnings("unchecked") final Jwt<Header, Claims> jwt = Jwts.parser().setSigningKeyResolver(new SigningKeyResolver() {
+                @Override
+                public Key resolveSigningKey(final JwsHeader header, final Claims claims) {
+                    final TokenType tokenType = getTokenTypeFromClaims(claims);
+                    final String keyTimestamp = getKeyTimestampFromClaims(claims);
+
+                    try {
+                        return tenantRsaKeyProvider.getPublicKey(keyTimestamp);
+                    } catch (final IllegalArgumentException e) {
+                        throw AmitAuthenticationException.missingTenant();
+                    } catch (final InvalidKeyTimestampException e) {
+                        throw AmitAuthenticationException.invalidTokenKeyTimestamp(tokenType.getIssuer(), keyTimestamp);
+                    }
+                }
+
+                @Override
+                public Key resolveSigningKey(final JwsHeader header, final String plaintext) {
+                    return null;
+                }
+            }).parse(token);
+
+            final String alg = jwt.getHeader().get("alg").toString();
+            final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.forName(alg);
+            if (!signatureAlgorithm.isRsa()) {
+                throw AmitAuthenticationException.invalidTokenAlgorithm(alg);
+            }
+            return new TokenDeserializationResult(jwt.getBody().getSubject(), jwt.getBody().getExpiration(), jwt.getBody().getIssuer(), jwt.getBody().get(TokenConstants.JWT_ENDPOINT_SET_CLAIM, String.class));
+        } catch (final JwtException e) {
+            throw AmitAuthenticationException.invalidToken();
+        }
     }
 
-    public Specification setSourceApplication(final String applicationIdentifier) {
-      this.sourceApplication = applicationIdentifier;
-      return this;
+    public TokenSerializationResult build(final Specification specification) {
+        final long issued = System.currentTimeMillis();
+
+        final String serializedTokenContent = gson.toJson(specification.tokenContent);
+
+        if (specification.keyTimestamp == null) {
+            throw new IllegalArgumentException("token signature timestamp must not be null.");
+        }
+        if (specification.privateKey == null) {
+            throw new IllegalArgumentException("token signature privateKey must not be null.");
+        }
+        if (specification.sourceApplication == null) {
+            throw new IllegalArgumentException("token signature source application must not be null.");
+        }
+
+        final JwtBuilder jwtBuilder =
+                Jwts.builder()
+                        .setSubject(specification.user)
+                        .claim(TokenConstants.JWT_SIGNATURE_TIMESTAMP_CLAIM, specification.keyTimestamp)
+                        .claim(TokenConstants.JWT_CONTENT_CLAIM, serializedTokenContent)
+                        .claim(TokenConstants.JWT_SOURCE_APPLICATION_CLAIM, specification.sourceApplication)
+                        .setIssuer(TokenType.TENANT.getIssuer())
+                        .setIssuedAt(new Date(issued))
+                        .signWith(SignatureAlgorithm.RS512, specification.privateKey);
+        if (specification.secondsToLive <= 0) {
+            throw new IllegalArgumentException("token secondsToLive must be positive.");
+        }
+
+        final Date expiration = new Date(issued + TimeUnit.SECONDS.toMillis(specification.secondsToLive));
+        jwtBuilder.setExpiration(expiration);
+
+        return new TokenSerializationResult(TokenConstants.PREFIX + jwtBuilder.compact(), expiration);
     }
 
-    public Specification setTokenContent(final TokenContent tokenContent) {
-      this.tokenContent = tokenContent;
-      return this;
+    private @Nonnull
+    String getKeyTimestampFromClaims(final Claims claims) {
+        return claims.get(TokenConstants.JWT_SIGNATURE_TIMESTAMP_CLAIM, String.class);
     }
 
-    public Specification setSecondsToLive(final long secondsToLive) {
-      this.secondsToLive = secondsToLive;
-      return this;
-    }
-  }
-
-  public TokenSerializationResult build(final Specification specification)
-  {
-    final long issued = System.currentTimeMillis();
-
-    final String serializedTokenContent = gson.toJson(specification.tokenContent);
-
-    if (specification.keyTimestamp == null) {
-      throw new IllegalArgumentException("token signature timestamp must not be null.");
-    }
-    if (specification.privateKey == null) {
-      throw new IllegalArgumentException("token signature privateKey must not be null.");
-    }
-    if (specification.sourceApplication == null) {
-      throw new IllegalArgumentException("token signature source application must not be null.");
+    private @Nonnull
+    TokenType getTokenTypeFromClaims(final Claims claims) {
+        final String issuer = claims.getIssuer();
+        final Optional<TokenType> tokenType = TokenType.valueOfIssuer(issuer);
+        if (!tokenType.isPresent()) {
+            throw AmitAuthenticationException.invalidTokenIssuer(issuer);
+        }
+        return tokenType.get();
     }
 
-    final JwtBuilder jwtBuilder =
-        Jwts.builder()
-            .setSubject(specification.user)
-            .claim(TokenConstants.JWT_SIGNATURE_TIMESTAMP_CLAIM, specification.keyTimestamp)
-            .claim(TokenConstants.JWT_CONTENT_CLAIM, serializedTokenContent)
-            .claim(TokenConstants.JWT_SOURCE_APPLICATION_CLAIM, specification.sourceApplication)
-            .setIssuer(TokenType.TENANT.getIssuer())
-            .setIssuedAt(new Date(issued))
-            .signWith(SignatureAlgorithm.RS512, specification.privateKey);
-    if (specification.secondsToLive <= 0) {
-      throw new IllegalArgumentException("token secondsToLive must be positive.");
+    private static Optional<String> getJwtTokenString(final String refreshToken) {
+        if ((refreshToken == null) || refreshToken.equals(
+                TokenConstants.NO_AUTHENTICATION)) {
+            return Optional.empty();
+        }
+
+        if (!refreshToken.startsWith(TokenConstants.PREFIX)) {
+            throw AmitAuthenticationException.invalidToken();
+        }
+        return Optional.of(refreshToken.substring(TokenConstants.PREFIX.length()).trim());
     }
-
-    final Date expiration = new Date(issued + TimeUnit.SECONDS.toMillis(specification.secondsToLive));
-    jwtBuilder.setExpiration(expiration);
-
-    return new TokenSerializationResult(TokenConstants.PREFIX + jwtBuilder.compact(), expiration);
-  }
 }

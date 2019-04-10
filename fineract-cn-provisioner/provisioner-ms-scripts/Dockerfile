@@ -2,7 +2,7 @@ FROM openjdk:8-jdk-alpine
 
 ARG provisioner_port=2020
 
-ENV server.max-http-header-size=16384 \
+ENV server.max-http-header-size=26384 \
     bonecp.partitionCount=1 \
     bonecp.maxConnectionsPerPartition=4 \
     bonecp.minConnectionsPerPartition=1 \

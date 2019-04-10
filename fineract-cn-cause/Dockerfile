@@ -2,7 +2,7 @@ FROM openjdk:8-jdk-alpine
 
 ARG cause_port=2038
 
-ENV server.max-http-header-size=16384 \
+ENV server.max-http-header-size=26384 \
     bonecp.partitionCount=1 \
     bonecp.maxConnectionsPerPartition=4 \
     bonecp.minConnectionsPerPartition=1 \
