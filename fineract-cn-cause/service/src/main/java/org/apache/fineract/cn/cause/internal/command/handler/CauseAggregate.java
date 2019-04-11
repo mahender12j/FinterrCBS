@@ -158,6 +158,7 @@ public class CauseAggregate {
         final CauseEntity causeEntity = findCauseEntityOrThrow(updateCauseCommand.getIdentifier());
         final AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
         final List<CauseFiles> causeFiles = updateCauseCommand.getCause().getCauseFiles();
+        DocumentEntity documentEntity = documentRepository.findByCause(causeEntity);
 
         addressEntity.setStreet(cause.getAddress().getStreet());
         addressEntity.setCountryCode(cause.getAddress().getCountryCode());
@@ -184,15 +185,12 @@ public class CauseAggregate {
         causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
         this.causeRepository.save(causeEntity);
 
-        List<DocumentPageEntity> pageEntities = this.documentPageRepository
-                .findByDocument(documentRepository.findByCause(causeEntity));
-
-
-//        causeFiles.forEach(files -> {
-//            pageEntities.forEach(entity -> {
-//               if(entity.)
-//            });
-//        });
+        List<DocumentPageEntity> pageEntities = this.documentPageRepository.findByDocument(documentEntity);
+        causeFiles.forEach(files -> {
+            if (pageEntities.stream().noneMatch(pageEntity -> pageEntity.getDocRef().equals(files.getUuid()))) {
+                pageEntities.add(DocumentMapper.map(files, documentEntity));
+            }
+        });
 
         this.documentPageRepository.save(pageEntities);
         return cause.getIdentifier();

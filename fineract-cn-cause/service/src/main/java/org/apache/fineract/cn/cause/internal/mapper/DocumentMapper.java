@@ -89,17 +89,14 @@ public class DocumentMapper {
     }
 
 
-//    public static DocumentPageEntity map(final MultipartFile multipartFile, DocumentEntity documentEntity, final String type) throws IOException {
-//        DocumentPageEntity pageEntity = new DocumentPageEntity();
-//        pageEntity.setDocument(documentEntity);
-//        pageEntity.setContentType(multipartFile.getContentType());
-//        pageEntity.setImage(multipartFile.getBytes());
-//        pageEntity.setSize(multipartFile.getSize());
-//        pageEntity.setDocumentName(multipartFile.getOriginalFilename());
-//        pageEntity.setType(type);
-//        pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
-//        return pageEntity;
-//    }
+    public static DocumentPageEntity map(CauseFiles causeFiles, DocumentEntity documentEntity) {
+        DocumentPageEntity pageEntity = new DocumentPageEntity();
+        pageEntity.setDocument(documentEntity);
+        pageEntity.setDocRef(causeFiles.getUuid());
+        pageEntity.setDocumentName(causeFiles.getDocName());
+        pageEntity.setType(causeFiles.getType());
+        return pageEntity;
+    }
 
 
     public static List<CauseDocumentPage> map(List<DocumentPageEntity> pageEntity) {
