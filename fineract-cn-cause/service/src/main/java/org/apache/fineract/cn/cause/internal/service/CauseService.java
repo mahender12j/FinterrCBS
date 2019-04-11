@@ -95,11 +95,7 @@ public class CauseService {
     public Optional<Cause> findCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
             final Cause cause = CauseMapper.map(causeEntity);
-            final DocumentEntity documentEntity = this.documentRepository.findByCause(causeEntity);
-            final CauseDocument causeDocument = DocumentMapper.map(documentEntity);
-            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocumentAndIsMapped(documentEntity, CauseDocumentPage.MappedState.ACTIVE.name());
-            causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
-            cause.setCauseDocument(causeDocument);
+            setCauseDocuments(causeEntity, cause);
             AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
             cause.setAddress(AddressMapper.map(addressEntity));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
@@ -109,15 +105,21 @@ public class CauseService {
             }
             cause.setCauseRatingList(RatingMapper.map(ratingRepository.findByCause(causeEntity)));
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
-            if (avgRatingValue != null) {
-                cause.setAvgRating(avgRatingValue.toString());
-            } else {
-                cause.setAvgRating("0");
-            }
+            if (avgRatingValue != null) cause.setAvgRating(avgRatingValue.toString());
+            else cause.setAvgRating("0");
 
 
             return cause;
         });
+    }
+
+    private void setCauseDocuments(CauseEntity causeEntity, Cause cause) {
+        final DocumentEntity documentEntity = this.documentRepository.findByCause(causeEntity);
+        final CauseDocument causeDocument = DocumentMapper.map(documentEntity);
+        final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocumentAndIsMapped(documentEntity, CauseDocumentPage.MappedState.ACTIVE.name());
+        causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
+        cause.setCauseDocument(causeDocument);
+        cause.setCauseFiles(DocumentMapper.mapFile(pageEntity));
     }
 
 
@@ -170,7 +172,7 @@ public class CauseService {
     }
 
 
-    public CausePage fetchCauseByCategory(final String categoryIdentifier, final Pageable pageable) {
+    private CausePage fetchCauseByCategory(final String categoryIdentifier, final Pageable pageable) {
         final CausePage causePage = new CausePage();
         final Page<CauseEntity> causeEntities;
         Optional<CategoryEntity> categoryEntity;
@@ -210,11 +212,7 @@ public class CauseService {
             cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
 
-            final DocumentEntity entity = this.documentRepository.findByCause(causeEntity);
-            final CauseDocument causeDocument = DocumentMapper.map(entity);
-            final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocumentAndIsMapped(entity, CauseDocumentPage.MappedState.ACTIVE.name());
-            causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
-            cause.setCauseDocument(causeDocument);
+            setCauseDocuments(causeEntity, cause);
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
 
             if (avgRatingValue != null) {
@@ -231,7 +229,7 @@ public class CauseService {
 
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
-        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(identifier, Cause.State.ACTIVE.DELETED.name());
+        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(identifier, Cause.State.DELETED.name());
         ArrayList<CauseStatistics> causeStatistics = new ArrayList<>(causeEntities.size());
         for (CauseEntity causeEntity : causeEntities) {
             if (causeEntity.getAccountNumber() != null) {
@@ -241,8 +239,8 @@ public class CauseService {
         }
 
         final NGOStatistics ngoStatistics = new NGOStatistics();
-        ngoStatistics.setTotalRaisedAmount(causeStatistics.stream().mapToDouble(d -> d.getTotalRaised()).sum());
-        ngoStatistics.setTotalSupporter(causeStatistics.stream().mapToInt(d -> d.getTotalSupporter()).sum());
+        ngoStatistics.setTotalRaisedAmount(causeStatistics.stream().mapToDouble(CauseStatistics::getTotalRaised).sum());
+        ngoStatistics.setTotalSupporter(causeStatistics.stream().mapToInt(CauseStatistics::getTotalSupporter).sum());
         ngoStatistics.setTotalCause(causeEntities.size());
         return ngoStatistics;
     }

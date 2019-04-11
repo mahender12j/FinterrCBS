@@ -22,6 +22,7 @@ import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseFiles;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentPageEntity;
@@ -114,6 +115,20 @@ public class DocumentMapper {
         });
 
         return documentPages;
+    }
+
+
+    public static List<CauseFiles> mapFile(List<DocumentPageEntity> documentPageEntities) {
+        List<CauseFiles> causeFiles = new ArrayList<>();
+        documentPageEntities.forEach(d -> {
+            CauseFiles files = new CauseFiles();
+            files.setDocName(d.getDocumentName());
+            files.setType(d.getType().toLowerCase());
+            files.setUuid(d.getDocRef());
+            causeFiles.add(files);
+        });
+
+        return causeFiles;
     }
 
 

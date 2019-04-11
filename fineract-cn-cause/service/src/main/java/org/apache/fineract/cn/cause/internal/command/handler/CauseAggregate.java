@@ -22,6 +22,7 @@ import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseFiles;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
 import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.mapper.*;
@@ -38,6 +39,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Padma Raju Sattineni
@@ -155,6 +157,7 @@ public class CauseAggregate {
         final Cause cause = updateCauseCommand.getCause();
         final CauseEntity causeEntity = findCauseEntityOrThrow(updateCauseCommand.getIdentifier());
         final AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
+        final List<CauseFiles> causeFiles = updateCauseCommand.getCause().getCauseFiles();
 
         addressEntity.setStreet(cause.getAddress().getStreet());
         addressEntity.setCountryCode(cause.getAddress().getCountryCode());
@@ -182,10 +185,14 @@ public class CauseAggregate {
         this.causeRepository.save(causeEntity);
 
         List<DocumentPageEntity> pageEntities = this.documentPageRepository
-                .findByDocumentAndIsMapped(documentRepository
-                        .findByCause(causeEntity), CauseDocumentPage.MappedState.UPLOADED.name());
-        pageEntities.forEach(pageEntity -> pageEntity.setIsMapped(CauseDocumentPage.MappedState.ACTIVE.name()));
+                .findByDocument(documentRepository.findByCause(causeEntity));
 
+
+//        causeFiles.forEach(files -> {
+//            pageEntities.forEach(entity -> {
+//               if(entity.)
+//            });
+//        });
 
         this.documentPageRepository.save(pageEntities);
         return cause.getIdentifier();

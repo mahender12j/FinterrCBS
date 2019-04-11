@@ -36,4 +36,6 @@ public interface DocumentPageRepository extends JpaRepository<DocumentPageEntity
     Optional<DocumentPageEntity> findById(Long Id);
 
     List<DocumentPageEntity> findByDocumentAndIsMapped(DocumentEntity entity, String isMapped);
+
+    List<DocumentPageEntity> findByDocument(DocumentEntity documentEntity);
 }
