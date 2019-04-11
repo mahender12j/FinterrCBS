@@ -30,9 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -109,11 +107,18 @@ public class DocumentService {
         CustomerDocument customerDocument = new CustomerDocument();
         if (documentEntity.isPresent()) {
             customerDocument = DocumentMapper.map(documentEntity.get());
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatusNotAndStatusNot(documentEntity.get(), "DELETED", "UPLOADED").stream()
-                    .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                    this.documentEntryRepository.findByDocumentAndStatusNotAndStatusNot(documentEntity.get(), "DELETED", "UPLOADED").stream()
+                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+
             List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
             customerDocument.setDocumentsTypes(documentsType);
-            customerDocument.setKycStatus(documentsType.stream().allMatch(DocumentsType::isKYCVerified));
+
+            Set<String> doc_master = new HashSet<>();
+            doc_master.add("Photo ID Proof");
+            doc_master.add("Residence Proof");
+            final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
+            customerDocument.setKycStatus(documentsType.stream().allMatch(DocumentsType::isKYCVerified) && isDocAvailable);
         }
         return customerDocument;
     }
@@ -127,15 +132,14 @@ public class DocumentService {
                     .collect(groupingBy(DocumentEntryEntity::getType, toList()));
             List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
             customerDocument.setDocumentsTypes(documentsType);
-            customerDocument.setKycStatus(documentsType.stream().allMatch(d -> d.isKYCVerified()));
+            customerDocument.setKycStatus(documentsType.stream().allMatch(DocumentsType::isKYCVerified));
         }
         return customerDocument;
     }
 
-    public List<DocumentEntryEntity> findUploadedDocumentEntries(final String customerIdentifier) {
+    private List<DocumentEntryEntity> findUploadedDocumentEntries(final String customerIdentifier) {
         final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).findFirst();
-        List<DocumentEntryEntity> entries = this.documentEntryRepository.findByDocumentAndStatus(documentEntity.get(), "UPLOADED");
-        return entries;
+        return this.documentEntryRepository.findByDocumentAndStatus(documentEntity.get(), "UPLOADED");
     }
 
     public Optional<CustomerDocumentEntry> findDocument(final String customerIdentifier,
