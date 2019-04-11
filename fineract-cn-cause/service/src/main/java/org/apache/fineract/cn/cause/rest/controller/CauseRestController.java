@@ -754,7 +754,7 @@ public class CauseRestController {
             throw ServiceException.badRequest("Terms document is required");
         } else if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("feature"))) {
             throw ServiceException.badRequest("Feature document is required");
-        } else if (!cause.getTaxExamption() && cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("tax"))) {
+        } else if (cause.getTaxExamption() && cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("tax"))) {
             throw ServiceException.badRequest("Tax document is required when Tax is not exemption");
         } else if (cause.getCauseFiles().stream().filter(d -> d.getType().toLowerCase().equals("terms")).count() > 1) {
             throw ServiceException.badRequest("Max one terms document can be uploaded");
