@@ -34,6 +34,7 @@ public class DocumentsSubType {
     private String reasonForReject;
     private String description;
     private String createdOn;
+    private String docRef;
 
 
     public DocumentsSubType() {
@@ -133,6 +134,14 @@ public class DocumentsSubType {
 
     public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public String getDocRef() {
+        return docRef;
+    }
+
+    public void setDocRef(String docRef) {
+        this.docRef = docRef;
     }
 
     @Override

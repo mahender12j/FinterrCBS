@@ -72,6 +72,7 @@ public class DocumentMapper {
                 documentsSubType.setReasonForReject(doc.getReasonForReject());
                 documentsSubType.setDescription(doc.getDescription());
                 documentsSubType.setCreatedOn(doc.getCreatedOn().toString());
+                documentsSubType.setDocRef(doc.getDocRef());
                 if (doc.getStatus().equals("APPROVED")) {
                     d.setKYCVerified(true);
                 }
