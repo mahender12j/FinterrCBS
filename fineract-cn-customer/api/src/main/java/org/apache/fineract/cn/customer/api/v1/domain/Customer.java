@@ -55,7 +55,8 @@ public final class Customer {
         NOTUPLOADED,
         PENDING,
         APPROVED,
-        REJECTED
+        REJECTED,
+        PROCESSING
     }
 
     @NotBlank
