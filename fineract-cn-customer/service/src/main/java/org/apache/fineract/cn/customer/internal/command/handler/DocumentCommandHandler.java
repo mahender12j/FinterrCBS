@@ -65,25 +65,19 @@ public class DocumentCommandHandler {
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_PAGE)
     public DocumentPageEvent process(final CreateDocumentEntryCommand command) {
-        DocumentEntity documentEntity = documentRepository.findByCustomerId(command.getCustomeridentifier())
-                .findFirst().orElseThrow(() -> ServiceException.notFound("Customer not found"));
+        CustomerEntity customerEntity = customerRepository.findByIdentifier(command.getCustomeridentifier())
+                .orElseThrow(() -> ServiceException.notFound("Customer {0} not found", command.getCustomeridentifier()));
 
+        Boolean findDocument = documentRepository.findByIdentifierAndCustomer(command.getCustomeridentifier());
+        if (!findDocument) {
+            documentRepository.save(DocumentMapper.map(command.getCustomerDocument(), customerEntity));
+        }
+
+        final DocumentEntity documentEntity = documentRepository.findByCustomer(customerEntity);
         List<DocumentEntryEntity> documentEntryEntityList = DocumentMapper.map(command.getCustomerDocument().getKycDocuments(), documentEntity);
         this.documentEntryRepository.save(documentEntryEntityList);
         return new DocumentPageEvent(command.getCustomeridentifier(), command.getCustomeridentifier(), 1);
-
     }
-
-//    @Transactional
-//    @CommandHandler
-//    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT)
-//    public DocumentEvent process(final CreateDocumentCommand command) throws IOException {
-//        customerRepository.findByIdentifier(command.getCustomerIdentifier())
-//                .map(customerEntity -> DocumentMapper.map(command.getCustomerDocument(), customerEntity))
-//                .ifPresent(documentRepository::save);
-//
-//        return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocument().getIdentifier());
-//    }
 
 
     @Transactional

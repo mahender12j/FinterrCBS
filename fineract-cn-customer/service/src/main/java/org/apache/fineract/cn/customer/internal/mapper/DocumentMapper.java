@@ -121,11 +121,11 @@ public class DocumentMapper {
     public static DocumentEntity map(final CustomerDocument customerDocument, final CustomerEntity customerEntity) {
         final DocumentEntity ret = new DocumentEntity();
         ret.setCustomer(customerEntity);
+        ret.setIdentifier(customerEntity.getIdentifier());
         ret.setCompleted(false);
-        ret.setStatus("CREATED");
+        ret.setStatus("PENDING");
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-        ret.setIdentifier(customerDocument.getIdentifier());
         ret.setDescription(customerDocument.getDescription());
         return ret;
     }
@@ -135,7 +135,7 @@ public class DocumentMapper {
         final DocumentEntity ret = new DocumentEntity();
         ret.setCustomer(customerEntity);
         ret.setCompleted(false);
-        ret.setStatus("CREATED");
+        ret.setStatus("PENDING");
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setIdentifier(customerEntity.getIdentifier());
