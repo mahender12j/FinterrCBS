@@ -21,6 +21,7 @@ package org.apache.fineract.cn.cause.internal.command.handler;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentsType;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseFiles;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
 import org.apache.fineract.cn.cause.internal.command.*;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Padma Raju Sattineni
@@ -181,13 +183,31 @@ public class CauseAggregate {
         causeEntity.setSoftTarget(cause.getSoftTarget());
         causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
         this.causeRepository.save(causeEntity);
-
         List<DocumentPageEntity> pageEntities = this.documentPageRepository.findByDocument(documentEntity);
+
         causeFiles.forEach(files -> {
-            if (pageEntities.stream().noneMatch(pageEntity -> pageEntity.getDocRef().equals(files.getUuid()))) {
-                this.documentPageRepository.save(DocumentMapper.map(files, documentEntity));
+
+            if (files.getType().toLowerCase().equals(CauseDocumentsType.OTHER.name().toLowerCase()) || files.getType().toLowerCase().equals(CauseDocumentsType.GALLARY.name().toLowerCase())) {
+                if (pageEntities.stream().noneMatch(pageEntity -> pageEntity.getDocRef().equals(files.getUuid()))) {
+                    this.documentPageRepository.save(DocumentMapper.map(files, documentEntity));
+
+                }
+            } else {
+                Optional<DocumentPageEntity> documentPageEntity = this.documentPageRepository.findByDocRef(files.getUuid());
+                if (documentPageEntity.isPresent()) {
+                    DocumentPageEntity entity = this.documentPageRepository.findOne(documentEntity.getId());
+                    entity.setType(files.getType());
+                    entity.setDocumentName(files.getDocName());
+                    entity.setDocRef(files.getUuid());
+                    this.documentPageRepository.save(entity);
+
+                } else {
+                    this.documentPageRepository.save(DocumentMapper.map(files, documentEntity));
+                }
             }
         });
+
+
         return cause.getIdentifier();
     }
 

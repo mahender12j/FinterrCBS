@@ -16,26 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
+package org.apache.fineract.cn.cause.api.v1.domain;
 
 /**
- * @author Myrle Krantz
+ * @author Padma Raju Sattineni
  */
-@Repository
-public interface DocumentPageRepository extends JpaRepository<DocumentPageEntity, Long> {
 
-    Optional<DocumentPageEntity> findById(Long Id);
-
-    List<DocumentPageEntity> findByDocument(DocumentEntity documentEntity);
-
-    Optional<DocumentPageEntity> findByDocRef(final String docRef);
+public enum CauseDocumentsType {
+    GALLARY, FEATURE, TERMS, OTHER, TAX
 }
+
