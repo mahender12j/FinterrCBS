@@ -82,15 +82,6 @@ public class CauseService {
         return this.causeRepository.existsByIdentifier(identifier);
     }
 
-  /*public Boolean imageExists(final String number) {
-    return this.imageRepository.existsByNumber(number);
-  }
-
-  public Boolean imageScanExists(final String number, final String identifier) {
-    return this.imageRepository.findByNumber(number)
-            .map(cardEntity -> this.imageScanRepository.existsByIdentifierAndIdentificationCard(identifier, cardEntity))
-            .orElse(false);
-  }*/
 
     public Optional<Cause> findCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
@@ -116,7 +107,7 @@ public class CauseService {
     private void setCauseDocuments(CauseEntity causeEntity, Cause cause) {
         final DocumentEntity documentEntity = this.documentRepository.findByCause(causeEntity);
         final CauseDocument causeDocument = DocumentMapper.map(documentEntity);
-        final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocumentAndIsMapped(documentEntity, CauseDocumentPage.MappedState.ACTIVE.name());
+        final List<DocumentPageEntity> pageEntity = this.documentPageRepository.findByDocument(documentEntity);
         causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
         cause.setCauseDocument(causeDocument);
         cause.setCauseFiles(DocumentMapper.mapFile(pageEntity));
@@ -128,7 +119,7 @@ public class CauseService {
 
         if (causeEntity.isPresent()) {
             DocumentEntity entity = documentRepository.findByCauseAndCreatedBy(causeEntity.get(), UserContextHolder.checkedGetUser());
-            return documentPageRepository.findByDocumentAndIsMapped(entity, CauseDocumentPage.MappedState.UPLOADED.name()).stream().map(DocumentMapper::map).collect(Collectors.toList());
+            return documentPageRepository.findByDocument(entity).stream().map(DocumentMapper::map).collect(Collectors.toList());
         } else {
             throw ServiceException.notFound("Cause not found");
         }
@@ -284,42 +275,6 @@ public class CauseService {
         }
         return false;
     }
-
-/*  public final Stream<IdentificationCard> fetchIdentificationCardsByCause(final String identifier) {
-    return causeRepository.findByIdentifier(identifier)
-        .map(identificationCardRepository::findByCause)
-        .orElse(Stream.empty())
-        .map(IdentificationCardMapper::map);
-  }*/
-
-/*
-  public Optional<IdentificationCard> findIdentificationCard(final String number) {
-    final Optional<IdentificationCardEntity> identificationCardEntity = this.identificationCardRepository.findByNumber(number);
-
-    return identificationCardEntity.map(IdentificationCardMapper::map);
-  }
-*/
-
-/*  public final List<IdentificationCardScan> fetchScansByIdentificationCard(final String number) {
-    final Optional<IdentificationCardEntity> identificationCard = this.identificationCardRepository.findByNumber(number);
-
-    return identificationCard.map(this.identificationCardScanRepository::findByIdentificationCard)
-            .map(x -> x.stream().map(IdentificationCardScanMapper::map).collect(Collectors.toList()))
-            .orElseGet(Collections::emptyList);
-  }*/
-
-/*  private Optional<IdentificationCardScanEntity> findIdentificationCardEntity(final String number, final String identifier) {
-    final Optional<IdentificationCardEntity> cardEntity = this.identificationCardRepository.findByNumber(number);
-    return cardEntity.flatMap(card -> this.identificationCardScanRepository.findByIdentifierAndIdentificationCard(identifier, card));
-  }*/
-
-//  public Optional<IdentificationCardScan> findIdentificationCardScan(final String number, final String identifier) {
-//    return this.findIdentificationCardEntity(number, identifier).map(IdentificationCardScanMapper::map);
-//  }
-//
-//  public Optional<byte[]> findIdentificationCardScanImage(final String number, final String identifier) {
-//    return this.findIdentificationCardEntity(number, identifier).map(IdentificationCardScanEntity::getImage);
-//  }
 
     public List<ProcessStep> getProcessSteps(final String causeIdentifier) {
         return causeRepository.findByIdentifier(causeIdentifier)

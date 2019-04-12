@@ -25,9 +25,7 @@ import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
 import org.apache.fineract.cn.cause.internal.command.ChangeDocumentCommand;
 import org.apache.fineract.cn.cause.internal.command.CompleteDocumentCommand;
-import org.apache.fineract.cn.cause.internal.command.DeleteCauseDocumentCommand;
 import org.apache.fineract.cn.cause.internal.command.DeleteDocumentCommand;
-import org.apache.fineract.cn.cause.internal.repository.DocumentPageEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.DocumentService;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
@@ -95,21 +93,21 @@ public class DocumentsRestController {
 //    }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{pageId}",
-            method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> deleteCauseDocument(@PathVariable("causeidentifier") final String causeIdentifier,
-                                             @PathVariable("pageId") final Long pageId) {
-        throwIfCauseNotExists(causeIdentifier);
-        throwIfCauseDocumentPageNotExists(causeIdentifier, pageId);
-        this.commandGateway.process(new DeleteCauseDocumentCommand(pageId, causeIdentifier));
-        return ResponseEntity.accepted().build();
-    }
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/{pageId}",
+//            method = RequestMethod.DELETE,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.APPLICATION_JSON_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> deleteCauseDocument(@PathVariable("causeidentifier") final String causeIdentifier,
+//                                             @PathVariable("pageId") final Long pageId) {
+//        throwIfCauseNotExists(causeIdentifier);
+//        throwIfCauseDocumentPageNotExists(causeIdentifier, pageId);
+//        this.commandGateway.process(new DeleteCauseDocumentCommand(pageId, causeIdentifier));
+//        return ResponseEntity.accepted().build();
+//    }
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)

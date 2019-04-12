@@ -18,24 +18,13 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
-import org.hibernate.validator.constraints.Length;
-
-import java.util.Objects;
-
 /**
  * @author Myrle Krantz
  */
 public class CauseDocumentPage {
 
-    public enum MappedState {
-        ACTIVE, DELETED, UPLOADED
-    }
-
-
     private Long id;
     private String type;
-    private MappedState isMapped;
     private String documentName;
     private String docRef;
 
@@ -65,14 +54,6 @@ public class CauseDocumentPage {
 
     public void setDocumentName(String documentName) {
         this.documentName = documentName;
-    }
-
-    public MappedState getIsMapped() {
-        return isMapped;
-    }
-
-    public void setIsMapped(MappedState isMapped) {
-        this.isMapped = isMapped;
     }
 
     public String getDocRef() {

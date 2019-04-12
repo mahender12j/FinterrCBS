@@ -21,7 +21,6 @@ package org.apache.fineract.cn.cause.internal.command.handler;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseFiles;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
 import org.apache.fineract.cn.cause.internal.command.*;
@@ -38,8 +37,6 @@ import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author Padma Raju Sattineni
@@ -134,20 +131,20 @@ public class CauseAggregate {
 //    }
 
 
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_CAUSE_DOCUMENT)
-    public String deleteCauseDocument(final DeleteCauseDocumentCommand deleteCauseDocumentCommand) {
-
-        final Optional<DocumentPageEntity> pageEntity = documentPageRepository.findById(deleteCauseDocumentCommand.getPageId());
-        if (pageEntity.isPresent()) {
-            pageEntity.get().setIsMapped(CauseDocumentPage.MappedState.DELETED.name());
-            documentPageRepository.save(pageEntity.get());
-        } else {
-            System.out.println("this document id is not available");
-        }
-        return deleteCauseDocumentCommand.getCauseIdentifier();
-    }
+//    @Transactional
+//    @CommandHandler
+//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_CAUSE_DOCUMENT)
+//    public String deleteCauseDocument(final DeleteCauseDocumentCommand deleteCauseDocumentCommand) {
+//
+//        final Optional<DocumentPageEntity> pageEntity = documentPageRepository.findById(deleteCauseDocumentCommand.getPageId());
+//        if (pageEntity.isPresent()) {
+//            pageEntity.get().setIsMapped(CauseDocumentPage.MappedState.DELETED.name());
+//            documentPageRepository.save(pageEntity.get());
+//        } else {
+//            System.out.println("this document id is not available");
+//        }
+//        return deleteCauseDocumentCommand.getCauseIdentifier();
+//    }
 
 
     @Transactional
@@ -188,11 +185,9 @@ public class CauseAggregate {
         List<DocumentPageEntity> pageEntities = this.documentPageRepository.findByDocument(documentEntity);
         causeFiles.forEach(files -> {
             if (pageEntities.stream().noneMatch(pageEntity -> pageEntity.getDocRef().equals(files.getUuid()))) {
-                pageEntities.add(DocumentMapper.map(files, documentEntity));
+                this.documentPageRepository.save(DocumentMapper.map(files, documentEntity));
             }
         });
-
-        this.documentPageRepository.save(pageEntities);
         return cause.getIdentifier();
     }
 
