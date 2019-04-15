@@ -31,6 +31,7 @@ import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.lang.ServiceException;
+import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,7 +46,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.time.Clock;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -239,26 +243,25 @@ public class CauseRestController {
     public @ResponseBody
     ResponseEntity<Void> extendCause(@PathVariable("identifier") final String identifier,
                                      @RequestBody CauseState causeState) {
+        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
+        if (causeEntity.getCurrentState().toLowerCase().equals(Cause.State.ACTIVE.name().toLowerCase())) {
 
-        Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
-        if (causeEntity.isPresent()) {
+            LocalDateTime causeEndDate = causeEntity.getEndDate().minusDays(2);
 
-            if (causeEntity.get().getCurrentState().toLowerCase().equals(Cause.State.ACTIVE.name().toLowerCase())) {
 
-                if (causeEntity.get().getEndDate().compareTo(LocalDateTime.now(Clock.systemUTC())) < 2) {
-                    throw ServiceException.conflict("Cause {0} required minimum two days at least. Current end date: {1}", identifier, causeEntity.get().getEndDate());
-                } else {
-                    LocalDateTime localDateTime = LocalDateTime.parse(causeState.getNewDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-//                    System.out.println("local date time: " + localDateTime);
-                    this.commandGateway.process(new ExtendCauseCommand(identifier, localDateTime));
-                }
+            System.out.println("End date: " + causeEntity.getEndDate().toLocalDate().minusDays(2));
+            System.out.println("Local Date Time: " + LocalDate.now(Clock.systemDefaultZone()));
+            System.out.println("date compare with the end date: " + causeEndDate.isBefore(LocalDateTime.now(Clock.systemDefaultZone())));
 
+            if (causeEndDate.isBefore(LocalDateTime.now(Clock.systemDefaultZone()))) {
+                throw ServiceException.conflict("Cause {0} required minimum two days at least. Current end date: {1}", identifier, causeEntity.getEndDate());
             } else {
-                throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
+                LocalDateTime localDateTime = LocalDateTime.parse(causeState.getNewDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                this.commandGateway.process(new ExtendCauseCommand(identifier, localDateTime));
             }
 
         } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
+            throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }
 
         return ResponseEntity.accepted().build();

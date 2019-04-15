@@ -18,9 +18,6 @@
  */
 package org.apache.fineract.cn.identity.rest;
 
-import org.apache.fineract.cn.identity.api.v1.PermittableGroupIds;
-import org.apache.fineract.cn.identity.api.v1.client.IdentityManager;
-import org.apache.fineract.cn.identity.api.v1.domain.Authentication;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.anubis.api.v1.TokenConstants;
@@ -28,7 +25,9 @@ import org.apache.fineract.cn.anubis.security.AmitAuthenticationException;
 import org.apache.fineract.cn.command.domain.CommandCallback;
 import org.apache.fineract.cn.command.domain.CommandProcessingException;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
-import org.apache.fineract.cn.identity.internal.command.AccessTokenAuthenticationCommand;
+import org.apache.fineract.cn.identity.api.v1.PermittableGroupIds;
+import org.apache.fineract.cn.identity.api.v1.client.IdentityManager;
+import org.apache.fineract.cn.identity.api.v1.domain.Authentication;
 import org.apache.fineract.cn.identity.internal.command.AuthenticationCommandResponse;
 import org.apache.fineract.cn.identity.internal.command.PasswordAuthenticationCommand;
 import org.apache.fineract.cn.identity.internal.command.RefreshTokenAuthenticationCommand;
@@ -126,26 +125,6 @@ public class AuthorizationRestController {
         }
     }
 
-
-    @RequestMapping(value = "/token/renew", method = RequestMethod.POST,
-            consumes = {MediaType.ALL_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE}
-    )
-    @Permittable(value = AcceptedTokenType.GUEST)
-    public
-    @ResponseBody
-    ResponseEntity<Authentication> renewToken(final HttpServletResponse response,
-                                              final HttpServletRequest request,
-                                              @RequestHeader(value = "accessToken") final String accessToken) throws InterruptedException {
-        try {
-            final Authentication ret = mapAccess(getAuthenticationCommandResponse(new AccessTokenAuthenticationCommand(accessToken)), response);
-            return new ResponseEntity<>(ret, HttpStatus.OK);
-        } catch (final AmitAuthenticationException e) {
-            System.out.println("access in catch block for token");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
     @RequestMapping(value = "/token/_current", method = RequestMethod.DELETE,
             consumes = {MediaType.ALL_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -173,9 +152,7 @@ public class AuthorizationRestController {
     private AuthenticationCommandResponse getAuthenticationCommandResponse(
             final Object authenticationCommand) throws AmitAuthenticationException, InterruptedException {
         try {
-            final CommandCallback<AuthenticationCommandResponse> ret =
-                    commandGateway.process(authenticationCommand,
-                            AuthenticationCommandResponse.class);
+            final CommandCallback<AuthenticationCommandResponse> ret = commandGateway.process(authenticationCommand, AuthenticationCommandResponse.class);
 
             return ret.get();
         } catch (final ExecutionException e) {
@@ -188,17 +165,17 @@ public class AuthorizationRestController {
                     throw (ServiceException) commandProcessingException.getCause();
                 else {
                     logger.error("Authentication failed with an unexpected error.", e);
-                    throw ServiceException.internalError("An error occurred while attempting to authenticate a user.");
+                    throw ServiceException.internalError("An error occurred while attempting to authenticate a user.1");
                 }
             } else if (ServiceException.class.isAssignableFrom(e.getCause().getClass())) {
                 throw (ServiceException) e.getCause();
             } else {
                 logger.error("Authentication failed with an unexpected error.", e);
-                throw ServiceException.internalError("An error occurred while attempting to authenticate a user.");
+                throw ServiceException.internalError("An error occurred while attempting to authenticate a user.2");
             }
         } catch (final CommandProcessingException e) {
             logger.error("Authentication failed with an unexpected error.", e);
-            throw ServiceException.internalError("An error occurred while attempting to authenticate a user.");
+            throw ServiceException.internalError("An error occurred while attempting to authenticate a user.3");
         }
     }
 
@@ -210,19 +187,6 @@ public class AuthorizationRestController {
         return new Authentication(
                 commandResponse.getAccessToken(),
                 commandResponse.getRefreshToken(),
-                commandResponse.getAccessTokenExpiration(),
-                commandResponse.getRefreshTokenExpiration(),
-                commandResponse.getPasswordExpiration());
-    }
-
-    private Authentication mapAccess(
-            final AuthenticationCommandResponse commandResponse,
-            final HttpServletResponse httpServletResponse) {
-        httpServletResponse.addCookie(bakeRefreshTokenCookie(commandResponse.getRefreshToken()));
-
-        return new Authentication(
-                commandResponse.getRefreshToken(),
-                commandResponse.getAccessToken(),
                 commandResponse.getAccessTokenExpiration(),
                 commandResponse.getRefreshTokenExpiration(),
                 commandResponse.getPasswordExpiration());

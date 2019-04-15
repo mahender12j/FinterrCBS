@@ -186,7 +186,6 @@ public class CauseAggregate {
         List<DocumentPageEntity> pageEntities = this.documentPageRepository.findByDocument(documentEntity);
 
         causeFiles.forEach(files -> {
-
             if (files.getType().toLowerCase().equals(CauseDocumentsType.OTHER.name().toLowerCase()) || files.getType().toLowerCase().equals(CauseDocumentsType.GALLARY.name().toLowerCase())) {
                 if (pageEntities.stream().noneMatch(pageEntity -> pageEntity.getDocRef().equals(files.getUuid()))) {
                     this.documentPageRepository.save(DocumentMapper.map(files, documentEntity));
@@ -195,12 +194,10 @@ public class CauseAggregate {
             } else {
                 Optional<DocumentPageEntity> documentPageEntity = this.documentPageRepository.findByDocRef(files.getUuid());
                 if (documentPageEntity.isPresent()) {
-                    DocumentPageEntity entity = this.documentPageRepository.findOne(documentEntity.getId());
-                    entity.setType(files.getType());
-                    entity.setDocumentName(files.getDocName());
-                    entity.setDocRef(files.getUuid());
-                    this.documentPageRepository.save(entity);
-
+                    documentPageEntity.get().setType(files.getType());
+                    documentPageEntity.get().setDocumentName(files.getDocName());
+                    documentPageEntity.get().setDocRef(files.getUuid());
+                    this.documentPageRepository.save(documentPageEntity.get());
                 } else {
                     this.documentPageRepository.save(DocumentMapper.map(files, documentEntity));
                 }

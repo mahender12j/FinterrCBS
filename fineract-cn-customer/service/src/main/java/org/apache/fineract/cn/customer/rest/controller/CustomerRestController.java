@@ -27,6 +27,7 @@ import org.apache.fineract.cn.customer.ServiceConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.catalog.internal.service.FieldValueValidator;
 import org.apache.fineract.cn.customer.internal.command.*;
+import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.customer.internal.repository.PortraitEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.TaskService;
@@ -151,21 +152,20 @@ public class CustomerRestController {
         }
     }
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
+    @Permittable(
+            value = AcceptedTokenType.TENANT,
+            groupId = PermittableGroupIds.CUSTOMER
+    )
     @RequestMapping(
             value = "/customers/{identifier}/ngo",
             method = RequestMethod.GET,
-            produces = MediaType.ALL_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
     )
-    public @ResponseBody
+    public
+    @ResponseBody
     ResponseEntity<Customer> findNgo(@PathVariable("identifier") final String identifier) {
-        final Optional<Customer> customerNgo = this.customerService.findNgo(identifier);
-        if (customerNgo.isPresent()) {
-            return ResponseEntity.ok(customerNgo.get());
-        } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
-        }
+        return ResponseEntity.ok(this.customerService.findNgo(identifier));
     }
 
 

@@ -252,22 +252,12 @@ public class CustomerService {
                 });
     }
 
-    public Optional<Customer> findNgo(final String identifier) {
-        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifierAndType(identifier, "BUSINESS");
-        if (customerEntity.isPresent()) {
-            return customerEntity.map(entity -> {
-                final Customer customerNgo = CustomerMapper.map(entity);
+    public Customer findNgo(final String identifier) {
+        System.out.println("------------customer identifier------------" + identifier);
+        CustomerEntity customerEntity = customerRepository.findByIdentifierAndType(identifier, "BUSINESS")
+                .orElseThrow(() -> ServiceException.notFound("Oops! We cant find you..."));
+        return CustomerMapper.map(customerEntity);
 
-                // final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
-                // if (contactDetailEntities != null) {
-                //     customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
-                // }
-                return customerNgo;
-            });
-
-        } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
-        }
     }
 
     public final Stream<Command> fetchCommandsByCustomer(final String identifier) {

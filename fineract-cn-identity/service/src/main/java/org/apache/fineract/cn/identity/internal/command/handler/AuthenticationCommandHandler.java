@@ -18,48 +18,24 @@
  */
 package org.apache.fineract.cn.identity.internal.command.handler;
 
-import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import org.apache.fineract.cn.identity.api.v1.events.EventConstants;
 import org.apache.fineract.cn.anubis.api.v1.domain.AllowedOperation;
 import org.apache.fineract.cn.anubis.api.v1.domain.TokenContent;
 import org.apache.fineract.cn.anubis.api.v1.domain.TokenPermission;
 import org.apache.fineract.cn.anubis.provider.InvalidKeyTimestampException;
 import org.apache.fineract.cn.anubis.provider.TenantRsaKeyProvider;
 import org.apache.fineract.cn.anubis.security.AmitAuthenticationException;
-import org.apache.fineract.cn.anubis.token.TenantAccessTokenSerializer;
-import org.apache.fineract.cn.anubis.token.TenantApplicationRsaKeyProvider;
-import org.apache.fineract.cn.anubis.token.TenantRefreshTokenSerializer;
-import org.apache.fineract.cn.anubis.token.TokenDeserializationResult;
-import org.apache.fineract.cn.anubis.token.TokenSerializationResult;
+import org.apache.fineract.cn.anubis.token.*;
 import org.apache.fineract.cn.command.annotation.Aggregate;
 import org.apache.fineract.cn.command.annotation.CommandHandler;
 import org.apache.fineract.cn.command.annotation.CommandLogLevel;
 import org.apache.fineract.cn.crypto.HashGenerator;
-import org.apache.fineract.cn.identity.internal.command.AccessTokenAuthenticationCommand;
+import org.apache.fineract.cn.identity.api.v1.events.EventConstants;
 import org.apache.fineract.cn.identity.internal.command.AuthenticationCommandResponse;
 import org.apache.fineract.cn.identity.internal.command.PasswordAuthenticationCommand;
 import org.apache.fineract.cn.identity.internal.command.RefreshTokenAuthenticationCommand;
-import org.apache.fineract.cn.identity.internal.repository.AllowedOperationType;
-import org.apache.fineract.cn.identity.internal.repository.ApplicationCallEndpointSetEntity;
-import org.apache.fineract.cn.identity.internal.repository.ApplicationCallEndpointSets;
-import org.apache.fineract.cn.identity.internal.repository.ApplicationPermissionUsers;
-import org.apache.fineract.cn.identity.internal.repository.ApplicationPermissions;
-import org.apache.fineract.cn.identity.internal.repository.ApplicationSignatureEntity;
-import org.apache.fineract.cn.identity.internal.repository.ApplicationSignatures;
-import org.apache.fineract.cn.identity.internal.repository.PermissionType;
-import org.apache.fineract.cn.identity.internal.repository.PermittableGroupEntity;
-import org.apache.fineract.cn.identity.internal.repository.PermittableGroups;
-import org.apache.fineract.cn.identity.internal.repository.PermittableType;
-import org.apache.fineract.cn.identity.internal.repository.PrivateSignatureEntity;
-import org.apache.fineract.cn.identity.internal.repository.PrivateTenantInfoEntity;
-import org.apache.fineract.cn.identity.internal.repository.RoleEntity;
-import org.apache.fineract.cn.identity.internal.repository.Roles;
-import org.apache.fineract.cn.identity.internal.repository.Signatures;
-import org.apache.fineract.cn.identity.internal.repository.Tenants;
-import org.apache.fineract.cn.identity.internal.repository.UserEntity;
-import org.apache.fineract.cn.identity.internal.repository.Users;
+import org.apache.fineract.cn.identity.internal.repository.*;
 import org.apache.fineract.cn.identity.internal.service.RoleMapper;
 import org.apache.fineract.cn.identity.internal.util.IdentityConstants;
 import org.apache.fineract.cn.lang.ApplicationName;
@@ -229,21 +205,19 @@ public class AuthenticationCommandHandler {
             final ApplicationSignatureEntity signature = applicationSignatures.get(tokenApplicationName, timestamp)
                     .orElseThrow(() -> new InvalidKeyTimestampException(timestamp));
 
-            return new RsaPublicKeyBuilder()
-                    .setPublicKeyMod(signature.getPublicKeyMod())
-                    .setPublicKeyExp(signature.getPublicKeyExp())
-                    .build();
+            return new RsaPublicKeyBuilder().setPublicKeyMod(signature.getPublicKeyMod()).setPublicKeyExp(signature.getPublicKeyExp()).build();
         }
     }
 
     @CommandHandler(logStart = CommandLogLevel.DEBUG, logFinish = CommandLogLevel.DEBUG)
     public AuthenticationCommandResponse process(final RefreshTokenAuthenticationCommand command)
             throws AmitAuthenticationException {
-        final TokenDeserializationResult deserializedRefreshToken =
-                tenantRefreshTokenSerializer.deserialize(new TenantIdentityRsaKeyProvider(), command.getRefreshToken());
+        final TokenDeserializationResult deserializedRefreshToken = tenantRefreshTokenSerializer.deserialize(new TenantIdentityRsaKeyProvider(), command.getRefreshToken());
 
         final PrivateTenantInfoEntity privateTenantInfo = checkedGetPrivateTenantInfo();
         final PrivateSignatureEntity privateSignature = checkedGetPrivateSignature();
+
+        System.out.println("---------------private signature---------" + privateSignature);
 
         final UserEntity user = getUser(deserializedRefreshToken.getUserIdentifier());
         final String sourceApplicationName = deserializedRefreshToken.getSourceApplication();
@@ -258,35 +232,16 @@ public class AuthenticationCommandHandler {
                 LocalDateTime.ofInstant(deserializedRefreshToken.getExpiration().toInstant(), ZoneId.of("UTC")));
     }
 
-
-    @CommandHandler(logStart = CommandLogLevel.DEBUG, logFinish = CommandLogLevel.DEBUG)
-    public AuthenticationCommandResponse process(final AccessTokenAuthenticationCommand command) throws AmitAuthenticationException {
-        final TokenDeserializationResult deserializedAccessToken = this.tenantAccessTokenSerializer.deserialize(this.tenantRsaKeyProvider, command.getAccessToken());
-        final PrivateTenantInfoEntity privateTenantInfo = checkedGetPrivateTenantInfo();
-        final PrivateSignatureEntity privateSignature = checkedGetPrivateSignature();
-
-        final UserEntity user = getUser(deserializedAccessToken.getUserIdentifier());
-        final String sourceApplicationName = deserializedAccessToken.getSourceApplication();
-
-        return getAuthenticationResponse(
-                sourceApplicationName,
-                Optional.ofNullable(deserializedAccessToken.getEndpointSet()),
-                privateTenantInfo,
-                privateSignature,
-                user,
-                command.getAccessToken(),
-                LocalDateTime.ofInstant(deserializedAccessToken.getExpiration().toInstant(), ZoneId.of("UTC")));
-    }
-
-    private AuthenticationCommandResponse getAuthenticationResponse(
-            final String sourceApplicationName,
-            @SuppressWarnings("OptionalUsedAsFieldOrParameterType") final Optional<String> callEndpointSet,
-            final PrivateTenantInfoEntity privateTenantInfo,
-            final PrivateSignatureEntity privateSignature,
-            final UserEntity user,
-            final String refreshToken,
-            final LocalDateTime refreshTokenExpiration) {
+    private AuthenticationCommandResponse getAuthenticationResponse(final String sourceApplicationName,
+                                                                    @SuppressWarnings("OptionalUsedAsFieldOrParameterType") final Optional<String> callEndpointSet,
+                                                                    final PrivateTenantInfoEntity privateTenantInfo,
+                                                                    final PrivateSignatureEntity privateSignature,
+                                                                    final UserEntity user,
+                                                                    final String refreshToken,
+                                                                    final LocalDateTime refreshTokenExpiration) {
         final Optional<LocalDateTime> passwordExpiration = getExpiration(user);
+
+        System.out.println("-------------------password expiration---------" + passwordExpiration);
 
         final int gracePeriod = privateTenantInfo.getTimeToChangePasswordAfterExpirationInDays();
         if (pastGracePeriod(passwordExpiration, gracePeriod))
@@ -297,6 +252,7 @@ public class AuthenticationCommandHandler {
         if (sourceApplicationName.equals(applicationName.toString())) { //ie, this is a token for the identity manager.
             if (pastExpiration(passwordExpiration)) {
                 tokenPermissions = identityEndpointsAllowedEvenWithExpiredPassword();
+                System.out.println("-------------password expired-----------------");
                 logger.info("Password expired {}", passwordExpiration.map(LocalDateTime::toString).orElse("empty"));
             } else {
                 tokenPermissions = getUserTokenPermissions(user);
@@ -327,11 +283,13 @@ public class AuthenticationCommandHandler {
                 callEndpointSet.orElse("null"),
                 minifiedTokenPermissions.toString());
 
-        final TokenSerializationResult accessToken = getAuthenticationResponse(
-                user.getIdentifier(),
+        final TokenSerializationResult accessToken = getAuthenticationResponse(user.getIdentifier(),
                 minifiedTokenPermissions,
                 privateSignature,
                 sourceApplicationName);
+
+
+        System.out.println("-----------------------access token generated");
 
         return new AuthenticationCommandResponse(
                 accessToken.getToken(), DateConverter.toIsoString(accessToken.getExpiration()),
@@ -376,16 +334,17 @@ public class AuthenticationCommandHandler {
         );
     }
 
-    private TokenSerializationResult getAuthenticationResponse(
-            final String userIdentifier,
-            final Set<TokenPermission> tokenPermissions,
-            final PrivateSignatureEntity privateSignatureEntity,
-            final String sourceApplication) {
+    private TokenSerializationResult getAuthenticationResponse(final String userIdentifier,
+                                                               final Set<TokenPermission> tokenPermissions,
+                                                               final PrivateSignatureEntity privateSignatureEntity,
+                                                               final String sourceApplication) {
 
         final PrivateKey privateKey = new RsaPrivateKeyBuilder()
                 .setPrivateKeyExp(privateSignatureEntity.getPrivateKeyExp())
                 .setPrivateKeyMod(privateSignatureEntity.getPrivateKeyMod())
                 .build();
+
+        System.out.println("---------------private key------------" + privateKey);
 
         final TenantAccessTokenSerializer.Specification x =
                 new TenantAccessTokenSerializer.Specification()

@@ -19,21 +19,17 @@
 package org.apache.fineract.cn.anubis.token;
 
 import com.google.gson.Gson;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.fineract.cn.anubis.api.v1.TokenConstants;
 import org.apache.fineract.cn.anubis.api.v1.domain.TokenContent;
-import org.apache.fineract.cn.anubis.provider.InvalidKeyTimestampException;
-import org.apache.fineract.cn.anubis.provider.TenantRsaKeyProvider;
-import org.apache.fineract.cn.anubis.security.AmitAuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.security.Key;
 import java.security.PrivateKey;
 import java.util.Date;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -90,42 +86,6 @@ public class TenantAccessTokenSerializer {
         }
     }
 
-    public TokenDeserializationResult deserialize(final TenantRsaKeyProvider tenantRsaKeyProvider, final String accessToken) {
-        final Optional<String> tokenString = getJwtTokenString(accessToken);
-        final String token = tokenString.orElseThrow(AmitAuthenticationException::invalidToken);
-        try {
-            @SuppressWarnings("unchecked") final Jwt<Header, Claims> jwt = Jwts.parser().setSigningKeyResolver(new SigningKeyResolver() {
-                @Override
-                public Key resolveSigningKey(final JwsHeader header, final Claims claims) {
-                    final TokenType tokenType = getTokenTypeFromClaims(claims);
-                    final String keyTimestamp = getKeyTimestampFromClaims(claims);
-
-                    try {
-                        return tenantRsaKeyProvider.getPublicKey(keyTimestamp);
-                    } catch (final IllegalArgumentException e) {
-                        throw AmitAuthenticationException.missingTenant();
-                    } catch (final InvalidKeyTimestampException e) {
-                        throw AmitAuthenticationException.invalidTokenKeyTimestamp(tokenType.getIssuer(), keyTimestamp);
-                    }
-                }
-
-                @Override
-                public Key resolveSigningKey(final JwsHeader header, final String plaintext) {
-                    return null;
-                }
-            }).parse(token);
-
-            final String alg = jwt.getHeader().get("alg").toString();
-            final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.forName(alg);
-            if (!signatureAlgorithm.isRsa()) {
-                throw AmitAuthenticationException.invalidTokenAlgorithm(alg);
-            }
-            return new TokenDeserializationResult(jwt.getBody().getSubject(), jwt.getBody().getExpiration(), jwt.getBody().getIssuer(), jwt.getBody().get(TokenConstants.JWT_ENDPOINT_SET_CLAIM, String.class));
-        } catch (final JwtException e) {
-            throw AmitAuthenticationException.invalidToken();
-        }
-    }
-
     public TokenSerializationResult build(final Specification specification) {
         final long issued = System.currentTimeMillis();
 
@@ -158,32 +118,5 @@ public class TenantAccessTokenSerializer {
         jwtBuilder.setExpiration(expiration);
 
         return new TokenSerializationResult(TokenConstants.PREFIX + jwtBuilder.compact(), expiration);
-    }
-
-    private @Nonnull
-    String getKeyTimestampFromClaims(final Claims claims) {
-        return claims.get(TokenConstants.JWT_SIGNATURE_TIMESTAMP_CLAIM, String.class);
-    }
-
-    private @Nonnull
-    TokenType getTokenTypeFromClaims(final Claims claims) {
-        final String issuer = claims.getIssuer();
-        final Optional<TokenType> tokenType = TokenType.valueOfIssuer(issuer);
-        if (!tokenType.isPresent()) {
-            throw AmitAuthenticationException.invalidTokenIssuer(issuer);
-        }
-        return tokenType.get();
-    }
-
-    private static Optional<String> getJwtTokenString(final String refreshToken) {
-        if ((refreshToken == null) || refreshToken.equals(
-                TokenConstants.NO_AUTHENTICATION)) {
-            return Optional.empty();
-        }
-
-        if (!refreshToken.startsWith(TokenConstants.PREFIX)) {
-            throw AmitAuthenticationException.invalidToken();
-        }
-        return Optional.of(refreshToken.substring(TokenConstants.PREFIX.length()).trim());
     }
 }
