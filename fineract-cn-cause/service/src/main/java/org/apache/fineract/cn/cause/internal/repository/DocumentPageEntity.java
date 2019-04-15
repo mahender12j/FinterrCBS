@@ -41,9 +41,6 @@ public class DocumentPageEntity {
     @Column(name = "doc_ref")
     private String docRef;
 
-    @Column(name = "is_mapped")
-    private String isMapped;
-
     @Column(name = "document_name")
     private String documentName;
 
@@ -76,14 +73,6 @@ public class DocumentPageEntity {
         this.type = type;
     }
 
-    public String getIsMapped() {
-        return isMapped;
-    }
-
-    public void setIsMapped(String isMapped) {
-        this.isMapped = isMapped;
-    }
-
     public String getDocumentName() {
         return documentName;
     }
@@ -109,7 +98,6 @@ public class DocumentPageEntity {
                 ", document=" + document +
                 ", type='" + type + '\'' +
                 ", docRef='" + docRef + '\'' +
-                ", isMapped='" + isMapped + '\'' +
                 ", documentName='" + documentName + '\'' +
                 '}';
     }

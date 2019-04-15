@@ -193,15 +193,13 @@ public class CauseAggregate {
 
                 }
             } else {
-                Optional<DocumentPageEntity> documentPageEntity = this.documentPageRepository.findByDocRef(files.getUuid());
-                if (documentPageEntity.isPresent()) {
-                    documentPageEntity.get().setType(files.getType());
-                    documentPageEntity.get().setDocumentName(files.getDocName());
-                    documentPageEntity.get().setDocRef(files.getUuid());
-                    this.documentPageRepository.save(documentPageEntity.get());
-                } else {
-                    this.documentPageRepository.save(DocumentMapper.map(files, documentEntity));
-                }
+                DocumentPageEntity documentPageEntity = this.documentPageRepository.findByDocRef(files.getUuid()).orElse(new DocumentPageEntity());
+                documentPageEntity.setDocument(documentEntity);
+                documentPageEntity.setType(files.getType());
+                documentPageEntity.setDocumentName(files.getDocName());
+                documentPageEntity.setDocRef(files.getUuid());
+                this.documentPageRepository.save(documentPageEntity);
+
             }
         });
 
