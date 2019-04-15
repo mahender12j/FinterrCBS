@@ -19,6 +19,7 @@
 package org.apache.fineract.cn.customer.internal.mapper;
 
 import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
+import org.apache.fineract.cn.customer.api.v1.domain.BusinessCustomer;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
 import org.apache.fineract.cn.customer.api.v1.domain.SocialMatrix;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
@@ -169,5 +170,16 @@ public final class CustomerMapper {
         }
         customer.setRefAccountNumber(customerEntity.getRefAccountNumber());
         return customer;
+    }
+
+
+    public static BusinessCustomer mapBusinessCustomer(final CustomerEntity customerEntity) {
+        final BusinessCustomer businessCustomer = new BusinessCustomer();
+        businessCustomer.setIdentifier(customerEntity.getIdentifier());
+        businessCustomer.setDateOfBirth(customerEntity.getDateOfBirth().toString());
+        businessCustomer.setGivenName(customerEntity.getGivenName());
+        businessCustomer.setMiddleName(customerEntity.getMiddleName());
+        businessCustomer.setSurname(customerEntity.getSurname());
+        return businessCustomer;
     }
 }

@@ -252,11 +252,10 @@ public class CustomerService {
                 });
     }
 
-    public Customer findNgo(final String identifier) {
-        System.out.println("------------customer identifier------------" + identifier);
+    public BusinessCustomer findNgo(final String identifier) {
         CustomerEntity customerEntity = customerRepository.findByIdentifierAndType(identifier, "BUSINESS")
                 .orElseThrow(() -> ServiceException.notFound("Oops! We cant find you..."));
-        return CustomerMapper.map(customerEntity);
+        return CustomerMapper.mapBusinessCustomer(customerEntity);
 
     }
 

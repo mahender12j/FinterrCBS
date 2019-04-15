@@ -164,7 +164,7 @@ public class CustomerRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Customer> findNgo(@PathVariable("identifier") final String identifier) {
+    ResponseEntity<BusinessCustomer> findNgo(@PathVariable("identifier") final String identifier) {
         return ResponseEntity.ok(this.customerService.findNgo(identifier));
     }
 
