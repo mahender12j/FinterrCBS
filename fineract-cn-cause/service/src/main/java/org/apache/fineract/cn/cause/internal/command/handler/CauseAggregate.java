@@ -181,6 +181,7 @@ public class CauseAggregate {
         causeEntity.setActualRaisedFin(cause.getActualRaisedFiat());
         causeEntity.setHardTarget(cause.getHardTarget());
         causeEntity.setSoftTarget(cause.getSoftTarget());
+        causeEntity.setCurrentState(Cause.State.PENDING.name());
         causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
         this.causeRepository.save(causeEntity);
         List<DocumentPageEntity> pageEntities = this.documentPageRepository.findByDocument(documentEntity);
