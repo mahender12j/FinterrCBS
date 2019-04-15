@@ -128,6 +128,21 @@ public class DocumentMapper {
     }
 
 
+    public static List<DocumentPageEntity> map(List<CauseFiles> causeFiles, DocumentEntity documentEntity) {
+        List<DocumentPageEntity> documentPageEntityList = new ArrayList<>();
+        causeFiles.forEach(d -> {
+            DocumentPageEntity entity = new DocumentPageEntity();
+            entity.setDocument(documentEntity);
+            entity.setDocRef(d.getUuid());
+            entity.setDocumentName(d.getDocName());
+            entity.setType(d.getType());
+            documentPageEntityList.add(entity);
+        });
+
+        return documentPageEntityList;
+    }
+
+
     public static CauseDocumentPage map(DocumentPageEntity pageEntity) {
         CauseDocumentPage causeDocumentPage = new CauseDocumentPage();
         causeDocumentPage.setType(pageEntity.getType().toLowerCase());

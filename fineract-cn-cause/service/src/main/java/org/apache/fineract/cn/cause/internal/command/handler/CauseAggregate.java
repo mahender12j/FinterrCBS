@@ -185,25 +185,11 @@ public class CauseAggregate {
         causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
         this.causeRepository.save(causeEntity);
         List<DocumentPageEntity> pageEntities = this.documentPageRepository.findByDocument(documentEntity);
-
-        causeFiles.forEach(files -> {
-            if (files.getType().toLowerCase().equals(CauseDocumentsType.OTHER.name().toLowerCase()) || files.getType().toLowerCase().equals(CauseDocumentsType.GALLARY.name().toLowerCase())) {
-                if (pageEntities.stream().noneMatch(pageEntity -> pageEntity.getDocRef().equals(files.getUuid()))) {
-                    this.documentPageRepository.save(DocumentMapper.map(files, documentEntity));
-
-                }
-            } else {
-                DocumentPageEntity documentPageEntity = this.documentPageRepository.findByDocRef(files.getUuid()).orElse(new DocumentPageEntity());
-                documentPageEntity.setDocument(documentEntity);
-                documentPageEntity.setType(files.getType());
-                documentPageEntity.setDocumentName(files.getDocName());
-                documentPageEntity.setDocRef(files.getUuid());
-                this.documentPageRepository.save(documentPageEntity);
-
-            }
-        });
-
-
+        this.documentPageRepository.delete(pageEntities);
+        System.out.println("--------start---------");
+        List<DocumentPageEntity> documentPageEntities = DocumentMapper.map(causeFiles, documentEntity);
+        this.documentPageRepository.save(documentPageEntities);
+        System.out.println("complete");
         return cause.getIdentifier();
     }
 
