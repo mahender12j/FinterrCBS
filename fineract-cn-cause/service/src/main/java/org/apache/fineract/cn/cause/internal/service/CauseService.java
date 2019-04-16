@@ -51,6 +51,7 @@ public class CauseService {
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
     private final AccountingAdaptor accountingAdaptor;
+    private final CauseStateRepository causeStateRepository;
 
     @Autowired
     public CauseService(final CauseRepository causeRepository,
@@ -63,7 +64,8 @@ public class CauseService {
                         final CommandRepository commandRepository,
                         final AccountingAdaptor accountingAdaptor,
                         final TaskDefinitionRepository taskDefinitionRepository,
-                        final TaskInstanceRepository taskInstanceRepository) {
+                        final TaskInstanceRepository taskInstanceRepository,
+                        final CauseStateRepository causeStateRepository) {
         super();
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
@@ -76,6 +78,7 @@ public class CauseService {
         this.taskInstanceRepository = taskInstanceRepository;
         this.accountingAdaptor = accountingAdaptor;
         this.documentRepository = documentRepository;
+        this.causeStateRepository = causeStateRepository;
     }
 
     public Boolean causeExists(final String identifier) {
@@ -90,6 +93,8 @@ public class CauseService {
             AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
             cause.setAddress(AddressMapper.map(addressEntity));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
+            cause.setNumberOfExtended(this.causeStateRepository.totalExtendedByIdentifier(causeEntity.getIdentifier()));
+            cause.setNumberOfResubmit(this.causeStateRepository.totalResubmitedByIdentifier(causeEntity.getIdentifier()));
             if (cause.getAccountNumber() != null) {
                 final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
@@ -137,7 +142,7 @@ public class CauseService {
         if (includeClosed) {
             final String userIdentifier = UserContextHolder.checkedGetUser();
             if (param == null) {
-                causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(userIdentifier, Cause.State.ACTIVE.DELETED.name(), pageable);
+                causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(userIdentifier, Cause.State.DELETED.name(), pageable);
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
@@ -168,7 +173,7 @@ public class CauseService {
         final Page<CauseEntity> causeEntities;
         Optional<CategoryEntity> categoryEntity;
         if (categoryIdentifier != null) {
-            categoryEntity = categoryRepository.findByIdentifier(categoryIdentifier.toLowerCase());
+            categoryEntity = this.categoryRepository.findByIdentifier(categoryIdentifier.toLowerCase());
             if (categoryEntity.isPresent()) {
                 causeEntities = this.causeRepository.findByCategoryAndCurrentState(categoryEntity.get(), Cause.State.ACTIVE.name(), pageable);
                 causePage.setCauses(causeArrayList(causeEntities));
@@ -196,12 +201,15 @@ public class CauseService {
         for (CauseEntity causeEntity : causeEntities) {
             final Cause cause = CauseMapper.map(causeEntity);
             if (cause.getAccountNumber() != null) {
-                final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                final List<JournalEntry> journalEntry = this.accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
             }
 
             cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
+
+            cause.setNumberOfExtended(this.causeStateRepository.totalExtendedByIdentifier(causeEntity.getIdentifier()));
+            cause.setNumberOfResubmit(this.causeStateRepository.totalResubmitedByIdentifier(causeEntity.getIdentifier()));
 
             setCauseDocuments(causeEntity, cause);
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
@@ -217,7 +225,6 @@ public class CauseService {
 
         return causes;
     }
-
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
         final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(identifier, Cause.State.DELETED.name());

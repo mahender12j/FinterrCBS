@@ -26,12 +26,12 @@ import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
+import org.apache.fineract.cn.cause.internal.repository.CauseStateRepository;
 import org.apache.fineract.cn.cause.internal.repository.PortraitEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.lang.ServiceException;
-import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,10 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.time.Clock;
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -66,19 +63,21 @@ public class CauseRestController {
     private final CauseService causeService;
     private final TaskService taskService;
     private final Environment environment;
+    private final CauseStateRepository causeStateRepository;
 
     @Autowired
     public CauseRestController(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
                                final CommandGateway commandGateway,
                                final CauseService causeService,
                                final TaskService taskService,
-                               final Environment environment) {
+                               final Environment environment, CauseStateRepository causeStateRepository) {
         super();
         this.logger = logger;
         this.commandGateway = commandGateway;
         this.causeService = causeService;
         this.taskService = taskService;
         this.environment = environment;
+        this.causeStateRepository = causeStateRepository;
     }
 
     @Permittable(value = AcceptedTokenType.SYSTEM)
@@ -217,16 +216,11 @@ public class CauseRestController {
     )
     public @ResponseBody
     ResponseEntity<Void> publishCause(@PathVariable("identifier") final String identifier) {
-        Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
-        if (causeEntity.isPresent()) {
-            if (causeEntity.get().getCurrentState().toLowerCase().equals(Cause.State.APPROVED.name().toLowerCase())) {
-                this.commandGateway.process(new PublishCauseCommand(identifier));
-            } else {
-                throw ServiceException.conflict("Cause {0} not APPROVED state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
-            }
-
+        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
+        if (causeEntity.getCurrentState().toLowerCase().equals(Cause.State.APPROVED.name().toLowerCase())) {
+            this.commandGateway.process(new PublishCauseCommand(identifier));
         } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
+            throw ServiceException.conflict("Cause {0} not APPROVED state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }
 
         return ResponseEntity.accepted().build();
@@ -244,26 +238,50 @@ public class CauseRestController {
     ResponseEntity<Void> extendCause(@PathVariable("identifier") final String identifier,
                                      @RequestBody CauseState causeState) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
-        if (causeEntity.getCurrentState().toLowerCase().equals(Cause.State.ACTIVE.name().toLowerCase())) {
+        throwIfCauseIsNotActive(causeEntity);
+        throwIfMin2DaysLeft(causeEntity);
+        throwIfCauseExtendMoreThan2Times(causeEntity);
+        LocalDateTime localDateTime = LocalDateTime.parse(causeState.getNewDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        this.commandGateway.process(new ExtendCauseCommand(identifier, localDateTime));
+        return ResponseEntity.accepted().build();
+    }
 
-            LocalDateTime causeEndDate = causeEntity.getEndDate().minusDays(2);
-
-
-            System.out.println("End date: " + causeEntity.getEndDate().toLocalDate().minusDays(2));
-            System.out.println("Local Date Time: " + LocalDate.now(Clock.systemDefaultZone()));
-            System.out.println("date compare with the end date: " + causeEndDate.isBefore(LocalDateTime.now(Clock.systemDefaultZone())));
-
-            if (causeEndDate.isBefore(LocalDateTime.now(Clock.systemDefaultZone()))) {
-                throw ServiceException.conflict("Cause {0} required minimum two days at least. Current end date: {1}", identifier, causeEntity.getEndDate());
-            } else {
-                LocalDateTime localDateTime = LocalDateTime.parse(causeState.getNewDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                this.commandGateway.process(new ExtendCauseCommand(identifier, localDateTime));
-            }
-
-        } else {
-            throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
+    private void throwIfCauseExtendMoreThan2Times(CauseEntity causeEntity) {
+        if (this.causeStateRepository.totalExtendedByIdentifier(causeEntity.getIdentifier()) > 2) {
+            throw ServiceException.conflict("Cause {0} cant be extended more than two times.", causeEntity.getIdentifier());
         }
 
+    }
+
+    private void throwIfCauseIsNotActive(CauseEntity causeEntity) {
+        if (!causeEntity.getCurrentState().toLowerCase().equals(Cause.State.ACTIVE.name().toLowerCase()))
+            throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", causeEntity.getIdentifier(), causeEntity.getCurrentState());
+    }
+
+
+    private void throwIfMin2DaysLeft(final CauseEntity causeEntity) {
+        LocalDateTime causeEndDate = causeEntity.getEndDate().minusDays(2);
+        if (causeEndDate.isBefore(LocalDateTime.now(Clock.systemDefaultZone()))) {
+            throw ServiceException.conflict("Cause {0} required minimum two days at least. Current end date: {1}", causeEntity.getIdentifier(), causeEntity.getEndDate());
+        }
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/res-submit",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> reSubmitCause(@PathVariable("identifier") final String identifier, @RequestBody CauseState causeState) {
+        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
+        if (causeEntity.getCurrentState().toLowerCase().equals(Cause.State.INACTIVE.name().toLowerCase())) {
+            this.commandGateway.process(new ReSubmitCauseCommand(identifier));
+        } else {
+            throw ServiceException.conflict("Cause {0} not INACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
+        }
         return ResponseEntity.accepted().build();
     }
 
@@ -278,16 +296,11 @@ public class CauseRestController {
     public @ResponseBody
     ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
                                       @RequestBody final CauseApprove cause) {
-        Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
-        if (causeEntity.isPresent()) {
-            if (causeEntity.get().getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
-                this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate(), cause.getSuccessFees()));
-            } else {
-                throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
-            }
-
+        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
+        if (causeEntity.getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
+            this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate(), cause.getSuccessFees()));
         } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
+            throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }
 
         return ResponseEntity.accepted().build();

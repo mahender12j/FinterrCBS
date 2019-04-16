@@ -32,7 +32,7 @@ import java.util.List;
 public class Cause {
 
     public enum State {
-        PENDING, APPROVED, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED, EXTENDED, INACTIVE
+        PENDING, APPROVED, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED, RESUBMITED, EXTENDED, INACTIVE
     }
 
     public enum RemovableCauseState {
@@ -99,6 +99,10 @@ public class Cause {
     private LocalDateTime publishDate;
     private List<CauseRating> causeRatingList;
     private List<CauseFiles> causeFiles;
+
+    //    resubmit and extended
+    private Long numberOfResubmit;
+    private Long numberOfExtended;
 
 
     public Cause() {
@@ -448,6 +452,22 @@ public class Cause {
 
     public void setCauseFiles(List<CauseFiles> causeFiles) {
         this.causeFiles = causeFiles;
+    }
+
+    public Long getNumberOfResubmit() {
+        return numberOfResubmit;
+    }
+
+    public void setNumberOfResubmit(Long numberOfResubmit) {
+        this.numberOfResubmit = numberOfResubmit;
+    }
+
+    public Long getNumberOfExtended() {
+        return numberOfExtended;
+    }
+
+    public void setNumberOfExtended(Long numberOfExtended) {
+        this.numberOfExtended = numberOfExtended;
     }
 
     @Override
