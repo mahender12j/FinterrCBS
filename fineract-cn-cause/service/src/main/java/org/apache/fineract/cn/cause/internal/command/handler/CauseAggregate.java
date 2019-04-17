@@ -266,23 +266,6 @@ public class CauseAggregate {
 
     @Transactional
     @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.RESUBMIT_CAUSE)
-    public String ExtendCause(final ReSubmitCauseCommand reSubmitCauseCommand) {
-
-        final CauseEntity causeEntity = findCauseEntityOrThrow(reSubmitCauseCommand.getIdentifier());
-        causeEntity.setResubmited(true);
-        causeEntity.setCurrentState(Cause.State.PENDING.name());
-        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-        this.causeRepository.save(causeEntity);
-
-        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, null, Cause.State.RESUBMITTED.name());
-        this.causeStateRepository.save(stateEntity);
-        return reSubmitCauseCommand.getIdentifier();
-    }
-
-
-    @Transactional
-    @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.APPROVE_CAUSE)
     public String ApproveCause(final ApproveCauseCommand approveCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(approveCauseCommand.getIdentifier());

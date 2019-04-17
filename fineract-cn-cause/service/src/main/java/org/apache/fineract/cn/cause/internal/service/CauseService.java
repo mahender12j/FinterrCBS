@@ -225,7 +225,7 @@ public class CauseService {
 
     private void setCauseExtendedAndResubmitValue(CauseEntity causeEntity, Cause cause) {
         cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name()))));
-        cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.RESUBMITTED.name()))));
+        cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()))));
     }
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {

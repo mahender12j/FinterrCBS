@@ -267,25 +267,6 @@ public class CauseRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/{identifier}/res-submit",
-            method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> reSubmitCause(@PathVariable("identifier") final String identifier, @RequestBody CauseState causeState) {
-        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
-        if (causeEntity.getCurrentState().toLowerCase().equals(Cause.State.INACTIVE.name().toLowerCase())) {
-            this.commandGateway.process(new ReSubmitCauseCommand(identifier));
-        } else {
-            throw ServiceException.conflict("Cause {0} not INACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
-        }
-        return ResponseEntity.accepted().build();
-    }
-
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
             value = "/causes/{identifier}/approved",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE,
