@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.apache.fineract.cn.cause.api.v1.domain.Cause.State.PENDING;
+import static org.apache.fineract.cn.cause.api.v1.domain.Cause.State.*;
 
 @RestController
 @RequestMapping("/")
@@ -201,6 +201,8 @@ public class CauseRestController {
         throwIfCauseNotExists(identifier);
         throwIfDocumentNotValid(cause);
         throwIfActionMoreThan2Times(identifier, PENDING.name());
+        throwIfActionMoreThan2Times(identifier, APPROVED.name());
+        throwIfActionMoreThan2Times(identifier, REJECTED.name());
 
         this.commandGateway.process(new UpdateCauseCommand(identifier, cause));
         return ResponseEntity.accepted().build();
