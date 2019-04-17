@@ -200,6 +200,23 @@ public class CauseAggregate {
         List<CauseEntity> causes = causeRepository.findByApproveDate(LocalDateTime.now(Clock.systemUTC()).minusDays(12), Cause.State.APPROVED.name())
                 .stream().map(causeEntity -> {
                     causeEntity.setCurrentState(Cause.State.INACTIVE.name());
+
+
+                    //        set the status to zero
+                    Set<String> stateTypes = new HashSet<>(Arrays.asList(Cause.State.EDITED.name(), Cause.State.APPROVED.name(), Cause.State.REJECTED.name()));
+                    List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes);
+                    this.causeStateRepository.save(stateEntity
+                            .stream()
+                            .map(entity -> {
+                                entity.setType(entity.getType() + "-" + Cause.State.INACTIVE.name());
+                                return entity;
+                            }).collect(Collectors.toList()));
+
+                    //        add the status to state
+                    CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, null, Cause.State.REJECTED.name());
+                    this.causeStateRepository.save(causeStateEntity);
+
+
                     return causeEntity;
                 }).collect(Collectors.toList());
         causeRepository.save(causes);
@@ -226,7 +243,7 @@ public class CauseAggregate {
         }).collect(Collectors.toList()));
 
 //        add the status to state
-        CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, causeEntity.getClosedDate(), Cause.State.REJECTED.name());
+        CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, null, Cause.State.REJECTED.name());
         this.causeStateRepository.save(causeStateEntity);
 
         return rejectCauseCommand.getIdentifier();
@@ -258,7 +275,7 @@ public class CauseAggregate {
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
         this.causeRepository.save(causeEntity);
 
-        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, causeEntity.getClosedDate(), Cause.State.RESUBMITTED.name());
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, null, Cause.State.RESUBMITTED.name());
         this.causeStateRepository.save(stateEntity);
         return reSubmitCauseCommand.getIdentifier();
     }
@@ -278,7 +295,7 @@ public class CauseAggregate {
 
         updateCauseStateForApproval(causeEntity);
 
-        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, causeEntity.getClosedDate(), Cause.State.APPROVED.name());
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, null, Cause.State.APPROVED.name());
         this.causeStateRepository.save(stateEntity);
 
         return approveCauseCommand.getIdentifier();
