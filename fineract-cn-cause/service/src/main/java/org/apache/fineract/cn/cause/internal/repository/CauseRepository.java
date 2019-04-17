@@ -25,7 +25,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -51,9 +50,6 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
     Page<CauseEntity> findByCreatedByAndCurrentStateNot(final String createdBy, final String state, final Pageable pageable);
 
     Page<CauseEntity> findByCreatedByAndCurrentState(final String createdBy, final String state, final Pageable pageable);
-
-
-    Page<CauseEntity> findByCategoryAndCurrentState(CategoryEntity entity, final String state, Pageable pageable);
 
     Page<CauseEntity> findByCategoryAndCurrentStateAndStartDateGreaterThanEqual(CategoryEntity entity, final String state, final LocalDateTime localDateTime, Pageable pageable);
 
