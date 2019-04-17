@@ -226,7 +226,7 @@ public class CauseAggregate {
         }).collect(Collectors.toList()));
 
 //        add the status to state
-        CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, causeEntity.getEndDate(), Cause.State.REJECTED.name());
+        CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, causeEntity.getClosedDate(), Cause.State.REJECTED.name());
         this.causeStateRepository.save(causeStateEntity);
 
         return rejectCauseCommand.getIdentifier();
@@ -258,7 +258,7 @@ public class CauseAggregate {
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
         this.causeRepository.save(causeEntity);
 
-        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, causeEntity.getEndDate(), Cause.State.RESUBMITTED.name());
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, causeEntity.getClosedDate(), Cause.State.RESUBMITTED.name());
         this.causeStateRepository.save(stateEntity);
         return reSubmitCauseCommand.getIdentifier();
     }
@@ -277,6 +277,10 @@ public class CauseAggregate {
         this.causeRepository.save(causeEntity);
 
         updateCauseStateForApproval(causeEntity);
+
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, causeEntity.getClosedDate(), Cause.State.APPROVED.name());
+        this.causeStateRepository.save(stateEntity);
+
         return approveCauseCommand.getIdentifier();
     }
 
@@ -285,7 +289,7 @@ public class CauseAggregate {
         List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes)
                 .stream()
                 .map(entity -> {
-                    entity.setType(Cause.State.EDITED.name() + "-" + Cause.State.APPROVED.name());
+                    entity.setType(entity.getType() + "-" + Cause.State.APPROVED.name());
                     return entity;
                 })
                 .collect(Collectors.toList());
