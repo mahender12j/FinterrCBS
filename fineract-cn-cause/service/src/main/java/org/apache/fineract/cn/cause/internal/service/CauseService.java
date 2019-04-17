@@ -152,7 +152,7 @@ public class CauseService {
             }
         } else {
             if (param == null) {
-                causeEntities = this.causeRepository.findByCurrentStateAndStartDateGreaterThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
+                causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
@@ -173,7 +173,7 @@ public class CauseService {
         if (categoryIdentifier != null) {
             categoryEntity = this.categoryRepository.findByIdentifier(categoryIdentifier.toLowerCase());
             if (categoryEntity.isPresent()) {
-                causeEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateGreaterThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
+                causeEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
                 causePage.setCauses(causeArrayList(causeEntities));
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
@@ -183,7 +183,7 @@ public class CauseService {
                 causePage.setTotalElements((long) 0);
             }
         } else {
-            causeEntities = this.causeRepository.findByCurrentStateAndStartDateGreaterThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
+            causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
             causePage.setCauses(causeArrayList(causeEntities));
             causePage.setTotalPages(causeEntities.getTotalPages());
             causePage.setTotalElements(causeEntities.getTotalElements());
