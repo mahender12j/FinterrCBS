@@ -118,36 +118,6 @@ public class CauseAggregate {
         return cause.getIdentifier();
     }
 
-
-//    @Transactional
-//    @CommandHandler
-//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE_DOCUMENT)
-//    public String createCause(final CreateCauseDocumentCommand createCauseDocumentCommand) throws IOException {
-//        final CauseEntity causeEntity = this.findCauseEntityOrThrow(createCauseDocumentCommand.getCauseIdentifier());
-//        DocumentEntity entity = documentRepository.findByCause(causeEntity);
-//        DocumentPageEntity pageEntity = DocumentMapper.map(createCauseDocumentCommand.getDoc(), entity, createCauseDocumentCommand.getDocType());
-//        pageEntity.setIsMapped(CauseDocumentPage.MappedState.UPLOADED.name());
-//        documentPageRepository.save(pageEntity);
-//        return causeEntity.getIdentifier();
-//    }
-
-
-//    @Transactional
-//    @CommandHandler
-//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_CAUSE_DOCUMENT)
-//    public String deleteCauseDocument(final DeleteCauseDocumentCommand deleteCauseDocumentCommand) {
-//
-//        final Optional<DocumentPageEntity> pageEntity = documentPageRepository.findById(deleteCauseDocumentCommand.getPageId());
-//        if (pageEntity.isPresent()) {
-//            pageEntity.get().setIsMapped(CauseDocumentPage.MappedState.DELETED.name());
-//            documentPageRepository.save(pageEntity.get());
-//        } else {
-//            System.out.println("this document id is not available");
-//        }
-//        return deleteCauseDocumentCommand.getCauseIdentifier();
-//    }
-
-
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.PUT_CAUSE)
@@ -227,10 +197,11 @@ public class CauseAggregate {
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.INACTIVE_CAUSE)
     public String expireCause(final InactiveCauseCommand inactiveCauseCommand) {
-        List<CauseEntity> causes = causeRepository.findByApproveDate(LocalDateTime.now(Clock.systemUTC()).minusDays(12), Cause.State.APPROVED.name());
-        causes.forEach(causeEntity -> {
-            causeEntity.setCurrentState(Cause.State.INACTIVE.name());
-        });
+        List<CauseEntity> causes = causeRepository.findByApproveDate(LocalDateTime.now(Clock.systemUTC()).minusDays(12), Cause.State.APPROVED.name())
+                .stream().map(causeEntity -> {
+                    causeEntity.setCurrentState(Cause.State.INACTIVE.name());
+                    return causeEntity;
+                }).collect(Collectors.toList());
         causeRepository.save(causes);
         return causes.toString();
     }
@@ -327,9 +298,7 @@ public class CauseAggregate {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_CAUSE)
     public String deleteCause(final DeleteCauseCommand deleteCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseCommand.getCauseIdentifier());
-        causeEntity.setCurrentState(Cause.State.DELETED.name());
-        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        setStateAndTimestamp(causeEntity, Cause.State.DELETED);
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
         this.commandRepository.save(CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), deleteCauseCommand.comment()));
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.UNLOCK);
@@ -346,9 +315,7 @@ public class CauseAggregate {
             throw ServiceException.conflict("Open Tasks for cause {0} exists.", activateCauseCommand.identifier());
         }
 
-        causeEntity.setCurrentState(Cause.State.ACTIVE.name());
-        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        setStateAndTimestamp(causeEntity, Cause.State.ACTIVE);
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
@@ -365,9 +332,7 @@ public class CauseAggregate {
     public String lockCause(final LockCauseCommand lockCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(lockCauseCommand.identifier());
 
-        causeEntity.setCurrentState(Cause.State.LOCKED.name());
-        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        setStateAndTimestamp(causeEntity, Cause.State.LOCKED);
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
@@ -390,9 +355,7 @@ public class CauseAggregate {
             throw ServiceException.conflict("Open Tasks for cause {0} exists.", unlockCauseCommand.identifier());
         }
 
-        causeEntity.setCurrentState(Cause.State.ACTIVE.name());
-        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        setStateAndTimestamp(causeEntity, Cause.State.ACTIVE);
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
@@ -403,15 +366,19 @@ public class CauseAggregate {
         return unlockCauseCommand.identifier();
     }
 
+    private void setStateAndTimestamp(CauseEntity causeEntity, Cause.State active) {
+        causeEntity.setCurrentState(active.name());
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+    }
+
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.CLOSE_CAUSE)
     public String closeCause(final CloseCauseCommand closeCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(closeCauseCommand.identifier());
 
-        causeEntity.setCurrentState(Cause.State.CLOSED.name());
-        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        setStateAndTimestamp(causeEntity, Cause.State.CLOSED);
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
@@ -434,9 +401,7 @@ public class CauseAggregate {
             throw ServiceException.conflict("Open Tasks for cause {0} exists.", reopenCauseCommand.identifier());
         }
 
-        causeEntity.setCurrentState(Cause.State.ACTIVE.name());
-        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        setStateAndTimestamp(causeEntity, Cause.State.ACTIVE);
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
@@ -527,8 +492,7 @@ public class CauseAggregate {
     }
 
     private CauseEntity findCauseEntityOrThrow(String identifier) {
-        return this.causeRepository.findByIdentifier(identifier)
-                .orElseThrow(() -> ServiceException.notFound("Cause ''{0}'' not found", identifier));
+        return this.causeRepository.findByIdentifier(identifier).orElseThrow(() -> ServiceException.notFound("Cause ''{0}'' not found", identifier));
     }
 }
 
