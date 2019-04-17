@@ -48,8 +48,7 @@ import javax.validation.Valid;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.fineract.cn.cause.api.v1.domain.Cause.State.*;
@@ -200,10 +199,7 @@ public class CauseRestController {
                                      @RequestBody final Cause cause) {
         throwIfCauseNotExists(identifier);
         throwIfDocumentNotValid(cause);
-        throwIfActionMoreThan2Times(identifier, PENDING.name());
-        throwIfActionMoreThan2Times(identifier, APPROVED.name());
-        throwIfActionMoreThan2Times(identifier, REJECTED.name());
-
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Arrays.asList(PENDING.name(), APPROVED.name(), REJECTED.name())));
         this.commandGateway.process(new UpdateCauseCommand(identifier, cause));
         return ResponseEntity.accepted().build();
     }
@@ -244,7 +240,7 @@ public class CauseRestController {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
         throwIfCauseIsNotActive(causeEntity);
         throwIfMin2DaysLeft(causeEntity);
-        throwIfActionMoreThan2Times(identifier, Cause.State.EXTENDED.name());
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Arrays.asList(EXTENDED.name())));
         LocalDateTime localDateTime = LocalDateTime.parse(causeState.getNewDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         this.commandGateway.process(new ExtendCauseCommand(identifier, localDateTime));
         return ResponseEntity.accepted().build();
@@ -294,7 +290,7 @@ public class CauseRestController {
     ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
                                       @RequestBody final CauseApprove cause) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
-        throwIfActionMoreThan2Times(identifier, Cause.State.APPROVED.name());
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Arrays.asList(APPROVED.name())));
 
         if (causeEntity.getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
             this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate(), cause.getSuccessFees()));
@@ -342,7 +338,7 @@ public class CauseRestController {
     ResponseEntity<Void> RejectCause(@PathVariable("identifier") final String identifier,
                                      @RequestBody final Cause cause) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
-        throwIfActionMoreThan2Times(identifier, Cause.State.REJECTED.name());
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Arrays.asList(Cause.State.REJECTED.name())));
 
         if (PENDING.name().toLowerCase().equals(causeEntity.getCurrentState().toLowerCase())) {
             this.commandGateway.process(new RejectCauseCommand(identifier, cause.getRejectedReason()));
@@ -759,9 +755,9 @@ public class CauseRestController {
         }
     }
 
-    private void throwIfActionMoreThan2Times(String identifier, final String state) {
+    private void throwIfActionMoreThan2Times(String identifier, final Set<String> state) {
         if (this.causeStateRepository.totalStateByCauseIdentifier(identifier, state) >= 2) {
-            throw ServiceException.conflict("Cause {0} cant be {1} more than two times.", identifier, state);
+            throw ServiceException.conflict("Cause {0} cant be {1} more than two times.", identifier, state.toString());
         }
     }
 

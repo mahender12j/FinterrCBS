@@ -35,8 +35,8 @@ public interface CauseStateRepository extends JpaRepository<CauseStateEntity, Lo
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CauseStateEntity c WHERE c.id = :identifier")
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
-    @Query("SELECT COUNT(c) FROM CauseStateEntity c WHERE c.cause.identifier = :identifier and c.type = :type")
-    Long totalStateByCauseIdentifier(@Param("identifier") final String identifier, @Param("type") final String type);
+    @Query("SELECT COUNT(c) FROM CauseStateEntity c WHERE c.cause.identifier = :identifier and c.type in :type")
+    Long totalStateByCauseIdentifier(@Param("identifier") final String identifier, @Param("type") final Set<String> type);
 
     List<CauseStateEntity> findByCauseAndTypeIn(final CauseEntity causeEntity, final Set<String> type);
 

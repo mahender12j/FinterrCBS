@@ -30,10 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -230,8 +227,8 @@ public class CauseService {
     }
 
     private void setCauseExtendedAndResubmitValue(CauseEntity causeEntity, Cause cause) {
-        cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), Cause.State.EXTENDED.name()));
-        cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), Cause.State.RESUBMITTED.name()));
+        cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Arrays.asList(Cause.State.EXTENDED.name()))));
+        cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Arrays.asList(Cause.State.RESUBMITTED.name()))));
     }
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
