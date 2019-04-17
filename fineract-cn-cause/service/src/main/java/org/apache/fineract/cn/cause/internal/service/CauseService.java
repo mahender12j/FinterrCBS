@@ -30,6 +30,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -90,12 +92,7 @@ public class CauseService {
             AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
             cause.setAddress(AddressMapper.map(addressEntity));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
-
             setCauseExtendedAndResubmitValue(causeEntity, cause);
-
-
-//            cause.setNumberOfExtended(this.causeStateRepository.totalExtendedByIdentifier(causeEntity.getIdentifier()));
-//            cause.setNumberOfResubmit(this.causeStateRepository.totalResubmitedByIdentifier(causeEntity.getIdentifier()));
             if (cause.getAccountNumber() != null) {
                 final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
@@ -155,7 +152,7 @@ public class CauseService {
             }
         } else {
             if (param == null) {
-                causeEntities = this.causeRepository.findByCurrentState(Cause.State.ACTIVE.name(), pageable);
+                causeEntities = this.causeRepository.findByCurrentStateAndStartDateGreaterThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
                 causePage.setCauses(causeArrayList(causeEntities));
@@ -176,7 +173,7 @@ public class CauseService {
         if (categoryIdentifier != null) {
             categoryEntity = this.categoryRepository.findByIdentifier(categoryIdentifier.toLowerCase());
             if (categoryEntity.isPresent()) {
-                causeEntities = this.causeRepository.findByCategoryAndCurrentState(categoryEntity.get(), Cause.State.ACTIVE.name(), pageable);
+                causeEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateGreaterThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()) ,pageable);
                 causePage.setCauses(causeArrayList(causeEntities));
                 causePage.setTotalPages(causeEntities.getTotalPages());
                 causePage.setTotalElements(causeEntities.getTotalElements());
@@ -227,8 +224,8 @@ public class CauseService {
     }
 
     private void setCauseExtendedAndResubmitValue(CauseEntity causeEntity, Cause cause) {
-        cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Arrays.asList(Cause.State.EXTENDED.name()))));
-        cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Arrays.asList(Cause.State.RESUBMITTED.name()))));
+        cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name()))));
+        cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.RESUBMITTED.name()))));
     }
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
@@ -249,16 +246,16 @@ public class CauseService {
     }
 
 
-    public Boolean causeRatingExists(final String causeIdentifier, final String createdBy) {
-        return this.ratingRepository.existsByCreatedBy(causeIdentifier, createdBy);
-    }
-
-    public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {
-        return causeRepository.findByIdentifier(identifier)
-                .map(ratingRepository::findByCause)
-                .orElse(Stream.empty())
-                .map(RatingMapper::map);
-    }
+//    public Boolean causeRatingExists(final String causeIdentifier, final String createdBy) {
+//        return this.ratingRepository.existsByCreatedBy(causeIdentifier, createdBy);
+//    }
+//
+//    public final Stream<CauseRating> fetchRatingsByCause(final String identifier) {
+//        return causeRepository.findByIdentifier(identifier)
+//                .map(ratingRepository::findByCause)
+//                .orElse(Stream.empty())
+//                .map(RatingMapper::map);
+//    }
 
     public final Stream<CauseRating> fetchActiveRatingsByCause(final String identifier, final Boolean active) {
         return causeRepository.findByIdentifier(identifier)

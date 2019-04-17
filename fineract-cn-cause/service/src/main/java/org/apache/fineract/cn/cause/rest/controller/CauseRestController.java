@@ -100,7 +100,8 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-    public @ResponseBody
+    public
+    @ResponseBody
     ResponseEntity<Void> createCause(@RequestBody final Cause cause) {
         throwIfCauseExists(cause.getIdentifier());
         throwIfDocumentNotValid(cause);
@@ -137,7 +138,8 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-    public @ResponseBody
+    public
+    @ResponseBody
     ResponseEntity<Void> deleteCause(@PathVariable("identifier") final String identifier) {
 
         final Optional<Cause> cause = this.causeService.findCause(identifier);
@@ -194,7 +196,8 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public @ResponseBody
+    public
+    @ResponseBody
     ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier,
                                      @RequestBody final Cause cause) {
         throwIfCauseNotExists(identifier);
@@ -214,7 +217,8 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public @ResponseBody
+    public
+    @ResponseBody
     ResponseEntity<Void> publishCause(@PathVariable("identifier") final String identifier) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
         if (causeEntity.getCurrentState().toLowerCase().equals(Cause.State.APPROVED.name().toLowerCase())) {
@@ -234,13 +238,14 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public @ResponseBody
+    public
+    @ResponseBody
     ResponseEntity<Void> extendCause(@PathVariable("identifier") final String identifier,
                                      @RequestBody CauseState causeState) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
         throwIfCauseIsNotActive(causeEntity);
         throwIfMin2DaysLeft(causeEntity);
-        throwIfActionMoreThan2Times(identifier, new HashSet<>(Arrays.asList(EXTENDED.name())));
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(EXTENDED.name())));
         LocalDateTime localDateTime = LocalDateTime.parse(causeState.getNewDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         this.commandGateway.process(new ExtendCauseCommand(identifier, localDateTime));
         return ResponseEntity.accepted().build();
@@ -286,7 +291,8 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public @ResponseBody
+    public
+    @ResponseBody
     ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
                                       @RequestBody final CauseApprove cause) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
