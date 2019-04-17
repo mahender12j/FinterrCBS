@@ -158,7 +158,7 @@ public class CauseAggregate {
         List<DocumentPageEntity> documentPageEntities = DocumentMapper.map(causeFiles, documentEntity);
         this.documentPageRepository.save(documentPageEntities);
 
-        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, causeEntity.getEndDate(), Cause.State.EDITED.name());
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, null, Cause.State.PENDING.name());
         this.causeStateRepository.save(stateEntity);
 
 
@@ -203,7 +203,7 @@ public class CauseAggregate {
 
 
                     //        set the status to zero
-                    Set<String> stateTypes = new HashSet<>(Arrays.asList(Cause.State.EDITED.name(), Cause.State.APPROVED.name(), Cause.State.REJECTED.name()));
+                    Set<String> stateTypes = new HashSet<>(Arrays.asList(Cause.State.PENDING.name(), Cause.State.APPROVED.name(), Cause.State.REJECTED.name()));
                     List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes);
                     this.causeStateRepository.save(stateEntity
                             .stream()
@@ -213,7 +213,7 @@ public class CauseAggregate {
                             }).collect(Collectors.toList()));
 
                     //        add the status to state
-                    CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, null, Cause.State.REJECTED.name());
+                    CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, null, Cause.State.INACTIVE.name());
                     this.causeStateRepository.save(causeStateEntity);
 
 
@@ -235,10 +235,10 @@ public class CauseAggregate {
 
 
 //        set the pending status to zero
-        Set<String> stateTypes = new HashSet<>(Collections.singletonList(Cause.State.EDITED.name()));
+        Set<String> stateTypes = new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()));
         List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes);
         this.causeStateRepository.save(stateEntity.stream().map(entity -> {
-            entity.setType(Cause.State.EDITED.name() + "-" + Cause.State.PENDING.name() + "-" + Cause.State.REJECTED.name());
+            entity.setType(Cause.State.PENDING.name() + "-" + Cause.State.PENDING.name() + "-" + Cause.State.REJECTED.name());
             return entity;
         }).collect(Collectors.toList()));
 
@@ -302,7 +302,7 @@ public class CauseAggregate {
     }
 
     private void updateCauseStateForApproval(CauseEntity causeEntity) {
-        Set<String> stateTypes = new HashSet<>(Arrays.asList(Cause.State.REJECTED.name(), Cause.State.EDITED.name()));
+        Set<String> stateTypes = new HashSet<>(Arrays.asList(Cause.State.REJECTED.name(), Cause.State.PENDING.name()));
         List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes)
                 .stream()
                 .map(entity -> {

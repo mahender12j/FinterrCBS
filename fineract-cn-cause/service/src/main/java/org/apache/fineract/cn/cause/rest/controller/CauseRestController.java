@@ -200,7 +200,7 @@ public class CauseRestController {
                                      @RequestBody final Cause cause) {
         throwIfCauseNotExists(identifier);
         throwIfDocumentNotValid(cause);
-        throwIfActionMoreThan2Times(identifier, Cause.State.EDITED.name());
+        throwIfActionMoreThan2Times(identifier, PENDING.name());
 
         this.commandGateway.process(new UpdateCauseCommand(identifier, cause));
         return ResponseEntity.accepted().build();
