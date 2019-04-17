@@ -141,14 +141,14 @@ public final class CauseMapper {
     }
 
 
-    public static CauseStateEntity map(CauseEntity causeEntity, LocalDateTime extended_date) {
+    public static CauseStateEntity map(CauseEntity causeEntity, LocalDateTime extended_date, String type) {
         CauseStateEntity stateEntity = new CauseStateEntity();
         stateEntity.setCause(causeEntity);
         stateEntity.setCreatedBy(UserContextHolder.checkedGetUser());
         stateEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         stateEntity.setModifiedAt(LocalDateTime.now(Clock.systemUTC()));
         stateEntity.setNewDate(extended_date);
-        stateEntity.setType(Cause.State.EXTENDED.name());
+        stateEntity.setType(type);
         stateEntity.setStatus(Cause.State.PENDING.name());
         return stateEntity;
     }

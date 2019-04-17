@@ -21,7 +21,6 @@ package org.apache.fineract.cn.cause.internal.command.handler;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentsType;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseFiles;
 import org.apache.fineract.cn.cause.api.v1.domain.Command;
 import org.apache.fineract.cn.cause.internal.command.*;
@@ -37,8 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Padma Raju Sattineni
@@ -186,10 +185,13 @@ public class CauseAggregate {
         this.causeRepository.save(causeEntity);
         List<DocumentPageEntity> pageEntities = this.documentPageRepository.findByDocument(documentEntity);
         this.documentPageRepository.delete(pageEntities);
-        System.out.println("--------start---------");
         List<DocumentPageEntity> documentPageEntities = DocumentMapper.map(causeFiles, documentEntity);
         this.documentPageRepository.save(documentPageEntities);
-        System.out.println("complete");
+
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, causeEntity.getEndDate(), Cause.State.EDITED.name());
+        this.causeStateRepository.save(stateEntity);
+
+
         return cause.getIdentifier();
     }
 
@@ -211,11 +213,12 @@ public class CauseAggregate {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.EXPIRE_CAUSE)
     public String expireCause(final ExpiredCauseCommand expiredCauseCommand) {
         List<CauseEntity> causes = causeRepository.findByEndDateAndCurrentState(Cause.State.ACTIVE.name(), Cause.State.EXTENDED.name());
-        causes.forEach(causeEntity -> {
+        causeRepository.save(causes.stream().map(causeEntity -> {
             causeEntity.setCurrentState(Cause.State.CLOSED.name());
             causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
-        });
-        causeRepository.save(causes);
+            return causeEntity;
+        }).collect(Collectors.toList()));
+
         return causes.toString();
     }
 
@@ -241,6 +244,20 @@ public class CauseAggregate {
         causeEntity.setRejectedReason(rejectCauseCommand.getReason());
         causeEntity.setRejectedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
+
+
+//        set the pending status to zero
+        Set<String> stateTypes = new HashSet<>(Collections.singletonList(Cause.State.EDITED.name()));
+        List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes);
+        this.causeStateRepository.save(stateEntity.stream().map(entity -> {
+            entity.setType(Cause.State.EDITED.name() + "-" + Cause.State.PENDING.name() + "-" + Cause.State.REJECTED.name());
+            return entity;
+        }).collect(Collectors.toList()));
+
+//        add the status to state
+        CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, causeEntity.getEndDate(), Cause.State.REJECTED.name());
+        this.causeStateRepository.save(causeStateEntity);
+
         return rejectCauseCommand.getIdentifier();
     }
 
@@ -252,7 +269,7 @@ public class CauseAggregate {
         final CauseEntity causeEntity = findCauseEntityOrThrow(extendCauseCommand.getIdentifier());
         causeEntity.setExtended(true);
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, extendCauseCommand.getExtend_date());
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, extendCauseCommand.getExtend_date(), Cause.State.EXTENDED.name());
         this.causeRepository.save(causeEntity);
         this.causeStateRepository.save(stateEntity);
         return extendCauseCommand.getIdentifier();
@@ -270,9 +287,7 @@ public class CauseAggregate {
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
         this.causeRepository.save(causeEntity);
 
-        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, causeEntity.getEndDate());
-        stateEntity.setType(Cause.State.RESUBMITED.name());
-        stateEntity.setStatus(Cause.State.PENDING.name());
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, causeEntity.getEndDate(), Cause.State.RESUBMITTED.name());
         this.causeStateRepository.save(stateEntity);
         return reSubmitCauseCommand.getIdentifier();
     }
@@ -289,7 +304,22 @@ public class CauseAggregate {
         causeEntity.setApprovedOn(LocalDateTime.now(Clock.systemUTC()));
         causeEntity.setApprovedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
+
+        updateCauseStateForApproval(causeEntity);
         return approveCauseCommand.getIdentifier();
+    }
+
+    private void updateCauseStateForApproval(CauseEntity causeEntity) {
+        Set<String> stateTypes = new HashSet<>(Arrays.asList(Cause.State.REJECTED.name(), Cause.State.EDITED.name()));
+        List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes)
+                .stream()
+                .map(entity -> {
+                    entity.setType(Cause.State.EDITED.name() + "-" + Cause.State.APPROVED.name());
+                    return entity;
+                })
+                .collect(Collectors.toList());
+
+        this.causeStateRepository.save(stateEntity);
     }
 
     @Transactional

@@ -198,8 +198,10 @@ public class CauseRestController {
     public @ResponseBody
     ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier,
                                      @RequestBody final Cause cause) {
-        throwIfCauseNotExists(cause.getIdentifier());
+        throwIfCauseNotExists(identifier);
         throwIfDocumentNotValid(cause);
+        throwIfActionMoreThan2Times(identifier, Cause.State.EDITED.name());
+
         this.commandGateway.process(new UpdateCauseCommand(identifier, cause));
         return ResponseEntity.accepted().build();
     }
@@ -240,17 +242,10 @@ public class CauseRestController {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
         throwIfCauseIsNotActive(causeEntity);
         throwIfMin2DaysLeft(causeEntity);
-        throwIfCauseExtendMoreThan2Times(causeEntity);
+        throwIfActionMoreThan2Times(identifier, Cause.State.EXTENDED.name());
         LocalDateTime localDateTime = LocalDateTime.parse(causeState.getNewDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         this.commandGateway.process(new ExtendCauseCommand(identifier, localDateTime));
         return ResponseEntity.accepted().build();
-    }
-
-    private void throwIfCauseExtendMoreThan2Times(CauseEntity causeEntity) {
-        if (this.causeStateRepository.totalExtendedByIdentifier(causeEntity.getIdentifier()) > 2) {
-            throw ServiceException.conflict("Cause {0} cant be extended more than two times.", causeEntity.getIdentifier());
-        }
-
     }
 
     private void throwIfCauseIsNotActive(CauseEntity causeEntity) {
@@ -338,22 +333,18 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public @ResponseBody
-    ResponseEntity<Void> RejectCause(
-            @PathVariable("identifier") final String identifier,
-            @RequestBody final Cause cause) {
-        Optional<CauseEntity> causeEntity = causeService.findCauseEntity(identifier);
-        if (causeEntity.isPresent()) {
-            if (PENDING.name().toLowerCase().equals(causeEntity.get().getCurrentState().toLowerCase())) {
-                this.commandGateway.process(new RejectCauseCommand(identifier, cause.getRejectedReason()));
-            } else {
-                throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.get().getCurrentState());
-            }
+    public
+    @ResponseBody
+    ResponseEntity<Void> RejectCause(@PathVariable("identifier") final String identifier,
+                                     @RequestBody final Cause cause) {
+        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
+        throwIfActionMoreThan2Times(identifier, Cause.State.REJECTED.name());
 
+        if (PENDING.name().toLowerCase().equals(causeEntity.getCurrentState().toLowerCase())) {
+            this.commandGateway.process(new RejectCauseCommand(identifier, cause.getRejectedReason()));
         } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
+            throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }
-
         return ResponseEntity.accepted().build();
     }
 
@@ -761,6 +752,12 @@ public class CauseRestController {
     private void throwIfCauseExists(final String identifier) {
         if (this.causeService.causeExists(identifier)) {
             throw ServiceException.notFound("Cause {0} already exist.", identifier);
+        }
+    }
+
+    private void throwIfActionMoreThan2Times(String identifier, final String state) {
+        if (this.causeStateRepository.totalStateByCauseIdentifier(identifier, state) >= 2) {
+            throw ServiceException.conflict("Cause {0} cant be {1} more than two times.", identifier, state);
         }
     }
 

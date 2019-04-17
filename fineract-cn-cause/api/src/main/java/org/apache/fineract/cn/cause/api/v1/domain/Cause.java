@@ -32,7 +32,7 @@ import java.util.List;
 public class Cause {
 
     public enum State {
-        PENDING, APPROVED, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED, RESUBMITED, EXTENDED, INACTIVE
+        PENDING, APPROVED, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED, RESUBMITTED, EXTENDED, INACTIVE, EDITED
     }
 
     public enum RemovableCauseState {

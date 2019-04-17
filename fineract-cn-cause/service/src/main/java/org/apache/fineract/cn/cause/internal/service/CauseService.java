@@ -93,8 +93,12 @@ public class CauseService {
             AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
             cause.setAddress(AddressMapper.map(addressEntity));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
-            cause.setNumberOfExtended(this.causeStateRepository.totalExtendedByIdentifier(causeEntity.getIdentifier()));
-            cause.setNumberOfResubmit(this.causeStateRepository.totalResubmitedByIdentifier(causeEntity.getIdentifier()));
+
+            setCauseExtendedAndResubmitValue(causeEntity, cause);
+
+
+//            cause.setNumberOfExtended(this.causeStateRepository.totalExtendedByIdentifier(causeEntity.getIdentifier()));
+//            cause.setNumberOfResubmit(this.causeStateRepository.totalResubmitedByIdentifier(causeEntity.getIdentifier()));
             if (cause.getAccountNumber() != null) {
                 final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
@@ -208,8 +212,7 @@ public class CauseService {
             cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
 
-            cause.setNumberOfExtended(this.causeStateRepository.totalExtendedByIdentifier(causeEntity.getIdentifier()));
-            cause.setNumberOfResubmit(this.causeStateRepository.totalResubmitedByIdentifier(causeEntity.getIdentifier()));
+            setCauseExtendedAndResubmitValue(causeEntity, cause);
 
             setCauseDocuments(causeEntity, cause);
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
@@ -224,6 +227,11 @@ public class CauseService {
         }
 
         return causes;
+    }
+
+    private void setCauseExtendedAndResubmitValue(CauseEntity causeEntity, Cause cause) {
+        cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), Cause.State.EXTENDED.name()));
+        cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), Cause.State.RESUBMITTED.name()));
     }
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
