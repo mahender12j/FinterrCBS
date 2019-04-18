@@ -19,29 +19,15 @@
 package org.apache.fineract.cn.customer.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
- * @author Md Robiul Hassan
+ * @author Myrle Krantz
  */
 @Repository
-public interface DocumentEntryRepository extends JpaRepository<DocumentEntryEntity, Long> {
+public interface DocumentTypeRepository extends JpaRepository<DocumentTypeEntity, Long> {
 
-
-    List<DocumentEntryEntity> findByDocument(final DocumentEntity documentEntity);
-
-    List<DocumentEntryEntity> findByDocumentAndStatusNot(final DocumentEntity documentEntity, final String documentStatus);
-
-    List<DocumentEntryEntity> findByDocumentAndStatus(final DocumentEntity documentEntity, final String documentStatus);
-
-    Optional<DocumentEntryEntity> findById(final Long documentId);
-
-
-    @Query("SELECT d FROM DocumentEntryEntity d WHERE d.document.customer.identifier = :customerIdentifier AND d.id = :documentId")
-    Optional<DocumentEntryEntity> findByCustomerIdAndDocumentId(@Param("customerIdentifier") String customerIdentifier, @Param("documentId") Long documentId);
+    List<DocumentTypeEntity> findByUserType(final String userType);
 }

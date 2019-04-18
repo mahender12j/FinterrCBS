@@ -45,18 +45,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Aggregate
 public class DocumentCommandHandler {
     private final DocumentRepository documentRepository;
-    private final DocumentPageRepository documentPageRepository;
     private final CustomerRepository customerRepository;
     private final DocumentEntryRepository documentEntryRepository;
 
     @Autowired
     public DocumentCommandHandler(
             final DocumentRepository documentRepository,
-            final DocumentPageRepository documentPageRepository,
             final DocumentEntryRepository documentEntryRepository,
             final CustomerRepository customerRepository) {
         this.documentRepository = documentRepository;
-        this.documentPageRepository = documentPageRepository;
         this.customerRepository = customerRepository;
         this.documentEntryRepository = documentEntryRepository;
     }
@@ -79,30 +76,6 @@ public class DocumentCommandHandler {
         return new DocumentPageEvent(command.getCustomeridentifier(), command.getCustomeridentifier(), 1);
     }
 
-
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT)
-    public DocumentEvent process(final CreateKYCDocumentCommand command) throws IOException {
-
-        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifier(command.getCustomerIdentifier());
-
-        Boolean findDocument = documentRepository.findByIdentifierAndCustomer(command.getCustomerIdentifier());
-        if (!findDocument) {
-            documentRepository.save(DocumentMapper.map(command.getCustomerDocumentsBody(), customerEntity.get()));
-        }
-        final DocumentEntity documentEntity = documentRepository.findByCustomerIdAndDocumentIdentifier(
-                command.getCustomerIdentifier(), command.getCustomerIdentifier())
-                .orElseThrow(() -> ServiceException.badRequest("Document not found"));
-
-        final DocumentEntryEntity documentEntryEntity = DocumentMapper.map(command.getCustomerDocumentsBody(), documentEntity);
-        // documentEntryEntity.setStatus("PENDING");
-        documentEntryEntity.setStatus("UPLOADED");
-        DocumentEntryEntity doc = documentEntryRepository.save(documentEntryEntity);
-        final DocumentPageEntity documentPageEntity = DocumentMapper.map(command.getFile(), 1, documentEntity, doc);
-        documentPageRepository.save(documentPageEntity);
-        return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerIdentifier());
-    }
 
     @Transactional
     @CommandHandler
@@ -159,20 +132,5 @@ public class DocumentCommandHandler {
 
 
         return new DocumentEvent(command.getCustomerIdentifier(), command.getDocumentIdentifier());
-    }
-
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.DELETE_DOCUMENT_PAGE)
-    public DocumentPageEvent process(final DeleteDocumentPageCommand command) throws IOException {
-        documentPageRepository.findByCustomerIdAndDocumentIdentifierAndPageNumber(
-                command.getCustomerIdentifier(),
-                command.getDocumentIdentifier(),
-                command.getPageNumber())
-                .ifPresent(documentPageRepository::delete);
-
-        //No exception if it's not present, because why bother.  It's not present.  That was the goal.
-
-        return new DocumentPageEvent(command.getCustomerIdentifier(), command.getDocumentIdentifier(), command.getPageNumber());
     }
 }

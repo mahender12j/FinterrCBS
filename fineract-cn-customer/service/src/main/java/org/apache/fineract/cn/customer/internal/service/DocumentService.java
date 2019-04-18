@@ -32,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -43,29 +42,23 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class DocumentService {
     private final DocumentRepository documentRepository;
-    private final DocumentPageRepository documentPageRepository;
     private final DocumentEntryRepository documentEntryRepository;
     private final DocumentStorageRepository documentStorageRepository;
+    private final DocumentTypeRepository documentTypeRepository;
+    private final CustomerRepository customerRepository;
 
     @Autowired
     public DocumentService(
             final DocumentRepository documentRepository,
             final DocumentEntryRepository documentEntryRepository,
             final DocumentStorageRepository documentStorageRepository,
-            final DocumentPageRepository documentPageRepository) {
+            final DocumentTypeRepository documentTypeRepository,
+            final CustomerRepository customerRepository) {
         this.documentRepository = documentRepository;
         this.documentEntryRepository = documentEntryRepository;
-        this.documentPageRepository = documentPageRepository;
         this.documentStorageRepository = documentStorageRepository;
-    }
-
-    public Optional<DocumentPageEntity> findPage(final String customerIdentifier,
-                                                 final String documentIdentifier,
-                                                 final Integer pageNumber) {
-        return this.documentPageRepository.findByCustomerIdAndDocumentIdentifierAndPageNumber(
-                customerIdentifier,
-                documentIdentifier,
-                pageNumber);
+        this.documentTypeRepository = documentTypeRepository;
+        this.customerRepository = customerRepository;
     }
 
 
@@ -75,71 +68,48 @@ public class DocumentService {
         return DocumentMapper.map(entity);
     }
 
-
-    public DocumentStorage findDocumentStorage(final String uuid) {
-
-        Optional<DocumentStorageEntity> documentEntity = this.documentStorageRepository.findByUuid(uuid);
-        if (documentEntity.isPresent()) {
-            return DocumentMapper.map(documentEntity.get());
-        } else {
-            throw ServiceException.notFound("Document {0} not found.", uuid);
-        }
-    }
-
-
     public Optional<DocumentStorageEntity> findDocumentStorageByUUID(final String uuid) {
         return this.documentStorageRepository.findByUuid(uuid);
     }
 
-
-    public Optional<DocumentPageEntity> findPagebyDocumentID(final Long documentIdentifier) {
-        return this.documentPageRepository.findByDocumentEntryId(documentIdentifier);
-    }
-
-    public Stream<CustomerDocument> find(final String customerIdentifier) {
-        final Stream<DocumentEntity> preMappedRet = this.documentRepository.findByCustomerId(customerIdentifier);
-        return preMappedRet.map(DocumentMapper::map);
-    }
-
-
     public CustomerDocument findCustomerDocuments(final String customerIdentifier) {
-        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).findFirst();
-        CustomerDocument customerDocument = new CustomerDocument();
-        if (documentEntity.isPresent()) {
-            customerDocument = DocumentMapper.map(documentEntity.get());
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
-                    this.documentEntryRepository.findByDocumentAndStatusNotAndStatusNot(documentEntity.get(), "DELETED", "UPLOADED").stream()
-                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+        final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
+        final DocumentEntity documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Document not found"));
+        CustomerDocument customerDocument = DocumentMapper.map(documentEntity);
+        final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                this.documentEntryRepository
+                        .findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name()).stream()
+                        .collect(groupingBy(DocumentEntryEntity::getType, toList()));
 
-            List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
-            customerDocument.setDocumentsTypes(documentsType);
+        List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
+        customerDocument.setDocumentsTypes(documentsType);
 
-            Set<String> doc_master = new HashSet<>();
-            doc_master.add("Photo ID Proof");
-            doc_master.add("Residence Proof");
-            final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
-            customerDocument.setKycStatus(documentsType.stream().allMatch(DocumentsType::isKYCVerified) && isDocAvailable);
-        }
+        Set<String> doc_master = this.documentTypeRepository.findByUserType(customerEntity.getType())
+                .stream()
+                .map(DocumentTypeEntity::getTitle)
+                .collect(Collectors.toSet());
+        final boolean isDocAvailable = documentEntryEntity
+                .keySet()
+                .equals(doc_master);
+        customerDocument.setKycStatus(documentsType
+                .stream()
+                .allMatch(DocumentsType::isKYCVerified) && isDocAvailable);
         return customerDocument;
     }
 
     public CustomerDocument findCustomerUploadedDocuments(final String customerIdentifier) {
-        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).findFirst();
+        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier);
         CustomerDocument customerDocument = new CustomerDocument();
         if (documentEntity.isPresent()) {
             customerDocument = DocumentMapper.map(documentEntity.get());
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatus(documentEntity.get(), "UPLOADED").stream()
-                    .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                    this.documentEntryRepository.findByDocumentAndStatus(documentEntity.get(), CustomerDocument.Status.UPLOADED.name()).stream()
+                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
             List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
             customerDocument.setDocumentsTypes(documentsType);
             customerDocument.setKycStatus(documentsType.stream().allMatch(DocumentsType::isKYCVerified));
         }
         return customerDocument;
-    }
-
-    private List<DocumentEntryEntity> findUploadedDocumentEntries(final String customerIdentifier) {
-        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).findFirst();
-        return this.documentEntryRepository.findByDocumentAndStatus(documentEntity.get(), "UPLOADED");
     }
 
     public Optional<CustomerDocumentEntry> findDocument(final String customerIdentifier,
@@ -156,36 +126,11 @@ public class DocumentService {
         return this.documentRepository.findByIdentifierAndCustomer(identifier);
     }
 
-    public Stream<Integer> findPageNumbers(final String customerIdentifier,
-                                           final String documentIdentifier) {
-        return documentPageRepository.findByCustomerIdAndDocumentIdentifier(customerIdentifier, documentIdentifier)
-                .map(DocumentPageEntity::getPageNumber);
-    }
-
-    public void submitDocuments(final String customerIdentifier) {
-        List<DocumentEntryEntity> entries = this.findUploadedDocumentEntries(customerIdentifier);
-        entries.forEach(e -> {
-            e.setStatus("PENDING");
-        });
-        documentEntryRepository.save(entries);
-    }
 
     public boolean isDocumentCompleted(final String customerIdentifier,
                                        final Long documentIdentifier) {
         final Optional<DocumentEntryEntity> documentEntityOptional = documentEntryRepository.findByCustomerIdAndDocumentId(customerIdentifier, documentIdentifier);
-        return documentEntityOptional.map(DocumentEntryEntity::getStatus).get().equals("APPROVED");
+        return documentEntityOptional.map(DocumentEntryEntity::getStatus).get().equals(CustomerDocument.Status.APPROVED.name());
     }
 
-    public boolean isDocumentMissingPages(final String customerIdentifier,
-                                          final String documentIdentifier) {
-        final List<Integer> pageNumbers = findPageNumbers(customerIdentifier, documentIdentifier)
-                .sorted(Integer::compareTo)
-                .collect(Collectors.toList());
-        for (int i = 0; i < pageNumbers.size(); i++) {
-            if (i != pageNumbers.get(i))
-                return true;
-        }
-
-        return false;
-    }
 }

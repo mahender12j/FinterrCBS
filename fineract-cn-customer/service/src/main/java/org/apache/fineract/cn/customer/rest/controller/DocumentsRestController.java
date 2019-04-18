@@ -28,7 +28,6 @@ import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentsBody;
 import org.apache.fineract.cn.customer.api.v1.domain.DocumentStorage;
 import org.apache.fineract.cn.customer.internal.command.*;
-import org.apache.fineract.cn.customer.internal.repository.DocumentPageEntity;
 import org.apache.fineract.cn.customer.internal.repository.DocumentStorageEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.DocumentService;
@@ -41,8 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Myrle Krantz
@@ -206,64 +203,6 @@ public class DocumentsRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
-            value = "/{documentidentifier}/pages",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<List<Integer>> getDocumentPageNumbers(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier) {
-//        throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
-
-        return ResponseEntity.ok(documentService.findPageNumbers(customerIdentifier, documentIdentifier).collect(Collectors.toList()));
-    }
-
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}/pages/{pagenumber}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public ResponseEntity<byte[]> getDocumentPage(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final String documentIdentifier,
-            @PathVariable("pagenumber") final Integer pageNumber) {
-        final DocumentPageEntity documentPageEntity = documentService.findPage(customerIdentifier, documentIdentifier, pageNumber)
-                .orElseThrow(() -> ServiceException.notFound("Page ''{0}'' of document ''{1}'' for customer ''{2}'' not found.",
-                        pageNumber, documentIdentifier, customerIdentifier));
-
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.parseMediaType(documentPageEntity.getContentType()))
-                .contentLength(documentPageEntity.getImage().length)
-                .body(documentPageEntity.getImage());
-    }
-
-
-    //    ---------------- get document -------------------
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(value = "/{documentidentifier}/file",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public ResponseEntity<byte[]> getDocumentById(@PathVariable("customeridentifier") final String customerIdentifier,
-                                                  @PathVariable("documentidentifier") final Long documentIdentifier) {
-        final DocumentPageEntity documentPageEntity = documentService.findPagebyDocumentID(documentIdentifier)
-                .orElseThrow(() -> ServiceException.notFound("document ''{0}'' for customer ''{1}'' not found.", documentIdentifier, customerIdentifier));
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.parseMediaType(documentPageEntity.getContentType()))
-                .contentLength(documentPageEntity.getImage().length)
-                .body(documentPageEntity.getImage());
-    }
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
             value = "/submit",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -334,12 +273,6 @@ public class DocumentsRestController {
     private void throwIfDocumentCompleted(final String customerIdentifier, final Long documentIdentifier) {
         if (documentService.isDocumentCompleted(customerIdentifier, documentIdentifier))
             throw ServiceException.conflict("The document ''{0}'' for customer ''{1}'' is completed and cannot be uncompleted.",
-                    documentIdentifier, customerIdentifier);
-    }
-
-    private void throwIfPagesMissing(final String customerIdentifier, final String documentIdentifier) {
-        if (documentService.isDocumentMissingPages(customerIdentifier, documentIdentifier))
-            throw ServiceException.badRequest("The document ''{0}'' for customer ''{1}'' is missing pages.",
                     documentIdentifier, customerIdentifier);
     }
 }

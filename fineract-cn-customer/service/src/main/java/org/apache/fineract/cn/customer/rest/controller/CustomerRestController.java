@@ -27,7 +27,6 @@ import org.apache.fineract.cn.customer.ServiceConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.catalog.internal.service.FieldValueValidator;
 import org.apache.fineract.cn.customer.internal.command.*;
-import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.customer.internal.repository.PortraitEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.TaskService;
@@ -814,8 +813,8 @@ public class CustomerRestController {
     }
 
     private Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
-        final Integer pageIndexToUse = pageIndex != null ? pageIndex : 0;
-        final Integer sizeToUse = size != null ? size : 20;
+        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
+        final int sizeToUse = size != null ? size : 20;
         final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
         final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
         return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);

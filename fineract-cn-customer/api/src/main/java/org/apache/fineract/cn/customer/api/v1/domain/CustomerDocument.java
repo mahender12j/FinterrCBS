@@ -32,6 +32,8 @@ public class CustomerDocument {
     public enum Status {
         NOTUPLOADED,
         PENDING,
+        DELETED,
+        UPLOADED,
         APPROVED,
         REJECTED
     }

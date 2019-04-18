@@ -23,24 +23,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.*;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 /**
  * @author Myrle Krantz
  */
 @Repository
-public interface DocumentPageRepository extends JpaRepository<DocumentPageEntity, Long> {
+public interface DocumentSubTypeRepository extends JpaRepository<DocumentSubTypeEntity, Long> {
 
-    @Query("SELECT d FROM DocumentPageEntity d WHERE d.documentEntry.document.customer.identifier = :customerIdentifier AND d.documentEntry.document.identifier = :documentIdentifier AND d.pageNumber = :pageNumber")
-    Optional<DocumentPageEntity> findByCustomerIdAndDocumentIdentifierAndPageNumber(
-            @Param("customerIdentifier") String customerIdentifier, @Param("documentIdentifier") String documentIdentifier, @Param("pageNumber") Integer pageNumber);
-
-    @Query("SELECT d FROM DocumentPageEntity d WHERE d.documentEntry.document.customer.identifier = :customerIdentifier AND d.documentEntry.document.identifier = :documentIdentifier")
-    Stream<DocumentPageEntity> findByCustomerIdAndDocumentIdentifier(
-            @Param("customerIdentifier") String customerIdentifier, @Param("documentIdentifier") String documentIdentifier);
-
-    @Query("SELECT d FROM DocumentPageEntity d WHERE d.documentEntry.id = :documentIdentifier")
-    Optional<DocumentPageEntity> findByDocumentEntryId(@Param("documentIdentifier") Long documentIdentifier);
+    List<DocumentSubTypeEntity> findByDocumentType(final DocumentTypeEntity documentTypeEntity);
 
 }

@@ -18,8 +18,14 @@
  */
 package org.apache.fineract.cn.customer.internal.mapper;
 
+import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
-import org.apache.fineract.cn.customer.internal.repository.*;
+import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
+import org.apache.fineract.cn.customer.internal.repository.DocumentEntity;
+import org.apache.fineract.cn.customer.internal.repository.DocumentEntryEntity;
+import org.apache.fineract.cn.customer.internal.repository.DocumentStorageEntity;
+import org.apache.fineract.cn.lang.DateConverter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -27,10 +33,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.fineract.cn.api.util.UserContextHolder;
-import org.apache.fineract.cn.lang.DateConverter;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Myrle Krantz
@@ -40,19 +42,6 @@ public class DocumentMapper {
         super();
     }
 
-
-    public static DocumentPageEntity map(
-            final MultipartFile multipartFile,
-            final int pageNumber,
-            final DocumentEntity documentEntity, DocumentEntryEntity documentEntryEntity) throws IOException {
-        final DocumentPageEntity ret = new DocumentPageEntity();
-        ret.setDocumentEntry(documentEntryEntity);
-        ret.setPageNumber(pageNumber);
-        ret.setImage(multipartFile.getBytes());
-        ret.setSize(multipartFile.getSize());
-        ret.setContentType(multipartFile.getContentType());
-        return ret;
-    }
 
     public static List<DocumentsType> map(Map<String, List<DocumentEntryEntity>> documentEntryEntity) {
         final List<DocumentsType> ret = new ArrayList<>();
