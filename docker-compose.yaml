@@ -105,8 +105,6 @@ services:
       system.publicKey.exponent: 65537      
 
 
-
-
   cause-ms:
     build:
       context: ./fineract-cn-cause

@@ -23,10 +23,7 @@ import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentsBody;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentStorage;
+import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.command.*;
 import org.apache.fineract.cn.customer.internal.repository.DocumentStorageEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
@@ -40,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Myrle Krantz
@@ -71,6 +69,19 @@ public class DocumentsRestController {
     public ResponseEntity<CustomerDocument> getDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
         return ResponseEntity.ok(documentService.findCustomerUploadedDocuments(customerIdentifier));
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/master",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<List<DocumentsMaster>> getMasterDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
+        throwIfCustomerNotExists(customerIdentifier);
+        return ResponseEntity.ok(documentService.findDocumentsTypesMaster(customerIdentifier));
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)

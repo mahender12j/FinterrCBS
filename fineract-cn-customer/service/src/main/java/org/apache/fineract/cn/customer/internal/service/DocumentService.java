@@ -18,10 +18,7 @@
  */
 package org.apache.fineract.cn.customer.internal.service;
 
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocumentEntry;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentStorage;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
+import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.mapper.DocumentMapper;
 import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.lang.ServiceException;
@@ -46,6 +43,7 @@ public class DocumentService {
     private final DocumentStorageRepository documentStorageRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final CustomerRepository customerRepository;
+    private final DocumentSubTypeRepository documentSubTypeRepository;
 
     @Autowired
     public DocumentService(
@@ -53,12 +51,14 @@ public class DocumentService {
             final DocumentEntryRepository documentEntryRepository,
             final DocumentStorageRepository documentStorageRepository,
             final DocumentTypeRepository documentTypeRepository,
-            final CustomerRepository customerRepository) {
+            final CustomerRepository customerRepository,
+            final DocumentSubTypeRepository documentSubTypeRepository) {
         this.documentRepository = documentRepository;
         this.documentEntryRepository = documentEntryRepository;
         this.documentStorageRepository = documentStorageRepository;
         this.documentTypeRepository = documentTypeRepository;
         this.customerRepository = customerRepository;
+        this.documentSubTypeRepository = documentSubTypeRepository;
     }
 
 
@@ -95,6 +95,19 @@ public class DocumentService {
                 .stream()
                 .allMatch(DocumentsType::isKYCVerified) && isDocAvailable);
         return customerDocument;
+    }
+
+    public List<DocumentsMaster> findDocumentsTypesMaster(final String customerIdentifier) {
+        final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
+        List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findByUserType(customerEntity.getType());
+
+        return documentTypeEntities.stream().map(documentTypeEntity -> {
+            List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findByDocumentType(documentTypeEntity);
+            List<DocumentsMasterSubtype> documentsMasterSubtypes = DocumentMapper.map(documentSubTypeEntities);
+            return DocumentMapper.map(documentTypeEntity, documentsMasterSubtypes);
+        }).collect(toList());
+
+
     }
 
     public CustomerDocument findCustomerUploadedDocuments(final String customerIdentifier) {

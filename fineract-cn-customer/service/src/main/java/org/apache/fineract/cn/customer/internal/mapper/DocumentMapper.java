@@ -20,10 +20,7 @@ package org.apache.fineract.cn.customer.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
-import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
-import org.apache.fineract.cn.customer.internal.repository.DocumentEntity;
-import org.apache.fineract.cn.customer.internal.repository.DocumentEntryEntity;
-import org.apache.fineract.cn.customer.internal.repository.DocumentStorageEntity;
+import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.lang.DateConverter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,6 +72,28 @@ public class DocumentMapper {
         return ret;
     }
 
+
+    public static DocumentsMaster map(DocumentTypeEntity documentTypeEntity, List<DocumentsMasterSubtype> documentsMasterSubtypes) {
+        DocumentsMaster documentsMaster = new DocumentsMaster();
+        documentsMaster.setUuid(documentTypeEntity.getUuid());
+        documentsMaster.setTitle(documentTypeEntity.getTitle());
+        documentsMaster.setUserType(documentTypeEntity.getUserType());
+        documentsMaster.setDocumentsMasterSubtypes(documentsMasterSubtypes);
+        return documentsMaster;
+    }
+
+    public static List<DocumentsMasterSubtype> map(List<DocumentSubTypeEntity> documentSubTypeEntities) {
+        List<DocumentsMasterSubtype> documentsMasterSubtypes = new ArrayList<>();
+        documentSubTypeEntities.forEach(documentSubTypeEntity -> {
+            DocumentsMasterSubtype documentsMasterSubtype = new DocumentsMasterSubtype();
+            documentsMasterSubtype.setTitle(documentSubTypeEntity.getTitle());
+            documentsMasterSubtype.setUuid(documentSubTypeEntity.getUuid());
+            documentsMasterSubtype.setId(documentSubTypeEntity.getId());
+            documentsMasterSubtype.setDocTypeId(documentSubTypeEntity.getDocumentType().getId());
+            documentsMasterSubtypes.add(documentsMasterSubtype);
+        });
+        return documentsMasterSubtypes;
+    }
 
     public static CustomerDocumentEntry map(DocumentEntryEntity documentEntryEntity) {
         final CustomerDocumentEntry documentEntry = new CustomerDocumentEntry();
