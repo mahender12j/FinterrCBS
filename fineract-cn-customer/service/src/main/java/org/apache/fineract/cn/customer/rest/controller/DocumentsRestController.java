@@ -183,9 +183,10 @@ public class DocumentsRestController {
     public @ResponseBody
     DocumentStorage uploadNewDocument(
             @PathVariable(value = "customeridentifier") final String customeridentifier,
-            @RequestParam(value = "file") final MultipartFile file) throws IOException {
+            @RequestParam(value = "file") final MultipartFile file,
+            @RequestParam("data") String docType) throws IOException {
 
-        return this.documentService.addNewDocument(file, customeridentifier);
+        return this.documentService.addNewDocument(file, customeridentifier, docType);
     }
 
 
@@ -225,6 +226,8 @@ public class DocumentsRestController {
             @PathVariable("customeridentifier") final String customerIdentifier,
             @RequestBody CustomerDocument customerDocument) {
         throwIfCustomerNotExists(customerIdentifier);
+
+
         commandGateway.process(new CreateDocumentEntryCommand(customerDocument, customerIdentifier));
         return ResponseEntity.accepted().build();
     }

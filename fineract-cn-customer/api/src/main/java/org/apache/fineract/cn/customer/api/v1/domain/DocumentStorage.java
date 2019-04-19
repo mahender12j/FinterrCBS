@@ -40,6 +40,7 @@ public class DocumentStorage {
     @NotBlank
     private Long size;
 
+    private String docType;
 
     public DocumentStorage() {
     }
@@ -90,5 +91,13 @@ public class DocumentStorage {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public String getDocType() {
+        return docType;
+    }
+
+    public void setDocType(String docType) {
+        this.docType = docType;
     }
 }

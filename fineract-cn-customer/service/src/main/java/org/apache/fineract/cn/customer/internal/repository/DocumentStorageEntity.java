@@ -49,6 +49,9 @@ public class DocumentStorageEntity {
     @Column(name = "size")
     private Long size;
 
+    @Column(name = "doc_type")
+    private String docType;
+
     @Lob
     @Column(name = "image")
     private byte[] image;
@@ -111,5 +114,13 @@ public class DocumentStorageEntity {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public String getDocType() {
+        return docType;
+    }
+
+    public void setDocType(String docType) {
+        this.docType = docType;
     }
 }
