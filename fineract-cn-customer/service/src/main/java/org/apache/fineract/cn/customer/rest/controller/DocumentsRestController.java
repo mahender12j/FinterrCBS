@@ -184,7 +184,7 @@ public class DocumentsRestController {
     DocumentStorage uploadNewDocument(
             @PathVariable(value = "customeridentifier") final String customeridentifier,
             @RequestParam(value = "file") final MultipartFile file,
-            @RequestParam("data") String docType) throws IOException {
+            @RequestParam("docType") String docType) throws IOException {
 
         return this.documentService.addNewDocument(file, customeridentifier, docType);
     }
