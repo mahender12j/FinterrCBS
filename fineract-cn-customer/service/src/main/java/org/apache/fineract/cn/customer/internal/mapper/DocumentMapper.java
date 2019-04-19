@@ -79,6 +79,7 @@ public class DocumentMapper {
         documentsMaster.setTitle(documentTypeEntity.getTitle());
         documentsMaster.setUserType(documentTypeEntity.getUserType());
         documentsMaster.setDocumentsMasterSubtypes(documentsMasterSubtypes);
+        documentsMaster.setId(documentTypeEntity.getId());
         return documentsMaster;
     }
 
