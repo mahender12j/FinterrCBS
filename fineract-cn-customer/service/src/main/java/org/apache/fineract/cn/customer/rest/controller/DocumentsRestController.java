@@ -25,7 +25,9 @@ import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.command.*;
+import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.customer.internal.repository.DocumentStorageEntity;
+import org.apache.fineract.cn.customer.internal.repository.DocumentTypeEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.lang.ServiceException;
@@ -225,36 +227,40 @@ public class DocumentsRestController {
     ResponseEntity<Void> submitKycDocuments(
             @PathVariable("customeridentifier") final String customerIdentifier,
             @RequestBody CustomerDocument customerDocument) {
-        throwIfCustomerNotExists(customerIdentifier);
+        CustomerEntity customerEntity = this.customerService.getCustomerEntity(customerIdentifier);
 
+        customerDocument.getKycDocuments().forEach(kycDocuments -> {
+            DocumentTypeEntity documentTypeEntity = this.documentService.findDocumentTypeEntityByUserTypeAndUuid(customerEntity.getType(), kycDocuments.getType()).orElseThrow(() -> ServiceException.notFound("Document types not available"));
+            this.documentService.findDocumentSubTypeEntityByUuid(documentTypeEntity, kycDocuments.getSubType()).orElseThrow(() -> ServiceException.notFound("Document sub-types not available"));
+        });
 
         commandGateway.process(new CreateDocumentEntryCommand(customerDocument, customerIdentifier));
         return ResponseEntity.accepted().build();
     }
 
     //    ------------------ create document data with data --------------------------
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/upload",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> uploadKycDocuments(@PathVariable("customeridentifier") final String customerIdentifier,
-                                            @RequestParam("data") String data,
-                                            @RequestParam(value = "file") MultipartFile file) throws IOException {
-        throwIfCustomerNotExists(customerIdentifier);
-//        throwIfCustomerDocumentAlreadyExist(customerIdentifier);
-
-        ObjectMapper mapper = new ObjectMapper();
-        CustomerDocumentsBody documentEntry = mapper.readValue(data, CustomerDocumentsBody.class);
-        if (file == null) {
-            throw ServiceException.badRequest("Document not found");
-        }
-        commandGateway.process(new CreateKYCDocumentCommand(customerIdentifier, file, documentEntry));
-        return ResponseEntity.accepted().build();
-    }
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+//    @RequestMapping(
+//            value = "/upload",
+//            method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> uploadKycDocuments(@PathVariable("customeridentifier") final String customerIdentifier,
+//                                            @RequestParam("data") String data,
+//                                            @RequestParam(value = "file") MultipartFile file) throws IOException {
+//        throwIfCustomerNotExists(customerIdentifier);
+////        throwIfCustomerDocumentAlreadyExist(customerIdentifier);
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//        CustomerDocumentsBody documentEntry = mapper.readValue(data, CustomerDocumentsBody.class);
+//        if (file == null) {
+//            throw ServiceException.badRequest("Document not found");
+//        }
+//        commandGateway.process(new CreateKYCDocumentCommand(customerIdentifier, file, documentEntry));
+//        return ResponseEntity.accepted().build();
+//    }
 
 
     private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier) {

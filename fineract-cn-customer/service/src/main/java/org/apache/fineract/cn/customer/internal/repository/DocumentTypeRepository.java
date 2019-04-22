@@ -22,6 +22,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Myrle Krantz
@@ -30,4 +31,8 @@ import java.util.List;
 public interface DocumentTypeRepository extends JpaRepository<DocumentTypeEntity, Long> {
 
     List<DocumentTypeEntity> findByUserType(final String userType);
+
+    Optional<DocumentTypeEntity> findByUserTypeAndUuid(final String userType, final String uuid);
+
+    Optional<DocumentTypeEntity> findByUuid(final String uuid);
 }

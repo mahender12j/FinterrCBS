@@ -92,6 +92,11 @@ public class CustomerService {
                 .orElse(false);
     }
 
+    public CustomerEntity getCustomerEntity(final String customerIdentifier) {
+        return this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
+
+    }
+
     public Optional<Customer> findCustomer(final String identifier) {
         Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifier(identifier);
         if (customerEntity.isPresent()) {

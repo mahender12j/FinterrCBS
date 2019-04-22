@@ -81,21 +81,77 @@ public class DocumentService {
                         .findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name()).stream()
                         .collect(groupingBy(DocumentEntryEntity::getType, toList()));
 
-        List<DocumentsType> documentsType = DocumentMapper.map(documentEntryEntity);
+
+        List<DocumentsType> documentsType = new ArrayList<>();
+        documentEntryEntity.forEach((key, documentEntryEntities) -> {
+            final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
+            final DocumentsType type = new DocumentsType();
+            type.setKYCVerified(false);
+            documentEntryEntities.forEach(entity -> {
+                final DocumentsSubType documentsSubType = new DocumentsSubType();
+                documentsSubType.setId(entity.getId());
+                documentsSubType.setCreated_by(entity.getCreatedBy());
+                documentsSubType.setStatus(entity.getStatus());
+                documentsSubType.setType(this.getDocumentTypeTitle(entity.getType()));
+                documentsSubType.setSubType(this.getDocumentSubTypeTitle(entity.getSubType()));
+                setKycDocumentMapper(documentsSubTypeList, type, entity, documentsSubType);
+            });
+
+            type.setType(this.getDocumentTypeTitle(key));
+            type.setDocumentsSubType(documentsSubTypeList);
+            documentsType.add(type);
+        });
+
         customerDocument.setDocumentsTypes(documentsType);
 
-        Set<String> doc_master = this.documentTypeRepository.findByUserType(customerEntity.getType())
-                .stream()
-                .map(DocumentTypeEntity::getTitle)
-                .collect(Collectors.toSet());
+        Set<String> doc_master =
+                this.documentTypeRepository.findByUserType(customerEntity.getType())
+                        .stream()
+                        .map(DocumentTypeEntity::getUuid)
+                        .collect(Collectors.toSet());
+
         final boolean isDocAvailable = documentEntryEntity
                 .keySet()
                 .equals(doc_master);
+
         customerDocument.setKycStatus(documentsType
                 .stream()
                 .allMatch(DocumentsType::isKYCVerified) && isDocAvailable);
         return customerDocument;
     }
+
+    public static void setKycDocumentMapper(List<DocumentsSubType> documentsSubTypeList, DocumentsType d, DocumentEntryEntity doc, DocumentsSubType documentsSubType) {
+        documentsSubType.setApprovedBy(doc.getApprovedBy());
+        documentsSubType.setRejectedBy(doc.getRejectedBy());
+        documentsSubType.setReasonForReject(doc.getReasonForReject());
+        documentsSubType.setDescription(doc.getDescription());
+        documentsSubType.setCreatedOn(doc.getCreatedOn().toString());
+        documentsSubType.setDocRef(doc.getDocRef());
+        if (doc.getStatus().equals("APPROVED")) {
+            d.setKYCVerified(true);
+        }
+        documentsSubTypeList.add(documentsSubType);
+    }
+
+
+    public String getDocumentTypeTitle(final String uuid) {
+        Optional<DocumentTypeEntity> documentTypeEntity = this.documentTypeRepository.findByUuid(uuid);
+        if (documentTypeEntity.isPresent()) {
+            return documentTypeEntity.get().getTitle();
+        } else {
+            return "NOT-FOUND";
+        }
+    }
+
+    public String getDocumentSubTypeTitle(final String uuid) {
+        Optional<DocumentSubTypeEntity> documentSubTypeEntity = this.documentSubTypeRepository.findByUuid(uuid);
+        if (documentSubTypeEntity.isPresent()) {
+            return documentSubTypeEntity.get().getTitle();
+        } else {
+            return "NOT-FOUND";
+        }
+    }
+
 
     public List<DocumentsMaster> findDocumentsTypesMaster(final String customerIdentifier) {
         final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
@@ -106,8 +162,15 @@ public class DocumentService {
             List<DocumentsMasterSubtype> documentsMasterSubtypes = DocumentMapper.map(documentSubTypeEntities);
             return DocumentMapper.map(documentTypeEntity, documentsMasterSubtypes);
         }).collect(toList());
+    }
+
+    public Optional<DocumentSubTypeEntity> findDocumentSubTypeEntityByUuid(final DocumentTypeEntity documentType, final String uuid) {
+        return this.documentSubTypeRepository.findByDocumentTypeAndUuid(documentType, uuid);
+    }
 
 
+    public Optional<DocumentTypeEntity> findDocumentTypeEntityByUserTypeAndUuid(final String userType, final String uuid) {
+        return this.documentTypeRepository.findByUserTypeAndUuid(userType, uuid);
     }
 
     public CustomerDocument findCustomerUploadedDocuments(final String customerIdentifier) {

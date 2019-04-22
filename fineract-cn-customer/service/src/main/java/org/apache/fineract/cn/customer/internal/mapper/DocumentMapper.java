@@ -21,6 +21,7 @@ package org.apache.fineract.cn.customer.internal.mapper;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.repository.*;
+import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.lang.DateConverter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,6 +43,7 @@ public class DocumentMapper {
 
     public static List<DocumentsType> map(Map<String, List<DocumentEntryEntity>> documentEntryEntity) {
         final List<DocumentsType> ret = new ArrayList<>();
+
         documentEntryEntity.forEach((key, val) -> {
             final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
             final DocumentsType d = new DocumentsType();
@@ -53,16 +55,7 @@ public class DocumentMapper {
                 documentsSubType.setStatus(doc.getStatus());
                 documentsSubType.setType(doc.getType());
                 documentsSubType.setSubType(doc.getSubType());
-                documentsSubType.setApprovedBy(doc.getApprovedBy());
-                documentsSubType.setRejectedBy(doc.getRejectedBy());
-                documentsSubType.setReasonForReject(doc.getReasonForReject());
-                documentsSubType.setDescription(doc.getDescription());
-                documentsSubType.setCreatedOn(doc.getCreatedOn().toString());
-                documentsSubType.setDocRef(doc.getDocRef());
-                if (doc.getStatus().equals("APPROVED")) {
-                    d.setKYCVerified(true);
-                }
-                documentsSubTypeList.add(documentsSubType);
+                DocumentService.setKycDocumentMapper(documentsSubTypeList, d, doc, documentsSubType);
             });
 
             d.setType(key);

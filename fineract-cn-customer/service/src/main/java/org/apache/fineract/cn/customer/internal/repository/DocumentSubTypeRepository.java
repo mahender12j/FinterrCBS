@@ -37,4 +37,8 @@ public interface DocumentSubTypeRepository extends JpaRepository<DocumentSubType
 
     List<DocumentSubTypeEntity> findByDocumentType(final DocumentTypeEntity documentTypeEntity);
 
+    Optional<DocumentSubTypeEntity> findByUuid(final String uuid);
+
+    Optional<DocumentSubTypeEntity> findByDocumentTypeAndUuid(final DocumentTypeEntity documentType, final String uuid);
+
 }
