@@ -165,17 +165,17 @@ public class AuthorizationRestController {
                     throw (ServiceException) commandProcessingException.getCause();
                 else {
                     logger.error("Authentication failed with an unexpected error.", e);
-                    throw ServiceException.internalError("An error occurred while attempting to authenticate a user.1");
+                    throw ServiceException.internalError("Oops! Something went wrong. Try again…");
                 }
             } else if (ServiceException.class.isAssignableFrom(e.getCause().getClass())) {
                 throw (ServiceException) e.getCause();
             } else {
                 logger.error("Authentication failed with an unexpected error.", e);
-                throw ServiceException.internalError("An error occurred while attempting to authenticate a user.2");
+                throw ServiceException.internalError("Oops! Something went wrong. Try again…");
             }
         } catch (final CommandProcessingException e) {
             logger.error("Authentication failed with an unexpected error.", e);
-            throw ServiceException.internalError("An error occurred while attempting to authenticate a user.3");
+            throw ServiceException.internalError("Oops! Something went wrong. Try again…");
         }
     }
 
