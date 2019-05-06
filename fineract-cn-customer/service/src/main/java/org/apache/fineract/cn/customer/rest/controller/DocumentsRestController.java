@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cn.customer.rest.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
@@ -154,6 +153,27 @@ public class DocumentsRestController {
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(value = "/{documentidentifier}/reject",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> rejectCustomerDocument(
+            @PathVariable("customeridentifier") final String customerIdentifier,
+            @PathVariable("documentidentifier") final Long documentIdentifier,
+            @RequestBody final RejectDocument reason) {
+        throwIfCustomerNotExists(customerIdentifier);
+        throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
+        throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
+
+        commandGateway.process(new RejectDocumentCommand(customerIdentifier, documentIdentifier, reason.getRejectReason()));
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
             value = "/{documentidentifier}",
             method = RequestMethod.DELETE,
@@ -237,6 +257,7 @@ public class DocumentsRestController {
         commandGateway.process(new CreateDocumentEntryCommand(customerDocument, customerIdentifier));
         return ResponseEntity.accepted().build();
     }
+
 
     //    ------------------ create document data with data --------------------------
 //    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)

@@ -19,6 +19,7 @@
 package org.apache.fineract.cn.customer.internal.command.handler;
 
 import org.apache.fineract.cn.customer.api.v1.CustomerEventConstants;
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentEvent;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentPageEvent;
 import org.apache.fineract.cn.customer.internal.command.*;
@@ -84,11 +85,9 @@ public class DocumentCommandHandler {
 
         final DocumentEntryEntity existingDocument = documentEntryRepository.findByCustomerIdAndDocumentId(
                 command.getCustomerIdentifier(), command.getCustomerDocumentId())
-                .orElseThrow(() ->
-                        ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found",
-                                command.getCustomerDocumentId(), command.getCustomerIdentifier()));
+                .orElseThrow(() -> ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found", command.getCustomerDocumentId(), command.getCustomerIdentifier()));
 
-        existingDocument.setStatus("APPROVED");
+        existingDocument.setStatus(CustomerDocument.Status.APPROVED.name());
         documentEntryRepository.save(existingDocument);
 
 //        customerRepository.findByIdentifier(command.getCustomerIdentifier())
@@ -101,6 +100,25 @@ public class DocumentCommandHandler {
         return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocumentId().toString());
     }
 
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT)
+    public DocumentEvent process(final RejectDocumentCommand command) throws IOException {
+
+        final DocumentEntryEntity existingDocument = documentEntryRepository.findByCustomerIdAndDocumentId(
+                command.getCustomerIdentifier(), command.getCustomerDocumentId())
+                .orElseThrow(() -> ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found", command.getCustomerDocumentId(), command.getCustomerIdentifier()));
+
+        existingDocument.setStatus(CustomerDocument.Status.REJECTED.name());
+        existingDocument.setReasonForReject(command.getReason());
+        existingDocument.setRejectedBy(UserContextHolder.checkedGetUser());
+        existingDocument.setRejectedOn(LocalDateTime.now(Clock.systemUTC()));
+        documentEntryRepository.save(existingDocument);
+        return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocumentId().toString());
+    }
+
+
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.DELETE_DOCUMENT)
@@ -109,7 +127,7 @@ public class DocumentCommandHandler {
                 .orElseThrow(() ->
                         ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found",
                                 command.getDocumentIdentifier(), command.getCustomerIdentifier()));
-        existingDocument.setStatus("DELETED");
+        existingDocument.setStatus(CustomerDocument.Status.DELETED.name());
 
         documentEntryRepository.save(existingDocument);
 

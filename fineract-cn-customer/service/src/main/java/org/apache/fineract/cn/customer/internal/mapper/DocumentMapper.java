@@ -190,7 +190,8 @@ public class DocumentMapper {
             documents.setType(doc.getType());
             documents.setDocRef(doc.getUuid());
             documents.setCreatedBy(UserContextHolder.checkedGetUser());
-            documents.setStatus("PENDING");
+            documents.setStatus(CustomerDocument.Status.PENDING.name());
+            documents.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
             documents.setDocument(documentEntity);
             documentEntryEntityList.add(documents);
         });
