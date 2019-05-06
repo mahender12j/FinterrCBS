@@ -52,6 +52,7 @@ public class CustomerService {
     private final CommandRepository commandRepository;
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
+    private final DocumentService documentService;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -63,8 +64,8 @@ public class CustomerService {
                            final AccountingAdaptor accountingAdaptor,
                            final CommandRepository commandRepository,
                            final TaskDefinitionRepository taskDefinitionRepository,
-                           final TaskInstanceRepository taskInstanceRepository
-    ) {
+                           final TaskInstanceRepository taskInstanceRepository,
+                           DocumentService documentService) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -76,6 +77,7 @@ public class CustomerService {
         this.accountingAdaptor = accountingAdaptor;
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
+        this.documentService = documentService;
     }
 
     public Boolean customerExists(final String identifier) {
@@ -158,6 +160,23 @@ public class CustomerService {
         } else {
             throw ServiceException.notFound("Customer with identifier {0} not found in this system", identifier);
         }
+    }
+
+    public CustomerPage findAllCustomers(final Pageable pageable) {
+        Page<CustomerEntity> customerEntities = this.customerRepository.findAll(pageable);
+        CustomerPage customerPage = new CustomerPage();
+        customerPage.setTotalPages(customerEntities.getTotalPages());
+        customerPage.setTotalElements(customerEntities.getTotalElements());
+        if (customerEntities.getSize() > 0) {
+            final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
+            customerPage.setCustomers(customers);
+            for (CustomerEntity customerEntity : customerEntities) {
+                Customer customer = CustomerMapper.map(customerEntity);
+                customer.setCustomerDocument(this.documentService.findCustomerDocumentsForCA(customer.getIdentifier()));
+                customers.add(customer);
+            }
+        }
+        return customerPage;
     }
 
     public CustomerPage fetchCustomer(final String term, final Boolean includeClosed, final Pageable pageable) {

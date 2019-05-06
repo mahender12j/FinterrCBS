@@ -35,6 +35,8 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
 
+    Page<CustomerEntity> findAll(final Pageable pageable);
+
     @Query("select COUNT(c) from  CustomerEntity c where c.referenceCustomer=:identifier")
     Integer findAllByRefferalCodeIdentifier(@Param("identifier") final String identifier);
 

@@ -72,6 +72,7 @@ public class DocumentService {
         return this.documentStorageRepository.findByUuid(uuid);
     }
 
+
     public CustomerDocument findCustomerDocuments(final String customerIdentifier) {
         final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
         final DocumentEntity documentEntity = this.documentRepository.findByCustomerId(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Document not found"));
@@ -117,6 +118,56 @@ public class DocumentService {
         customerDocument.setKycStatus(documentsType
                 .stream()
                 .allMatch(DocumentsType::isKYCVerified) && isDocAvailable);
+        return customerDocument;
+    }
+
+    CustomerDocument findCustomerDocumentsForCA(final String customerIdentifier) {
+        final Optional<CustomerEntity> customerEntity = this.customerRepository.findByIdentifier(customerIdentifier);
+        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier);
+        CustomerDocument customerDocument = new CustomerDocument();
+        if (documentEntity.isPresent()) {
+
+            customerDocument = DocumentMapper.map(documentEntity.get());
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                    this.documentEntryRepository
+                            .findByDocumentAndStatusNot(documentEntity.get(), CustomerDocument.Status.DELETED.name()).stream()
+                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+
+            List<DocumentsType> documentsType = new ArrayList<>();
+            documentEntryEntity.forEach((key, documentEntryEntities) -> {
+                final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
+                final DocumentsType type = new DocumentsType();
+                type.setKYCVerified(false);
+                documentEntryEntities.forEach(entity -> {
+                    final DocumentsSubType documentsSubType = new DocumentsSubType();
+                    documentsSubType.setId(entity.getId());
+                    documentsSubType.setCreated_by(entity.getCreatedBy());
+                    documentsSubType.setStatus(entity.getStatus());
+                    documentsSubType.setType(this.getDocumentTypeTitle(entity.getType()));
+                    documentsSubType.setSubType(this.getDocumentSubTypeTitle(entity.getSubType()));
+                    setKycDocumentMapper(documentsSubTypeList, type, entity, documentsSubType);
+                });
+
+                type.setType(this.getDocumentTypeTitle(key));
+                type.setDocumentsSubType(documentsSubTypeList);
+                documentsType.add(type);
+            });
+            customerDocument.setDocumentsTypes(documentsType);
+
+            Set<String> doc_master =
+                    this.documentTypeRepository.findByUserType(customerEntity.get().getType())
+                            .stream()
+                            .map(DocumentTypeEntity::getUuid)
+                            .collect(Collectors.toSet());
+
+            final boolean isDocAvailable = documentEntryEntity
+                    .keySet()
+                    .equals(doc_master);
+
+            customerDocument.setKycStatus(documentsType.stream().allMatch(DocumentsType::isKYCVerified) && isDocAvailable);
+        }
+
+
         return customerDocument;
     }
 

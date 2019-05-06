@@ -232,6 +232,23 @@ public class CustomerRestController {
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
+    @RequestMapping(
+            value = "/customers/all/documents",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<CustomerPage> fetchCustomerWithKycDetails(@RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
+                                                             @RequestParam(value = "size", required = false) final Integer size,
+                                                             @RequestParam(value = "sortColumn", required = false) final String sortColumn,
+                                                             @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
+        return ResponseEntity.ok(this.customerService.findAllCustomers(this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+    }
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
     @RequestMapping(
             value = "/customers/{referralcode}/customer",

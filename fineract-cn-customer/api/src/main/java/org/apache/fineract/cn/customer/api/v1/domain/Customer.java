@@ -101,6 +101,7 @@ public final class Customer {
     private String refAccountNumber;
     private Double refferalBalance;
     private SocialMatrix socialMatrix;
+    private CustomerDocument customerDocument;
 
     public Customer() {
         super();
@@ -371,11 +372,11 @@ public final class Customer {
     }
 
     public Double getRefferalBalance() {
-    return this.refferalBalance;
+        return this.refferalBalance;
     }
 
     public void setRefferalBalance(final Double refferalBalance) {
-    this.refferalBalance = refferalBalance;
+        this.refferalBalance = refferalBalance;
     }
 
     public SocialMatrix getSocialMatrix() {
@@ -384,6 +385,14 @@ public final class Customer {
 
     public void setSocialMatrix(SocialMatrix socialMatrix) {
         this.socialMatrix = socialMatrix;
+    }
+
+    public CustomerDocument getCustomerDocument() {
+        return customerDocument;
+    }
+
+    public void setCustomerDocument(CustomerDocument customerDocument) {
+        this.customerDocument = customerDocument;
     }
 
     @Override
