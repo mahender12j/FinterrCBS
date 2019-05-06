@@ -163,7 +163,7 @@ public class CustomerService {
     }
 
     public CustomerPage findAllCustomers(final Pageable pageable) {
-        Page<CustomerEntity> customerEntities = this.customerRepository.findAll(pageable);
+        Page<CustomerEntity> customerEntities = this.customerRepository.findAllByType(Customer.Type.PERSON.name(), pageable);
         CustomerPage customerPage = new CustomerPage();
         customerPage.setTotalPages(customerEntities.getTotalPages());
         customerPage.setTotalElements(customerEntities.getTotalElements());
