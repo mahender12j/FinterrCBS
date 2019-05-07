@@ -47,7 +47,6 @@ public class DocumentMapper {
         documentEntryEntity.forEach((key, val) -> {
             final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
             final DocumentsType d = new DocumentsType();
-            d.setKYCVerified(false);
             val.forEach(doc -> {
                 final DocumentsSubType documentsSubType = new DocumentsSubType();
                 documentsSubType.setId(doc.getId());
@@ -55,14 +54,26 @@ public class DocumentMapper {
                 documentsSubType.setStatus(doc.getStatus());
                 documentsSubType.setType(doc.getType());
                 documentsSubType.setSubType(doc.getSubType());
-                DocumentService.setKycDocumentMapper(documentsSubTypeList, d, doc, documentsSubType);
+                DocumentService.setKycDocumentMapper(documentsSubTypeList, doc, documentsSubType);
             });
 
+            setDocumentTypeStatus(val, d);
             d.setType(key);
             d.setDocumentsSubType(documentsSubTypeList);
             ret.add(d);
         });
         return ret;
+    }
+
+    public static void setDocumentTypeStatus(List<DocumentEntryEntity> val, DocumentsType d) {
+        if (val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
+            d.setStatus(CustomerDocument.Status.APPROVED.name());
+        } else if (val.stream().noneMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+                && val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
+            d.setStatus(CustomerDocument.Status.REJECTED.name());
+        } else {
+            d.setStatus(CustomerDocument.Status.PENDING.name());
+        }
     }
 
 
@@ -112,7 +123,7 @@ public class DocumentMapper {
 
     public static CustomerDocument map(final DocumentEntity documentEntity) {
         final CustomerDocument ret = new CustomerDocument();
-        ret.setCompleted(documentEntity.getCompleted());
+//        ret.setCompleted(documentEntity.getCompleted());
         ret.setCreatedBy(documentEntity.getCreatedBy());
         ret.setCreatedOn(DateConverter.toIsoString(documentEntity.getCreatedOn()));
         ret.setIdentifier(documentEntity.getIdentifier());
@@ -125,7 +136,7 @@ public class DocumentMapper {
         ret.setCustomer(customerEntity);
         ret.setIdentifier(customerEntity.getIdentifier());
         ret.setCompleted(false);
-        ret.setStatus("PENDING");
+        ret.setStatus(CustomerDocument.Status.PENDING.name());
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setDescription(customerDocument.getDescription());
@@ -137,7 +148,7 @@ public class DocumentMapper {
         final DocumentEntity ret = new DocumentEntity();
         ret.setCustomer(customerEntity);
         ret.setCompleted(false);
-        ret.setStatus("PENDING");
+        ret.setStatus(CustomerDocument.Status.PENDING.name());
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setIdentifier(customerEntity.getIdentifier());

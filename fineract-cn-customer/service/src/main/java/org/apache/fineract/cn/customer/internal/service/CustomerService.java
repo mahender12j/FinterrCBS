@@ -47,12 +47,10 @@ public class CustomerService {
     private final IdentificationCardScanRepository identificationCardScanRepository;
     private final PortraitRepository portraitRepository;
     private final ContactDetailRepository contactDetailRepository;
-    private final FieldValueRepository fieldValueRepository;
     private final AccountingAdaptor accountingAdaptor;
     private final CommandRepository commandRepository;
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
-    private final DocumentService documentService;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -60,24 +58,20 @@ public class CustomerService {
                            final IdentificationCardScanRepository identificationCardScanRepository,
                            final PortraitRepository portraitRepository,
                            final ContactDetailRepository contactDetailRepository,
-                           final FieldValueRepository fieldValueRepository,
                            final AccountingAdaptor accountingAdaptor,
                            final CommandRepository commandRepository,
                            final TaskDefinitionRepository taskDefinitionRepository,
-                           final TaskInstanceRepository taskInstanceRepository,
-                           DocumentService documentService) {
+                           final TaskInstanceRepository taskInstanceRepository) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
         this.identificationCardScanRepository = identificationCardScanRepository;
         this.portraitRepository = portraitRepository;
         this.contactDetailRepository = contactDetailRepository;
-        this.fieldValueRepository = fieldValueRepository;
         this.commandRepository = commandRepository;
         this.accountingAdaptor = accountingAdaptor;
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
-        this.documentService = documentService;
     }
 
     public Boolean customerExists(final String identifier) {
@@ -160,23 +154,6 @@ public class CustomerService {
         } else {
             throw ServiceException.notFound("Customer with identifier {0} not found in this system", identifier);
         }
-    }
-
-    public CustomerPage findAllCustomers(final Pageable pageable) {
-        Page<CustomerEntity> customerEntities = this.customerRepository.findAllByType(Customer.Type.PERSON.name(), pageable);
-        CustomerPage customerPage = new CustomerPage();
-        customerPage.setTotalPages(customerEntities.getTotalPages());
-        customerPage.setTotalElements(customerEntities.getTotalElements());
-        if (customerEntities.getSize() > 0) {
-            final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
-            customerPage.setCustomers(customers);
-            for (CustomerEntity customerEntity : customerEntities) {
-                Customer customer = CustomerMapper.map(customerEntity);
-                customer.setCustomerDocument(this.documentService.findCustomerDocumentsForCA(customer.getIdentifier()));
-                customers.add(customer);
-            }
-        }
-        return customerPage;
     }
 
     public CustomerPage fetchCustomer(final String term, final Boolean includeClosed, final Pageable pageable) {

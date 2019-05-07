@@ -232,23 +232,6 @@ public class CustomerRestController {
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
-    @RequestMapping(
-            value = "/customers/all/documents",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<CustomerPage> fetchCustomerWithKycDetails(@RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
-                                                             @RequestParam(value = "size", required = false) final Integer size,
-                                                             @RequestParam(value = "sortColumn", required = false) final String sortColumn,
-                                                             @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
-        return ResponseEntity.ok(this.customerService.findAllCustomers(this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
-    }
-
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
     @RequestMapping(
             value = "/customers/{referralcode}/customer",
@@ -829,7 +812,7 @@ public class CustomerRestController {
         return ResponseEntity.accepted().build();
     }
 
-    private Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
+     Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
         final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
         final int sizeToUse = size != null ? size : 20;
         final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";

@@ -29,23 +29,16 @@ import org.hibernate.validator.constraints.Length;
  */
 public class CustomerDocument {
 
-    public enum Status {
-        NOTUPLOADED,
-        PENDING,
-        DELETED,
-        UPLOADED,
-        APPROVED,
-        REJECTED
-    }
+    public enum Status {PENDING, DELETED, APPROVED, REJECTED}
 
     @ValidIdentifier
     private String identifier;
     @Length(max = 4096)
     private String description;
-    private boolean completed;
+    //    private boolean completed;
     private String createdBy;
     private String createdOn;
-    private boolean kycStatus;
+    private String kycStatus;
 
     private List<DocumentsType> documentsTypes;
     private List<KycDocuments> kycDocuments;
@@ -70,13 +63,13 @@ public class CustomerDocument {
         this.description = description;
     }
 
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
+//    public boolean isCompleted() {
+//        return completed;
+//    }
+//
+//    public void setCompleted(boolean completed) {
+//        this.completed = completed;
+//    }
 
     public String getCreatedBy() {
         return createdBy;
@@ -102,11 +95,6 @@ public class CustomerDocument {
         this.documentsTypes = documentsTypes;
     }
 
-    public boolean isKycStatus() {
-        return kycStatus;
-    }
-
-
     public List<KycDocuments> getKycDocuments() {
         return kycDocuments;
     }
@@ -115,23 +103,12 @@ public class CustomerDocument {
         this.kycDocuments = kycDocuments;
     }
 
-    public void setKycStatus(boolean kycStatus) {
+    public String getKycStatus() {
+        return kycStatus;
+    }
+
+    public void setKycStatus(String kycStatus) {
         this.kycStatus = kycStatus;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CustomerDocument that = (CustomerDocument) o;
-        return completed == that.completed &&
-                Objects.equals(identifier, that.identifier) &&
-                Objects.equals(description, that.description);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(identifier, description, completed);
     }
 
     @Override
@@ -139,9 +116,11 @@ public class CustomerDocument {
         return "CustomerDocument{" +
                 "identifier='" + identifier + '\'' +
                 ", description='" + description + '\'' +
-                ", completed=" + completed +
                 ", createdBy='" + createdBy + '\'' +
                 ", createdOn='" + createdOn + '\'' +
+                ", kycStatus='" + kycStatus + '\'' +
+                ", documentsTypes=" + documentsTypes +
+                ", kycDocuments=" + kycDocuments +
                 '}';
     }
 }
