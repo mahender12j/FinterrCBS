@@ -38,7 +38,9 @@ public class CustomerDocument {
     //    private boolean completed;
     private String createdBy;
     private String createdOn;
-    private String kycStatus;
+    private boolean kycStatus;
+    private String kycStatusText;
+
 
     private List<DocumentsType> documentsTypes;
     private List<KycDocuments> kycDocuments;
@@ -103,12 +105,20 @@ public class CustomerDocument {
         this.kycDocuments = kycDocuments;
     }
 
-    public String getKycStatus() {
+    public boolean isKycStatus() {
         return kycStatus;
     }
 
-    public void setKycStatus(String kycStatus) {
+    public void setKycStatus(boolean kycStatus) {
         this.kycStatus = kycStatus;
+    }
+
+    public String getKycStatusText() {
+        return kycStatusText;
+    }
+
+    public void setKycStatusText(String kycStatusText) {
+        this.kycStatusText = kycStatusText;
     }
 
     @Override
