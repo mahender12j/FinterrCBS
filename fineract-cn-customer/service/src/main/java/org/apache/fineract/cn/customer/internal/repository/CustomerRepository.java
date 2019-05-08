@@ -27,6 +27,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
@@ -35,7 +36,9 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
 
-//    Page<CustomerEntity> findAllByCurrentState(final String type, final Pageable pageable);
+    Page<CustomerEntity> findAllByTypeIn(final Set<String> type, Pageable pageable);
+
+    List<CustomerEntity> findAllByTypeIn(final Set<String> type);
 
     @Query("select COUNT(c) from  CustomerEntity c where c.referenceCustomer=:identifier")
     Integer findAllByRefferalCodeIdentifier(@Param("identifier") final String identifier);

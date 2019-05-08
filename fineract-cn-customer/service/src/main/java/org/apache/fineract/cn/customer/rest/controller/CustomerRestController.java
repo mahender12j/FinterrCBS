@@ -29,6 +29,7 @@ import org.apache.fineract.cn.customer.catalog.internal.service.FieldValueValida
 import org.apache.fineract.cn.customer.internal.command.*;
 import org.apache.fineract.cn.customer.internal.repository.PortraitEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
+import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.customer.internal.service.TaskService;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
@@ -63,6 +64,7 @@ public class CustomerRestController {
     private final FieldValueValidator fieldValueValidator;
     private final TaskService taskService;
     private final Environment environment;
+    private final DocumentService documentService;
 
     @Autowired
     public CustomerRestController(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
@@ -70,7 +72,7 @@ public class CustomerRestController {
                                   final CustomerService customerService,
                                   final FieldValueValidator fieldValueValidator,
                                   final TaskService taskService,
-                                  final Environment environment) {
+                                  final Environment environment, DocumentService documentService) {
         super();
         this.logger = logger;
         this.commandGateway = commandGateway;
@@ -78,6 +80,7 @@ public class CustomerRestController {
         this.fieldValueValidator = fieldValueValidator;
         this.taskService = taskService;
         this.environment = environment;
+        this.documentService = documentService;
     }
 
     @Permittable(value = AcceptedTokenType.SYSTEM)
@@ -134,6 +137,38 @@ public class CustomerRestController {
                 term, (includeClosed != null ? includeClosed : Boolean.FALSE),
                 this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
+
+    //    get via kyc status
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
+    @RequestMapping(
+            value = "/customers/kyc-documents",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<List<Customer>> fetchCustomerByKycStatus(
+            @RequestParam(value = "status") final String status) {
+        return ResponseEntity.ok(this.documentService.findCustomersByKYCStatus(status));
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
+    @RequestMapping(
+            value = "/customers/{identifier}/details/verify",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<UserContactVerificationStatus> fetchCustomersContactDetails(@PathVariable("identifier") final String identifier) {
+//        throwIfCustomerNotExists(identifier);
+        return ResponseEntity.ok(this.documentService.findCustomersContactDetails(identifier));
+    }
+
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
     @RequestMapping(value = "/customers/{identifier}",
@@ -812,7 +847,7 @@ public class CustomerRestController {
         return ResponseEntity.accepted().build();
     }
 
-     Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
+    Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
         final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
         final int sizeToUse = size != null ? size : 20;
         final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";

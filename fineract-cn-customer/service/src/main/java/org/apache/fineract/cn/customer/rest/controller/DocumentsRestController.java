@@ -31,9 +31,6 @@ import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -84,27 +81,6 @@ public class DocumentsRestController {
     public ResponseEntity<CustomerDocument> getUploadedDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
         return ResponseEntity.ok(documentService.findCustomerDocuments(customerIdentifier));
-    }
-
-
-    //    get via kyc status
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
-    @RequestMapping(
-            value = "/kyc/{status}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<CustomerPage> fetchCustomerByKycStatus(
-            @RequestParam(value = "status", required = false) final String status,
-            @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
-            @RequestParam(value = "size", required = false) final Integer size,
-            @RequestParam(value = "sortColumn", required = false) final String sortColumn,
-            @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
-        return ResponseEntity.ok(this.documentService.findCustomersByKYCStatus(status, this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
 
@@ -267,39 +243,6 @@ public class DocumentsRestController {
 
         commandGateway.process(new CreateDocumentEntryCommand(customerDocument, customerIdentifier));
         return ResponseEntity.accepted().build();
-    }
-
-
-    //    ------------------ create document data with data --------------------------
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-//    @RequestMapping(
-//            value = "/upload",
-//            method = RequestMethod.POST,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-//    )
-//    public @ResponseBody
-//    ResponseEntity<Void> uploadKycDocuments(@PathVariable("customeridentifier") final String customerIdentifier,
-//                                            @RequestParam("data") String data,
-//                                            @RequestParam(value = "file") MultipartFile file) throws IOException {
-//        throwIfCustomerNotExists(customerIdentifier);
-////        throwIfCustomerDocumentAlreadyExist(customerIdentifier);
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        CustomerDocumentsBody documentEntry = mapper.readValue(data, CustomerDocumentsBody.class);
-//        if (file == null) {
-//            throw ServiceException.badRequest("Document not found");
-//        }
-//        commandGateway.process(new CreateKYCDocumentCommand(customerIdentifier, file, documentEntry));
-//        return ResponseEntity.accepted().build();
-//    }
-
-    Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
-        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
-        final int sizeToUse = size != null ? size : 20;
-        final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
-        final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
-        return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);
     }
 
     private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier) {

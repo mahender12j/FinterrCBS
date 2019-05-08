@@ -19,12 +19,23 @@
 package org.apache.fineract.cn.customer.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ContactDetailRepository extends JpaRepository<ContactDetailEntity, Long> {
 
-  List<ContactDetailEntity> findByCustomer(final CustomerEntity customerEntity);
+    List<ContactDetailEntity> findByCustomer(final CustomerEntity customerEntity);
+
+    List<ContactDetailEntity> findByCustomerAndType(final CustomerEntity customerEntity, final String s);
+
+    List<ContactDetailEntity> findAllByValue(final String s);
+
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true  ELSE  false END FROM ContactDetailEntity c WHERE c.type = :type and c.value = :identifier and c.valid = true ")
+    Boolean existsByIdentifierAndTypeAndValid(@Param("identifier") final String identifier, @Param("type") final String type);
+
 }

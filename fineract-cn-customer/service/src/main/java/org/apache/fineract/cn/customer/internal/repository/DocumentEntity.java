@@ -18,19 +18,11 @@
  */
 package org.apache.fineract.cn.customer.internal.repository;
 
+import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
 /**
  * @author Myrle Krantz
@@ -39,170 +31,189 @@ import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 @Table(name = "maat_documents")
 public class DocumentEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
-  @OneToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "customer_id")
-  private CustomerEntity customer;
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id")
+    private CustomerEntity customer;
 
-  @Column(name = "identifier", nullable = false)
-  private String identifier;
+    @Column(name = "identifier", nullable = false)
+    private String identifier;
 
-  @SuppressWarnings("DefaultAnnotationParam")
-  @Column(name = "description", nullable = true)
-  private String description;
+    @SuppressWarnings("DefaultAnnotationParam")
+    @Column(name = "description", nullable = true)
+    private String description;
 
-  @Column(name = "is_completed", nullable = false)
-  private Boolean completed;
+    @Column(name = "is_completed", nullable = false)
+    private Boolean completed;
 
-  @Column(name = "created_by")
-  private String createdBy;
+    @Column(name = "created_by")
+    private String createdBy;
 
-  @Column(name = "created_on")
-  @Convert(converter = LocalDateTimeConverter.class)
-  private LocalDateTime createdOn;
+    @Column(name = "created_on")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime createdOn;
 
-  @Column(name = "status")
-  private String status;
+    @Column(name = "status")
+    private String status;
 
-  @Column(name = "approved_by")
-  private String approvedBy;
+    @Column(name = "approved_by")
+    private String approvedBy;
 
-  @Column(name = "approved_on")
-  @Convert(converter = LocalDateTimeConverter.class)
-  private LocalDateTime approvedOn;
+    @Column(name = "approved_on")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime approvedOn;
 
-  @Column(name = "reason_for_reject")
-  private String reasonForReject;
+    @Column(name = "reason_for_reject")
+    private String reasonForReject;
 
-  @Column(name = "rejected_by")
-  private String rejectedBy;
+    @Column(name = "rejected_by")
+    private String rejectedBy;
 
-  @Column(name = "rejected_on")
-  @Convert(converter = LocalDateTimeConverter.class)
-  private LocalDateTime rejectedOn;
+    @Column(name = "rejected_on")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime rejectedOn;
 
-  public DocumentEntity() {
-  }
+    public DocumentEntity() {
+    }
 
-  public Long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public CustomerEntity getCustomer() {
-    return customer;
-  }
+    public CustomerEntity getCustomer() {
+        return customer;
+    }
 
-  public void setCustomer(CustomerEntity customer) {
-    this.customer = customer;
-  }
+    public void setCustomer(CustomerEntity customer) {
+        this.customer = customer;
+    }
 
-  public String getIdentifier() {
-    return identifier;
-  }
+    public String getIdentifier() {
+        return identifier;
+    }
 
-  public void setIdentifier(String identifier) {
-    this.identifier = identifier;
-  }
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public Boolean getCompleted() {
-    return completed;
-  }
+    public Boolean getCompleted() {
+        return completed;
+    }
 
-  public void setCompleted(Boolean completed) {
-    this.completed = completed;
-  }
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
 
-  public String getCreatedBy() {
-    return createdBy;
-  }
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-  public LocalDateTime getCreatedOn() {
-    return createdOn;
-  }
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
 
-  public void setCreatedOn(LocalDateTime createdOn) {
-    this.createdOn = createdOn;
-  }
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
+    }
 
-  public String getStatus() {
-    return this.status;
-  }
+    public String getStatus() {
+        return this.status;
+    }
 
-  public void setStatus(final String status) {
-    this.status = status;
-  }
+    public void setStatus(final String status) {
+        this.status = status;
+    }
 
-  public String getApprovedBy() {
-    return approvedBy;
-  }
+    public String getApprovedBy() {
+        return approvedBy;
+    }
 
-  public void setApprovedBy(String approvedBy) {
-    this.approvedBy = approvedBy;
-  }
+    public void setApprovedBy(String approvedBy) {
+        this.approvedBy = approvedBy;
+    }
 
-  public LocalDateTime getApprovedOn() {
-    return approvedOn;
-  }
+    public LocalDateTime getApprovedOn() {
+        return approvedOn;
+    }
 
-  public void setApprovedOn(LocalDateTime approvedOn) {
-    this.approvedOn = approvedOn;
-  }
+    public void setApprovedOn(LocalDateTime approvedOn) {
+        this.approvedOn = approvedOn;
+    }
 
-  public String getReasonForReject() {
-		return reasonForReject;
-  }
+    public String getReasonForReject() {
+        return reasonForReject;
+    }
 
-	public void setReasonForReject(String reasonForReject) {
-		this.reasonForReject = reasonForReject;
-  }
+    public void setReasonForReject(String reasonForReject) {
+        this.reasonForReject = reasonForReject;
+    }
 
-  public String getRejectedBy() {
-    return rejectedBy;
-  }
+    public String getRejectedBy() {
+        return rejectedBy;
+    }
 
-  public void setRejectedBy(String rejectedBy) {
-    this.rejectedBy = rejectedBy;
-  }
+    public void setRejectedBy(String rejectedBy) {
+        this.rejectedBy = rejectedBy;
+    }
 
-  public LocalDateTime getRejectedOn() {
-    return rejectedOn;
-  }
+    public LocalDateTime getRejectedOn() {
+        return rejectedOn;
+    }
 
-  public void setRejectedOn(LocalDateTime rejectedOn) {
-    this.rejectedOn = rejectedOn;
-  }
+    public void setRejectedOn(LocalDateTime rejectedOn) {
+        this.rejectedOn = rejectedOn;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    DocumentEntity that = (DocumentEntity) o;
-    return Objects.equals(customer, that.customer) &&
-        Objects.equals(identifier, that.identifier);
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocumentEntity that = (DocumentEntity) o;
+        return Objects.equals(customer, that.customer) &&
+                Objects.equals(identifier, that.identifier);
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(customer, identifier);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(customer, identifier);
+    }
+
+    @Override
+    public String toString() {
+        return "DocumentEntity{" +
+                "id=" + id +
+                ", customer=" + customer +
+                ", identifier='" + identifier + '\'' +
+                ", description='" + description + '\'' +
+                ", completed=" + completed +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdOn=" + createdOn +
+                ", status='" + status + '\'' +
+                ", approvedBy='" + approvedBy + '\'' +
+                ", approvedOn=" + approvedOn +
+                ", reasonForReject='" + reasonForReject + '\'' +
+                ", rejectedBy='" + rejectedBy + '\'' +
+                ", rejectedOn=" + rejectedOn +
+                '}';
+    }
 }

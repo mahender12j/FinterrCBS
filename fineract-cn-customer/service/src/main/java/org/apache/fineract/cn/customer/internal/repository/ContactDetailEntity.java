@@ -109,4 +109,17 @@ public class ContactDetailEntity {
   public void setValid(final Boolean valid) {
     this.valid = valid;
   }
+
+  @Override
+  public String toString() {
+    return "ContactDetailEntity{" +
+            "id=" + id +
+            ", customer=" + customer +
+            ", type='" + type + '\'' +
+            ", group='" + group + '\'' +
+            ", value='" + value + '\'' +
+            ", preferenceLevel=" + preferenceLevel +
+            ", valid=" + valid +
+            '}';
+  }
 }

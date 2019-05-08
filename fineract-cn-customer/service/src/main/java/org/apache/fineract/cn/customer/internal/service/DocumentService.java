@@ -19,19 +19,17 @@
 package org.apache.fineract.cn.customer.internal.service;
 
 import org.apache.fineract.cn.customer.api.v1.domain.*;
+import org.apache.fineract.cn.customer.catalog.api.v1.domain.Field;
+import org.apache.fineract.cn.customer.internal.mapper.ContactDetailMapper;
 import org.apache.fineract.cn.customer.internal.mapper.CustomerMapper;
 import org.apache.fineract.cn.customer.internal.mapper.DocumentMapper;
 import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,6 +47,7 @@ public class DocumentService {
     private final DocumentTypeRepository documentTypeRepository;
     private final CustomerRepository customerRepository;
     private final DocumentSubTypeRepository documentSubTypeRepository;
+    private final ContactDetailRepository contactDetailRepository;
 
     @Autowired
     public DocumentService(
@@ -57,13 +56,14 @@ public class DocumentService {
             final DocumentStorageRepository documentStorageRepository,
             final DocumentTypeRepository documentTypeRepository,
             final CustomerRepository customerRepository,
-            final DocumentSubTypeRepository documentSubTypeRepository) {
+            final DocumentSubTypeRepository documentSubTypeRepository, ContactDetailRepository contactDetailRepository) {
         this.documentRepository = documentRepository;
         this.documentEntryRepository = documentEntryRepository;
         this.documentStorageRepository = documentStorageRepository;
         this.documentTypeRepository = documentTypeRepository;
         this.customerRepository = customerRepository;
         this.documentSubTypeRepository = documentSubTypeRepository;
+        this.contactDetailRepository = contactDetailRepository;
     }
 
 
@@ -150,86 +150,152 @@ public class DocumentService {
         documentsSubTypeList.add(documentsSubType);
     }
 
-    public CustomerPage findCustomersByKYCStatus(final String status, final Pageable pageable) {
 
-//        this.documentRepository.findAll().stream().filter(documentEntity -> {
-//            CustomerDocument customerDocument = this.findCustomerDocumentsForCA(documentEntity.getIdentifier());
-//            return customerDocument.isKycStatus() ==
-//        })
+    public List<Customer> findCustomersByKYCStatus(final String status) {
+        List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.Type.PERSON.name(), Customer.Type.BUSINESS.name())));
 
-//        Page<CustomerEntity> customerEntities = this.customerRepository.findAllByType(Customer.Type.PERSON.name(), pageable);
-//        CustomerPage customerPage = new CustomerPage();
-//        customerPage.setTotalPages(customerEntities.getTotalPages());
-//        customerPage.setTotalElements(customerEntities.getTotalElements());
-//        if (customerEntities.getSize() > 0) {
-//            final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
-//            customerPage.setCustomers(customers);
-//            for (CustomerEntity customerEntity : customerEntities) {
-//                Customer customer = CustomerMapper.map(customerEntity);
-//                customer.setCustomerDocument(this.documentService.findCustomerDocumentsForCA(customer.getIdentifier()));
-//                customers.add(customer);
-//            }
-//        }
-//        return customerPage;
+        return customerEntities.stream().map(entity -> {
+            Customer customer = CustomerMapper.map(entity);
+            final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(entity.getIdentifier());
 
-        return new CustomerPage();
+            System.out.println(documentEntity.toString() + "\n\n");
+
+//            CustomerDocument customerDocument = this.findCustomerDocumentsForKYCFilter(entity);
+//            customer.setCustomerDocument(customerDocument);
+            return customer;
+
+        })
+//                .filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status))
+                .collect(Collectors.toList());
     }
-//    CustomerDocument findCustomerDocumentsForCA(final String customerIdentifier) {
-//        final Optional<CustomerEntity> customerEntity = this.customerRepository.findByIdentifier(customerIdentifier);
-//        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier);
-//        CustomerDocument customerDocument = new CustomerDocument();
-//        if (documentEntity.isPresent()) {
-//
-//            customerDocument = DocumentMapper.map(documentEntity.get());
-//            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
-//                    this.documentEntryRepository
-//                            .findByDocumentAndStatusNot(documentEntity.get(), CustomerDocument.Status.DELETED.name()).stream()
-//                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
-//
-//            List<DocumentsType> documentsType = new ArrayList<>();
-//            documentEntryEntity.forEach((key, documentEntryEntities) -> {
-//                final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
-//                final DocumentsType type = new DocumentsType();
-//                type.setKYCVerified(false);
-//                documentEntryEntities.forEach(entity -> {
-//                    final DocumentsSubType documentsSubType = new DocumentsSubType();
-//                    documentsSubType.setId(entity.getId());
-//                    documentsSubType.setCreated_by(entity.getCreatedBy());
-//                    documentsSubType.setStatus(entity.getStatus());
-//                    documentsSubType.setType(this.getDocumentTypeTitle(entity.getType()));
-//                    documentsSubType.setSubType(this.getDocumentSubTypeTitle(entity.getSubType()));
-//                    setKycDocumentMapper(documentsSubTypeList, type, entity, documentsSubType);
-//                });
-//
-//                type.setType(this.getDocumentTypeTitle(key));
-//                type.setDocumentsSubType(documentsSubTypeList);
-//                documentsType.add(type);
-//            });
-//            customerDocument.setDocumentsTypes(documentsType);
-//
-//            Set<String> doc_master =
-//                    this.documentTypeRepository.findByUserType(customerEntity.get().getType())
-//                            .stream()
-//                            .map(DocumentTypeEntity::getUuid)
-//                            .collect(Collectors.toSet());
-//
-//            final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
-//
-//            if (documentsType.stream().allMatch(type -> type.getType().equals(CustomerDocument.Status.APPROVED.name())) && isDocAvailable) {
-//                customerDocument.setKycStatus(CustomerDocument.Status.APPROVED.name());
-//            } else if (!documentsType.stream().allMatch(type -> type.getType().equals(CustomerDocument.Status.APPROVED.name()))
-//                    && documentsType.stream().anyMatch(type -> type.getType().equals(CustomerDocument.Status.REJECTED.name()))
-//                    && isDocAvailable) {
-//                customerDocument.setKycStatus(CustomerDocument.Status.APPROVED.name());
-//            } else {
-//                customerDocument.setKycStatus(CustomerDocument.Status.PENDING.name());
-//            }
-//        }
-//
-//
-//        return customerDocument;
 
-//    }
+
+    public UserContactVerificationStatus findCustomersContactDetails(final String identifier) {
+        final ContactDetailEntity contactDetailEntity = this.contactDetailRepository.findAllByValue(identifier).stream().findFirst().orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
+        UserContactVerificationStatus userContactVerificationStatus = new UserContactVerificationStatus();
+
+        switch (contactDetailEntity.getType()) {
+            case "EMAIL":
+                System.out.println(contactDetailEntity.toString());
+                userContactVerificationStatus.setEmail(contactDetailEntity.getValue());
+                userContactVerificationStatus.setEmailVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL"));
+
+                Optional<ContactDetailEntity> mobileContactDetail = contactDetailRepository.findByCustomerAndType(contactDetailEntity.getCustomer(), "MOBILE").stream().findFirst();
+
+                if (mobileContactDetail.isPresent()) {
+
+                    Optional<ContactDetailEntity> contactDetailData = contactDetailRepository.findAllByValue(mobileContactDetail.get().getValue()).stream().findFirst();
+                    if (contactDetailData.isPresent()) {
+                        userContactVerificationStatus.setMobile(contactDetailData.get().getValue());
+                        userContactVerificationStatus.setMobileVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailData.get().getValue(), "MOBILE"));
+                    } else {
+                        userContactVerificationStatus.setMobile("");
+                        userContactVerificationStatus.setMobileVerified(false);
+                    }
+
+
+                } else {
+                    userContactVerificationStatus.setMobile("");
+                    userContactVerificationStatus.setMobileVerified(false);
+                }
+
+                break;
+            case "MOBILE":
+                userContactVerificationStatus.setMobile(contactDetailEntity.getValue());
+                userContactVerificationStatus.setMobileVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE"));
+
+                Optional<ContactDetailEntity> detailEntity = contactDetailRepository.findByCustomerAndType(contactDetailEntity.getCustomer(), "EMAIL").stream().findFirst();
+
+
+                if (detailEntity.isPresent()) {
+                    detailEntity = contactDetailRepository.findAllByValue(detailEntity.get().getValue()).stream().findFirst();
+
+                    if (detailEntity.isPresent()) {
+                        userContactVerificationStatus.setEmail(detailEntity.get().getValue());
+                        userContactVerificationStatus.setEmailVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(detailEntity.get().getValue(), "EMAIL"));
+
+                    } else {
+                        userContactVerificationStatus.setEmail("");
+                        userContactVerificationStatus.setEmailVerified(false);
+
+                    }
+
+                } else {
+                    userContactVerificationStatus.setEmail("");
+                    userContactVerificationStatus.setEmailVerified(false);
+                }
+                break;
+            default:
+                userContactVerificationStatus.setEmail("");
+                userContactVerificationStatus.setMobile("");
+                userContactVerificationStatus.setMobileVerified(false);
+                userContactVerificationStatus.setEmailVerified(false);
+        }
+
+        return userContactVerificationStatus;
+    }
+
+    private List<CustomerDocument> findAllCustomerKYCDetails(CustomerEntity customerEntity) {
+        //        call the master types so later can be filtered
+        List<DocumentTypeEntity> doc_master_ent = this.documentTypeRepository.findAll();
+        List<DocumentSubTypeEntity> doc_sub_master_ent = this.documentSubTypeRepository.findAll();
+
+        return this.documentRepository.findAll()
+                .stream()
+                .map(documentEntity -> {
+                    CustomerDocument customerDocument = DocumentMapper.map(documentEntity);
+                    final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                            this.documentEntryRepository
+                                    .findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
+                                    .stream()
+                                    .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+
+                    List<DocumentsType> documentsType = new ArrayList<>();
+                    documentEntryEntity.forEach((key, documentEntryEntities) -> {
+                        final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
+                        final DocumentsType type = new DocumentsType();
+                        documentEntryEntities.forEach(entity -> {
+                            final DocumentsSubType documentsSubType = new DocumentsSubType();
+                            documentsSubType.setId(entity.getId());
+                            documentsSubType.setCreated_by(entity.getCreatedBy());
+                            documentsSubType.setStatus(entity.getStatus());
+                            documentsSubType.setType(doc_master_ent.stream().filter(d -> d.getUuid().equals(entity.getType())).findAny().orElseThrow(null).getTitle());
+                            documentsSubType.setSubType(this.getDocumentSubTypeTitle(entity.getSubType()));
+                            setKycDocumentMapper(documentsSubTypeList, entity, documentsSubType);
+                        });
+
+                        DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
+                        type.setType(this.getDocumentTypeTitle(key));
+                        type.setDocumentsSubType(documentsSubTypeList);
+                        documentsType.add(type);
+                    });
+
+                    customerDocument.setDocumentsTypes(documentsType);
+
+                    Set<String> doc_master = doc_master_ent
+                            .stream()
+                            .map(DocumentTypeEntity::getUuid)
+                            .collect(Collectors.toSet());
+
+
+                    final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
+
+                    if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())) && isDocAvailable) {
+                        customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
+                        customerDocument.setKycStatus(true);
+                    } else if ((documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+                            || documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())))
+                            && isDocAvailable
+                            && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
+                        customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
+                        customerDocument.setKycStatus(false);
+                    } else {
+                        customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
+                        customerDocument.setKycStatus(false);
+                    }
+                    return customerDocument;
+                }).collect(Collectors.toList());
+    }
 
 
     private String getDocumentTypeTitle(final String uuid) {
