@@ -158,14 +158,14 @@ public class DocumentService {
             Customer customer = CustomerMapper.map(entity);
             final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(entity.getIdentifier());
 
-            System.out.println(documentEntity.toString() + "\n\n");
+//            System.out.println(documentEntity.toString() + "\n\n");
 
-//            CustomerDocument customerDocument = this.findCustomerDocumentsForKYCFilter(entity);
-//            customer.setCustomerDocument(customerDocument);
+            CustomerDocument customerDocument = this.findCustomerDocuments(entity.getIdentifier());
+            customer.setCustomerDocument(customerDocument);
             return customer;
 
         })
-//                .filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status))
+                .filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status))
                 .collect(Collectors.toList());
     }
 
