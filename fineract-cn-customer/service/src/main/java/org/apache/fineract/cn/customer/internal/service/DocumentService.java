@@ -176,14 +176,13 @@ public class DocumentService {
 
         switch (contactDetailEntity.getType()) {
             case "EMAIL":
-                System.out.println(contactDetailEntity.toString());
                 userContactVerificationStatus.setEmail(contactDetailEntity.getValue());
                 userContactVerificationStatus.setEmailVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL"));
-
-                Optional<ContactDetailEntity> mobileContactDetail = contactDetailRepository.findByCustomerAndType(contactDetailEntity.getCustomer(), "MOBILE").stream().findFirst();
+                CustomerEntity customerEntity = contactDetailEntity.getCustomer();
+                userContactVerificationStatus.setUsername(customerEntity.getIdentifier());
+                Optional<ContactDetailEntity> mobileContactDetail = contactDetailRepository.findByCustomerAndType(customerEntity, "MOBILE").stream().findFirst();
 
                 if (mobileContactDetail.isPresent()) {
-
                     Optional<ContactDetailEntity> contactDetailData = contactDetailRepository.findAllByValue(mobileContactDetail.get().getValue()).stream().findFirst();
                     if (contactDetailData.isPresent()) {
                         userContactVerificationStatus.setMobile(contactDetailData.get().getValue());
@@ -204,7 +203,9 @@ public class DocumentService {
                 userContactVerificationStatus.setMobile(contactDetailEntity.getValue());
                 userContactVerificationStatus.setMobileVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE"));
 
-                Optional<ContactDetailEntity> detailEntity = contactDetailRepository.findByCustomerAndType(contactDetailEntity.getCustomer(), "EMAIL").stream().findFirst();
+                CustomerEntity customerEntity1 = contactDetailEntity.getCustomer();
+                userContactVerificationStatus.setUsername(customerEntity1.getIdentifier());
+                Optional<ContactDetailEntity> detailEntity = contactDetailRepository.findByCustomerAndType(customerEntity1, "EMAIL").stream().findFirst();
 
 
                 if (detailEntity.isPresent()) {

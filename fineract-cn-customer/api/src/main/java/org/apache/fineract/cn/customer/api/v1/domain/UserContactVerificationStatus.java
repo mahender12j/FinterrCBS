@@ -31,6 +31,7 @@ public final class UserContactVerificationStatus {
     private boolean isEmailVerified;
     private String mobile;
     private boolean isMobileVerified;
+    private String username;
 
     public UserContactVerificationStatus() {
     }
@@ -65,5 +66,13 @@ public final class UserContactVerificationStatus {
 
     public boolean isEmailVerified() {
         return isEmailVerified;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
