@@ -177,9 +177,13 @@ public class DocumentService {
         switch (contactDetailEntity.getType()) {
             case "EMAIL":
                 userContactVerificationStatus.setEmail(contactDetailEntity.getValue());
-                userContactVerificationStatus.setEmailVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL"));
+                boolean isEmailValid = this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL");
+                userContactVerificationStatus.setEmailVerified(isEmailValid);
                 CustomerEntity customerEntity = contactDetailEntity.getCustomer();
-                userContactVerificationStatus.setUsername(customerEntity.getIdentifier());
+                if (isEmailValid) {
+                    ContactDetailEntity e = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL", true);
+                    userContactVerificationStatus.setUsername(e.getCustomer().getIdentifier());
+                }
                 Optional<ContactDetailEntity> mobileContactDetail = contactDetailRepository.findByCustomerAndType(customerEntity, "MOBILE").stream().findFirst();
 
                 if (mobileContactDetail.isPresent()) {
@@ -201,12 +205,14 @@ public class DocumentService {
                 break;
             case "MOBILE":
                 userContactVerificationStatus.setMobile(contactDetailEntity.getValue());
-                userContactVerificationStatus.setMobileVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE"));
-
+                boolean isMobileValid = this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE");
+                userContactVerificationStatus.setMobileVerified(isMobileValid);
                 CustomerEntity customerEntity1 = contactDetailEntity.getCustomer();
-                userContactVerificationStatus.setUsername(customerEntity1.getIdentifier());
+                if (isMobileValid) {
+                    ContactDetailEntity d = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE", true);
+                    userContactVerificationStatus.setUsername(d.getCustomer().getIdentifier());
+                }
                 Optional<ContactDetailEntity> detailEntity = contactDetailRepository.findByCustomerAndType(customerEntity1, "EMAIL").stream().findFirst();
-
 
                 if (detailEntity.isPresent()) {
                     detailEntity = contactDetailRepository.findAllByValue(detailEntity.get().getValue()).stream().findFirst();
