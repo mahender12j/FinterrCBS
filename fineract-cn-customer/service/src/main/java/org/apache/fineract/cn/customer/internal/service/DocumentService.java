@@ -165,7 +165,7 @@ public class DocumentService {
             return customer;
 
         })
-                .filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status))
+                .filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status.toUpperCase()))
                 .collect(Collectors.toList());
     }
 
