@@ -175,7 +175,7 @@ public class DocumentService {
                 userContactVerificationStatus.setEmailVerified(isEmailValid);
                 CustomerEntity customerEntity = contactDetailEntity.getCustomer();
                 if (isEmailValid) {
-                    ContactDetailEntity e = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL", true);
+                    ContactDetailEntity e = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL", true).stream().findFirst().get();
                     userContactVerificationStatus.setUsername(e.getCustomer().getIdentifier());
                 }
                 Optional<ContactDetailEntity> mobileContactDetail = contactDetailRepository.findByCustomerAndType(customerEntity, "MOBILE").stream().findFirst();
@@ -203,7 +203,7 @@ public class DocumentService {
                 userContactVerificationStatus.setMobileVerified(isMobileValid);
                 CustomerEntity customerEntity1 = contactDetailEntity.getCustomer();
                 if (isMobileValid) {
-                    ContactDetailEntity d = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE", true);
+                    ContactDetailEntity d = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE", true).stream().findFirst().get();
                     userContactVerificationStatus.setUsername(d.getCustomer().getIdentifier());
                 }
                 Optional<ContactDetailEntity> detailEntity = contactDetailRepository.findByCustomerAndType(customerEntity1, "EMAIL").stream().findFirst();

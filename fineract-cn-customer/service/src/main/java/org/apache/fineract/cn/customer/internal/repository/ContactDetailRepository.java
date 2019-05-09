@@ -39,6 +39,6 @@ public interface ContactDetailRepository extends JpaRepository<ContactDetailEnti
     Boolean existsByIdentifierAndTypeAndValid(@Param("identifier") final String identifier, @Param("type") final String type);
 
 
-    ContactDetailEntity findAllByValueAndTypeAndValid(final String identifier, final String type, final boolean valid);
+    List<ContactDetailEntity> findAllByValueAndTypeAndValid(final String identifier, final String type, final boolean valid);
 
 }
