@@ -152,6 +152,7 @@ public class DocumentService {
 
 
     public List<Customer> findCustomersByKYCStatus(final String status) {
+        System.out.println("---------status------------" + status);
         List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.Type.PERSON.name(), Customer.Type.BUSINESS.name())));
         return customerEntities.stream().map(entity -> {
             Customer customer = CustomerMapper.map(entity);
@@ -159,7 +160,9 @@ public class DocumentService {
             customer.setCustomerDocument(customerDocument);
             return customer;
 
-        }).filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status.toUpperCase()))
+        }).collect(Collectors.toList())
+                .stream()
+                .filter(customer -> customer.getCustomerDocument().getKycStatusText() != null && customer.getCustomerDocument().getKycStatusText().equals(status.toUpperCase()))
                 .collect(Collectors.toList());
     }
 
