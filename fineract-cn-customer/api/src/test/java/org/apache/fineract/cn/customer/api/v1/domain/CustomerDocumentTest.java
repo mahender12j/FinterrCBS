@@ -41,7 +41,7 @@ public class CustomerDocumentTest extends ValidationTest<CustomerDocument> {
   protected CustomerDocument createValidTestSubject() {
     final CustomerDocument ret = new CustomerDocument();
     ret.setIdentifier(RandomStringUtils.randomAlphanumeric(8));
-    ret.setCompleted(false);
+//    ret.setCompleted(false);
     ret.setCreatedOn(null);
     ret.setCreatedBy(null);
     ret.setDescription(RandomStringUtils.random(5));
