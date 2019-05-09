@@ -23,6 +23,8 @@ create table maat_documents_entry
   id                bigint auto_increment
     primary key,
   document_id       bigint                                    not null,
+  document_name     varchar(256)                              not null,
+  uuid              varchar(65)                               not null,
   created_by        varchar(32)                               null,
   status            varchar(256)                              null,
   type              varchar(256)                              not null,
@@ -32,9 +34,10 @@ create table maat_documents_entry
   rejected_on       timestamp(3)                              null,
   rejected_by       varchar(32)                               null,
   reason_for_reject text                                      null,
-  created_on        timestamp(3) default CURRENT_TIMESTAMP(3) not null on update CURRENT_TIMESTAMP(3),
+  created_on        timestamp(3) default CURRENT_TIMESTAMP(3) null on update CURRENT_TIMESTAMP(3),
   description       varchar(32)                               null,
   constraint maat_documents_entry_fk
     foreign key (document_id) references maat_documents (id)
 );
+
 
