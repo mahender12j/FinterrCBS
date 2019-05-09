@@ -153,139 +153,17 @@ public class DocumentService {
 
     public List<Customer> findCustomersByKYCStatus(final String status) {
         List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.Type.PERSON.name(), Customer.Type.BUSINESS.name())));
-
         return customerEntities.stream().map(entity -> {
             Customer customer = CustomerMapper.map(entity);
-//            final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(entity.getIdentifier());
-
-//            System.out.println(documentEntity.toString() + "\n\n");
-
-            CustomerDocument customerDocument = findAllCustomerKYCDetails(entity);
+            CustomerDocument customerDocument = findCustomerDocuments(entity.getIdentifier());
             customer.setCustomerDocument(customerDocument);
             return customer;
 
-        }).filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status.toUpperCase()))
+        }).collect(Collectors.toList()).stream()
+                .filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status.toUpperCase()))
                 .collect(Collectors.toList());
     }
 
-
-    private CustomerDocument findAllCustomerKYCDetails(CustomerEntity customerEntity) {
-        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerEntity.getIdentifier());
-
-        CustomerDocument customerDocument = new CustomerDocument();
-        if (documentEntity.isPresent()) {
-            customerDocument = DocumentMapper.map(documentEntity.get());
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
-                    this.documentEntryRepository
-                            .findByDocumentAndStatusNot(documentEntity.get(), CustomerDocument.Status.DELETED.name()).stream()
-                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
-
-            List<DocumentsType> documentsType = new ArrayList<>();
-            documentEntryEntity.forEach((key, documentEntryEntities) -> {
-                final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
-                final DocumentsType type = new DocumentsType();
-                documentEntryEntities.forEach(entity -> {
-                    final DocumentsSubType documentsSubType = new DocumentsSubType();
-                    documentsSubType.setId(entity.getId());
-                    documentsSubType.setCreated_by(entity.getCreatedBy());
-                    documentsSubType.setStatus(entity.getStatus());
-                    documentsSubType.setType(this.getDocumentTypeTitle(entity.getType()));
-                    documentsSubType.setSubType(this.getDocumentSubTypeTitle(entity.getSubType()));
-                    setKycDocumentMapper(documentsSubTypeList, entity, documentsSubType);
-                });
-
-                DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
-                type.setType(this.getDocumentTypeTitle(key));
-                type.setDocumentsSubType(documentsSubTypeList);
-                documentsType.add(type);
-            });
-
-            customerDocument.setDocumentsTypes(documentsType);
-
-            Set<String> doc_master =
-                    this.documentTypeRepository.findByUserType(customerEntity.getType())
-                            .stream()
-                            .map(DocumentTypeEntity::getUuid)
-                            .collect(Collectors.toSet());
-
-            final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
-
-            if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())) && isDocAvailable) {
-                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                customerDocument.setKycStatus(true);
-            } else if ((documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                    || documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())))
-                    && isDocAvailable
-                    && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
-                customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
-                customerDocument.setKycStatus(false);
-            } else {
-                customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
-                customerDocument.setKycStatus(false);
-            }
-
-        }
-
-
-        return customerDocument;
-        //        call the master types so later can be filtered
-//        List<DocumentTypeEntity> doc_master_ent = this.documentTypeRepository.findAll();
-//        List<DocumentSubTypeEntity> doc_sub_master_ent = this.documentSubTypeRepository.findAll();
-
-//        return this.documentRepository.findAll().stream().map(documentEntity -> {
-//            CustomerDocument customerDocument = DocumentMapper.map(documentEntity);
-//            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
-//                    this.documentEntryRepository
-//                            .findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
-//                            .stream()
-//                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
-//
-//            List<DocumentsType> documentsType = new ArrayList<>();
-//            documentEntryEntity.forEach((key, documentEntryEntities) -> {
-//                final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
-//                final DocumentsType type = new DocumentsType();
-//                documentEntryEntities.forEach(entity -> {
-//                    final DocumentsSubType documentsSubType = new DocumentsSubType();
-//                    documentsSubType.setId(entity.getId());
-//                    documentsSubType.setCreated_by(entity.getCreatedBy());
-//                    documentsSubType.setStatus(entity.getStatus());
-//                    documentsSubType.setType(doc_master_ent.stream().filter(d -> d.getUuid().equals(entity.getType())).findAny().orElseThrow(null).getTitle());
-//                    documentsSubType.setSubType(this.getDocumentSubTypeTitle(entity.getSubType()));
-//                    setKycDocumentMapper(documentsSubTypeList, entity, documentsSubType);
-//                });
-//
-//                DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
-//                type.setType(this.getDocumentTypeTitle(key));
-//                type.setDocumentsSubType(documentsSubTypeList);
-//                documentsType.add(type);
-//            });
-//
-//            customerDocument.setDocumentsTypes(documentsType);
-//
-//            Set<String> doc_master = doc_master_ent
-//                    .stream()
-//                    .map(DocumentTypeEntity::getUuid)
-//                    .collect(Collectors.toSet());
-//
-//
-//            final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
-//
-//            if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())) && isDocAvailable) {
-//                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-//                customerDocument.setKycStatus(true);
-//            } else if ((documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-//                    || documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())))
-//                    && isDocAvailable
-//                    && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
-//                customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
-//                customerDocument.setKycStatus(false);
-//            } else {
-//                customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
-//                customerDocument.setKycStatus(false);
-//            }
-//            return customerDocument;
-//        }).collect(Collectors.toList());
-    }
 
     public UserContactVerificationStatus findCustomersContactDetails(final String identifier) {
         final ContactDetailEntity contactDetailEntity = this.contactDetailRepository.findAllByValue(identifier).stream().findFirst().orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
