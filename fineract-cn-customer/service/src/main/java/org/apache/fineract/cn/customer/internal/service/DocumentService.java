@@ -78,6 +78,16 @@ public class DocumentService {
     }
 
 
+    public static void setKycDocumentMapper(List<DocumentsSubType> documentsSubTypeList, DocumentEntryEntity doc, DocumentsSubType documentsSubType) {
+        documentsSubType.setApprovedBy(doc.getApprovedBy());
+        documentsSubType.setRejectedBy(doc.getRejectedBy());
+        documentsSubType.setReasonForReject(doc.getReasonForReject());
+        documentsSubType.setDescription(doc.getDescription());
+        documentsSubType.setCreatedOn(doc.getCreatedOn().toString());
+        documentsSubType.setDocRef(doc.getDocRef());
+        documentsSubTypeList.add(documentsSubType);
+    }
+
     public CustomerDocument findCustomerDocuments(final String customerIdentifier) {
         final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
         final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerIdentifier);
@@ -85,9 +95,10 @@ public class DocumentService {
         CustomerDocument customerDocument = new CustomerDocument();
         if (documentEntity.isPresent()) {
             customerDocument = DocumentMapper.map(documentEntity.get());
+
             final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
-                    this.documentEntryRepository
-                            .findByDocumentAndStatusNot(documentEntity.get(), CustomerDocument.Status.DELETED.name()).stream()
+                    this.documentEntryRepository.findByDocument(documentEntity.get())
+                            .stream()
                             .collect(groupingBy(DocumentEntryEntity::getType, toList()));
 
             List<DocumentsType> documentsType = new ArrayList<>();
@@ -112,11 +123,10 @@ public class DocumentService {
 
             customerDocument.setDocumentsTypes(documentsType);
 
-            Set<String> doc_master =
-                    this.documentTypeRepository.findByUserType(customerEntity.getType())
-                            .stream()
-                            .map(DocumentTypeEntity::getUuid)
-                            .collect(Collectors.toSet());
+            Set<String> doc_master = this.documentTypeRepository.findByUserType(customerEntity.getType())
+                    .stream()
+                    .map(DocumentTypeEntity::getUuid)
+                    .collect(Collectors.toSet());
 
             final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
 
@@ -140,27 +150,16 @@ public class DocumentService {
         return customerDocument;
     }
 
-    public static void setKycDocumentMapper(List<DocumentsSubType> documentsSubTypeList, DocumentEntryEntity doc, DocumentsSubType documentsSubType) {
-        documentsSubType.setApprovedBy(doc.getApprovedBy());
-        documentsSubType.setRejectedBy(doc.getRejectedBy());
-        documentsSubType.setReasonForReject(doc.getReasonForReject());
-        documentsSubType.setDescription(doc.getDescription());
-        documentsSubType.setCreatedOn(doc.getCreatedOn().toString());
-        documentsSubType.setDocRef(doc.getDocRef());
-        documentsSubTypeList.add(documentsSubType);
-    }
-
 
     public List<Customer> findCustomersByKYCStatus(final String status) {
         List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.Type.PERSON.name(), Customer.Type.BUSINESS.name())));
         return customerEntities.stream().map(entity -> {
             Customer customer = CustomerMapper.map(entity);
-            CustomerDocument customerDocument = findCustomerDocuments(entity.getIdentifier());
+            CustomerDocument customerDocument = findCustomerDocuments(customer.getIdentifier());
             customer.setCustomerDocument(customerDocument);
             return customer;
 
-        }).collect(Collectors.toList()).stream()
-                .filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status.toUpperCase()))
+        }).filter(customer -> customer.getCustomerDocument().getKycStatusText().equals(status.toUpperCase()))
                 .collect(Collectors.toList());
     }
 
