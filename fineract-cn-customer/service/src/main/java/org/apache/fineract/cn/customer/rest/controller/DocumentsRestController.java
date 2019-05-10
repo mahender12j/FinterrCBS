@@ -121,13 +121,13 @@ public class DocumentsRestController {
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(value = "/{documentidentifier}",
+    @RequestMapping(value = "/{documentidentifier}/approved",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> changeDocumentStatus(
+    ResponseEntity<Void> approvedDocumentStatus(
             @PathVariable("customeridentifier") final String customerIdentifier,
             @PathVariable("documentidentifier") final Long documentIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
@@ -140,7 +140,7 @@ public class DocumentsRestController {
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(value = "/{documentidentifier}/reject",
+    @RequestMapping(value = "/{documentidentifier}/rejected",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
