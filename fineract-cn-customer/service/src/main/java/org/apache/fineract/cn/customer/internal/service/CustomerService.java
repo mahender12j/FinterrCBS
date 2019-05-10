@@ -135,7 +135,7 @@ public class CustomerService {
 
 
                 socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
-                socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifier(customer.getRefferalCodeIdentifier()));
+                socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifierActive(customer.getRefferalCodeIdentifier()));
                 customer.setSocialMatrix(socialMatrix);
 
 //                System.out.println("----------------------social matrix---------------------" + socialMatrix.toString());

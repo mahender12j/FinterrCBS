@@ -43,6 +43,9 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     @Query("select COUNT(c) from  CustomerEntity c where c.referenceCustomer=:identifier")
     Integer findAllByRefferalCodeIdentifier(@Param("identifier") final String identifier);
 
+    @Query("select COUNT(c) from  CustomerEntity c where c.referenceCustomer=:identifier AND c.isDeposited = 1")
+    Integer findAllByRefferalCodeIdentifierActive(@Param("identifier") final String identifier);
+
     Page<CustomerEntity> findByIdentifierContainingOrGivenNameContainingOrSurnameContaining(
             final String identifier, final String givenName, final String surname, final Pageable pageable);
 
