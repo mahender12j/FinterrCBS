@@ -97,7 +97,7 @@ public class DocumentService {
             customerDocument = DocumentMapper.map(documentEntity.get());
 
             final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
-                    this.documentEntryRepository.findByDocument(documentEntity.get())
+                    this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity.get(), CustomerDocument.Status.DELETED.name())
                             .stream()
                             .collect(groupingBy(DocumentEntryEntity::getType, toList()));
 
@@ -152,7 +152,6 @@ public class DocumentService {
 
 
     public List<Customer> findCustomersByKYCStatus(final String status) {
-        System.out.println("---------status------------" + status);
         List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.Type.PERSON.name(), Customer.Type.BUSINESS.name())));
         return customerEntities.stream().map(entity -> {
             Customer customer = CustomerMapper.map(entity);
@@ -160,9 +159,7 @@ public class DocumentService {
             customer.setCustomerDocument(customerDocument);
             return customer;
 
-        }).collect(Collectors.toList())
-                .stream()
-                .filter(customer -> customer.getCustomerDocument().getKycStatusText() != null && customer.getCustomerDocument().getKycStatusText().equals(status.toUpperCase()))
+        }).filter(customer -> customer.getCustomerDocument().getKycStatusText() != null && customer.getCustomerDocument().getKycStatusText().equals(status.toUpperCase()))
                 .collect(Collectors.toList());
     }
 
