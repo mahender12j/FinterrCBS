@@ -196,7 +196,7 @@ public class CustomerService {
                 customerEntities =
                         this.customerRepository.findByReferenceCustomerAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, term, term, term, pageable);
             } else {
-                customerEntities = this.customerRepository.findAllByReferenceCustomer(refferalcode, pageable);
+                customerEntities = this.customerRepository.findAllByReferenceCustomerAndIsDeposited(refferalcode, true, pageable);
             }
         } else {
             if (term != null) {
@@ -204,7 +204,7 @@ public class CustomerService {
                         this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
                                 refferalcode, Customer.State.CLOSED.name(), term, term, term, pageable);
             } else {
-                customerEntities = this.customerRepository.findByReferenceCustomerAndCurrentStateNot(refferalcode, Customer.State.CLOSED.name(), pageable);
+                customerEntities = this.customerRepository.findByReferenceCustomerAndIsDepositedAndCurrentStateNot(refferalcode, true, Customer.State.CLOSED.name(), pageable);
             }
         }
 
