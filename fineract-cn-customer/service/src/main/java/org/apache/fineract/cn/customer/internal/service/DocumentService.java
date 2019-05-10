@@ -144,6 +144,9 @@ public class DocumentService {
                 customerDocument.setKycStatus(false);
             }
 
+        } else {
+            customerDocument.setKycStatus(false);
+            customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
         }
 
 
