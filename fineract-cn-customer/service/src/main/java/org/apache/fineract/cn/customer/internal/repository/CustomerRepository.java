@@ -51,6 +51,8 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
 
     Page<CustomerEntity> findAllByReferenceCustomer(final String refferalCodeIdentifier, final Pageable pageable);
 
+    Page<CustomerEntity> findAllByReferenceCustomerAndIsDeposited(final String refferalCodeIdentifier, final Boolean isDeposited,final Pageable pageable);
+
     Optional<CustomerEntity> findByIdentifier(final String identifier);
 
     Optional<CustomerEntity> findByIdentifierAndType(final String identifier, final String userType);
@@ -60,6 +62,8 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     Page<CustomerEntity> findByCurrentStateNot(final String state, final Pageable pageable);
 
     Page<CustomerEntity> findByReferenceCustomerAndCurrentStateNot(final String refferalCodeIdentifier, final String state, final Pageable pageable);
+
+    Page<CustomerEntity> findByReferenceCustomerAndIsDepositedAndCurrentStateNot(final String refferalCodeIdentifier, final Boolean isDeposited, final String state, final Pageable pageable);
 
     Page<CustomerEntity> findByCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
             final String state, final String identifier, final String givenName, final String surname, final Pageable pageable);
