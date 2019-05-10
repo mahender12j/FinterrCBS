@@ -155,7 +155,12 @@ public class DocumentService {
         List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.Type.PERSON.name(), Customer.Type.BUSINESS.name())));
         return customerEntities.stream().map(entity -> {
             Customer customer = CustomerMapper.map(entity);
+
             CustomerDocument customerDocument = findCustomerDocuments(customer.getIdentifier());
+            final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
+            if (contactDetailEntities != null) {
+                customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
+            }
             customer.setCustomerDocument(customerDocument);
             return customer;
 
