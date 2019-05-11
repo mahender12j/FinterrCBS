@@ -255,7 +255,7 @@ public class CustomerService {
 
     public BusinessCustomer findNgo(final String identifier) {
         CustomerEntity customerEntity = customerRepository.findByIdentifierAndType(identifier, "BUSINESS")
-                .orElseThrow(() -> ServiceException.notFound("Oops! We cant find you..."));
+                .orElseThrow(() -> ServiceException.notFound("Invalid Username"));
         return CustomerMapper.mapBusinessCustomer(customerEntity);
 
     }

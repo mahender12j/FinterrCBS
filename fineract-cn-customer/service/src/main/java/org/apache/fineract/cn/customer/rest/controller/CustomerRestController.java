@@ -182,7 +182,7 @@ public class CustomerRestController {
         if (customer.isPresent()) {
             return ResponseEntity.ok(customer.get());
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
     }
 
@@ -219,7 +219,7 @@ public class CustomerRestController {
             return Collections.singletonMap("success", true);
         } else {
             System.out.println("Customer not present in DB");
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
     }
 
@@ -241,7 +241,7 @@ public class CustomerRestController {
             }
             this.commandGateway.process(new UpdateCustomerCommand(customer));
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
         return ResponseEntity.accepted().build();
     }
@@ -333,7 +333,7 @@ public class CustomerRestController {
                     throw ServiceException.badRequest("Unsupported action {0}.", command.getAction());
             }
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
         return ResponseEntity.accepted().build();
     }
@@ -351,7 +351,7 @@ public class CustomerRestController {
         if (this.customerService.customerExists(identifier)) {
             return ResponseEntity.ok(this.customerService.fetchCommandsByCustomer(identifier).collect(Collectors.toList()));
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
     }
 
@@ -373,7 +373,7 @@ public class CustomerRestController {
                 throw ServiceException.notFound("Task definition {0} not found.", taskIdentifier);
             }
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
         return ResponseEntity.accepted().build();
     }
@@ -413,7 +413,7 @@ public class CustomerRestController {
                 throw ServiceException.notFound("Task definition {0} not found.", taskIdentifier);
             }
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
         return ResponseEntity.accepted().build();
     }
@@ -432,7 +432,7 @@ public class CustomerRestController {
         if (this.customerService.customerExists(identifier)) {
             return ResponseEntity.ok(this.taskService.findTasksByCustomer(identifier, (includeExecuted != null ? includeExecuted : Boolean.FALSE)));
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
     }
 
@@ -450,7 +450,7 @@ public class CustomerRestController {
         if (this.customerService.customerExists(identifier)) {
             this.commandGateway.process(new UpdateAddressCommand(identifier, address));
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
         return ResponseEntity.accepted().build();
     }
@@ -469,7 +469,7 @@ public class CustomerRestController {
         if (this.customerService.customerExists(identifier)) {
             this.commandGateway.process(new UpdateContactDetailsCommand(identifier, contactDetails));
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
         return ResponseEntity.accepted().build();
     }
@@ -526,7 +526,7 @@ public class CustomerRestController {
 
             this.commandGateway.process(new CreateIdentificationCardCommand(identifier, identificationCard));
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
 
         return ResponseEntity.accepted().build();
@@ -842,7 +842,7 @@ public class CustomerRestController {
         if (this.customerService.customerExists(identifier)) {
             this.commandGateway.process(new CreateAmlDetailCommand(identifier, amlDetail));
         } else {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
         return ResponseEntity.accepted().build();
     }
@@ -857,7 +857,7 @@ public class CustomerRestController {
 
     private void throwIfCustomerNotExists(final String identifier) {
         if (!this.customerService.customerExists(identifier)) {
-            throw ServiceException.notFound("Oops! We cant find you...");
+            throw ServiceException.notFound("Invalid Username");
         }
     }
 
