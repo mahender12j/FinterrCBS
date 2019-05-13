@@ -56,6 +56,7 @@ public interface CustomerEventConstants {
 
   String POST_DOCUMENT = "post-document";
   String PUT_DOCUMENT = "put-document";
+  String UNDO_DOCUMENT = "undo-document";
   String DELETE_DOCUMENT = "delete-document";
   String POST_DOCUMENT_PAGE = "post-document-page";
   String DELETE_DOCUMENT_PAGE = "delete-document-page";

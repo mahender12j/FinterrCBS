@@ -105,6 +105,21 @@ public class DocumentCommandHandler {
 
     @Transactional
     @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.UNDO_DOCUMENT)
+    public DocumentEvent process(final UndoDocumentStatusCommand command) throws IOException {
+
+        final DocumentEntryEntity existingDocument = documentEntryRepository.findByCustomerIdAndDocumentId(
+                command.getCustomerIdentifier(), command.getCustomerDocumentId())
+                .orElseThrow(() -> ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found", command.getCustomerDocumentId(), command.getCustomerIdentifier()));
+
+        existingDocument.setStatus(CustomerDocument.Status.PENDING.name());
+        documentEntryRepository.save(existingDocument);
+        return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocumentId().toString());
+    }
+
+
+    @Transactional
+    @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_TYPE)
     public DocumentEvent process(final CreateDocumentTypeCommand command) throws IOException {
 

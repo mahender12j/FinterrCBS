@@ -243,6 +243,25 @@ public class DocumentsRestController {
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(value = "/{documentidentifier}/pending",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> undoDocumentStatus(
+            @PathVariable("customeridentifier") final String customerIdentifier,
+            @PathVariable("documentidentifier") final Long documentIdentifier) {
+        throwIfCustomerNotExists(customerIdentifier);
+        throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
+        throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
+
+        commandGateway.process(new UndoDocumentStatusCommand(customerIdentifier, documentIdentifier));
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(value = "/{documentidentifier}/rejected",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE,
