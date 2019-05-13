@@ -121,6 +121,52 @@ public class DocumentsRestController {
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/master/type",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<List<DocumentsMaster>> getMasterDocumentsType(@PathVariable("customeridentifier") final String customerIdentifier) {
+        throwIfCustomerNotExists(customerIdentifier);
+        return ResponseEntity.ok(documentService.findDocumentsTypes());
+    }
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/master/type",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> createDocumentType(
+            @PathVariable("customeridentifier") final String customerIdentifier,
+            @RequestBody final @Valid DocumentsType instance) {
+        throwIfCustomerNotExists(customerIdentifier);
+
+        commandGateway.process(new CreateDocumentTypeCommand(customerIdentifier, instance));
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(value = "/master/type/{uuid}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> changeDocumentType(
+            @PathVariable("customeridentifier") final String customerIdentifier,
+            @PathVariable("uuid") final String uuid,
+            @RequestBody final @Valid DocumentsType instance) {
+        commandGateway.process(new UpdateDocumentTypeCommand(uuid, instance));
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(value = "/{documentidentifier}/approved",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE,

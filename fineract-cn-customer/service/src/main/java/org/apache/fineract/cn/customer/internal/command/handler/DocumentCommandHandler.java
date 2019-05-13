@@ -20,6 +20,7 @@ package org.apache.fineract.cn.customer.internal.command.handler;
 
 import org.apache.fineract.cn.customer.api.v1.CustomerEventConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentEvent;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentPageEvent;
 import org.apache.fineract.cn.customer.internal.command.*;
@@ -30,7 +31,6 @@ import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.command.annotation.Aggregate;
@@ -48,15 +48,17 @@ public class DocumentCommandHandler {
     private final DocumentRepository documentRepository;
     private final CustomerRepository customerRepository;
     private final DocumentEntryRepository documentEntryRepository;
+    private final DocumentTypeRepository documentTypeRepository;
 
     @Autowired
     public DocumentCommandHandler(
             final DocumentRepository documentRepository,
             final DocumentEntryRepository documentEntryRepository,
-            final CustomerRepository customerRepository) {
+            final CustomerRepository customerRepository, DocumentTypeRepository documentTypeRepository) {
         this.documentRepository = documentRepository;
         this.customerRepository = customerRepository;
         this.documentEntryRepository = documentEntryRepository;
+        this.documentTypeRepository = documentTypeRepository;
     }
 
     @Transactional
@@ -98,6 +100,31 @@ public class DocumentCommandHandler {
 //                });
 
         return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocumentId().toString());
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_TYPE)
+    public DocumentEvent process(final CreateDocumentTypeCommand command) throws IOException {
+
+        final DocumentTypeEntity documentTypeEntity = DocumentMapper.map(command.getDocumentsType());
+        this.documentTypeRepository.save(documentTypeEntity);
+        return new DocumentEvent(command.getCustomerIdentifier(), command.getDocumentsType().toString());
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT_TYPE)
+    public DocumentEvent process(final UpdateDocumentTypeCommand command) throws IOException {
+        DocumentsType documentsType = command.getDocumentsType();
+
+        final DocumentTypeEntity documentTypeEntity = documentTypeRepository.findByUuid(command.getuuid()).orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
+        documentTypeEntity.setTitle(documentsType.getType());
+        documentTypeEntity.setUserType(documentsType.getUserType());
+        this.documentTypeRepository.save(documentTypeEntity);
+        return new DocumentEvent(command.getuuid(), command.getDocumentsType().toString());
     }
 
 

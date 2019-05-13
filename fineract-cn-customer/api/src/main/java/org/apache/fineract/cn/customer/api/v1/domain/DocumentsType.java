@@ -26,6 +26,7 @@ import java.util.List;
 public class DocumentsType {
 
     private String type;
+    private String userType;
     private String status;
     private List<DocumentsSubType> documentsSubType;
 
@@ -38,6 +39,14 @@ public class DocumentsType {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 
     public List<DocumentsSubType> getDocumentsSubType() {

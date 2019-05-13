@@ -51,6 +51,9 @@ public interface CustomerEventConstants {
   String POST_PORTRAIT = "post-portrait";
   String DELETE_PORTRAIT = "delete-portrait";
 
+  String POST_DOCUMENT_TYPE = "post-document_type";
+  String PUT_DOCUMENT_TYPE = "put-document_type";
+
   String POST_DOCUMENT = "post-document";
   String PUT_DOCUMENT = "put-document";
   String DELETE_DOCUMENT = "delete-document";

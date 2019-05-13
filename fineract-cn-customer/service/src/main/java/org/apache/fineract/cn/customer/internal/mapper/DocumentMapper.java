@@ -131,6 +131,16 @@ public class DocumentMapper {
         return ret;
     }
 
+
+    public static DocumentsMaster map(final DocumentTypeEntity documentTypeEntity) {
+        final DocumentsMaster documentsMaster = new DocumentsMaster();
+        documentsMaster.setUuid(documentTypeEntity.getUuid());
+        documentsMaster.setUserType(documentTypeEntity.getUserType());
+        documentsMaster.setTitle(documentTypeEntity.getTitle());
+        return documentsMaster;
+    }
+
+
     public static DocumentEntity map(final CustomerDocument customerDocument, final CustomerEntity customerEntity) {
         final DocumentEntity ret = new DocumentEntity();
         ret.setCustomer(customerEntity);
@@ -207,6 +217,13 @@ public class DocumentMapper {
             documentEntryEntityList.add(documents);
         });
         return documentEntryEntityList;
+    }
+
+    public static DocumentTypeEntity map(DocumentsType documentsType) {
+        DocumentTypeEntity documentTypeEntity = new DocumentTypeEntity();
+        documentTypeEntity.setTitle(documentsType.getType());
+        documentTypeEntity.setUserType(documentsType.getUserType());
+        return documentTypeEntity;
     }
 
 }
