@@ -161,6 +161,9 @@ public class DocumentsRestController {
             @PathVariable("customeridentifier") final String customerIdentifier,
             @PathVariable("uuid") final String uuid,
             @RequestBody final @Valid DocumentsType instance) {
+        throwIfCustomerNotExists(customerIdentifier);
+        throwIfMasterTypeNotExists(uuid);
+
         commandGateway.process(new UpdateDocumentTypeCommand(uuid, instance));
         return ResponseEntity.accepted().build();
     }
@@ -303,6 +306,13 @@ public class DocumentsRestController {
             throw ServiceException.notFound("Customer ''{0}'' not found.", customerIdentifier);
         }
     }
+
+    private void throwIfMasterTypeNotExists(final String uuid) {
+        if (!this.customerService.masterTypeExists(uuid)) {
+            throw ServiceException.notFound("Document ''{0}'' not found.", uuid);
+        }
+    }
+
 
     private void throwIfCustomerDocumentNotExists(final String customerIdentifier, final Long documentIdentifier) {
         if (!this.documentService.documentExists(customerIdentifier, documentIdentifier)) {

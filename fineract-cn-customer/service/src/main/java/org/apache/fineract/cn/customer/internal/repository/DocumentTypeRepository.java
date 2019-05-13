@@ -19,6 +19,8 @@
 package org.apache.fineract.cn.customer.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,6 +31,9 @@ import java.util.Optional;
  */
 @Repository
 public interface DocumentTypeRepository extends JpaRepository<DocumentTypeEntity, Long> {
+
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM DocumentTypeEntity c WHERE c.uuid = :uuid")
+    Boolean existsByIdentifier(@Param("identifier") final String uuid);
 
     List<DocumentTypeEntity> findByUserType(final String userType);
 

@@ -21,7 +21,6 @@ package org.apache.fineract.cn.customer.internal.service;
 import org.apache.fineract.cn.accounting.api.v1.domain.Account;
 import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
-import org.apache.fineract.cn.customer.catalog.internal.repository.FieldValueRepository;
 import org.apache.fineract.cn.customer.internal.mapper.*;
 import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.customer.internal.service.helperService.AccountingAdaptor;
@@ -51,6 +50,7 @@ public class CustomerService {
     private final CommandRepository commandRepository;
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
+    private final DocumentTypeRepository documentTypeRepository;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -61,7 +61,7 @@ public class CustomerService {
                            final AccountingAdaptor accountingAdaptor,
                            final CommandRepository commandRepository,
                            final TaskDefinitionRepository taskDefinitionRepository,
-                           final TaskInstanceRepository taskInstanceRepository) {
+                           final TaskInstanceRepository taskInstanceRepository, DocumentTypeRepository documentTypeRepository) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -72,10 +72,15 @@ public class CustomerService {
         this.accountingAdaptor = accountingAdaptor;
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
+        this.documentTypeRepository = documentTypeRepository;
     }
 
     public Boolean customerExists(final String identifier) {
         return this.customerRepository.existsByIdentifier(identifier);
+    }
+
+    public Boolean masterTypeExists(final String uuid) {
+        return this.documentTypeRepository.existsByIdentifier(uuid);
     }
 
     public Boolean identificationCardExists(final String number) {
