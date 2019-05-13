@@ -33,7 +33,7 @@ import java.util.Optional;
 public interface DocumentTypeRepository extends JpaRepository<DocumentTypeEntity, Long> {
 
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM DocumentTypeEntity c WHERE c.uuid = :uuid")
-    Boolean existsByIdentifier(@Param("identifier") final String uuid);
+    Boolean existsByIdentifier(@Param("uuid") final String uuid);
 
     List<DocumentTypeEntity> findByUserType(final String userType);
 

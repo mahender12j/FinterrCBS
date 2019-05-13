@@ -35,6 +35,9 @@ import java.util.stream.Stream;
 @Repository
 public interface DocumentSubTypeRepository extends JpaRepository<DocumentSubTypeEntity, Long> {
 
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM DocumentSubTypeEntity c WHERE c.uuid = :uuid")
+    Boolean existsByIdentifier(@Param("uuid") final String uuid);
+
     List<DocumentSubTypeEntity> findByDocumentType(final DocumentTypeEntity documentTypeEntity);
 
     Optional<DocumentSubTypeEntity> findByUuid(final String uuid);
