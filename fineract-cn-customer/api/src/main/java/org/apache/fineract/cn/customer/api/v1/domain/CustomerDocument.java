@@ -29,7 +29,7 @@ import org.hibernate.validator.constraints.Length;
  */
 public class CustomerDocument {
 
-    public enum Status {PENDING, DELETED, APPROVED, REJECTED}
+    public enum Status {PENDING, DELETED, APPROVED, REJECTED, NOTUPLOADED}
 
     @ValidIdentifier
     private String identifier;

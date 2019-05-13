@@ -19,7 +19,6 @@
 package org.apache.fineract.cn.customer.internal.service;
 
 import org.apache.fineract.cn.customer.api.v1.domain.*;
-import org.apache.fineract.cn.customer.catalog.api.v1.domain.Field;
 import org.apache.fineract.cn.customer.internal.mapper.ContactDetailMapper;
 import org.apache.fineract.cn.customer.internal.mapper.CustomerMapper;
 import org.apache.fineract.cn.customer.internal.mapper.DocumentMapper;
