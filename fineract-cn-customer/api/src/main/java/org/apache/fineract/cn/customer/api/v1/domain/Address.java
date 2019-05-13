@@ -23,6 +23,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public final class Address {
 
   private String street;
+  private String state;
   private String city;
   private String region;
   private String postalCode;
@@ -99,6 +100,14 @@ public final class Address {
 
   public void setNationality(final String nationality) {
     this.nationality = nationality;
+  }
+
+  public String getState() {
+    return state;
+  }
+
+  public void setState(String state) {
+    this.state = state;
   }
 
   @Override

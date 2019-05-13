@@ -29,100 +29,110 @@ import javax.persistence.Table;
 @Table(name = "maat_addresses")
 public class AddressEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private Long id;
-  @Column(name = "street")
-  private String street;
-  @Column(name = "city")
-  private String city;
-  @Column(name = "postal_code")
-  private String postalCode;
-  @Column(name = "region")
-  private String region;
-  @Column(name = "country_code")
-  private String countryCode;
-  @Column(name = "country")
-  private String country;
-  @Column(name = "nationality_code")
-  private String nationalityCode;
-  @Column(name = "nationality")
-  private String nationality;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "street")
+    private String street;
+    @Column(name = "state")
+    private String state;
+    @Column(name = "city")
+    private String city;
+    @Column(name = "postal_code")
+    private String postalCode;
+    @Column(name = "region")
+    private String region;
+    @Column(name = "country_code")
+    private String countryCode;
+    @Column(name = "country")
+    private String country;
+    @Column(name = "nationality_code")
+    private String nationalityCode;
+    @Column(name = "nationality")
+    private String nationality;
 
-  public AddressEntity() {
-    super();
-  }
+    public String getState() {
+        return state;
+    }
 
-  public Long getId() {
-    return this.id;
-  }
+    public void setState(String state) {
+        this.state = state;
+    }
 
-  public void setId(final Long id) {
-    this.id = id;
-  }
+    public AddressEntity() {
+        super();
+    }
 
-  public String getStreet() {
-    return this.street;
-  }
+    public Long getId() {
+        return this.id;
+    }
 
-  public void setStreet(final String street) {
-    this.street = street;
-  }
+    public void setId(final Long id) {
+        this.id = id;
+    }
 
-  public String getCity() {
-    return this.city;
-  }
+    public String getStreet() {
+        return this.street;
+    }
 
-  public void setCity(final String city) {
-    this.city = city;
-  }
+    public void setStreet(final String street) {
+        this.street = street;
+    }
 
-  public String getPostalCode() {
-    return this.postalCode;
-  }
+    public String getCity() {
+        return this.city;
+    }
 
-  public void setPostalCode(final String postalCode) {
-    this.postalCode = postalCode;
-  }
+    public void setCity(final String city) {
+        this.city = city;
+    }
 
-  public String getRegion() {
-    return this.region;
-  }
+    public String getPostalCode() {
+        return this.postalCode;
+    }
 
-  public void setRegion(final String region) {
-    this.region = region;
-  }
+    public void setPostalCode(final String postalCode) {
+        this.postalCode = postalCode;
+    }
 
-  public String getCountryCode() {
-    return this.countryCode;
-  }
+    public String getRegion() {
+        return this.region;
+    }
 
-  public void setCountryCode(final String countryCode) {
-    this.countryCode = countryCode;
-  }
+    public void setRegion(final String region) {
+        this.region = region;
+    }
 
-  public String getCountry() {
-    return this.country;
-  }
+    public String getCountryCode() {
+        return this.countryCode;
+    }
 
-  public void setCountry(final String country) {
-    this.country = country;
-  }
+    public void setCountryCode(final String countryCode) {
+        this.countryCode = countryCode;
+    }
 
-  public String getNationalityCode() {
-    return this.nationalityCode;
-  }
+    public String getCountry() {
+        return this.country;
+    }
 
-  public void setNationalityCode(final String nationalityCode) {
-    this.nationalityCode = nationalityCode;
-  }
+    public void setCountry(final String country) {
+        this.country = country;
+    }
 
-  public String getNationality() {
-    return this.nationality;
-  }
+    public String getNationalityCode() {
+        return this.nationalityCode;
+    }
 
-  public void setNationality(final String nationality) {
-    this.nationality = nationality;
-  }
+    public void setNationalityCode(final String nationalityCode) {
+        this.nationalityCode = nationalityCode;
+    }
+
+    public String getNationality() {
+        return this.nationality;
+    }
+
+    public void setNationality(final String nationality) {
+        this.nationality = nationality;
+    }
 }

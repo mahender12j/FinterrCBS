@@ -23,33 +23,35 @@ import org.apache.fineract.cn.customer.internal.repository.AddressEntity;
 
 public final class AddressMapper {
 
-  private AddressMapper() {
-    super();
-  }
+    private AddressMapper() {
+        super();
+    }
 
-  public static AddressEntity map(final Address address) {
-    final AddressEntity addressEntity = new AddressEntity();
-    addressEntity.setStreet(address.getStreet());
-    addressEntity.setCity(address.getCity());
-    addressEntity.setPostalCode(address.getPostalCode());
-    addressEntity.setRegion(address.getRegion());
-    addressEntity.setCountryCode(address.getCountryCode());
-    addressEntity.setCountry(address.getCountry());
-    addressEntity.setNationalityCode(address.getNationalityCode());
-    addressEntity.setNationality(address.getNationality());
-    return addressEntity;
-  }
+    public static AddressEntity map(final Address address) {
+        final AddressEntity addressEntity = new AddressEntity();
+        addressEntity.setStreet(address.getStreet());
+        addressEntity.setCity(address.getCity());
+        addressEntity.setPostalCode(address.getPostalCode());
+        addressEntity.setRegion(address.getRegion());
+        addressEntity.setCountryCode(address.getCountryCode());
+        addressEntity.setCountry(address.getCountry());
+        addressEntity.setNationalityCode(address.getNationalityCode());
+        addressEntity.setNationality(address.getNationality());
+        addressEntity.setState(address.getState());
+        return addressEntity;
+    }
 
-  public static Address map(final AddressEntity addressEntity) {
-    final Address address = new Address();
-    address.setStreet(addressEntity.getStreet());
-    address.setCity(addressEntity.getCity());
-    address.setPostalCode(addressEntity.getPostalCode());
-    address.setRegion(addressEntity.getRegion());
-    address.setCountryCode(addressEntity.getCountryCode());
-    address.setCountry(addressEntity.getCountry());
-    address.setNationalityCode(addressEntity.getNationalityCode());
-    address.setNationality(addressEntity.getNationality());
-    return address;
-  }
+    public static Address map(final AddressEntity addressEntity) {
+        final Address address = new Address();
+        address.setStreet(addressEntity.getStreet());
+        address.setCity(addressEntity.getCity());
+        address.setPostalCode(addressEntity.getPostalCode());
+        address.setRegion(addressEntity.getRegion());
+        address.setCountryCode(addressEntity.getCountryCode());
+        address.setCountry(addressEntity.getCountry());
+        address.setNationalityCode(addressEntity.getNationalityCode());
+        address.setNationality(addressEntity.getNationality());
+        address.setState(addressEntity.getState());
+        return address;
+    }
 }
