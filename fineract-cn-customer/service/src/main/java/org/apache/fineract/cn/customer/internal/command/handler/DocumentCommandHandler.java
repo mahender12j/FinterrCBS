@@ -20,6 +20,8 @@ package org.apache.fineract.cn.customer.internal.command.handler;
 
 import org.apache.fineract.cn.customer.api.v1.CustomerEventConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+import org.apache.fineract.cn.customer.api.v1.domain.DocumentsMasterSubtype;
+import org.apache.fineract.cn.customer.api.v1.domain.DocumentsSubType;
 import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentEvent;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentPageEvent;
@@ -49,16 +51,18 @@ public class DocumentCommandHandler {
     private final CustomerRepository customerRepository;
     private final DocumentEntryRepository documentEntryRepository;
     private final DocumentTypeRepository documentTypeRepository;
+    private final DocumentSubTypeRepository documentSubTypeRepository;
 
     @Autowired
     public DocumentCommandHandler(
             final DocumentRepository documentRepository,
             final DocumentEntryRepository documentEntryRepository,
-            final CustomerRepository customerRepository, DocumentTypeRepository documentTypeRepository) {
+            final CustomerRepository customerRepository, DocumentTypeRepository documentTypeRepository, DocumentSubTypeRepository documentSubTypeRepository) {
         this.documentRepository = documentRepository;
         this.customerRepository = customerRepository;
         this.documentEntryRepository = documentEntryRepository;
         this.documentTypeRepository = documentTypeRepository;
+        this.documentSubTypeRepository = documentSubTypeRepository;
     }
 
     @Transactional
@@ -137,8 +141,33 @@ public class DocumentCommandHandler {
 
         final DocumentTypeEntity documentTypeEntity = documentTypeRepository.findByUuid(command.getuuid()).orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
         documentTypeEntity.setTitle(documentsType.getType());
+        documentTypeEntity.setActive(documentsType.isActive());
         documentTypeEntity.setUserType(documentsType.getUserType());
         this.documentTypeRepository.save(documentTypeEntity);
+        return new DocumentEvent(command.getuuid(), command.getDocumentsType().toString());
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_SUB_TYPE)
+    public DocumentEvent process(final CreateDocumentSubTypeCommand command) throws IOException {
+        DocumentTypeEntity documentTypeEntity = documentTypeRepository.findByUuid(command.getUuid()).orElseThrow(() -> ServiceException.notFound("Document not found"));
+        final DocumentSubTypeEntity documentSubTypeEntity = DocumentMapper.map(command.getDocumentsSubType(), documentTypeEntity);
+        this.documentSubTypeRepository.save(documentSubTypeEntity);
+        return new DocumentEvent(command.getUuid(), command.getDocumentsSubType().toString());
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT_SUB_TYPE)
+    public DocumentEvent process(final UpdateDocumentSubTypeCommand command) throws IOException {
+        DocumentsMasterSubtype documentsType = command.getDocumentsType();
+        final DocumentSubTypeEntity documentSubTypeEntity = documentSubTypeRepository.findByUuid(command.getuuid()).orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
+        documentSubTypeEntity.setTitle(documentsType.getTitle());
+        documentSubTypeEntity.setActive(documentsType.isActive());
+        this.documentSubTypeRepository.save(documentSubTypeEntity);
         return new DocumentEvent(command.getuuid(), command.getDocumentsType().toString());
     }
 

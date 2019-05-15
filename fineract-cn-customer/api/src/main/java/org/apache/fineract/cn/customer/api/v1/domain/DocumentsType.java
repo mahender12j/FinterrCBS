@@ -28,6 +28,7 @@ public class DocumentsType {
     private String type;
     private String userType;
     private String status;
+    private boolean isActive;
     private List<DocumentsSubType> documentsSubType;
 
     public DocumentsType() {
@@ -47,6 +48,14 @@ public class DocumentsType {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public List<DocumentsSubType> getDocumentsSubType() {

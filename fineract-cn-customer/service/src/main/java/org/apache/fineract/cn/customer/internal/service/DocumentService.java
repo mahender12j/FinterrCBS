@@ -279,6 +279,12 @@ public class DocumentService {
         return documentTypeEntities.stream().map(DocumentMapper::map).collect(toList());
     }
 
+
+    public List<DocumentsMasterSubtype> findDocumentsSubTypes() {
+        List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findAll();
+        return documentSubTypeEntities.stream().map(DocumentMapper::map).collect(toList());
+    }
+
     public Optional<DocumentSubTypeEntity> findDocumentSubTypeEntityByUuid(final DocumentTypeEntity documentType, final String uuid) {
         return this.documentSubTypeRepository.findByDocumentTypeAndUuid(documentType, uuid);
     }

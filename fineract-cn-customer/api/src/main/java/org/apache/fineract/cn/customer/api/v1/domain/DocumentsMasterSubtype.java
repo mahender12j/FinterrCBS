@@ -29,6 +29,7 @@ public class DocumentsMasterSubtype {
     private String title;
     private String uuid;
     private Long docTypeId;
+    private boolean isActive;
 
     public DocumentsMasterSubtype() {
     }
@@ -63,6 +64,14 @@ public class DocumentsMasterSubtype {
 
     public void setDocTypeId(Long docTypeId) {
         this.docTypeId = docTypeId;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     @Override

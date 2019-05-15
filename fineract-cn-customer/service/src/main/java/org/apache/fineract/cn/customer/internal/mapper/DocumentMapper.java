@@ -84,6 +84,7 @@ public class DocumentMapper {
         documentsMaster.setUserType(documentTypeEntity.getUserType());
         documentsMaster.setDocumentsMasterSubtypes(documentsMasterSubtypes);
         documentsMaster.setId(documentTypeEntity.getId());
+        documentsMaster.setActive(documentTypeEntity.isActive());
         return documentsMaster;
     }
 
@@ -94,6 +95,7 @@ public class DocumentMapper {
             documentsMasterSubtype.setTitle(documentSubTypeEntity.getTitle());
             documentsMasterSubtype.setUuid(documentSubTypeEntity.getUuid());
             documentsMasterSubtype.setId(documentSubTypeEntity.getId());
+            documentsMasterSubtype.setActive(documentSubTypeEntity.isActive());
             documentsMasterSubtype.setDocTypeId(documentSubTypeEntity.getDocumentType().getId());
             documentsMasterSubtypes.add(documentsMasterSubtype);
         });
@@ -137,6 +139,7 @@ public class DocumentMapper {
         documentsMaster.setUuid(documentTypeEntity.getUuid());
         documentsMaster.setUserType(documentTypeEntity.getUserType());
         documentsMaster.setTitle(documentTypeEntity.getTitle());
+        documentsMaster.setActive(documentTypeEntity.isActive());
         return documentsMaster;
     }
 
@@ -223,7 +226,25 @@ public class DocumentMapper {
         DocumentTypeEntity documentTypeEntity = new DocumentTypeEntity();
         documentTypeEntity.setTitle(documentsType.getType());
         documentTypeEntity.setUserType(documentsType.getUserType());
+        documentTypeEntity.setActive(documentsType.isActive());
         return documentTypeEntity;
+    }
+
+    public static DocumentSubTypeEntity map(DocumentsMasterSubtype documentsMasterSubtype, DocumentTypeEntity documentTypeEntity) {
+        DocumentSubTypeEntity documentSubTypeEntity = new DocumentSubTypeEntity();
+        documentSubTypeEntity.setTitle(documentsMasterSubtype.getTitle());
+        documentSubTypeEntity.setDocumentType(documentTypeEntity);
+        documentSubTypeEntity.setActive(documentsMasterSubtype.isActive());
+        return documentSubTypeEntity;
+    }
+
+    public static DocumentsMasterSubtype map(DocumentSubTypeEntity documentSubTypeEntity) {
+        DocumentsMasterSubtype documentsSubType = new DocumentsMasterSubtype();
+        documentsSubType.setTitle(documentSubTypeEntity.getTitle());
+        documentsSubType.setUuid(documentSubTypeEntity.getUuid());
+        documentsSubType.setDocTypeId(documentSubTypeEntity.getDocumentType().getId());
+        documentsSubType.setActive(documentSubTypeEntity.isActive());
+        return documentsSubType;
     }
 
 }

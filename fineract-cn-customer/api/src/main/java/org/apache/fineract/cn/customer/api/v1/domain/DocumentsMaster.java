@@ -29,6 +29,7 @@ public class DocumentsMaster {
     private String title;
     private String uuid;
     private String userType;
+    private boolean isActive;
     private List<DocumentsMasterSubtype> documentsMasterSubtypes;
 
     public DocumentsMaster() {
@@ -64,6 +65,14 @@ public class DocumentsMaster {
 
     public void setDocumentsMasterSubtypes(List<DocumentsMasterSubtype> documentsMasterSubtypes) {
         this.documentsMasterSubtypes = documentsMasterSubtypes;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public Long getId() {
