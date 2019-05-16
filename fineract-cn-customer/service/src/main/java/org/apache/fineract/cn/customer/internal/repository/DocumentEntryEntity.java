@@ -56,6 +56,10 @@ public class DocumentEntryEntity {
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime createdOn;
 
+    @Column(name = "updated_on")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime updatedOn;
+
     @Column(name = "status")
     private String status;
 
@@ -128,6 +132,14 @@ public class DocumentEntryEntity {
 
     public String getType() {
         return type;
+    }
+
+    public LocalDateTime getUpdatedOn() {
+        return updatedOn;
+    }
+
+    public void setUpdatedOn(LocalDateTime updatedOn) {
+        this.updatedOn = updatedOn;
     }
 
     public void setType(String type) {

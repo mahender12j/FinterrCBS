@@ -111,6 +111,7 @@ public class DocumentService {
                     documentsSubType.setStatus(entity.getStatus());
                     documentsSubType.setType(this.getDocumentTypeTitle(entity.getType()));
                     documentsSubType.setSubType(this.getDocumentSubTypeTitle(entity.getSubType()));
+                    documentsSubType.setUpdatedOn(entity.getUpdatedOn().toString());
                     setKycDocumentMapper(documentsSubTypeList, entity, documentsSubType);
                 });
 

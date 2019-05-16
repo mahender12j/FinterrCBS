@@ -94,6 +94,7 @@ public class DocumentCommandHandler {
                 .orElseThrow(() -> ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found", command.getCustomerDocumentId(), command.getCustomerIdentifier()));
 
         existingDocument.setStatus(CustomerDocument.Status.APPROVED.name());
+        existingDocument.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
         documentEntryRepository.save(existingDocument);
 
 //        customerRepository.findByIdentifier(command.getCustomerIdentifier())
@@ -117,6 +118,7 @@ public class DocumentCommandHandler {
                 .orElseThrow(() -> ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found", command.getCustomerDocumentId(), command.getCustomerIdentifier()));
 
         existingDocument.setStatus(CustomerDocument.Status.PENDING.name());
+        existingDocument.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
         documentEntryRepository.save(existingDocument);
         return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocumentId().toString());
     }
@@ -185,6 +187,7 @@ public class DocumentCommandHandler {
         existingDocument.setReasonForReject(command.getReason());
         existingDocument.setRejectedBy(UserContextHolder.checkedGetUser());
         existingDocument.setRejectedOn(LocalDateTime.now(Clock.systemUTC()));
+        existingDocument.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
         documentEntryRepository.save(existingDocument);
         return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocumentId().toString());
     }
