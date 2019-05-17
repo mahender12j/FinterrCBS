@@ -22,19 +22,14 @@ import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
-import org.apache.fineract.cn.customer.ServiceConstants;
+import org.apache.fineract.cn.customer.api.v1.domain.CAdminPage;
+import org.apache.fineract.cn.customer.internal.service.CAdminService;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
-import org.apache.fineract.cn.customer.internal.service.DocumentService;
-import org.apache.fineract.cn.customer.internal.service.TaskService;
-import org.slf4j.Logger;
+import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/")
@@ -42,11 +37,17 @@ public class CAdminRestController {
 
 
     private final CommandGateway commandGateway;
+    private final CAdminService cAdminService;
+    private final CustomerService customerService;
 
     @Autowired
-    public CAdminRestController(final CommandGateway commandGateway) {
+    public CAdminRestController(final CommandGateway commandGateway,
+                                final CAdminService cAdminService,
+                                final CustomerService customerService) {
         super();
         this.commandGateway = commandGateway;
+        this.cAdminService = cAdminService;
+        this.customerService = customerService;
     }
 
     //    GET NGO statistics
@@ -61,9 +62,16 @@ public class CAdminRestController {
     )
     public
     @ResponseBody
-    Map<String, Boolean> getNgoStatistics(@PathVariable("identifier") final String identifier) {
-        System.out.println("NGO statistics called");
-        return Collections.singletonMap(identifier, true);
+    ResponseEntity<CAdminPage> getCadminStatistics(@PathVariable("identifier") final String identifier) {
+        this.throwIfCustomerNotExists(identifier);
+        return ResponseEntity.ok(this.cAdminService.getCaAdminStatistics());
+    }
+
+
+    private void throwIfCustomerNotExists(final String identifier) {
+        if (!this.customerService.customerExists(identifier)) {
+            throw ServiceException.notFound("Invalid Username");
+        }
     }
 
 }

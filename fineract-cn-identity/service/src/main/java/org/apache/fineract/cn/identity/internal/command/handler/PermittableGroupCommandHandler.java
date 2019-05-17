@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.cn.identity.internal.command.handler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -67,15 +69,25 @@ public class PermittableGroupCommandHandler {
     @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
     @EventEmitter(selectorName = EventConstants.OPERATION_HEADER, selectorValue = EventConstants.OPERATION_UPDATE_PERMITTABLE_GROUP)
     public String process(final UpdatePermittableGroupCommand command) {
-        Assert.isTrue(!repository.get(command.getIdentifier()).isPresent());
+//        Assert.isTrue(!repository.get(command.getIdentifier()).isPresent());
         repository.add(update(command.getEndpoint(), command.getIdentifier()));
         return command.getIdentifier();
     }
 
     private PermittableGroupEntity update(final PermittableEndpoint endpoint, final String identifier) {
-        final PermittableGroupEntity ret = repository.get(identifier).orElseThrow(() -> ServiceException.notFound("Permittable Group Not Found"));
-        ret.getPermittables().add(map(endpoint));
-        return ret;
+        final Optional<PermittableGroupEntity> ret = repository.get(identifier);
+        if (ret.isPresent()) {
+            ret.get().getPermittables().add(map(endpoint));
+            return ret.get();
+        } else {
+            PermittableGroupEntity entity = new PermittableGroupEntity();
+            entity.setIdentifier(identifier);
+            List<PermittableType> permittables = new ArrayList<>();
+            permittables.add(map(endpoint));
+            entity.setPermittables(permittables);
+            return entity;
+        }
+
     }
 
     private PermittableGroupEntity map(final PermittableGroup instance) {
