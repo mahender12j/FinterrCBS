@@ -27,18 +27,21 @@ public class CAdminPage {
     private Long NoOfNGOThisWeek;
     private List<PerMonthRecord> ngoPerMonth;
     private List<PerMonthRecord> inactiveNgoPerMonth;
+    private List<PerMonthRecord> activeNgoPerMonth;
 
     private Long NoOfMember;
     private Long ActiveMember;
     private Long NoOfMemberThisWeek;
     private List<PerMonthRecord> memberPerMonth;
     private List<PerMonthRecord> inactiveMemberPerMonth;
+    private List<PerMonthRecord> activeMemberPerMonth;
 
     private Long NoOfCause;
     private Long ActiveCause;
     private Long NoOfCauseThisWeek;
     private List<PerMonthRecord> causePerMonth;
     private List<PerMonthRecord> inactiveCausePerMonth;
+    private List<PerMonthRecord> activeCausePerMonth;
 
     private Long KycPending;
     private Long KycSubmitted;
@@ -219,29 +222,28 @@ public class CAdminPage {
     public void setTotalPromoCode(Long totalPromoCode) {
         this.totalPromoCode = totalPromoCode;
     }
-}
 
-
-class PerMonthRecord {
-    private Long month;
-    private Long numberOfRecord;
-
-    public PerMonthRecord() {
+    public List<PerMonthRecord> getActiveNgoPerMonth() {
+        return activeNgoPerMonth;
     }
 
-    public Long getMonth() {
-        return month;
+    public void setActiveNgoPerMonth(List<PerMonthRecord> activeNgoPerMonth) {
+        this.activeNgoPerMonth = activeNgoPerMonth;
     }
 
-    public void setMonth(Long month) {
-        this.month = month;
+    public List<PerMonthRecord> getActiveMemberPerMonth() {
+        return activeMemberPerMonth;
     }
 
-    public Long getNumberOfRecord() {
-        return numberOfRecord;
+    public void setActiveMemberPerMonth(List<PerMonthRecord> activeMemberPerMonth) {
+        this.activeMemberPerMonth = activeMemberPerMonth;
     }
 
-    public void setNumberOfRecord(Long numberOfRecord) {
-        this.numberOfRecord = numberOfRecord;
+    public List<PerMonthRecord> getActiveCausePerMonth() {
+        return activeCausePerMonth;
+    }
+
+    public void setActiveCausePerMonth(List<PerMonthRecord> activeCausePerMonth) {
+        this.activeCausePerMonth = activeCausePerMonth;
     }
 }

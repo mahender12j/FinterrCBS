@@ -119,6 +119,7 @@ public class DocumentMapper {
         ret.setType(customerDocumentEntry.getType());
         ret.setSubType(customerDocumentEntry.getSubType());
         ret.setCreatedBy(documentEntity.getCreatedBy());
+        ret.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setDocument(documentEntity);
         return ret;
     }
@@ -176,6 +177,7 @@ public class DocumentMapper {
         ret.setSubType(customerDocumentsBody.getSubType());
         ret.setCreatedBy(documentEntity.getCreatedBy());
         ret.setDocument(documentEntity);
+        ret.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
         return ret;
     }
 
@@ -216,6 +218,7 @@ public class DocumentMapper {
             documents.setCreatedBy(UserContextHolder.checkedGetUser());
             documents.setStatus(CustomerDocument.Status.PENDING.name());
             documents.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+            documents.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
             documents.setDocument(documentEntity);
             documentEntryEntityList.add(documents);
         });

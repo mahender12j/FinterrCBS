@@ -21,6 +21,7 @@ package org.apache.fineract.cn.customer.internal.repository;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
 import javax.persistence.*;
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 /**
@@ -88,6 +89,7 @@ public class DocumentEntryEntity {
 
 
     public DocumentEntryEntity() {
+        this.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
     }
 
     public Long getId() {

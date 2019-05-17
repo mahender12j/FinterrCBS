@@ -20,17 +20,31 @@ package org.apache.fineract.cn.customer.internal.service;
 
 import org.apache.fineract.cn.customer.api.v1.domain.CAdminPage;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
+import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+import org.apache.fineract.cn.customer.api.v1.domain.PerMonthRecord;
+import org.apache.fineract.cn.customer.internal.mapper.CadminMapper;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.customer.internal.repository.CustomerRepository;
+import org.apache.fineract.cn.customer.internal.repository.DocumentEntryEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.*;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class CAdminService {
 
     private final CustomerRepository customerRepository;
+
 
     @Autowired
     public CAdminService(final CustomerRepository customerRepository) {
@@ -43,15 +57,26 @@ public class CAdminService {
         CAdminPage cAdminPage = new CAdminPage();
         List<CustomerEntity> customerEntities = this.customerRepository.findAll();
 
-//        getIsDeposited is checked for active since deposit is only possible after kyc is approved
+        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
+        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+
 
         cAdminPage.setActiveMember(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.Type.PERSON.name())).count());
         cAdminPage.setNoOfMember(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.PERSON.name())).count());
+        cAdminPage.setNoOfMemberThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.PERSON.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setMemberPerMonth(CadminMapper.map(customerEntities, Customer.Type.PERSON));
+        cAdminPage.setActiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.PERSON, true));
+        cAdminPage.setInactiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.PERSON, false));
+
 
         cAdminPage.setActiveNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.Type.BUSINESS.name())).count());
         cAdminPage.setNoOfNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.BUSINESS.name())).count());
-
+        cAdminPage.setNoOfNGOThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.BUSINESS.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setNgoPerMonth(CadminMapper.map(customerEntities, Customer.Type.BUSINESS));
+        cAdminPage.setActiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.BUSINESS, true));
+        cAdminPage.setInactiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.BUSINESS, false));
 
         return cAdminPage;
     }
+
 }
