@@ -20,12 +20,19 @@ package org.apache.fineract.cn.cause.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
+import org.apache.fineract.cn.cause.api.v1.domain.PerMonthRecord;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.CauseStateEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.format.TextStyle;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Padma Raju Sattineni
@@ -151,6 +158,29 @@ public final class CauseMapper {
         stateEntity.setType(type);
         stateEntity.setStatus(Cause.State.PENDING.name());
         return stateEntity;
+    }
+
+
+    public static List<PerMonthRecord> map(List<CauseEntity> causeEntities, Cause.State state) {
+        final LocalDateTime oneYearBack = LocalDateTime.now().minusYears(1);
+        Map<String, Long> byMonth = causeEntities.stream()
+                .filter(causeEntity -> causeEntity.getCreatedOn().isAfter(oneYearBack) && causeEntity.getCurrentState().equals(state.name()))
+                .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
+
+        List<PerMonthRecord> perMonthRecords = byMonth.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(e -> new PerMonthRecord(e.getKey(), e.getValue())).collect(Collectors.toList());
+        return perMonthRecords;
+    }
+
+    public static List<PerMonthRecord> mapAll(List<CauseEntity> causeEntities) {
+        final LocalDateTime oneYearBack = LocalDateTime.now().minusYears(1);
+        Map<String, Long> byMonth = causeEntities.stream()
+                .filter(causeEntity -> causeEntity.getCreatedOn().isAfter(oneYearBack))
+                .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
+
+        List<PerMonthRecord> perMonthRecords = byMonth.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(e -> new PerMonthRecord(e.getKey(), e.getValue())).collect(Collectors.toList());
+        return perMonthRecords;
     }
 }
 

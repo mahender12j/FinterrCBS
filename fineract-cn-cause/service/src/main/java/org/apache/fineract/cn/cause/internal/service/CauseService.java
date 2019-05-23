@@ -31,7 +31,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -226,6 +229,27 @@ public class CauseService {
     private void setCauseExtendedAndResubmitValue(CauseEntity causeEntity, Cause cause) {
         cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name()))));
         cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()))));
+    }
+
+
+    public CaAdminCauseData findAllCauseData() {
+        CaAdminCauseData caAdminCauseData = new CaAdminCauseData();
+        List<CauseEntity> causeEntities = this.causeRepository.findAll();
+        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
+        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+
+
+        caAdminCauseData.setNoOfCause((long) causeEntities.size());
+        caAdminCauseData.setActiveCause(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.ACTIVE.name())).count());
+        caAdminCauseData.setCausePending(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.ACTIVE.name())).count());
+        caAdminCauseData.setNoOfCauseThisWeek(causeEntities.stream().filter(causeEntity -> causeEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        caAdminCauseData.setCauseCompleted(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.CLOSED.name())).count());
+
+        caAdminCauseData.setCausePerMonth(CauseMapper.mapAll(causeEntities));
+        caAdminCauseData.setActiveCausePerMonth(CauseMapper.map(causeEntities, Cause.State.ACTIVE));
+        caAdminCauseData.setInactiveCausePerMonth(CauseMapper.map(causeEntities, Cause.State.INACTIVE));
+
+        return caAdminCauseData;
     }
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {

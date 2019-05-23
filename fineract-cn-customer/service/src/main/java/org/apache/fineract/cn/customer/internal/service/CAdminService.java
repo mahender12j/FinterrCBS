@@ -18,10 +18,12 @@
  */
 package org.apache.fineract.cn.customer.internal.service;
 
+import org.apache.fineract.cn.cause.api.v1.domain.CaAdminCauseData;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.mapper.CadminMapper;
 import org.apache.fineract.cn.customer.internal.mapper.DocumentMapper;
 import org.apache.fineract.cn.customer.internal.repository.*;
+import org.apache.fineract.cn.customer.internal.service.helperService.CauseAdaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,19 +44,22 @@ public class CAdminService {
     private final DocumentEntryRepository documentEntryRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final DocumentSubTypeRepository documentSubTypeRepository;
+    private final CauseAdaptor causeAdaptor;
 
     @Autowired
     public CAdminService(final CustomerRepository customerRepository,
                          final DocumentRepository documentRepository,
                          final DocumentEntryRepository documentEntryRepository,
                          final DocumentTypeRepository documentTypeRepository,
-                         final DocumentSubTypeRepository documentSubTypeRepository) {
+                         final DocumentSubTypeRepository documentSubTypeRepository,
+                         final CauseAdaptor causeAdaptor) {
         super();
         this.customerRepository = customerRepository;
         this.documentRepository = documentRepository;
         this.documentEntryRepository = documentEntryRepository;
         this.documentTypeRepository = documentTypeRepository;
         this.documentSubTypeRepository = documentSubTypeRepository;
+        this.causeAdaptor = causeAdaptor;
     }
 
 
@@ -63,6 +68,8 @@ public class CAdminService {
         List<CustomerEntity> customerEntities = this.customerRepository.findAll();
         List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findAll();
         List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findAll();
+
+        CaAdminCauseData caAdminCauseData = this.causeAdaptor.fetchCauseData();
 
         final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
         final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
@@ -89,6 +96,31 @@ public class CAdminService {
         cAdminPage.setKycRejected(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.REJECTED.name())).count());
         cAdminPage.setKycApproved(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.APPROVED.name())).count());
         cAdminPage.setKycNotUploaded(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.NOTUPLOADED.name())).count());
+
+        cAdminPage.setNoOfCause(caAdminCauseData.getNoOfCause());
+        cAdminPage.setActiveCause(caAdminCauseData.getActiveCause());
+        cAdminPage.setCausePending(caAdminCauseData.getCausePending());
+        cAdminPage.setNoOfCauseThisWeek(caAdminCauseData.getNoOfCauseThisWeek());
+        cAdminPage.setCauseCompleted(caAdminCauseData.getCauseCompleted());
+
+        cAdminPage.setCausePerMonth(caAdminCauseData.getCausePerMonth().stream().map(perMonthRecord -> {
+            PerMonthRecord record = new PerMonthRecord();
+            record.setMonth(perMonthRecord.getMonth());
+            record.setNumberOfRecord(perMonthRecord.getNumberOfRecord());
+            return record;
+        }).collect(toList()));
+        cAdminPage.setActiveCausePerMonth(caAdminCauseData.getActiveCausePerMonth().stream().map(perMonthRecord -> {
+            PerMonthRecord record = new PerMonthRecord();
+            record.setMonth(perMonthRecord.getMonth());
+            record.setNumberOfRecord(perMonthRecord.getNumberOfRecord());
+            return record;
+        }).collect(toList()));
+        cAdminPage.setInactiveCausePerMonth(caAdminCauseData.getInactiveCausePerMonth().stream().map(perMonthRecord -> {
+            PerMonthRecord record = new PerMonthRecord();
+            record.setMonth(perMonthRecord.getMonth());
+            record.setNumberOfRecord(perMonthRecord.getNumberOfRecord());
+            return record;
+        }).collect(toList()));
 
 
         return cAdminPage;

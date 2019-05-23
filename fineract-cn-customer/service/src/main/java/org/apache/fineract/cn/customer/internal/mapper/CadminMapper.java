@@ -19,10 +19,8 @@
 package org.apache.fineract.cn.customer.internal.mapper;
 
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
 import org.apache.fineract.cn.customer.api.v1.domain.PerMonthRecord;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
-import org.apache.fineract.cn.customer.internal.repository.DocumentEntryEntity;
 
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;

@@ -187,6 +187,20 @@ public class CauseRestController {
     }
 
 
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/cadmin/all",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<CaAdminCauseData> findAllCauseData() {
+        return ResponseEntity.ok(this.causeService.findAllCauseData());
+    }
+
+
 //    cause update by cause ID
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)

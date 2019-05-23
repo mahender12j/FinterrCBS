@@ -49,7 +49,7 @@ public class CAdminPage {
     private Long KycNotUploaded;
 
     private Long causePending;
-    private Long causeSubmitted;
+    private Long causeCompleted;
 
     private Long activePromoCode;
     private Long totalPromoCode;
@@ -217,12 +217,12 @@ public class CAdminPage {
         this.causePending = causePending;
     }
 
-    public Long getCauseSubmitted() {
-        return causeSubmitted;
+    public Long getCauseCompleted() {
+        return causeCompleted;
     }
 
-    public void setCauseSubmitted(Long causeSubmitted) {
-        this.causeSubmitted = causeSubmitted;
+    public void setCauseCompleted(Long causeCompleted) {
+        this.causeCompleted = causeCompleted;
     }
 
     public Long getActivePromoCode() {
