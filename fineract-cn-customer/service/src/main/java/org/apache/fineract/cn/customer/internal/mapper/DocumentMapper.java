@@ -41,29 +41,29 @@ public class DocumentMapper {
     }
 
 
-    public static List<DocumentsType> map(Map<String, List<DocumentEntryEntity>> documentEntryEntity) {
-        final List<DocumentsType> ret = new ArrayList<>();
-
-        documentEntryEntity.forEach((key, val) -> {
-            final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
-            final DocumentsType d = new DocumentsType();
-            val.forEach(doc -> {
-                final DocumentsSubType documentsSubType = new DocumentsSubType();
-                documentsSubType.setId(doc.getId());
-                documentsSubType.setCreated_by(doc.getCreatedBy());
-                documentsSubType.setStatus(doc.getStatus());
-                documentsSubType.setType(doc.getType());
-                documentsSubType.setSubType(doc.getSubType());
-                DocumentService.setKycDocumentMapper(documentsSubTypeList, doc, documentsSubType);
-            });
-
-            setDocumentTypeStatus(val, d);
-            d.setType(key);
-            d.setDocumentsSubType(documentsSubTypeList);
-            ret.add(d);
-        });
-        return ret;
-    }
+//    public static List<DocumentsType> map(Map<String, List<DocumentEntryEntity>> documentEntryEntity) {
+//        final List<DocumentsType> ret = new ArrayList<>();
+//
+//        documentEntryEntity.forEach((key, val) -> {
+//            final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
+//            final DocumentsType d = new DocumentsType();
+//            val.forEach(doc -> {
+//                final DocumentsSubType documentsSubType = new DocumentsSubType();
+//                documentsSubType.setId(doc.getId());
+//                documentsSubType.setCreated_by(doc.getCreatedBy());
+//                documentsSubType.setStatus(doc.getStatus());
+//                documentsSubType.setType(doc.getType());
+//                documentsSubType.setSubType(doc.getSubType());
+//                DocumentService.setKycDocumentMapper(documentsSubTypeList, doc, documentsSubType);
+//            });
+//
+//            setDocumentTypeStatus(val, d);
+//            d.setType(key);
+//            d.setDocumentsSubType(documentsSubTypeList);
+//            ret.add(d);
+//        });
+//        return ret;
+//    }
 
     public static void setDocumentTypeStatus(List<DocumentEntryEntity> val, DocumentsType d) {
         if (val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {

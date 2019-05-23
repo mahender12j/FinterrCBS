@@ -43,8 +43,10 @@ public class CAdminPage {
     private List<PerMonthRecord> inactiveCausePerMonth;
     private List<PerMonthRecord> activeCausePerMonth;
 
+    private Long KycApproved;
     private Long KycPending;
-    private Long KycSubmitted;
+    private Long KycRejected;
+    private Long KycNotUploaded;
 
     private Long causePending;
     private Long causeSubmitted;
@@ -183,12 +185,28 @@ public class CAdminPage {
         KycPending = kycPending;
     }
 
-    public Long getKycSubmitted() {
-        return KycSubmitted;
+    public Long getKycApproved() {
+        return KycApproved;
     }
 
-    public void setKycSubmitted(Long kycSubmitted) {
-        KycSubmitted = kycSubmitted;
+    public void setKycApproved(Long kycApproved) {
+        KycApproved = kycApproved;
+    }
+
+    public Long getKycRejected() {
+        return KycRejected;
+    }
+
+    public void setKycRejected(Long kycRejected) {
+        KycRejected = kycRejected;
+    }
+
+    public Long getKycNotUploaded() {
+        return KycNotUploaded;
+    }
+
+    public void setKycNotUploaded(Long kycNotUploaded) {
+        KycNotUploaded = kycNotUploaded;
     }
 
     public Long getCausePending() {
