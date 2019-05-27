@@ -20,14 +20,24 @@ package org.apache.fineract.cn.customer.api.v1.domain;
 
 public class PerMonthRecord {
     private String month;
+    private int monthNumber;
     private Long numberOfRecord;
 
     public PerMonthRecord() {
     }
 
-    public PerMonthRecord(String month, Long numberOfRecord) {
+    public PerMonthRecord(String month, int monthNumber, Long numberOfRecord) {
         this.month = month;
+        this.monthNumber = monthNumber;
         this.numberOfRecord = numberOfRecord;
+    }
+
+    public int getMonthNumber() {
+        return monthNumber;
+    }
+
+    public void setMonthNumber(int monthNumber) {
+        this.monthNumber = monthNumber;
     }
 
     public String getMonth() {

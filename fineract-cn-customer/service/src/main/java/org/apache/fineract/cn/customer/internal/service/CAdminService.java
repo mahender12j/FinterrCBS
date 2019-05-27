@@ -112,24 +112,9 @@ public class CAdminService {
         cAdminPage.setCausePending(caAdminCauseData.getCausePending());
         cAdminPage.setCauseCompleted(caAdminCauseData.getCauseCompleted());
 
-        cAdminPage.setCausePerMonth(caAdminCauseData.getCausePerMonth().stream().map(perMonthRecord -> {
-            PerMonthRecord record = new PerMonthRecord();
-            record.setMonth(perMonthRecord.getMonth());
-            record.setNumberOfRecord(perMonthRecord.getNumberOfRecord());
-            return record;
-        }).collect(toList()));
-        cAdminPage.setActiveCausePerMonth(caAdminCauseData.getActiveCausePerMonth().stream().map(perMonthRecord -> {
-            PerMonthRecord record = new PerMonthRecord();
-            record.setMonth(perMonthRecord.getMonth());
-            record.setNumberOfRecord(perMonthRecord.getNumberOfRecord());
-            return record;
-        }).collect(toList()));
-        cAdminPage.setInactiveCausePerMonth(caAdminCauseData.getInactiveCausePerMonth().stream().map(perMonthRecord -> {
-            PerMonthRecord record = new PerMonthRecord();
-            record.setMonth(perMonthRecord.getMonth());
-            record.setNumberOfRecord(perMonthRecord.getNumberOfRecord());
-            return record;
-        }).collect(toList()));
+        cAdminPage.setCausePerMonth(caAdminCauseData.getCausePerMonth().stream().map(perMonthRecord -> new PerMonthRecord(perMonthRecord.getMonth(), perMonthRecord.getMonthNumber(), perMonthRecord.getNumberOfRecord())).collect(toList()));
+        cAdminPage.setActiveCausePerMonth(caAdminCauseData.getActiveCausePerMonth().stream().map(perMonthRecord -> new PerMonthRecord(perMonthRecord.getMonth(), perMonthRecord.getMonthNumber(), perMonthRecord.getNumberOfRecord())).collect(toList()));
+        cAdminPage.setInactiveCausePerMonth(caAdminCauseData.getInactiveCausePerMonth().stream().map(perMonthRecord -> new PerMonthRecord(perMonthRecord.getMonth(), perMonthRecord.getMonthNumber(), perMonthRecord.getNumberOfRecord())).collect(toList()));
 
 
         return cAdminPage;

@@ -23,6 +23,7 @@ import org.apache.fineract.cn.customer.api.v1.domain.PerMonthRecord;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Comparator;
 import java.util.List;
@@ -42,9 +43,12 @@ public final class CadminMapper {
                 .filter(customerEntity -> customerEntity.getCreatedOn().isAfter(oneYearBack) && customerEntity.getType().equals(type.name()))
                 .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
 
-        List<PerMonthRecord> perMonthRecords = byMonth.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
-                .map(e -> new PerMonthRecord(e.getKey(), e.getValue())).collect(Collectors.toList());
-        return perMonthRecords;
+        return getPerMonthRecords(byMonth);
+    }
+
+    private static List<PerMonthRecord> getPerMonthRecords(Map<String, Long> byMonth) {
+        return byMonth.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(e -> new PerMonthRecord(e.getKey(), Month.valueOf(e.getKey().toUpperCase()).getValue(), e.getValue())).collect(Collectors.toList());
     }
 
 
@@ -54,8 +58,6 @@ public final class CadminMapper {
                 .filter(customerEntity -> customerEntity.getCreatedOn().isAfter(oneYearBack) && customerEntity.getType().equals(type.name()) && customerEntity.getIsDeposited() == customerStatus)
                 .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
 
-        List<PerMonthRecord> perMonthRecords = byMonth.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
-                .map(e -> new PerMonthRecord(e.getKey(), e.getValue())).collect(Collectors.toList());
-        return perMonthRecords;
+        return getPerMonthRecords(byMonth);
     }
 }

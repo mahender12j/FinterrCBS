@@ -27,6 +27,7 @@ import org.apache.fineract.cn.lang.DateConverter;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Comparator;
 import java.util.List;
@@ -167,9 +168,12 @@ public final class CauseMapper {
                 .filter(causeEntity -> causeEntity.getCreatedOn().isAfter(oneYearBack) && causeEntity.getCurrentState().equals(state.name()))
                 .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
 
-        List<PerMonthRecord> perMonthRecords = byMonth.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
-                .map(e -> new PerMonthRecord(e.getKey(), e.getValue())).collect(Collectors.toList());
-        return perMonthRecords;
+        return getPerMonthRecords(byMonth);
+    }
+
+    private static List<PerMonthRecord> getPerMonthRecords(Map<String, Long> byMonth) {
+        return byMonth.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(e -> new PerMonthRecord(e.getKey(), Month.valueOf(e.getKey().toUpperCase()).getValue(), e.getValue())).collect(Collectors.toList());
     }
 
     public static List<PerMonthRecord> mapAll(List<CauseEntity> causeEntities) {
@@ -178,9 +182,7 @@ public final class CauseMapper {
                 .filter(causeEntity -> causeEntity.getCreatedOn().isAfter(oneYearBack))
                 .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
 
-        List<PerMonthRecord> perMonthRecords = byMonth.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
-                .map(e -> new PerMonthRecord(e.getKey(), e.getValue())).collect(Collectors.toList());
-        return perMonthRecords;
+        return getPerMonthRecords(byMonth);
     }
 }
 
