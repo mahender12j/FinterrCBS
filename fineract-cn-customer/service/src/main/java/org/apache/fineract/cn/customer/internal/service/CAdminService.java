@@ -71,10 +71,13 @@ public class CAdminService {
 
         CaAdminCauseData caAdminCauseData = this.causeAdaptor.fetchCauseData();
 
-        System.out.println("object: " + caAdminCauseData.toString());
+//        System.out.println("object: " + caAdminCauseData.toString());
 
-        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
-        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+//        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
+//        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).minusDays(7);
+
+//        System.out.println("Start Date Of This Week" + startDateOfThisWeek);
 
 
         cAdminPage.setActiveMember(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.Type.PERSON.name())).count());
@@ -99,8 +102,8 @@ public class CAdminService {
         cAdminPage.setKycApproved(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.APPROVED.name())).count());
         cAdminPage.setKycNotUploaded(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.NOTUPLOADED.name())).count());
 
-        System.out.println("No of Cause: " + caAdminCauseData.getNoOfCause());
-        System.out.println("No of active Cause: " + caAdminCauseData.getActiveCause());
+//        System.out.println("No of Cause: " + caAdminCauseData.getNoOfCause());
+//        System.out.println("No of active Cause: " + caAdminCauseData.getActiveCause());
 
         cAdminPage.setNoOfCause(caAdminCauseData.getNoOfCause());
         cAdminPage.setNoOfCauseThisWeek(caAdminCauseData.getNoOfCauseThisWeek());

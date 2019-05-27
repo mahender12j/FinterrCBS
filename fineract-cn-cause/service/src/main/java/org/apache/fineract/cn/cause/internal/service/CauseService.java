@@ -236,8 +236,9 @@ public class CauseService {
         CaAdminCauseData caAdminCauseData = new CaAdminCauseData();
         List<CauseEntity> causeEntities = this.causeRepository.findAll();
 
-        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
-        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+//        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
+//        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).minusDays(7);
         caAdminCauseData.setNoOfCause((long) causeEntities.size());
         caAdminCauseData.setActiveCause(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.ACTIVE.name())).count());
         caAdminCauseData.setCausePending(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.ACTIVE.name())).count());
