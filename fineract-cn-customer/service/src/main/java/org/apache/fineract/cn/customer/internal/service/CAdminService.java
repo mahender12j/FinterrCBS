@@ -71,6 +71,8 @@ public class CAdminService {
 
         CaAdminCauseData caAdminCauseData = this.causeAdaptor.fetchCauseData();
 
+        System.out.println("object: " + caAdminCauseData.toString());
+
         final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
         final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
 
@@ -97,10 +99,14 @@ public class CAdminService {
         cAdminPage.setKycApproved(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.APPROVED.name())).count());
         cAdminPage.setKycNotUploaded(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.NOTUPLOADED.name())).count());
 
+        System.out.println("No of Cause: " + caAdminCauseData.getNoOfCause());
+        System.out.println("No of active Cause: " + caAdminCauseData.getActiveCause());
+
         cAdminPage.setNoOfCause(caAdminCauseData.getNoOfCause());
-        cAdminPage.setActiveCause(caAdminCauseData.getActiveCause());
-        cAdminPage.setCausePending(caAdminCauseData.getCausePending());
         cAdminPage.setNoOfCauseThisWeek(caAdminCauseData.getNoOfCauseThisWeek());
+        cAdminPage.setActiveCause(caAdminCauseData.getActiveCause());
+
+        cAdminPage.setCausePending(caAdminCauseData.getCausePending());
         cAdminPage.setCauseCompleted(caAdminCauseData.getCauseCompleted());
 
         cAdminPage.setCausePerMonth(caAdminCauseData.getCausePerMonth().stream().map(perMonthRecord -> {

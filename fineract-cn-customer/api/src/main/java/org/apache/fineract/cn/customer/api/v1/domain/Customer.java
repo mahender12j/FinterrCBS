@@ -88,6 +88,7 @@ public final class Customer {
     private String lastModifiedOn;
     @NotBlank
     private String refferalCodeIdentifier;
+    private String refferalUserIdentifier;
     private String ethAddress;
     private Boolean isDeposited;
     private String depositedOn;
@@ -353,6 +354,14 @@ public final class Customer {
 
     public void setNgoRegistrationNumber(String ngoRegistrationNumber) {
         this.ngoRegistrationNumber = ngoRegistrationNumber;
+    }
+
+    public String getRefferalUserIdentifier() {
+        return refferalUserIdentifier;
+    }
+
+    public void setRefferalUserIdentifier(String refferalUserIdentifier) {
+        this.refferalUserIdentifier = refferalUserIdentifier;
     }
 
     public String getDateOfRegistration() {

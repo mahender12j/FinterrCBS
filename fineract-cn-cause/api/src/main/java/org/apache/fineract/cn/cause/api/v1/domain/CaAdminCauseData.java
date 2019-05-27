@@ -21,9 +21,9 @@ package org.apache.fineract.cn.cause.api.v1.domain;
 import java.util.List;
 
 public class CaAdminCauseData {
-    private Long NoOfCause;
-    private Long ActiveCause;
-    private Long NoOfCauseThisWeek;
+    private Long noOfCause;
+    private Long activeCause;
+    private Long noOfCauseThisWeek;
 
     private List<PerMonthRecord> causePerMonth;
     private List<PerMonthRecord> inactiveCausePerMonth;
@@ -35,29 +35,28 @@ public class CaAdminCauseData {
     public CaAdminCauseData() {
     }
 
-
     public Long getNoOfCause() {
-        return NoOfCause;
+        return noOfCause;
     }
 
     public void setNoOfCause(Long noOfCause) {
-        NoOfCause = noOfCause;
+        this.noOfCause = noOfCause;
     }
 
     public Long getActiveCause() {
-        return ActiveCause;
+        return activeCause;
     }
 
     public void setActiveCause(Long activeCause) {
-        ActiveCause = activeCause;
+        this.activeCause = activeCause;
     }
 
     public Long getNoOfCauseThisWeek() {
-        return NoOfCauseThisWeek;
+        return noOfCauseThisWeek;
     }
 
     public void setNoOfCauseThisWeek(Long noOfCauseThisWeek) {
-        NoOfCauseThisWeek = noOfCauseThisWeek;
+        this.noOfCauseThisWeek = noOfCauseThisWeek;
     }
 
     public List<PerMonthRecord> getCausePerMonth() {
@@ -76,6 +75,14 @@ public class CaAdminCauseData {
         this.inactiveCausePerMonth = inactiveCausePerMonth;
     }
 
+    public List<PerMonthRecord> getActiveCausePerMonth() {
+        return activeCausePerMonth;
+    }
+
+    public void setActiveCausePerMonth(List<PerMonthRecord> activeCausePerMonth) {
+        this.activeCausePerMonth = activeCausePerMonth;
+    }
+
     public Long getCausePending() {
         return causePending;
     }
@@ -90,13 +97,5 @@ public class CaAdminCauseData {
 
     public void setCauseCompleted(Long causeCompleted) {
         this.causeCompleted = causeCompleted;
-    }
-
-    public List<PerMonthRecord> getActiveCausePerMonth() {
-        return activeCausePerMonth;
-    }
-
-    public void setActiveCausePerMonth(List<PerMonthRecord> activeCausePerMonth) {
-        this.activeCausePerMonth = activeCausePerMonth;
     }
 }

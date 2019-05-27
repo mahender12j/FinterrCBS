@@ -22,9 +22,9 @@ import java.util.List;
 
 public class CAdminPage {
 
-    private Long NoOfNGO;
-    private Long ActiveNGO;
-    private Long NoOfNGOThisWeek;
+    private Long noOfNGO;
+    private Long activeNGO;
+    private Long noOfNGOThisWeek;
     private List<PerMonthRecord> ngoPerMonth;
     private List<PerMonthRecord> inactiveNgoPerMonth;
     private List<PerMonthRecord> activeNgoPerMonth;
@@ -36,17 +36,17 @@ public class CAdminPage {
     private List<PerMonthRecord> inactiveMemberPerMonth;
     private List<PerMonthRecord> activeMemberPerMonth;
 
-    private Long NoOfCause;
-    private Long ActiveCause;
-    private Long NoOfCauseThisWeek;
+    private Long noOfCause;
+    private Long activeCause;
+    private Long noOfCauseThisWeek;
     private List<PerMonthRecord> causePerMonth;
     private List<PerMonthRecord> inactiveCausePerMonth;
     private List<PerMonthRecord> activeCausePerMonth;
 
-    private Long KycApproved;
-    private Long KycPending;
-    private Long KycRejected;
-    private Long KycNotUploaded;
+    private Long kycApproved;
+    private Long kycPending;
+    private Long kycRejected;
+    private Long kycNotUploaded;
 
     private Long causePending;
     private Long causeCompleted;
@@ -58,27 +58,27 @@ public class CAdminPage {
     }
 
     public Long getNoOfNGO() {
-        return NoOfNGO;
+        return noOfNGO;
     }
 
     public void setNoOfNGO(Long noOfNGO) {
-        NoOfNGO = noOfNGO;
+        this.noOfNGO = noOfNGO;
     }
 
     public Long getActiveNGO() {
-        return ActiveNGO;
+        return activeNGO;
     }
 
     public void setActiveNGO(Long activeNGO) {
-        ActiveNGO = activeNGO;
+        this.activeNGO = activeNGO;
     }
 
     public Long getNoOfNGOThisWeek() {
-        return NoOfNGOThisWeek;
+        return noOfNGOThisWeek;
     }
 
     public void setNoOfNGOThisWeek(Long noOfNGOThisWeek) {
-        NoOfNGOThisWeek = noOfNGOThisWeek;
+        this.noOfNGOThisWeek = noOfNGOThisWeek;
     }
 
     public List<PerMonthRecord> getNgoPerMonth() {
@@ -95,6 +95,14 @@ public class CAdminPage {
 
     public void setInactiveNgoPerMonth(List<PerMonthRecord> inactiveNgoPerMonth) {
         this.inactiveNgoPerMonth = inactiveNgoPerMonth;
+    }
+
+    public List<PerMonthRecord> getActiveNgoPerMonth() {
+        return activeNgoPerMonth;
+    }
+
+    public void setActiveNgoPerMonth(List<PerMonthRecord> activeNgoPerMonth) {
+        this.activeNgoPerMonth = activeNgoPerMonth;
     }
 
     public Long getNoOfMember() {
@@ -137,28 +145,36 @@ public class CAdminPage {
         this.inactiveMemberPerMonth = inactiveMemberPerMonth;
     }
 
+    public List<PerMonthRecord> getActiveMemberPerMonth() {
+        return activeMemberPerMonth;
+    }
+
+    public void setActiveMemberPerMonth(List<PerMonthRecord> activeMemberPerMonth) {
+        this.activeMemberPerMonth = activeMemberPerMonth;
+    }
+
     public Long getNoOfCause() {
-        return NoOfCause;
+        return noOfCause;
     }
 
     public void setNoOfCause(Long noOfCause) {
-        NoOfCause = noOfCause;
+        this.noOfCause = noOfCause;
     }
 
     public Long getActiveCause() {
-        return ActiveCause;
+        return activeCause;
     }
 
     public void setActiveCause(Long activeCause) {
-        ActiveCause = activeCause;
+        this.activeCause = activeCause;
     }
 
     public Long getNoOfCauseThisWeek() {
-        return NoOfCauseThisWeek;
+        return noOfCauseThisWeek;
     }
 
     public void setNoOfCauseThisWeek(Long noOfCauseThisWeek) {
-        NoOfCauseThisWeek = noOfCauseThisWeek;
+        this.noOfCauseThisWeek = noOfCauseThisWeek;
     }
 
     public List<PerMonthRecord> getCausePerMonth() {
@@ -177,36 +193,44 @@ public class CAdminPage {
         this.inactiveCausePerMonth = inactiveCausePerMonth;
     }
 
-    public Long getKycPending() {
-        return KycPending;
+    public List<PerMonthRecord> getActiveCausePerMonth() {
+        return activeCausePerMonth;
     }
 
-    public void setKycPending(Long kycPending) {
-        KycPending = kycPending;
+    public void setActiveCausePerMonth(List<PerMonthRecord> activeCausePerMonth) {
+        this.activeCausePerMonth = activeCausePerMonth;
     }
 
     public Long getKycApproved() {
-        return KycApproved;
+        return kycApproved;
     }
 
     public void setKycApproved(Long kycApproved) {
-        KycApproved = kycApproved;
+        this.kycApproved = kycApproved;
+    }
+
+    public Long getKycPending() {
+        return kycPending;
+    }
+
+    public void setKycPending(Long kycPending) {
+        this.kycPending = kycPending;
     }
 
     public Long getKycRejected() {
-        return KycRejected;
+        return kycRejected;
     }
 
     public void setKycRejected(Long kycRejected) {
-        KycRejected = kycRejected;
+        this.kycRejected = kycRejected;
     }
 
     public Long getKycNotUploaded() {
-        return KycNotUploaded;
+        return kycNotUploaded;
     }
 
     public void setKycNotUploaded(Long kycNotUploaded) {
-        KycNotUploaded = kycNotUploaded;
+        this.kycNotUploaded = kycNotUploaded;
     }
 
     public Long getCausePending() {
@@ -239,29 +263,5 @@ public class CAdminPage {
 
     public void setTotalPromoCode(Long totalPromoCode) {
         this.totalPromoCode = totalPromoCode;
-    }
-
-    public List<PerMonthRecord> getActiveNgoPerMonth() {
-        return activeNgoPerMonth;
-    }
-
-    public void setActiveNgoPerMonth(List<PerMonthRecord> activeNgoPerMonth) {
-        this.activeNgoPerMonth = activeNgoPerMonth;
-    }
-
-    public List<PerMonthRecord> getActiveMemberPerMonth() {
-        return activeMemberPerMonth;
-    }
-
-    public void setActiveMemberPerMonth(List<PerMonthRecord> activeMemberPerMonth) {
-        this.activeMemberPerMonth = activeMemberPerMonth;
-    }
-
-    public List<PerMonthRecord> getActiveCausePerMonth() {
-        return activeCausePerMonth;
-    }
-
-    public void setActiveCausePerMonth(List<PerMonthRecord> activeCausePerMonth) {
-        this.activeCausePerMonth = activeCausePerMonth;
     }
 }
