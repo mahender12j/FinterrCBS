@@ -27,7 +27,9 @@ import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAd
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -165,6 +167,23 @@ public class CauseService {
         }
 
 
+        return causePage;
+    }
+
+    public CausePage fetchAllCause(final String param, final Pageable pageable) {
+        final Page<CauseEntity> causeEntities;
+        CausePage causePage = new CausePage();
+        if (param == null) {
+            causeEntities = this.causeRepository.findAll(pageable);
+            causePage.setTotalPages(causeEntities.getTotalPages());
+            causePage.setTotalElements(causeEntities.getTotalElements());
+            causePage.setCauses(causeArrayList(causeEntities));
+        } else {
+            causeEntities = this.causeRepository.findByCurrentState(param, pageable);
+            causePage.setTotalPages(causeEntities.getTotalPages());
+            causePage.setTotalElements(causeEntities.getTotalElements());
+            causePage.setCauses(causeArrayList(causeEntities));
+        }
         return causePage;
     }
 
@@ -358,5 +377,15 @@ public class CauseService {
 
         return processStep;
     }
+
+
+    public Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
+        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
+        final int sizeToUse = size != null ? size : 20;
+        final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
+        final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
+        return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);
+    }
+
 }
 

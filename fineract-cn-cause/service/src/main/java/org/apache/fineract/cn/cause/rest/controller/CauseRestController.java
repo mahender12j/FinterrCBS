@@ -128,7 +128,7 @@ public class CauseRestController {
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
 
         return ResponseEntity.ok(this.causeService.fetchCause((includeClosed != null ? includeClosed : Boolean.TRUE), param,
-                this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+                this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
@@ -733,15 +733,6 @@ public class CauseRestController {
         this.throwIfCauseNotExists(causeIdentifier);
         return ResponseEntity.ok(this.causeService.getProcessSteps(causeIdentifier));
     }
-
-    private Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
-        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
-        final int sizeToUse = size != null ? size : 20;
-        final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
-        final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
-        return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);
-    }
-
 
     private void throwIfCauseNotExists(final String identifier) {
         if (!this.causeService.causeExists(identifier)) {
