@@ -122,8 +122,6 @@ public class CAdminService {
 
 
     public CustomerDocument findCustomerDocuments(CustomerEntity customerEntity, List<DocumentTypeEntity> documentTypeEntities, List<DocumentSubTypeEntity> documentSubTypeEntities) {
-
-        List<CustomerDocument> customerDocuments = new ArrayList<>();
         final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerEntity.getIdentifier());
         CustomerDocument customerDocument = new CustomerDocument();
         List<DocumentsType> documentsType = new ArrayList<>();
@@ -131,10 +129,9 @@ public class CAdminService {
         if (documentEntity.isPresent()) {
 //                start document entity
             customerDocument = DocumentMapper.map(documentEntity.get());
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
-                    this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity.get(), CustomerDocument.Status.DELETED.name())
-                            .stream()
-                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity.get(), CustomerDocument.Status.DELETED.name())
+                    .stream()
+                    .collect(groupingBy(DocumentEntryEntity::getType, toList()));
 
             documentEntryEntity.forEach((key, documentEntryEntities) -> {
                 final List<DocumentsSubType> documentsSubTypeList = documentEntryEntities.stream().map(entity -> {
@@ -171,10 +168,9 @@ public class CAdminService {
             if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())) && isDocAvailable) {
                 customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
                 customerDocument.setKycStatus(true);
-            } else if ((documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                    || documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())))
-                    && isDocAvailable
-                    && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
+            } else if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+                    && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))
+                    && isDocAvailable) {
                 customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
                 customerDocument.setKycStatus(false);
             } else {

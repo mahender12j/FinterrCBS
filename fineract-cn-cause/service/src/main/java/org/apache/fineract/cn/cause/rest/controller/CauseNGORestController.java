@@ -24,6 +24,7 @@ import org.apache.fineract.cn.cause.ServiceConstants;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.cause.api.v1.domain.CaAdminCauseData;
 import org.apache.fineract.cn.cause.api.v1.domain.CausePage;
+import org.apache.fineract.cn.cause.api.v1.domain.NGOStatistics;
 import org.apache.fineract.cn.cause.internal.repository.CauseStateRepository;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
@@ -32,16 +33,13 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/")
-public class CauseCARestController {
+public class CauseNGORestController {
 
     private final Logger logger;
     private final CommandGateway commandGateway;
@@ -51,11 +49,11 @@ public class CauseCARestController {
     private final CauseStateRepository causeStateRepository;
 
     @Autowired
-    public CauseCARestController(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
-                                 final CommandGateway commandGateway,
-                                 final CauseService causeService,
-                                 final TaskService taskService,
-                                 final Environment environment, CauseStateRepository causeStateRepository) {
+    public CauseNGORestController(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
+                                  final CommandGateway commandGateway,
+                                  final CauseService causeService,
+                                  final TaskService taskService,
+                                  final Environment environment, CauseStateRepository causeStateRepository) {
         super();
         this.logger = logger;
         this.commandGateway = commandGateway;
@@ -68,33 +66,14 @@ public class CauseCARestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/all",
+            value = "/causes/ngo/{identifier}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
     public
     @ResponseBody
-    ResponseEntity<CausePage> fetchCauses(@RequestParam(value = "param", required = false) final String param,
-                                          @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
-                                          @RequestParam(value = "size", required = false) final Integer size,
-                                          @RequestParam(value = "sortColumn", required = false) final String sortColumn,
-                                          @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
-
-        return ResponseEntity.ok(this.causeService.fetchAllCause(param, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
-    }
-
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
-            value = "/causes/cadmin/all",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<CaAdminCauseData> findAllCauseData() {
-        return ResponseEntity.ok(this.causeService.findAllCauseData());
+    ResponseEntity<NGOStatistics> findCausebyCreatedBy(@PathVariable("identifier") final String createdBy) {
+        return ResponseEntity.ok(this.causeService.fetchCauseByCreatedBy(createdBy));
     }
 }

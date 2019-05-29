@@ -21,7 +21,6 @@ package org.apache.fineract.cn.customer.internal.mapper;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.repository.*;
-import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.lang.DateConverter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,10 +29,9 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
- * @author Myrle Krantz
+ * @author Md  Robiul Hassan
  */
 public class DocumentMapper {
     private DocumentMapper() {
@@ -70,7 +68,16 @@ public class DocumentMapper {
             d.setStatus(CustomerDocument.Status.APPROVED.name());
         } else if (val.stream().noneMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
                 && val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
-            d.setStatus(CustomerDocument.Status.REJECTED.name());
+//            new requirements on the pending and rejected documents status on timestamp
+            val.stream().filter(documentEntryEntity -> documentEntryEntity.getStatus().equals(CustomerDocument.Status.REJECTED.name())).findFirst().ifPresent(documentEntryEntity -> {
+                boolean isAnyPendingDocumentPresentAfterRejected = val.stream().anyMatch(documentEntryEntity1 -> documentEntryEntity1.getCreatedOn().isAfter(documentEntryEntity.getCreatedOn()) && documentEntryEntity1.getStatus().equals(CustomerDocument.Status.PENDING.name()));
+                if (isAnyPendingDocumentPresentAfterRejected) {
+                    d.setStatus(CustomerDocument.Status.PENDING.name());
+                } else {
+                    d.setStatus(CustomerDocument.Status.REJECTED.name());
+                }
+            });
+
         } else {
             d.setStatus(CustomerDocument.Status.PENDING.name());
         }
