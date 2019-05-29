@@ -192,7 +192,8 @@ public class CauseRestController {
 
     //    publish cause
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @Permittable(value = AcceptedTokenType.TENANT,
+            groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/{identifier}/publish",
             method = RequestMethod.PUT,
@@ -259,7 +260,8 @@ public class CauseRestController {
     }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @Permittable(value = AcceptedTokenType.TENANT,
+            groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(value = "/causes/expired", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)

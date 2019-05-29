@@ -67,9 +67,10 @@ public final class Customer {
     private RegistrationType registrationType;
     @NotBlank
     private String givenName;
-    private String middleName;
     @NotBlank
     private String surname;
+    private String middleName;
+    private String gender;
     private DateOfBirth dateOfBirth;
     private Boolean member;
     private String accountBeneficiary;
@@ -402,6 +403,14 @@ public final class Customer {
 
     public void setCustomerDocument(CustomerDocument customerDocument) {
         this.customerDocument = customerDocument;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     @Override
