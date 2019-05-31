@@ -97,4 +97,8 @@ public class CauseCARestController {
     ResponseEntity<CaAdminCauseData> findAllCauseData() {
         return ResponseEntity.ok(this.causeService.findAllCauseData());
     }
+
+
+
+
 }

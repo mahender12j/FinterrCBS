@@ -22,13 +22,14 @@ import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.cause.ServiceConstants;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
-import org.apache.fineract.cn.cause.api.v1.domain.CaAdminCauseData;
-import org.apache.fineract.cn.cause.api.v1.domain.CausePage;
-import org.apache.fineract.cn.cause.api.v1.domain.NGOStatistics;
+import org.apache.fineract.cn.cause.api.v1.domain.*;
+import org.apache.fineract.cn.cause.internal.command.CreateCauseCommand;
+import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateCommand;
 import org.apache.fineract.cn.cause.internal.repository.CauseStateRepository;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
+import org.apache.fineract.cn.lang.ServiceException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -76,4 +77,33 @@ public class CauseNGORestController {
     ResponseEntity<NGOStatistics> findCausebyCreatedBy(@PathVariable("identifier") final String createdBy) {
         return ResponseEntity.ok(this.causeService.fetchCauseByCreatedBy(createdBy));
     }
+
+
+    //    post cause update to database
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(value = "/causes/{identifier}/ngo/update",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> createCause(@PathVariable("identifier") final String identifier,
+                                     @RequestBody final CauseUpdate causeUpdate) {
+        throwIfCauseNotExists(identifier);
+
+        this.commandGateway.process(new CreateCauseUpdateCommand(identifier, causeUpdate));
+        return ResponseEntity.accepted().build();
+    }
+
+
+//    util function
+
+    private void throwIfCauseNotExists(final String identifier) {
+        if (!this.causeService.causeExists(identifier)) {
+            throw ServiceException.notFound("Cause {0} not found", identifier);
+        }
+    }
+
+
 }
