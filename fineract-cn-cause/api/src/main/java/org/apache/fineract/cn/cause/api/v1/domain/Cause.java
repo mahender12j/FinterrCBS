@@ -94,6 +94,15 @@ public class Cause {
     private CauseStatistics causeStatistics;
     private CauseDocument causeDocument;
 
+
+    //    1a update
+    @NotNull
+    @Valid
+    private int causeImplementationDuration;
+    @NotNull
+    @Valid
+    private int frequencyCauseImplementationUpdates;
+
     private String rejectedReason;
 
     private LocalDateTime publishDate;
@@ -440,6 +449,22 @@ public class Cause {
 
     public String getRejectedReason() {
         return rejectedReason;
+    }
+
+    public int getCauseImplementationDuration() {
+        return causeImplementationDuration;
+    }
+
+    public void setCauseImplementationDuration(int causeImplementationDuration) {
+        this.causeImplementationDuration = causeImplementationDuration;
+    }
+
+    public int getFrequencyCauseImplementationUpdates() {
+        return frequencyCauseImplementationUpdates;
+    }
+
+    public void setFrequencyCauseImplementationUpdates(int frequencyCauseImplementationUpdates) {
+        this.frequencyCauseImplementationUpdates = frequencyCauseImplementationUpdates;
     }
 
     public void setRejectedReason(String rejectedReason) {

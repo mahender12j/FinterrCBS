@@ -142,6 +142,35 @@ public class CauseEntity {
     private String rejectedBy;
 
 
+//    added for a1
+
+    @Column(name = "cause_implementation_duration")
+    private int causeImplementationDuration;
+
+    @Column(name = "frequency_cause_implementation_updates")
+    private int frequencyCauseImplementationUpdates;
+
+
+//    @Column(name = "rejected_by")
+//    private String rejectedBy;
+
+
+    public int getCauseImplementationDuration() {
+        return causeImplementationDuration;
+    }
+
+    public void setCauseImplementationDuration(int causeImplementationDuration) {
+        this.causeImplementationDuration = causeImplementationDuration;
+    }
+
+    public int getFrequencyCauseImplementationUpdates() {
+        return frequencyCauseImplementationUpdates;
+    }
+
+    public void setFrequencyCauseImplementationUpdates(int frequencyCauseImplementationUpdates) {
+        this.frequencyCauseImplementationUpdates = frequencyCauseImplementationUpdates;
+    }
+
     public Boolean getTaxExamption() {
         return isTaxExamption;
     }

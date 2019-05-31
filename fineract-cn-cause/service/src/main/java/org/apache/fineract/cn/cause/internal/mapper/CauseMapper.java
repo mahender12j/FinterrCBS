@@ -89,6 +89,8 @@ public final class CauseMapper {
         causeEntity.setEthAddress(cause.getEthAddress());
         causeEntity.setExtended(cause.getExtended());
         causeEntity.setResubmited(cause.getResubmited());
+        causeEntity.setCauseImplementationDuration(cause.getFrequencyCauseImplementationUpdates());
+        causeEntity.setFrequencyCauseImplementationUpdates(cause.getFrequencyCauseImplementationUpdates());
 
         return causeEntity;
     }
@@ -145,6 +147,8 @@ public final class CauseMapper {
         cause.setEthAddress(causeEntity.getEthAddress());
         cause.setExtended(causeEntity.getExtended());
         cause.setResubmited(causeEntity.getResubmited());
+        cause.setFrequencyCauseImplementationUpdates(cause.getFrequencyCauseImplementationUpdates());
+        cause.setCauseImplementationDuration(cause.getCauseImplementationDuration());
         return cause;
     }
 
