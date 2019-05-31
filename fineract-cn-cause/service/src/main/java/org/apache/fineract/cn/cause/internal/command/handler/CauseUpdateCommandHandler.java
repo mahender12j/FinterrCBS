@@ -20,9 +20,12 @@ package org.apache.fineract.cn.cause.internal.command.handler;
 
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdate;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdateInfo;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdatePage;
 import org.apache.fineract.cn.cause.api.v1.events.CauseUpdateEvent;
+import org.apache.fineract.cn.cause.api.v1.events.CauseUpdateInfoEvent;
 import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateCommand;
+import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateInfoCommand;
 import org.apache.fineract.cn.cause.internal.mapper.CauseUpdateMapper;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.command.annotation.Aggregate;
@@ -44,15 +47,18 @@ public class CauseUpdateCommandHandler {
     private final CauseRepository causeRepository;
     private final CauseUpdateRepository causeUpdateRepository;
     private final CauseUpdatePageRepository causeUpdatePageRepository;
+    private final CauseUpdateInfoRepository causeUpdateInfoRepository;
 
     @Autowired
     public CauseUpdateCommandHandler(final CauseRepository causeRepository,
                                      final CauseUpdateRepository causeUpdateRepository,
-                                     final CauseUpdatePageRepository causeUpdatePageRepository) {
+                                     final CauseUpdatePageRepository causeUpdatePageRepository,
+                                     final CauseUpdateInfoRepository causeUpdateInfoRepository) {
         super();
         this.causeRepository = causeRepository;
         this.causeUpdateRepository = causeUpdateRepository;
         this.causeUpdatePageRepository = causeUpdatePageRepository;
+        this.causeUpdateInfoRepository = causeUpdateInfoRepository;
     }
 
     @Transactional
@@ -72,6 +78,19 @@ public class CauseUpdateCommandHandler {
         this.causeUpdatePageRepository.save(pageEntities);
 
         return new CauseUpdateEvent(createCauseUpdateCommand.getIdentifier(), createCauseUpdateCommand.getCauseUpdate());
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE_UPDATE)
+    public CauseUpdateInfoEvent process(final CreateCauseUpdateInfoCommand createCauseUpdateInfoCommand) {
+
+        CauseUpdateInfo causeUpdateInfo = createCauseUpdateInfoCommand.getCauseUpdateInfo();
+        CauseEntity causeEntity = this.findCauseEntityOrThrow(createCauseUpdateInfoCommand.getIdentifier());
+        CauseUpdateInfoEntity updateInfoEntity = CauseUpdateMapper.map(causeUpdateInfo, causeEntity);
+        causeUpdateInfoRepository.save(updateInfoEntity);
+        return new CauseUpdateInfoEvent(createCauseUpdateInfoCommand.getIdentifier(), causeUpdateInfo);
     }
 
 

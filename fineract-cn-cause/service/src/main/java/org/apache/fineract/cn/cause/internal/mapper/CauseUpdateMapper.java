@@ -19,14 +19,8 @@
 package org.apache.fineract.cn.cause.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
-import org.apache.fineract.cn.cause.api.v1.domain.Cause;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdate;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdatePage;
-import org.apache.fineract.cn.cause.api.v1.domain.PerMonthRecord;
-import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
-import org.apache.fineract.cn.cause.internal.repository.CauseStateEntity;
-import org.apache.fineract.cn.cause.internal.repository.CauseUpdateEntity;
-import org.apache.fineract.cn.cause.internal.repository.CauseUpdatePageEntity;
+import org.apache.fineract.cn.cause.api.v1.domain.*;
+import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.lang.DateConverter;
 
 import java.time.Clock;
@@ -93,6 +87,27 @@ public final class CauseUpdateMapper {
         causeUpdatePage.setCreateOn(updatePageEntity.getCreatedOn().toString());
         causeUpdatePage.setUpdatedAt(updatePageEntity.getUpdatedAt().toString());
         return causeUpdatePage;
+    }
+
+
+    public static CauseUpdateInfo map(CauseUpdateInfoEntity causeUpdateInfoEntity) {
+        CauseUpdateInfo causeUpdateInfo = new CauseUpdateInfo();
+        causeUpdateInfo.setDescription(causeUpdateInfoEntity.getDescription());
+        causeUpdateInfo.setDocRef(causeUpdateInfoEntity.getDocRef());
+        causeUpdateInfo.setCreateOn(causeUpdateInfoEntity.getCreatedOn().toString());
+        causeUpdateInfo.setUpdatedAt(causeUpdateInfoEntity.getUpdatedAt().toString());
+        return causeUpdateInfo;
+    }
+
+
+    public static CauseUpdateInfoEntity map(CauseUpdateInfo causeUpdateInfo, CauseEntity causeEntity) {
+        CauseUpdateInfoEntity updateInfoEntity = new CauseUpdateInfoEntity();
+        updateInfoEntity.setCauseEntity(causeEntity);
+        updateInfoEntity.setDocRef(causeUpdateInfo.getDocRef());
+        updateInfoEntity.setDescription(causeUpdateInfo.getDescription());
+        updateInfoEntity.setCreatedOn(LocalDateTime.now());
+        updateInfoEntity.setUpdatedAt(LocalDateTime.now());
+        return updateInfoEntity;
     }
 }
 

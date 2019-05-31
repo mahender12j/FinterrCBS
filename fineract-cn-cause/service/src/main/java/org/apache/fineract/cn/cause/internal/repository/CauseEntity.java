@@ -510,5 +510,52 @@ public class CauseEntity {
     public int hashCode() {
         return identifier.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "CauseEntity{" +
+                "id=" + id +
+                ", identifier='" + identifier + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", completedDate=" + completedDate +
+                ", closedDate=" + closedDate +
+                ", publishDate=" + publishDate +
+                ", category=" + category +
+                ", currentState='" + currentState + '\'' +
+                ", softTarget=" + softTarget +
+                ", hardTarget=" + hardTarget +
+                ", isTaxExamption=" + isTaxExamption +
+                ", isResubmited=" + isResubmited +
+                ", isExtended=" + isExtended +
+                ", actualRaisedFiat=" + actualRaisedFiat +
+                ", actualRaisedFin=" + actualRaisedFin +
+                ", minAmount=" + minAmount +
+                ", maxAmount=" + maxAmount +
+                ", acceptedDenominationAmounts='" + acceptedDenominationAmounts + '\'' +
+                ", managementFee=" + managementFee +
+                ", finCollLimit=" + finCollLimit +
+                ", finRate='" + finRate + '\'' +
+                ", approvedBy='" + approvedBy + '\'' +
+                ", approvedOn=" + approvedOn +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdOn=" + createdOn +
+                ", lastModifiedBy='" + lastModifiedBy + '\'' +
+                ", lastModifiedOn=" + lastModifiedOn +
+                ", taxExemptionPercentage='" + taxExemptionPercentage + '\'' +
+                ", websiteUrl='" + websiteUrl + '\'' +
+                ", smediaLinks='" + smediaLinks + '\'' +
+                ", videoUrls='" + videoUrls + '\'' +
+                ", causeTxHash='" + causeTxHash + '\'' +
+                ", accountNumber='" + accountNumber + '\'' +
+                ", ethAddress='" + ethAddress + '\'' +
+                ", rejectedReason='" + rejectedReason + '\'' +
+                ", rejectedBy='" + rejectedBy + '\'' +
+                ", causeImplementationDuration=" + causeImplementationDuration +
+                ", frequencyCauseImplementationUpdates=" + frequencyCauseImplementationUpdates +
+                '}';
+    }
 }
 

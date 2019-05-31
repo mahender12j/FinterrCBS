@@ -90,6 +90,10 @@ public class CauseService {
     }
 
 
+    public Optional<CauseEntity> findCauseByIdentifier(final String identifier) {
+        return this.causeRepository.findByIdentifier(identifier);
+    }
+
     public Optional<Cause> findCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
             final Cause cause = CauseMapper.map(causeEntity);

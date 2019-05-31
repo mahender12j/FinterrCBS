@@ -25,34 +25,22 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
-public final class CauseUpdate {
+public final class CauseUpdateInfo {
 
-    @NotBlank
-    @Valid
-    private String title;
     @NotBlank
     @Valid
     private String description;
     @NotBlank
     @Valid
-    private double amountSpend;
+    private String docRef;
+
+    private List<CauseUpdate> causeUpdateList;
 
     private String updatedAt;
     private String createOn;
 
-    private List<CauseUpdatePage> causeUpdatePages;
 
-    private Map<String, List<CauseUpdatePage>> causeUpdatePagesMap;
-
-    public CauseUpdate() {
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public CauseUpdateInfo() {
     }
 
     public String getDescription() {
@@ -63,12 +51,12 @@ public final class CauseUpdate {
         this.description = description;
     }
 
-    public double getAmountSpend() {
-        return amountSpend;
+    public String getDocRef() {
+        return docRef;
     }
 
-    public void setAmountSpend(double amountSpend) {
-        this.amountSpend = amountSpend;
+    public void setDocRef(String docRef) {
+        this.docRef = docRef;
     }
 
     public String getUpdatedAt() {
@@ -87,29 +75,21 @@ public final class CauseUpdate {
         this.createOn = createOn;
     }
 
-    public List<CauseUpdatePage> getCauseUpdatePages() {
-        return causeUpdatePages;
+    public List<CauseUpdate> getCauseUpdateList() {
+        return causeUpdateList;
     }
 
-    public void setCauseUpdatePages(List<CauseUpdatePage> causeUpdatePages) {
-        this.causeUpdatePages = causeUpdatePages;
+    public void setCauseUpdateList(List<CauseUpdate> causeUpdateList) {
+        this.causeUpdateList = causeUpdateList;
     }
-
-    public Map<String, List<CauseUpdatePage>> getCauseUpdatePagesMap() {
-        return causeUpdatePagesMap;
-    }
-
-    public void setCauseUpdatePagesMap(Map<String, List<CauseUpdatePage>> causeUpdatePagesMap) {
-        this.causeUpdatePagesMap = causeUpdatePagesMap;
-    }
-
 
     @Override
     public String toString() {
-        return "CauseUpdate{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", amount_spend=" + amountSpend +
+        return "CauseUpdateInfo{" +
+                "description='" + description + '\'' +
+                ", docInfo=" + docRef +
+                ", updatedAt='" + updatedAt + '\'' +
+                ", createOn='" + createOn + '\'' +
                 '}';
     }
 }

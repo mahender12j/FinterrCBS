@@ -23,10 +23,12 @@ import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.cause.ServiceConstants;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.cause.api.v1.domain.*;
-import org.apache.fineract.cn.cause.internal.command.CreateCauseCommand;
 import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateCommand;
+import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateInfoCommand;
+import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.CauseStateRepository;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
+import org.apache.fineract.cn.cause.internal.service.CauseUpdateService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.lang.ServiceException;
@@ -38,36 +40,33 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/")
+@RequestMapping("/causes/ngo/{identifier}")
 public class CauseNGORestController {
 
     private final Logger logger;
     private final CommandGateway commandGateway;
     private final CauseService causeService;
-    private final TaskService taskService;
-    private final Environment environment;
-    private final CauseStateRepository causeStateRepository;
+    private final CauseUpdateService causeUpdateService;
 
     @Autowired
     public CauseNGORestController(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
                                   final CommandGateway commandGateway,
                                   final CauseService causeService,
-                                  final TaskService taskService,
-                                  final Environment environment, CauseStateRepository causeStateRepository) {
+                                  final CauseUpdateService causeUpdateService) {
         super();
         this.logger = logger;
         this.commandGateway = commandGateway;
         this.causeService = causeService;
-        this.taskService = taskService;
-        this.environment = environment;
-        this.causeStateRepository = causeStateRepository;
+        this.causeUpdateService = causeUpdateService;
     }
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/ngo/{identifier}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
@@ -79,9 +78,26 @@ public class CauseNGORestController {
     }
 
 
+//    Get Cause update data
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/update",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<CauseUpdateInfo> getCauseUpdateData(@PathVariable("identifier") final String identifier) {
+        throwIfCauseNotExists(identifier);
+        return ResponseEntity.ok(causeUpdateService.causeUpdateList(identifier));
+    }
+
+
     //    post cause update to database
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(value = "/causes/{identifier}/ngo/update",
+    @RequestMapping(value = "/update",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
@@ -97,7 +113,37 @@ public class CauseNGORestController {
     }
 
 
-//    util function
+    //    post cause update to database
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(value = "/update-info",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> createCauseInfo(@PathVariable("identifier") final String identifier,
+                                         @RequestBody final CauseUpdateInfo causeUpdateInfo) {
+        throwIfCauseNotExists(identifier);
+
+        causeService.findCauseByIdentifier(identifier).ifPresent(this::throwIfCauseInfoExists);
+
+        this.commandGateway.process(new CreateCauseUpdateInfoCommand(identifier, causeUpdateInfo));
+
+        return ResponseEntity.accepted().build();
+    }
+
+
+//    utils function
+
+
+    private void throwIfCauseInfoExists(final CauseEntity causeEntity) {
+        boolean isPresent = causeUpdateService.causeInfoExists(causeEntity).isPresent();
+        if (isPresent) {
+            throw ServiceException.notFound("Cause info {0} already exist", causeEntity.toString());
+        }
+
+    }
 
     private void throwIfCauseNotExists(final String identifier) {
         if (!this.causeService.causeExists(identifier)) {

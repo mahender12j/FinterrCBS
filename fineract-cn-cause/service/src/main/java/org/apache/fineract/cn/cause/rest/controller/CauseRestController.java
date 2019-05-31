@@ -248,7 +248,7 @@ public class CauseRestController {
     ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
                                       @RequestBody final CauseApprove cause) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
-        throwIfActionMoreThan2Times(identifier, new HashSet<>(Arrays.asList(APPROVED.name())));
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(APPROVED.name())));
 
         if (causeEntity.getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
             this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate(), cause.getSuccessFees()));
