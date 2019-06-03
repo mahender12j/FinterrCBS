@@ -153,7 +153,7 @@ public class CAdminService {
 
                 final DocumentsType type = new DocumentsType();
                 DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
-                type.setType(this.getDocumentTypeTitle(documentTypeEntities, key));
+                type.setTitle(this.getDocumentTypeTitle(documentTypeEntities, key));
                 type.setDocumentsSubType(documentsSubTypeList);
                 documentsType.add(type);
             });

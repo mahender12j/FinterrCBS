@@ -187,20 +187,19 @@ public class DocumentsRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
-            value = "/master/type/{uuid}/subtype",
+            value = "/master/subtype",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
     ResponseEntity<Void> createDocumentSubType(
-            @PathVariable("uuid") final String uuid,
             @PathVariable("customeridentifier") final String customerIdentifier,
             @RequestBody final @Valid DocumentsMasterSubtype instance) {
         throwIfCustomerNotExists(customerIdentifier);
-        throwIfDocumentTypeNotExists(uuid);
+        throwIfDocumentTypeNotExists(instance.getDocTypeUUID());
 
-        commandGateway.process(new CreateDocumentSubTypeCommand(instance, uuid));
+        commandGateway.process(new CreateDocumentSubTypeCommand(instance, instance.getDocTypeUUID()));
         return ResponseEntity.accepted().build();
     }
 

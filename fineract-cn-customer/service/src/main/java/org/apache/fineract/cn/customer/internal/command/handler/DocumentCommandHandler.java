@@ -142,7 +142,7 @@ public class DocumentCommandHandler {
         DocumentsType documentsType = command.getDocumentsType();
 
         final DocumentTypeEntity documentTypeEntity = documentTypeRepository.findByUuid(command.getuuid()).orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
-        documentTypeEntity.setTitle(documentsType.getType());
+        documentTypeEntity.setTitle(documentsType.getTitle());
         documentTypeEntity.setActive(documentsType.isActive());
         documentTypeEntity.setUserType(documentsType.getUserType());
         this.documentTypeRepository.save(documentTypeEntity);

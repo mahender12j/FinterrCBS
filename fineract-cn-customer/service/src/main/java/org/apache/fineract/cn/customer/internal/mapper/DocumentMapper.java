@@ -234,7 +234,7 @@ public class DocumentMapper {
 
     public static DocumentTypeEntity map(DocumentsType documentsType) {
         DocumentTypeEntity documentTypeEntity = new DocumentTypeEntity();
-        documentTypeEntity.setTitle(documentsType.getType());
+        documentTypeEntity.setTitle(documentsType.getTitle());
         documentTypeEntity.setUserType(documentsType.getUserType());
         documentTypeEntity.setActive(documentsType.isActive());
         return documentTypeEntity;
@@ -254,6 +254,7 @@ public class DocumentMapper {
         documentsSubType.setUuid(documentSubTypeEntity.getUuid());
         documentsSubType.setDocTypeId(documentSubTypeEntity.getDocumentType().getId());
         documentsSubType.setActive(documentSubTypeEntity.isActive());
+        documentsSubType.setId(documentSubTypeEntity.getId());
         return documentsSubType;
     }
 
