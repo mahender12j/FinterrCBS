@@ -215,7 +215,12 @@ public class DocumentService {
 
     public List<DocumentsMaster> findDocumentsTypes() {
         List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findAll();
-        return documentTypeEntities.stream().map(DocumentMapper::map).collect(toList());
+        return documentTypeEntities.stream().map(entity -> {
+            List<DocumentsMasterSubtype> masterSubtypes = this.findDocumentsSubTypes().stream().filter(stypes -> stypes.getDocTypeId().equals(entity.getId())).collect(toList());
+            DocumentsMaster master = DocumentMapper.map(entity);
+            master.setDocumentsMasterSubtypes(masterSubtypes);
+            return master;
+        }).collect(toList());
     }
 
 
