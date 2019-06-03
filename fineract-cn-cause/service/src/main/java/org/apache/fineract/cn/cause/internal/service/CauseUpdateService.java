@@ -55,6 +55,16 @@ public class CauseUpdateService {
         this.causeUpdateInfoRepository = causeUpdateInfoRepository;
     }
 
+
+    public Optional<CauseUpdateInfoEntity> causeInfoExists(final CauseEntity causeEntity) {
+        return this.causeUpdateInfoRepository.findByCauseEntity(causeEntity);
+    }
+
+    public boolean causeUpdateExists(final Long identifier) {
+        return this.causeUpdateInfoRepository.existsByIdentifier(identifier);
+    }
+
+
     public CauseUpdateInfo causeUpdateList(final String identefier) {
         CauseEntity causeEntity = causeRepository.findByIdentifier(identefier).orElseThrow(() -> ServiceException.notFound("Cause Not found"));
         CauseUpdateInfoEntity updateInfoEntity = causeUpdateInfoRepository.findByCauseEntity(causeEntity).orElseThrow(() -> ServiceException.notFound("Info Not found"));
@@ -89,12 +99,5 @@ public class CauseUpdateService {
         return updateInfo;
 
     }
-
-
-    public Optional<CauseUpdateInfoEntity> causeInfoExists(final CauseEntity causeEntity) {
-        return this.causeUpdateInfoRepository.findByCauseEntity(causeEntity);
-    }
-
-
 }
 

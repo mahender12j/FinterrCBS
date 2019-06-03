@@ -16,35 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.customer.internal.repository;
+package org.apache.fineract.cn.cause.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.*;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
- * @author Myrle Krantz
+ * @author Md Robiul Hassan
  */
 @Repository
-public interface DocumentSubTypeRepository extends JpaRepository<DocumentSubTypeEntity, Long> {
+public interface DocumentStorageRepository extends JpaRepository<DocumentStorageEntity, Long> {
 
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM DocumentSubTypeEntity c WHERE c.uuid = :uuid")
-    Boolean existsByIdentifier(@Param("uuid") final String uuid);
+    Optional<DocumentStorageEntity> findByUuid(final String uuid);
 
-    List<DocumentSubTypeEntity> findByDocumentType(final DocumentTypeEntity documentTypeEntity);
-
-    @Query("SELECT c FROM DocumentSubTypeEntity c WHERE c.isActive = true")
-    List<DocumentSubTypeEntity> findByisActive();
-
-    Optional<DocumentSubTypeEntity> findByUuid(final String uuid);
-
-    Optional<DocumentSubTypeEntity> findByDocumentTypeAndUuid(final DocumentTypeEntity documentType, final String uuid);
+    @Query("SELECT CASE WHEN COUNT(d) > 0 THEN 'true' ELSE 'false' END FROM DocumentStorageEntity d WHERE d.id = :id")
+    Boolean isDocumentFound(@Param("id") Long id);
 
 }

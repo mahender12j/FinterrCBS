@@ -19,6 +19,7 @@
 package org.apache.fineract.cn.cause.api.v1.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.Valid;
@@ -26,6 +27,10 @@ import java.util.List;
 import java.util.Map;
 
 public final class CauseUpdate {
+
+    @Valid
+    @NotBlank
+    private Long id;
 
     @NotBlank
     @Valid
@@ -40,11 +45,20 @@ public final class CauseUpdate {
     private String updatedAt;
     private String createOn;
 
+    @JsonIgnore
     private List<CauseUpdatePage> causeUpdatePages;
 
     private Map<String, List<CauseUpdatePage>> causeUpdatePagesMap;
 
     public CauseUpdate() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {

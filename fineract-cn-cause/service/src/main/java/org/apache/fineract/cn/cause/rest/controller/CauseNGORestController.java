@@ -22,26 +22,29 @@ import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.cause.ServiceConstants;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
-import org.apache.fineract.cn.cause.api.v1.domain.*;
-import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateCommand;
-import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateInfoCommand;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdate;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdateInfo;
+import org.apache.fineract.cn.cause.api.v1.domain.NGOStatistics;
+import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
-import org.apache.fineract.cn.cause.internal.repository.CauseStateRepository;
+import org.apache.fineract.cn.cause.internal.repository.DocumentStorageEntity;
+import org.apache.fineract.cn.cause.internal.repository.DocumentStorageRepository;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.CauseUpdateService;
-import org.apache.fineract.cn.cause.internal.service.TaskService;
+import org.apache.fineract.cn.command.domain.CommandCallback;
+import org.apache.fineract.cn.command.domain.CommandProcessingException;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/causes/ngo/{identifier}")
@@ -51,17 +54,20 @@ public class CauseNGORestController {
     private final CommandGateway commandGateway;
     private final CauseService causeService;
     private final CauseUpdateService causeUpdateService;
+    private final DocumentStorageRepository storageRepository;
 
     @Autowired
     public CauseNGORestController(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
                                   final CommandGateway commandGateway,
                                   final CauseService causeService,
-                                  final CauseUpdateService causeUpdateService) {
+                                  final CauseUpdateService causeUpdateService,
+                                  final DocumentStorageRepository storageRepository) {
         super();
         this.logger = logger;
         this.commandGateway = commandGateway;
         this.causeService = causeService;
         this.causeUpdateService = causeUpdateService;
+        this.storageRepository = storageRepository;
     }
 
 
@@ -75,6 +81,53 @@ public class CauseNGORestController {
     @ResponseBody
     ResponseEntity<NGOStatistics> findCausebyCreatedBy(@PathVariable("identifier") final String createdBy) {
         return ResponseEntity.ok(this.causeService.fetchCauseByCreatedBy(createdBy));
+    }
+
+
+    //    post cause update file to database
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(value = "/update/file",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<CauseUpdateFile> createCauseUpdateFile(@PathVariable("identifier") final String identifier,
+                                                          @RequestParam(value = "file") final MultipartFile file,
+                                                          @RequestParam("docType") final String docType) {
+        throwIfCauseNotExists(identifier);
+
+        try {
+            CommandCallback<CauseUpdateFile> ret = this.commandGateway.process(new CreateCauseUpdateFileCommand(file, docType), CauseUpdateFile.class);
+            return new ResponseEntity<>(ret.get(), HttpStatus.OK);
+
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Oops! Something went wrong. Try again…");
+        }
+    }
+
+
+    //    receive the storage file
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/update/file/{uuid}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+
+    public ResponseEntity<byte[]> getStorageDocument(
+            @PathVariable("identifier") final String identifier,
+            @PathVariable("uuid") final String uuid) {
+        throwIfCauseNotExists(identifier);
+
+        final DocumentStorageEntity storageEntity = this.storageRepository.findByUuid(uuid).orElseThrow(() -> ServiceException.notFound("document ''{0}'' not found.", uuid));
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.parseMediaType(storageEntity.getContentType()))
+                .contentLength(storageEntity.getImage().length)
+                .body(storageEntity.getImage());
     }
 
 
@@ -104,11 +157,29 @@ public class CauseNGORestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> createCause(@PathVariable("identifier") final String identifier,
-                                     @RequestBody final CauseUpdate causeUpdate) {
+    ResponseEntity<Void> createCauseUpdate(@PathVariable("identifier") final String identifier,
+                                           @RequestBody final CauseUpdate causeUpdate) {
         throwIfCauseNotExists(identifier);
 
         this.commandGateway.process(new CreateCauseUpdateCommand(identifier, causeUpdate));
+        return ResponseEntity.accepted().build();
+    }
+
+
+    //    update cause update to database
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(value = "/update",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> updateCauseUpdateData(@PathVariable("identifier") final String identifier,
+                                               @RequestBody final CauseUpdate causeUpdate) {
+        throwIfCauseNotExists(identifier);
+
+        this.commandGateway.process(new UpdateCauseUpdateCommand(identifier, causeUpdate));
         return ResponseEntity.accepted().build();
     }
 
@@ -150,6 +221,13 @@ public class CauseNGORestController {
             throw ServiceException.notFound("Cause {0} not found", identifier);
         }
     }
+
+//
+//    private void throwIfCauseUpdateNotExists(final Long identifier) {
+//        if (!this.causeUpdateService.causeUpdateExists(identifier)) {
+//            throw ServiceException.notFound("Cause {0} not found", identifier);
+//        }
+//    }
 
 
 }

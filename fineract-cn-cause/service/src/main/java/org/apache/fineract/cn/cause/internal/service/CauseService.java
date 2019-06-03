@@ -33,10 +33,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

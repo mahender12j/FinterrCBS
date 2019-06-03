@@ -27,6 +27,9 @@ public interface CauseEventConstants {
 
     String INITIALIZE = "initialize";
 
+    String POST_CAUSE_FILE = "post-cause-file";
+
+    String PUT_CAUSE_UPDATE = "put-cause-update";
     String POST_CAUSE_UPDATE = "post-cause-update";
     String POST_CAUSE_UPDATE_INFO = "post-cause-update-info";
 

@@ -59,6 +59,7 @@ public final class CauseUpdateMapper {
 
     public static CauseUpdate map(CauseUpdateEntity updateEntity) {
         CauseUpdate causeUpdate = new CauseUpdate();
+        causeUpdate.setId(updateEntity.getId());
         causeUpdate.setTitle(updateEntity.getTitle());
         causeUpdate.setDescription(updateEntity.getDescription());
         causeUpdate.setAmountSpend(updateEntity.getAmountSpend());
@@ -81,6 +82,7 @@ public final class CauseUpdateMapper {
 
     public static CauseUpdatePage map(CauseUpdatePageEntity updatePageEntity) {
         CauseUpdatePage causeUpdatePage = new CauseUpdatePage();
+        causeUpdatePage.setId(updatePageEntity.getId());
         causeUpdatePage.setDocName(updatePageEntity.getDocName());
         causeUpdatePage.setDocRef(updatePageEntity.getDocRef());
         causeUpdatePage.setType(updatePageEntity.getType());
@@ -92,6 +94,7 @@ public final class CauseUpdateMapper {
 
     public static CauseUpdateInfo map(CauseUpdateInfoEntity causeUpdateInfoEntity) {
         CauseUpdateInfo causeUpdateInfo = new CauseUpdateInfo();
+        causeUpdateInfo.setId(causeUpdateInfoEntity.getId());
         causeUpdateInfo.setDescription(causeUpdateInfoEntity.getDescription());
         causeUpdateInfo.setDocRef(causeUpdateInfoEntity.getDocRef());
         causeUpdateInfo.setCreateOn(causeUpdateInfoEntity.getCreatedOn().toString());

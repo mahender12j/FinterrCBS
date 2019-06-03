@@ -25,6 +25,10 @@ import javax.validation.Valid;
 
 public final class CauseUpdatePage {
 
+
+    @Valid
+    @NotBlank
+    private Long id;
     @NotBlank
     @Valid
     private String docName;
@@ -39,6 +43,14 @@ public final class CauseUpdatePage {
     private String createOn;
 
     public CauseUpdatePage() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getType() {

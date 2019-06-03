@@ -24,9 +24,10 @@ import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdateInfo;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdatePage;
 import org.apache.fineract.cn.cause.api.v1.events.CauseUpdateEvent;
 import org.apache.fineract.cn.cause.api.v1.events.CauseUpdateInfoEvent;
-import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateCommand;
-import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateInfoCommand;
+import org.apache.fineract.cn.cause.api.v1.events.CauseUpdatePatchEvent;
+import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.mapper.CauseUpdateMapper;
+import org.apache.fineract.cn.cause.internal.mapper.DocumentMapper;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.command.annotation.Aggregate;
 import org.apache.fineract.cn.command.annotation.CommandHandler;
@@ -35,6 +36,7 @@ import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,17 +50,20 @@ public class CauseUpdateCommandHandler {
     private final CauseUpdateRepository causeUpdateRepository;
     private final CauseUpdatePageRepository causeUpdatePageRepository;
     private final CauseUpdateInfoRepository causeUpdateInfoRepository;
+    private final DocumentStorageRepository documentStorageRepository;
 
     @Autowired
     public CauseUpdateCommandHandler(final CauseRepository causeRepository,
                                      final CauseUpdateRepository causeUpdateRepository,
                                      final CauseUpdatePageRepository causeUpdatePageRepository,
-                                     final CauseUpdateInfoRepository causeUpdateInfoRepository) {
+                                     final CauseUpdateInfoRepository causeUpdateInfoRepository,
+                                     final DocumentStorageRepository documentStorageRepository) {
         super();
         this.causeRepository = causeRepository;
         this.causeUpdateRepository = causeUpdateRepository;
         this.causeUpdatePageRepository = causeUpdatePageRepository;
         this.causeUpdateInfoRepository = causeUpdateInfoRepository;
+        this.documentStorageRepository = documentStorageRepository;
     }
 
     @Transactional
@@ -91,6 +96,32 @@ public class CauseUpdateCommandHandler {
         CauseUpdateInfoEntity updateInfoEntity = CauseUpdateMapper.map(causeUpdateInfo, causeEntity);
         causeUpdateInfoRepository.save(updateInfoEntity);
         return new CauseUpdateInfoEvent(createCauseUpdateInfoCommand.getIdentifier(), causeUpdateInfo);
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.PUT_CAUSE_UPDATE)
+    public CauseUpdatePatchEvent process(final UpdateCauseUpdateCommand updateCauseUpdateCommand) {
+
+        CauseUpdate causeUpdate = updateCauseUpdateCommand.getCauseUpdate();
+
+        System.out.println(causeUpdate.toString());
+//        CauseEntity causeEntity = this.findCauseEntityOrThrow(createCauseUpdateInfoCommand.getIdentifier());
+//        CauseUpdateInfoEntity updateInfoEntity = CauseUpdateMapper.map(causeUpdateInfo, causeEntity);
+//        causeUpdateInfoRepository.save(updateInfoEntity);
+        return new CauseUpdatePatchEvent(updateCauseUpdateCommand.getIdentifier(), causeUpdate);
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE_FILE)
+    public CauseUpdateFile process(final CreateCauseUpdateFileCommand fileCommand) throws IOException {
+
+        DocumentStorageEntity entity = this.documentStorageRepository.save(DocumentMapper.map(fileCommand));
+        return new CauseUpdateFile(entity.getId(), entity.getUuid(), entity.getCreatedBy(),
+                entity.getDocumentName(), entity.getContentType(), entity.getSize(), entity.getDocType());
     }
 
 

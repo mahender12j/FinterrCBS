@@ -85,8 +85,8 @@ public class DocumentService {
 
     public CustomerDocument findCustomerDocuments(final String customerIdentifier) {
         final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
-        List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findAll();
-        List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findAll();
+        List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findByisActive();
+        List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findByisActive();
         return cAdminService.findCustomerDocuments(customerEntity, documentTypeEntities, documentSubTypeEntities);
     }
 
@@ -95,7 +95,7 @@ public class DocumentService {
         List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.Type.PERSON.name(), Customer.Type.BUSINESS.name())));
         return customerEntities.stream().map(entity -> {
             Customer customer = CustomerMapper.map(entity);
-            final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
+            final List<ContactDetailEntity> contactDetailEntities = contactDetailRepository.findByCustomer(entity);
             if (contactDetailEntities != null) {
                 customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
             }

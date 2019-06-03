@@ -16,25 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.repository;
+package org.apache.fineract.cn.cause.internal.command;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdate;
 
-import java.util.List;
-import java.util.Optional;
+public class UpdateCauseUpdateCommand {
 
-/**
- * @author Md Robiul Hassan
- */
-@Repository
-public interface CauseUpdateInfoRepository extends JpaRepository<CauseUpdateInfoEntity, Long> {
+    private final String identifier;
+    private final CauseUpdate causeUpdate;
 
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CauseUpdateInfoEntity c WHERE c.id = :identifier")
-    Boolean existsByIdentifier(@Param("identifier") final Long identifier);
+    public UpdateCauseUpdateCommand(final String identifier, final CauseUpdate causeUpdate) {
+        super();
+        this.causeUpdate = causeUpdate;
+        this.identifier = identifier;
+    }
 
-    Optional<CauseUpdateInfoEntity> findByCauseEntity(final CauseEntity causeEntity);
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public CauseUpdate getCauseUpdate() {
+        return causeUpdate;
+    }
 }
-

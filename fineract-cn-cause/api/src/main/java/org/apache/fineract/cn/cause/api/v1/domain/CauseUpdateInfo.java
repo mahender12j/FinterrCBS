@@ -27,6 +27,11 @@ import java.util.Map;
 
 public final class CauseUpdateInfo {
 
+
+    @Valid
+    @NotBlank
+    private Long id;
+
     @NotBlank
     @Valid
     private String description;
@@ -41,6 +46,14 @@ public final class CauseUpdateInfo {
 
 
     public CauseUpdateInfo() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescription() {
