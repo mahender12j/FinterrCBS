@@ -31,6 +31,7 @@ public class DocumentsMasterSubtype {
     private Long id;
     private String title;
     private String uuid;
+    @JsonIgnore
     private Long docTypeId;
     private String docTypeUUID;
     private boolean isActive;
