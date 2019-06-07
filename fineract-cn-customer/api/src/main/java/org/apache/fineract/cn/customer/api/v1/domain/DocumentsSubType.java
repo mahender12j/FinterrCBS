@@ -34,6 +34,7 @@ public class DocumentsSubType {
     private String reasonForReject;
     private String description;
     private String createdOn;
+    private String updatedOn;
     private String docRef;
 
 
@@ -138,6 +139,14 @@ public class DocumentsSubType {
 
     public String getDocRef() {
         return docRef;
+    }
+
+    public String getUpdatedOn() {
+        return updatedOn;
+    }
+
+    public void setUpdatedOn(String updatedOn) {
+        this.updatedOn = updatedOn;
     }
 
     public void setDocRef(String docRef) {

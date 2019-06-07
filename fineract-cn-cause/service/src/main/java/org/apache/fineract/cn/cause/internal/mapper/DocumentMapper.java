@@ -23,9 +23,11 @@ import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseFiles;
+import org.apache.fineract.cn.cause.internal.command.CreateCauseUpdateFileCommand;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentPageEntity;
+import org.apache.fineract.cn.cause.internal.repository.DocumentStorageEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 
 import java.io.IOException;
@@ -167,5 +169,16 @@ public class DocumentMapper {
         return documentPageEntityList;
     }
 
+
+    public static DocumentStorageEntity map(final CreateCauseUpdateFileCommand fileCommand) throws IOException {
+        DocumentStorageEntity entity = new DocumentStorageEntity();
+        entity.setContentType(fileCommand.getFile().getContentType());
+        entity.setCreatedBy(UserContextHolder.checkedGetUser());
+        entity.setDocType(fileCommand.getDocType());
+        entity.setDocumentName(fileCommand.getFile().getOriginalFilename());
+        entity.setImage(fileCommand.getFile().getBytes());
+        entity.setSize(fileCommand.getFile().getSize());
+        return entity;
+    }
 
 }

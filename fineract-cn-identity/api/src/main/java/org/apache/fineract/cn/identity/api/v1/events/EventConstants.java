@@ -30,6 +30,7 @@ public interface EventConstants {
   String OPERATION_AUTHENTICATE = "auth";
 
   String OPERATION_POST_PERMITTABLE_GROUP = "post-permittablegroup";
+  String OPERATION_UPDATE_PERMITTABLE_GROUP = "update-permittablegroup";
 
   String OPERATION_POST_ROLE = "post-role";
   String OPERATION_PUT_ROLE = "put-role";

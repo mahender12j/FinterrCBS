@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 /**
@@ -25,10 +27,12 @@ import java.util.List;
  */
 public class DocumentsMaster {
 
+    @JsonIgnore
     private Long id;
     private String title;
     private String uuid;
     private String userType;
+    private boolean isActive;
     private List<DocumentsMasterSubtype> documentsMasterSubtypes;
 
     public DocumentsMaster() {
@@ -64,6 +68,14 @@ public class DocumentsMaster {
 
     public void setDocumentsMasterSubtypes(List<DocumentsMasterSubtype> documentsMasterSubtypes) {
         this.documentsMasterSubtypes = documentsMasterSubtypes;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public Long getId() {

@@ -216,9 +216,6 @@ public class AuthenticationCommandHandler {
 
         final PrivateTenantInfoEntity privateTenantInfo = checkedGetPrivateTenantInfo();
         final PrivateSignatureEntity privateSignature = checkedGetPrivateSignature();
-
-        System.out.println("---------------private signature---------" + privateSignature);
-
         final UserEntity user = getUser(deserializedRefreshToken.getUserIdentifier());
         final String sourceApplicationName = deserializedRefreshToken.getSourceApplication();
 

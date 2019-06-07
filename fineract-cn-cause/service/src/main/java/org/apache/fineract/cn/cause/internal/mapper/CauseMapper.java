@@ -20,12 +20,20 @@ package org.apache.fineract.cn.cause.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.Cause;
+import org.apache.fineract.cn.cause.api.v1.domain.PerMonthRecord;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.CauseStateEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Padma Raju Sattineni
@@ -81,6 +89,8 @@ public final class CauseMapper {
         causeEntity.setEthAddress(cause.getEthAddress());
         causeEntity.setExtended(cause.getExtended());
         causeEntity.setResubmited(cause.getResubmited());
+        causeEntity.setCauseImplementationDuration(cause.getFrequencyCauseImplementationUpdates());
+        causeEntity.setFrequencyCauseImplementationUpdates(cause.getFrequencyCauseImplementationUpdates());
 
         return causeEntity;
     }
@@ -137,6 +147,8 @@ public final class CauseMapper {
         cause.setEthAddress(causeEntity.getEthAddress());
         cause.setExtended(causeEntity.getExtended());
         cause.setResubmited(causeEntity.getResubmited());
+        cause.setFrequencyCauseImplementationUpdates(cause.getFrequencyCauseImplementationUpdates());
+        cause.setCauseImplementationDuration(cause.getCauseImplementationDuration());
         return cause;
     }
 
@@ -151,6 +163,30 @@ public final class CauseMapper {
         stateEntity.setType(type);
         stateEntity.setStatus(Cause.State.PENDING.name());
         return stateEntity;
+    }
+
+
+    public static List<PerMonthRecord> map(List<CauseEntity> causeEntities, Cause.State state) {
+        final LocalDateTime oneYearBack = LocalDateTime.now().minusYears(1);
+        Map<String, Long> byMonth = causeEntities.stream()
+                .filter(causeEntity -> causeEntity.getCreatedOn().isAfter(oneYearBack) && causeEntity.getCurrentState().equals(state.name()))
+                .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
+
+        return getPerMonthRecords(byMonth);
+    }
+
+    private static List<PerMonthRecord> getPerMonthRecords(Map<String, Long> byMonth) {
+        return byMonth.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(e -> new PerMonthRecord(e.getKey(), Month.valueOf(e.getKey().toUpperCase()).getValue(), e.getValue())).collect(Collectors.toList());
+    }
+
+    public static List<PerMonthRecord> mapAll(List<CauseEntity> causeEntities) {
+        final LocalDateTime oneYearBack = LocalDateTime.now().minusYears(1);
+        Map<String, Long> byMonth = causeEntities.stream()
+                .filter(causeEntity -> causeEntity.getCreatedOn().isAfter(oneYearBack))
+                .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
+
+        return getPerMonthRecords(byMonth);
     }
 }
 

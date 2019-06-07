@@ -32,52 +32,52 @@ import java.util.Objects;
 @SuppressWarnings({"unused", "WeakerAccess"})
 @Table(name = PermittableGroups.TABLE_NAME)
 public class PermittableGroupEntity {
-  @PartitionKey
-  @Column(name = PermittableGroups.IDENTIFIER_COLUMN)
-  private String identifier;
+    @PartitionKey
+    @Column(name = PermittableGroups.IDENTIFIER_COLUMN)
+    private String identifier;
 
-  @Frozen
-  @Column(name = PermittableGroups.PERMITTABLES_COLUMN)
-  private List<PermittableType> permittables;
+    @Frozen
+    @Column(name = PermittableGroups.PERMITTABLES_COLUMN)
+    private List<PermittableType> permittables;
 
-  public PermittableGroupEntity() {
-  }
+    public PermittableGroupEntity() {
+    }
 
-  public String getIdentifier() {
-    return identifier;
-  }
+    public String getIdentifier() {
+        return identifier;
+    }
 
-  public void setIdentifier(String identifier) {
-    this.identifier = identifier;
-  }
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
-  public List<PermittableType> getPermittables() {
-    return permittables;
-  }
+    public List<PermittableType> getPermittables() {
+        return permittables;
+    }
 
-  public void setPermittables(List<PermittableType> permittables) {
-    this.permittables = permittables;
-  }
+    public void setPermittables(List<PermittableType> permittables) {
+        this.permittables = permittables;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    PermittableGroupEntity that = (PermittableGroupEntity) o;
-    return Objects.equals(identifier, that.identifier) &&
-            Objects.equals(permittables, that.permittables);
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PermittableGroupEntity that = (PermittableGroupEntity) o;
+        return Objects.equals(identifier, that.identifier) &&
+                Objects.equals(permittables, that.permittables);
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(identifier, permittables);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, permittables);
+    }
 
-  @Override
-  public String toString() {
-    return "PermittableGroupEntity{" +
-            "identifier='" + identifier + '\'' +
-            ", permittables=" + permittables +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "PermittableGroupEntity{" +
+                "identifier='" + identifier + '\'' +
+                ", permittables=" + permittables +
+                '}';
+    }
 }

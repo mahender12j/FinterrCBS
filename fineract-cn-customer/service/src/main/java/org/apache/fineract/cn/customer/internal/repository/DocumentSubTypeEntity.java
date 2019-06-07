@@ -43,6 +43,9 @@ public class DocumentSubTypeEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
+
 
     public DocumentSubTypeEntity() {
         this.uuid = UUID.randomUUID().toString();
@@ -78,6 +81,14 @@ public class DocumentSubTypeEntity {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     @Override

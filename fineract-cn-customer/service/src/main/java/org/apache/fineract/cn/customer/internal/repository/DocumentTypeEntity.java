@@ -42,6 +42,8 @@ public class DocumentTypeEntity {
     @Column(name = "user_type", nullable = false)
     private String userType;
 
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 
     public DocumentTypeEntity() {
         this.uuid = UUID.randomUUID().toString();
@@ -77,6 +79,14 @@ public class DocumentTypeEntity {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     @Override

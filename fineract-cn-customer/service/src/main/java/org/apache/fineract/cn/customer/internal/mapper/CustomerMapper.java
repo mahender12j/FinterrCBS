@@ -18,20 +18,16 @@
  */
 package org.apache.fineract.cn.customer.internal.mapper;
 
-import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
+import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.BusinessCustomer;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
-import org.apache.fineract.cn.customer.api.v1.domain.SocialMatrix;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
+import org.apache.fineract.cn.lang.DateConverter;
+import org.apache.fineract.cn.lang.DateOfBirth;
 
 import java.sql.Date;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.List;
-
-import org.apache.fineract.cn.api.util.UserContextHolder;
-import org.apache.fineract.cn.lang.DateConverter;
-import org.apache.fineract.cn.lang.DateOfBirth;
 
 public final class CustomerMapper {
 
@@ -43,17 +39,15 @@ public final class CustomerMapper {
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setIdentifier(customer.getIdentifier());
         customerEntity.setType(customer.getType());
-        System.out.println(" Customer Type :: " + customer.getType());
         customerEntity.setRegistrationType(customer.getRegistrationType());
         customerEntity.setGivenName(customer.getGivenName());
         customerEntity.setMiddleName(customer.getMiddleName());
         customerEntity.setSurname(customer.getSurname());
-        System.out.println(" Customer DateOfBirth :: " + customer.getDateOfBirth());
+        customerEntity.setGender(customer.getGender());
         if (customer.getDateOfBirth() != null) {
             customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
         }
         customerEntity.setMember(customer.getMember());
-        System.out.println(" Customer Member :: " + customer.getMember());
         customerEntity.setAccountBeneficiary(customer.getAccountBeneficiary());
         customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
         customerEntity.setAssignedOffice(customer.getAssignedOffice());
@@ -70,12 +64,8 @@ public final class CustomerMapper {
         }
         customerEntity.setCreatedBy(UserContextHolder.checkedGetUser());
         customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-        System.out.println("Ref Code Ident :: " + customer.getRefferalCodeIdentifier());
         customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
-
-        System.out.println(" getEthAddress :: " + customer.getEthAddress());
         customerEntity.setEthAddress(customer.getEthAddress());
-        System.out.println("  IsDeposited:: " + customer.getIsDeposited());
         if (customer.getIsDeposited() != null) {
             customerEntity.setIsDeposited(customer.getIsDeposited());
         } else {
@@ -84,15 +74,12 @@ public final class CustomerMapper {
         if (customer.getDepositedOn() != null) {
             customerEntity.setDepositedOn(LocalDateTime.parse(customer.getDepositedOn()));
         }
-        System.out.println(" KycStatus:: " + customer.getKycStatus());
         if (customer.getKycStatus() != null) {
             customerEntity.setKycStatus(customer.getKycStatus());
         } else {
             customerEntity.setKycStatus("NOTUPLOADED");
         }
-        System.out.println(" AccountNumber :: " + customer.getAccountNumbers());
         customerEntity.setAccountNumbers(customer.getAccountNumbers());
-        System.out.println(" AvgMonthlyIncome :: " + customer.getAvgMonthlyIncome());
         if (customer.getAvgMonthlyIncome() != null) {
             customerEntity.setAvgMonthlyIncome(customer.getAvgMonthlyIncome());
         } else {
@@ -116,6 +103,7 @@ public final class CustomerMapper {
         customer.setRegistrationType(customerEntity.getRegistrationType());
         customer.setGivenName(customerEntity.getGivenName());
         customer.setMiddleName(customerEntity.getMiddleName());
+        customer.setGender(customerEntity.getGender());
         customer.setSurname(customerEntity.getSurname());
         if (customerEntity.getDateOfBirth() != null) {
             customer.setDateOfBirth(DateOfBirth.fromLocalDate(customerEntity.getDateOfBirth().toLocalDate()));
