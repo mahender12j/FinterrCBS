@@ -79,6 +79,8 @@ public class Cause {
     private String createdOn;
     private String lastModifiedBy;
     private String lastModifiedOn;
+    @NotNull
+    private boolean isFeeRevisionRequired;
 
 
     @Valid
@@ -493,6 +495,14 @@ public class Cause {
 
     public void setNumberOfExtended(Long numberOfExtended) {
         this.numberOfExtended = numberOfExtended;
+    }
+
+    public boolean isFeeRevisionRequired() {
+        return isFeeRevisionRequired;
+    }
+
+    public void setFeeRevisionRequired(boolean feeRevisionRequired) {
+        isFeeRevisionRequired = feeRevisionRequired;
     }
 
     @Override

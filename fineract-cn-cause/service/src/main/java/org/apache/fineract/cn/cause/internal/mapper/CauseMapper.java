@@ -73,6 +73,7 @@ public final class CauseMapper {
         causeEntity.setFinCollLimit(cause.getFinCollLimit());
         causeEntity.setFinRate(cause.getFinRate());
         causeEntity.setApprovedBy(cause.getApprovedBy());
+        causeEntity.setFeeRevisionRequired(cause.isFeeRevisionRequired());
 
         if (cause.getApprovedOn() != null) {
             causeEntity.setApprovedOn(LocalDateTime.parse(cause.getApprovedOn()));
@@ -125,6 +126,7 @@ public final class CauseMapper {
         cause.setFinRate(causeEntity.getFinRate());
         cause.setApprovedBy(causeEntity.getApprovedBy());
         cause.setRejectedReason(causeEntity.getRejectedReason());
+        cause.setFeeRevisionRequired(causeEntity.isFeeRevisionRequired());
 
         if (causeEntity.getApprovedOn() != null) {
             cause.setApprovedOn(DateConverter.toIsoString(causeEntity.getApprovedOn()));

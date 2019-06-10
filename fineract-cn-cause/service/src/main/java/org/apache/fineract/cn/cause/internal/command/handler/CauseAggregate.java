@@ -226,10 +226,10 @@ public class CauseAggregate {
     public String RejectCause(final RejectCauseCommand rejectCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(rejectCauseCommand.getIdentifier());
         causeEntity.setCurrentState(Cause.State.REJECTED.name());
-        causeEntity.setRejectedReason(rejectCauseCommand.getReason());
+        causeEntity.setRejectedReason(rejectCauseCommand.getCauseReject().getRejectedReason());
+        causeEntity.setFeeRevisionRequired(rejectCauseCommand.getCauseReject().isFeeRevisionRequired());
         causeEntity.setRejectedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
-
 
 //        set the pending status to zero
         Set<String> stateTypes = new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()));

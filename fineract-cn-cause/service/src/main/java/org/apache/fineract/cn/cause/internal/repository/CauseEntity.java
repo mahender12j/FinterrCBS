@@ -141,6 +141,8 @@ public class CauseEntity {
     @Column(name = "rejected_by")
     private String rejectedBy;
 
+    @Column(name = "is_fee_revision_required")
+    private boolean isFeeRevisionRequired;
 
 //    added for a1
 
@@ -495,6 +497,14 @@ public class CauseEntity {
 
     public void setClosedDate(LocalDateTime closedDate) {
         this.closedDate = closedDate;
+    }
+
+    public boolean isFeeRevisionRequired() {
+        return isFeeRevisionRequired;
+    }
+
+    public void setFeeRevisionRequired(boolean feeRevisionRequired) {
+        isFeeRevisionRequired = feeRevisionRequired;
     }
 
     @Override

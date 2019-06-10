@@ -295,12 +295,12 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> RejectCause(@PathVariable("identifier") final String identifier,
-                                     @RequestBody final Cause cause) {
+                                     @RequestBody final CauseReject causeReject) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
         throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(REJECTED.name())));
 
         if (PENDING.name().toLowerCase().equals(causeEntity.getCurrentState().toLowerCase())) {
-            this.commandGateway.process(new RejectCauseCommand(identifier, cause.getRejectedReason()));
+            this.commandGateway.process(new RejectCauseCommand(identifier, causeReject));
         } else {
             throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }

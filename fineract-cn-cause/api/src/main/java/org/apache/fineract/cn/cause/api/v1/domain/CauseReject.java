@@ -16,36 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.command;
+package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.apache.fineract.cn.cause.api.v1.domain.CauseReject;
+import org.hibernate.validator.constraints.NotBlank;
 
-public class RejectCauseCommand {
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.List;
 
+/**
+ * @author Padma Raju Sattineni
+ */
 
-    private final String identifier;
-    private final CauseReject causeReject;
+public class CauseReject {
 
-    public RejectCauseCommand(final String identifier,
-                              final CauseReject causeReject) {
-        super();
-        this.identifier = identifier;
-        this.causeReject = causeReject;
+    private boolean feeRevisionRequired;
+    private String rejectedReason;
+
+    public CauseReject() {
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public boolean isFeeRevisionRequired() {
+        return feeRevisionRequired;
     }
 
-    public CauseReject getCauseReject() {
-        return causeReject;
+    public void setFeeRevisionRequired(boolean feeRevisionRequired) {
+        this.feeRevisionRequired = feeRevisionRequired;
     }
 
-    @Override
-    public String toString() {
-        return "RejectCauseCommand{" +
-                "identifier='" + identifier + '\'' +
-                ", causeReject=" + causeReject +
-                '}';
+    public String getRejectedReason() {
+        return rejectedReason;
+    }
+
+    public void setRejectedReason(String rejectedReason) {
+        this.rejectedReason = rejectedReason;
     }
 }
+
