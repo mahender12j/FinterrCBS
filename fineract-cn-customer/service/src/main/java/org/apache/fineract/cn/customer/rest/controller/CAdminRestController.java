@@ -23,6 +23,7 @@ import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
 import org.apache.fineract.cn.customer.api.v1.domain.CAdminPage;
+import org.apache.fineract.cn.customer.api.v1.domain.Customer;
 import org.apache.fineract.cn.customer.internal.service.CAdminService;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.lang.ServiceException;
@@ -30,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/")
@@ -52,8 +55,7 @@ public class CAdminRestController {
 
     //    GET NGO statistics
 
-    @Permittable(value = AcceptedTokenType.TENANT,
-            groupId = PermittableGroupIds.CADMIN)
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CADMIN)
     @RequestMapping(
             value = "/cadmin/{identifier}/statistics",
             method = RequestMethod.GET,
@@ -65,6 +67,24 @@ public class CAdminRestController {
     ResponseEntity<CAdminPage> getCadminStatistics(@PathVariable("identifier") final String identifier) {
         this.throwIfCustomerNotExists(identifier);
         return ResponseEntity.ok(this.cAdminService.getCaAdminStatistics());
+    }
+
+
+    //    GET NGO users list
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CADMIN)
+    @RequestMapping(
+            value = "/cadmin/users/filter",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<List<Customer>> getCadminCustomersByType(
+            @RequestParam(value = "userType") final String userType) {
+        System.out.println(userType + ">> request param");
+        return ResponseEntity.ok(this.cAdminService.findCustomerByType(userType));
     }
 
 

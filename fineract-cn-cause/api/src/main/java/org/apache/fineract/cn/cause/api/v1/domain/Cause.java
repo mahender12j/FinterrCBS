@@ -98,12 +98,16 @@ public class Cause {
 
 
     //    1a update
-    @NotNull
     @Valid
     private int causeImplementationDuration;
-    @NotNull
     @Valid
     private int frequencyCauseImplementationUpdates;
+
+//    new 1a requirements
+    private int totalNumberOfUpdates;
+    private int NumberOfUpdateProvided;
+    private int NumberOfDaysLeftForNextUpdate;
+
 
     private String rejectedReason;
 
@@ -503,6 +507,30 @@ public class Cause {
 
     public void setFeeRevisionRequired(boolean feeRevisionRequired) {
         isFeeRevisionRequired = feeRevisionRequired;
+    }
+
+    public int getTotalNumberOfUpdates() {
+        return totalNumberOfUpdates;
+    }
+
+    public void setTotalNumberOfUpdates(int totalNumberOfUpdates) {
+        this.totalNumberOfUpdates = totalNumberOfUpdates;
+    }
+
+    public int getNumberOfUpdateProvided() {
+        return NumberOfUpdateProvided;
+    }
+
+    public void setNumberOfUpdateProvided(int numberOfUpdateProvided) {
+        NumberOfUpdateProvided = numberOfUpdateProvided;
+    }
+
+    public int getNumberOfDaysLeftForNextUpdate() {
+        return NumberOfDaysLeftForNextUpdate;
+    }
+
+    public void setNumberOfDaysLeftForNextUpdate(int numberOfDaysLeftForNextUpdate) {
+        NumberOfDaysLeftForNextUpdate = numberOfDaysLeftForNextUpdate;
     }
 
     @Override

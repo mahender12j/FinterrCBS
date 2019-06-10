@@ -21,6 +21,7 @@ package org.apache.fineract.cn.customer.internal.service;
 import org.apache.fineract.cn.cause.api.v1.domain.CaAdminCauseData;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.mapper.CadminMapper;
+import org.apache.fineract.cn.customer.internal.mapper.CustomerMapper;
 import org.apache.fineract.cn.customer.internal.mapper.DocumentMapper;
 import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.customer.internal.service.helperService.CauseAdaptor;
@@ -121,7 +122,16 @@ public class CAdminService {
     }
 
 
-    public CustomerDocument findCustomerDocuments(CustomerEntity customerEntity, List<DocumentTypeEntity> documentTypeEntities, List<DocumentSubTypeEntity> documentSubTypeEntities) {
+    public List<Customer> findCustomerByType(final String type) {
+        return customerRepository
+                .findAllByType(type.toUpperCase())
+                .stream()
+                .map(CustomerMapper::map)
+                .collect(Collectors.toList());
+
+    }
+
+    CustomerDocument findCustomerDocuments(CustomerEntity customerEntity, List<DocumentTypeEntity> documentTypeEntities, List<DocumentSubTypeEntity> documentSubTypeEntities) {
         final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerEntity.getIdentifier());
         CustomerDocument customerDocument = new CustomerDocument();
         List<DocumentsType> documentsType = new ArrayList<>();

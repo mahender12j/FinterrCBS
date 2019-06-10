@@ -36,16 +36,9 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CustomerEntity c WHERE c.identifier = :identifier")
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
-
-//    @Query("select c from CustomerEntity  as c where  c.createdOn  >= :dateTime  ORDER BY c.createdOn")
-//    List<CustomerEntity> findAllByCreatedOn(final LocalDateTime dateTime);
-
-    Page<CustomerEntity> findAllByTypeIn(final Set<String> type, Pageable pageable);
-
     List<CustomerEntity> findAllByTypeIn(final Set<String> type);
 
-    @Query("select COUNT(c) from  CustomerEntity c where c.referenceCustomer=:identifier")
-    Integer findAllByRefferalCodeIdentifier(@Param("identifier") final String identifier);
+    List<CustomerEntity> findAllByType(final String type);
 
     @Query("select COUNT(c) from  CustomerEntity c where c.referenceCustomer=:identifier AND c.isDeposited = 1")
     Integer findAllByRefferalCodeIdentifierActive(@Param("identifier") final String identifier);
@@ -56,8 +49,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     Page<CustomerEntity> findByReferenceCustomerAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
             final String refferalCodeIdentifier, final String identifier, final String givenName, final String surname, final Pageable pageable);
 
-    Page<CustomerEntity> findAllByReferenceCustomer(final String refferalCodeIdentifier, final Pageable pageable);
-
     Page<CustomerEntity> findAllByReferenceCustomerAndIsDeposited(final String refferalCodeIdentifier, final Boolean isDeposited, final Pageable pageable);
 
     Optional<CustomerEntity> findByIdentifier(final String identifier);
@@ -67,8 +58,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     Optional<CustomerEntity> findByRefferalCodeIdentifier(final String referralCode);
 
     Page<CustomerEntity> findByCurrentStateNot(final String state, final Pageable pageable);
-
-    Page<CustomerEntity> findByReferenceCustomerAndCurrentStateNot(final String refferalCodeIdentifier, final String state, final Pageable pageable);
 
     Page<CustomerEntity> findByReferenceCustomerAndIsDepositedAndCurrentStateNot(final String refferalCodeIdentifier, final Boolean isDeposited, final String state, final Pageable pageable);
 
