@@ -37,7 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -103,13 +105,25 @@ public class CauseUpdateCommandHandler {
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.PUT_CAUSE_UPDATE)
     public CauseUpdatePatchEvent process(final UpdateCauseUpdateCommand updateCauseUpdateCommand) {
-
         CauseUpdate causeUpdate = updateCauseUpdateCommand.getCauseUpdate();
+        CauseEntity entity = this.findCauseEntityOrThrow(updateCauseUpdateCommand.getIdentifier());
 
-        System.out.println(causeUpdate.toString());
-//        CauseEntity causeEntity = this.findCauseEntityOrThrow(createCauseUpdateInfoCommand.getIdentifier());
-//        CauseUpdateInfoEntity updateInfoEntity = CauseUpdateMapper.map(causeUpdateInfo, causeEntity);
-//        causeUpdateInfoRepository.save(updateInfoEntity);
+        CauseUpdateEntity updateEntity = this.causeUpdateRepository.findByCauseEntity(entity)
+                .stream().filter(e -> e.getId().equals(causeUpdate.getId())).findFirst().orElseThrow(() -> ServiceException.notFound("Cause Update not found"));
+
+        updateEntity.setTitle(causeUpdate.getTitle());
+        updateEntity.setDescription(causeUpdate.getDescription());
+        updateEntity.setAmountSpend(causeUpdate.getAmountSpend());
+        updateEntity.setUpdatedAt(LocalDateTime.now());
+        causeUpdateRepository.save(updateEntity);
+
+
+        List<CauseUpdatePageEntity> pageEntity = causeUpdatePageRepository.findByUpdateEntity(updateEntity);
+        causeUpdatePageRepository.delete(pageEntity);
+
+        List<CauseUpdatePageEntity> pageEntities = causeUpdate.getCauseUpdatePages()
+                .stream().map(causeUpdatePage -> CauseUpdateMapper.map(causeUpdatePage, updateEntity)).collect(Collectors.toList());
+        causeUpdatePageRepository.save(pageEntities);
         return new CauseUpdatePatchEvent(updateCauseUpdateCommand.getIdentifier(), causeUpdate);
     }
 
