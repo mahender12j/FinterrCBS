@@ -230,32 +230,9 @@ public class CauseRestController {
         throwIfCauseIsNotActive(causeEntity);
         throwIfMin2DaysLeft(causeEntity);
         throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(EXTENDED.name())));
+
         LocalDateTime localDateTime = LocalDateTime.parse(causeState.getNewDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         this.commandGateway.process(new ExtendCauseCommand(identifier, localDateTime));
-        return ResponseEntity.accepted().build();
-    }
-
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
-            value = "/causes/{identifier}/approved",
-            method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
-                                      @RequestBody final CauseApprove cause) {
-        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
-        throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(APPROVED.name())));
-
-        if (causeEntity.getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
-            this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate(), cause.getSuccessFees()));
-        } else {
-            throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
-        }
-
         return ResponseEntity.accepted().build();
     }
 
@@ -307,6 +284,52 @@ public class CauseRestController {
         return ResponseEntity.accepted().build();
     }
 
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/approved",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
+                                      @RequestBody final CauseApprove cause) {
+        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(APPROVED.name())));
+
+        if (causeEntity.getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
+            this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate(), cause.getSuccessFees()));
+        } else {
+            throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
+        }
+
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/approveExtended",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> approveExtendedCause(@PathVariable("identifier") final String identifier) {
+        throwIfActionLessThanOneTimes(identifier, new HashSet<>(Collections.singletonList(EXTENDED.name())));
+
+        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
+        if (causeEntity.getCurrentState().toLowerCase().equals(ACTIVE.name().toLowerCase())) {
+            this.commandGateway.process(new ApproveExtendedCauseCommand(identifier));
+        } else {
+            throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
+        }
+
+        return ResponseEntity.accepted().build();
+    }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
@@ -711,6 +734,12 @@ public class CauseRestController {
     private void throwIfActionMoreThan2Times(String identifier, final Set<String> state) {
         if (this.causeStateRepository.totalStateByCauseIdentifier(identifier, state) >= 2) {
             throw ServiceException.conflict("Cause {0} cant be {1} more than two times.", identifier, state.toString());
+        }
+    }
+
+    private void throwIfActionLessThanOneTimes(String identifier, final Set<String> state) {
+        if (this.causeStateRepository.totalStateByCauseIdentifier(identifier, state) <= 0) {
+            throw ServiceException.conflict("Cause {0} at least one time need to be extended.", identifier, state.toString());
         }
     }
 

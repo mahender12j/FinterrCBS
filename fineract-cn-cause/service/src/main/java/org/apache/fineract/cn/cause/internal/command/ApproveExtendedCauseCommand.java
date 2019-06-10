@@ -18,34 +18,19 @@
  */
 package org.apache.fineract.cn.cause.internal.command;
 
-import java.time.LocalDateTime;
-
-public class ApproveCauseCommand {
+public class ApproveExtendedCauseCommand {
 
 
     private final String identifier;
-    private final Double finRate;
-    private final Double successFees;
 
 
-    public ApproveCauseCommand(final String identifier,
-                               final Double finRate,
-                               final Double successFees) {
+    public ApproveExtendedCauseCommand(final String identifier) {
         super();
         this.identifier = identifier;
-        this.finRate = finRate;
-        this.successFees = successFees;
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public Double getFinRate() {
-        return finRate;
-    }
-
-    public Double getSuccessFees() {
-        return successFees;
-    }
 }

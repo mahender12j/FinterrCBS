@@ -27,20 +27,20 @@ public class ExtendCauseCommand {
 
     private final String identifier;
     @ValidLocalDateTimeString
-    private final LocalDateTime extend_date;
+    private final LocalDateTime extendDate;
 
 
-    public ExtendCauseCommand(String identifier, LocalDateTime extend_date) {
+    public ExtendCauseCommand(String identifier, LocalDateTime extendDate) {
         super();
         this.identifier = identifier;
-        this.extend_date = extend_date;
+        this.extendDate = extendDate;
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public LocalDateTime getExtend_date() {
-        return extend_date;
+    public LocalDateTime getExtendDate() {
+        return extendDate;
     }
 }

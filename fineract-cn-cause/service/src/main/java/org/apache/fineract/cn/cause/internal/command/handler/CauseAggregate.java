@@ -254,7 +254,7 @@ public class CauseAggregate {
         final CauseEntity causeEntity = findCauseEntityOrThrow(extendCauseCommand.getIdentifier());
         causeEntity.setExtended(true);
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, extendCauseCommand.getExtend_date(), Cause.State.EXTENDED.name());
+        CauseStateEntity stateEntity = CauseMapper.map(causeEntity, extendCauseCommand.getExtendDate(), Cause.State.EXTENDED.name());
         this.causeRepository.save(causeEntity);
         this.causeStateRepository.save(stateEntity);
         return extendCauseCommand.getIdentifier();
@@ -281,12 +281,36 @@ public class CauseAggregate {
         return approveCauseCommand.getIdentifier();
     }
 
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.APPROVE_EXTENDED_CAUSE)
+    public String ApproveCause(final ApproveExtendedCauseCommand approveExtendedCauseCommand) {
+        final CauseEntity causeEntity = findCauseEntityOrThrow(approveExtendedCauseCommand.getIdentifier());
+        List<CauseStateEntity> stateEntity = causeStateRepository.findByCauseAndTypeIn(causeEntity, new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name())));
+
+        causeEntity.setExtended(false);
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        CauseStateEntity latestStateEntity = stateEntity.stream().max(Comparator.comparing(CauseStateEntity::getCreatedOn)).get();
+        causeEntity.setEndDate(latestStateEntity.getNewDate());
+        this.causeRepository.save(causeEntity);
+
+        this.causeStateRepository.save(stateEntity.stream().map(entity -> {
+            entity.setStatus(Cause.State.APPROVED.name());
+            return entity;
+        }).collect(Collectors.toList()));
+
+
+        return approveExtendedCauseCommand.getIdentifier();
+    }
+
     private void updateCauseStateForApproval(CauseEntity causeEntity) {
         Set<String> stateTypes = new HashSet<>(Arrays.asList(Cause.State.REJECTED.name(), Cause.State.PENDING.name()));
         List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes)
                 .stream()
                 .map(entity -> {
                     entity.setType(entity.getType() + "-" + Cause.State.APPROVED.name());
+                    entity.setStatus(Cause.State.APPROVED.name());
                     return entity;
                 })
                 .collect(Collectors.toList());
