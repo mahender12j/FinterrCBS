@@ -171,53 +171,62 @@ public class DocumentsRestController {
 //    document sub type
 
 
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-//    @RequestMapping(
-//            value = "/master/type/uuid/",
-//            method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.ALL_VALUE
-//    )
-//    public ResponseEntity<List<DocumentsMaster>> getMasterDocumentsSubType(@PathVariable("customeridentifier") final String customerIdentifier) {
-//        throwIfCustomerNotExists(customerIdentifier);
-//        return ResponseEntity.ok(documentService.findDocumentsTypes());
-//    }
-//
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-//    @RequestMapping(
-//            value = "/master/type",
-//            method = RequestMethod.POST,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.APPLICATION_JSON_VALUE
-//    )
-//    public @ResponseBody
-//    ResponseEntity<Void> createDocumentSubType(
-//            @PathVariable("customeridentifier") final String customerIdentifier,
-//            @RequestBody final @Valid DocumentsType instance) {
-//        throwIfCustomerNotExists(customerIdentifier);
-//
-//        commandGateway.process(new CreateDocumentTypeCommand(customerIdentifier, instance));
-//        return ResponseEntity.accepted().build();
-//    }
-//
-//
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-//    @RequestMapping(value = "/master/type/{uuid}",
-//            method = RequestMethod.PUT,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.APPLICATION_JSON_VALUE
-//    )
-//    public @ResponseBody
-//    ResponseEntity<Void> changeDocumentSubType(
-//            @PathVariable("customeridentifier") final String customerIdentifier,
-//            @PathVariable("uuid") final String uuid,
-//            @RequestBody final @Valid DocumentsType instance) {
-//        throwIfCustomerNotExists(customerIdentifier);
-//        throwIfMasterTypeNotExists(uuid);
-//
-//        commandGateway.process(new UpdateDocumentTypeCommand(uuid, instance));
-//        return ResponseEntity.accepted().build();
-//    }
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/master/subtype",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<List<DocumentsMasterSubtype>> getMasterDocumentsSubType(
+            @PathVariable("customeridentifier") final String customerIdentifier) {
+        throwIfCustomerNotExists(customerIdentifier);
+        return ResponseEntity.ok(documentService.findDocumentsSubTypes());
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/master/subtype",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> createDocumentSubType(
+            @PathVariable("customeridentifier") final String customerIdentifier,
+            @RequestBody final @Valid DocumentsMasterSubtype instance) {
+        throwIfCustomerNotExists(customerIdentifier);
+        throwIfDocumentTypeNotExists(instance.getDocTypeUUID());
+
+        commandGateway.process(new CreateDocumentSubTypeCommand(instance, instance.getDocTypeUUID()));
+        return ResponseEntity.accepted().build();
+    }
+
+    private void throwIfDocumentTypeNotExists(String uuid) {
+        if (!this.customerService.masterTypeExists(uuid)) {
+            throw ServiceException.notFound("Customer ''{0}'' not found.", uuid);
+        }
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(value = "/master/subtype/{uuid}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> changeDocumentSubType(
+            @PathVariable("uuid") final String uuid,
+            @PathVariable("customeridentifier") final String customerIdentifier,
+            @RequestBody final @Valid DocumentsMasterSubtype instance) {
+        throwIfCustomerNotExists(customerIdentifier);
+        throwIfMasterTypeNotExists(uuid);
+
+        commandGateway.process(new UpdateDocumentSubTypeCommand(uuid, instance));
+        return ResponseEntity.accepted().build();
+    }
 
 
 // - document sub type

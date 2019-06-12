@@ -96,8 +96,8 @@ public class AuthorizationRestController {
                 final String refreshToken = getRefreshToken(refreshTokenParam, request);
 
                 try {
-                    final AuthenticationCommandResponse authenticationCommandResponse
-                            = getAuthenticationCommandResponse(new RefreshTokenAuthenticationCommand(refreshToken));
+                    RefreshTokenAuthenticationCommand refreshTokenAuthenticationCommand = new RefreshTokenAuthenticationCommand(refreshToken);
+                    final AuthenticationCommandResponse authenticationCommandResponse = getAuthenticationCommandResponse(refreshTokenAuthenticationCommand);
                     final Authentication ret = map(authenticationCommandResponse, response);
 
                     return new ResponseEntity<>(ret, HttpStatus.OK);
@@ -179,9 +179,7 @@ public class AuthorizationRestController {
         }
     }
 
-    private Authentication map(
-            final AuthenticationCommandResponse commandResponse,
-            final HttpServletResponse httpServletResponse) {
+    private Authentication map(final AuthenticationCommandResponse commandResponse, final HttpServletResponse httpServletResponse) {
         httpServletResponse.addCookie(bakeRefreshTokenCookie(commandResponse.getRefreshToken()));
 
         return new Authentication(

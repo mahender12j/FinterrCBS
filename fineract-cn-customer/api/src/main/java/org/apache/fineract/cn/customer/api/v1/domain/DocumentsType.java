@@ -25,20 +25,21 @@ import java.util.List;
  */
 public class DocumentsType {
 
-    private String type;
+    private String title;
     private String userType;
     private String status;
+    private boolean isActive;
     private List<DocumentsSubType> documentsSubType;
 
     public DocumentsType() {
     }
 
-    public String getType() {
-        return type;
+    public String getTitle() {
+        return title;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getUserType() {
@@ -47,6 +48,14 @@ public class DocumentsType {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public List<DocumentsSubType> getDocumentsSubType() {
@@ -68,7 +77,7 @@ public class DocumentsType {
     @Override
     public String toString() {
         return "DocumentsType{" +
-                "type='" + type + '\'' +
+                "type='" + title + '\'' +
                 ", documentsSubType=" + documentsSubType +
                 '}';
     }

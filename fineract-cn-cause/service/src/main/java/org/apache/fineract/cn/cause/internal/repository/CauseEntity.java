@@ -141,6 +141,37 @@ public class CauseEntity {
     @Column(name = "rejected_by")
     private String rejectedBy;
 
+    @Column(name = "is_fee_revision_required")
+    private boolean isFeeRevisionRequired;
+
+//    added for a1
+
+    @Column(name = "cause_implementation_duration")
+    private int causeImplementationDuration;
+
+    @Column(name = "frequency_cause_implementation_updates")
+    private int frequencyCauseImplementationUpdates;
+
+
+//    @Column(name = "rejected_by")
+//    private String rejectedBy;
+
+
+    public int getCauseImplementationDuration() {
+        return causeImplementationDuration;
+    }
+
+    public void setCauseImplementationDuration(int causeImplementationDuration) {
+        this.causeImplementationDuration = causeImplementationDuration;
+    }
+
+    public int getFrequencyCauseImplementationUpdates() {
+        return frequencyCauseImplementationUpdates;
+    }
+
+    public void setFrequencyCauseImplementationUpdates(int frequencyCauseImplementationUpdates) {
+        this.frequencyCauseImplementationUpdates = frequencyCauseImplementationUpdates;
+    }
 
     public Boolean getTaxExamption() {
         return isTaxExamption;
@@ -468,6 +499,14 @@ public class CauseEntity {
         this.closedDate = closedDate;
     }
 
+    public boolean isFeeRevisionRequired() {
+        return isFeeRevisionRequired;
+    }
+
+    public void setFeeRevisionRequired(boolean feeRevisionRequired) {
+        isFeeRevisionRequired = feeRevisionRequired;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -480,6 +519,53 @@ public class CauseEntity {
     @Override
     public int hashCode() {
         return identifier.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "CauseEntity{" +
+                "id=" + id +
+                ", identifier='" + identifier + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", completedDate=" + completedDate +
+                ", closedDate=" + closedDate +
+                ", publishDate=" + publishDate +
+                ", category=" + category +
+                ", currentState='" + currentState + '\'' +
+                ", softTarget=" + softTarget +
+                ", hardTarget=" + hardTarget +
+                ", isTaxExamption=" + isTaxExamption +
+                ", isResubmited=" + isResubmited +
+                ", isExtended=" + isExtended +
+                ", actualRaisedFiat=" + actualRaisedFiat +
+                ", actualRaisedFin=" + actualRaisedFin +
+                ", minAmount=" + minAmount +
+                ", maxAmount=" + maxAmount +
+                ", acceptedDenominationAmounts='" + acceptedDenominationAmounts + '\'' +
+                ", managementFee=" + managementFee +
+                ", finCollLimit=" + finCollLimit +
+                ", finRate='" + finRate + '\'' +
+                ", approvedBy='" + approvedBy + '\'' +
+                ", approvedOn=" + approvedOn +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdOn=" + createdOn +
+                ", lastModifiedBy='" + lastModifiedBy + '\'' +
+                ", lastModifiedOn=" + lastModifiedOn +
+                ", taxExemptionPercentage='" + taxExemptionPercentage + '\'' +
+                ", websiteUrl='" + websiteUrl + '\'' +
+                ", smediaLinks='" + smediaLinks + '\'' +
+                ", videoUrls='" + videoUrls + '\'' +
+                ", causeTxHash='" + causeTxHash + '\'' +
+                ", accountNumber='" + accountNumber + '\'' +
+                ", ethAddress='" + ethAddress + '\'' +
+                ", rejectedReason='" + rejectedReason + '\'' +
+                ", rejectedBy='" + rejectedBy + '\'' +
+                ", causeImplementationDuration=" + causeImplementationDuration +
+                ", frequencyCauseImplementationUpdates=" + frequencyCauseImplementationUpdates +
+                '}';
     }
 }
 

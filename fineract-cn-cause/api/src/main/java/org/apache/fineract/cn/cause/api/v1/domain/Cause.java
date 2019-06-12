@@ -79,6 +79,8 @@ public class Cause {
     private String createdOn;
     private String lastModifiedBy;
     private String lastModifiedOn;
+    @NotNull
+    private boolean isFeeRevisionRequired;
 
 
     @Valid
@@ -93,6 +95,15 @@ public class Cause {
     private String ethAddress;
     private CauseStatistics causeStatistics;
     private CauseDocument causeDocument;
+
+
+    //    1a update
+    @NotNull
+    @Valid
+    private int causeImplementationDuration;
+    @NotNull
+    @Valid
+    private int frequencyCauseImplementationUpdates;
 
     private String rejectedReason;
 
@@ -442,6 +453,22 @@ public class Cause {
         return rejectedReason;
     }
 
+    public int getCauseImplementationDuration() {
+        return causeImplementationDuration;
+    }
+
+    public void setCauseImplementationDuration(int causeImplementationDuration) {
+        this.causeImplementationDuration = causeImplementationDuration;
+    }
+
+    public int getFrequencyCauseImplementationUpdates() {
+        return frequencyCauseImplementationUpdates;
+    }
+
+    public void setFrequencyCauseImplementationUpdates(int frequencyCauseImplementationUpdates) {
+        this.frequencyCauseImplementationUpdates = frequencyCauseImplementationUpdates;
+    }
+
     public void setRejectedReason(String rejectedReason) {
         this.rejectedReason = rejectedReason;
     }
@@ -468,6 +495,14 @@ public class Cause {
 
     public void setNumberOfExtended(Long numberOfExtended) {
         this.numberOfExtended = numberOfExtended;
+    }
+
+    public boolean isFeeRevisionRequired() {
+        return isFeeRevisionRequired;
+    }
+
+    public void setFeeRevisionRequired(boolean feeRevisionRequired) {
+        isFeeRevisionRequired = feeRevisionRequired;
     }
 
     @Override

@@ -21,7 +21,6 @@ package org.apache.fineract.cn.customer.internal.mapper;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.repository.*;
-import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.lang.DateConverter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,10 +29,9 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
- * @author Myrle Krantz
+ * @author Md  Robiul Hassan
  */
 public class DocumentMapper {
     private DocumentMapper() {
@@ -41,36 +39,45 @@ public class DocumentMapper {
     }
 
 
-    public static List<DocumentsType> map(Map<String, List<DocumentEntryEntity>> documentEntryEntity) {
-        final List<DocumentsType> ret = new ArrayList<>();
-
-        documentEntryEntity.forEach((key, val) -> {
-            final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
-            final DocumentsType d = new DocumentsType();
-            val.forEach(doc -> {
-                final DocumentsSubType documentsSubType = new DocumentsSubType();
-                documentsSubType.setId(doc.getId());
-                documentsSubType.setCreated_by(doc.getCreatedBy());
-                documentsSubType.setStatus(doc.getStatus());
-                documentsSubType.setType(doc.getType());
-                documentsSubType.setSubType(doc.getSubType());
-                DocumentService.setKycDocumentMapper(documentsSubTypeList, doc, documentsSubType);
-            });
-
-            setDocumentTypeStatus(val, d);
-            d.setType(key);
-            d.setDocumentsSubType(documentsSubTypeList);
-            ret.add(d);
-        });
-        return ret;
-    }
+//    public static List<DocumentsType> map(Map<String, List<DocumentEntryEntity>> documentEntryEntity) {
+//        final List<DocumentsType> ret = new ArrayList<>();
+//
+//        documentEntryEntity.forEach((key, val) -> {
+//            final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
+//            final DocumentsType d = new DocumentsType();
+//            val.forEach(doc -> {
+//                final DocumentsSubType documentsSubType = new DocumentsSubType();
+//                documentsSubType.setId(doc.getId());
+//                documentsSubType.setCreated_by(doc.getCreatedBy());
+//                documentsSubType.setStatus(doc.getStatus());
+//                documentsSubType.setType(doc.getType());
+//                documentsSubType.setSubType(doc.getSubType());
+//                DocumentService.setKycDocumentMapper(documentsSubTypeList, doc, documentsSubType);
+//            });
+//
+//            setDocumentTypeStatus(val, d);
+//            d.setType(key);
+//            d.setDocumentsSubType(documentsSubTypeList);
+//            ret.add(d);
+//        });
+//        return ret;
+//    }
 
     public static void setDocumentTypeStatus(List<DocumentEntryEntity> val, DocumentsType d) {
         if (val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
             d.setStatus(CustomerDocument.Status.APPROVED.name());
         } else if (val.stream().noneMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
                 && val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
-            d.setStatus(CustomerDocument.Status.REJECTED.name());
+//            new requirements on the pending and rejected documents status on timestamp
+            val.stream().filter(documentEntryEntity -> documentEntryEntity.getStatus().equals(CustomerDocument.Status.REJECTED.name())).findFirst().ifPresent(documentEntryEntity -> {
+                boolean isAnyPendingDocumentPresentAfterRejected = val.stream().anyMatch(documentEntryEntity1 -> documentEntryEntity1.getCreatedOn().isAfter(documentEntryEntity.getCreatedOn()) && documentEntryEntity1.getStatus().equals(CustomerDocument.Status.PENDING.name()));
+                if (isAnyPendingDocumentPresentAfterRejected) {
+                    d.setStatus(CustomerDocument.Status.PENDING.name());
+                } else {
+                    d.setStatus(CustomerDocument.Status.REJECTED.name());
+                }
+            });
+
         } else {
             d.setStatus(CustomerDocument.Status.PENDING.name());
         }
@@ -84,6 +91,7 @@ public class DocumentMapper {
         documentsMaster.setUserType(documentTypeEntity.getUserType());
         documentsMaster.setDocumentsMasterSubtypes(documentsMasterSubtypes);
         documentsMaster.setId(documentTypeEntity.getId());
+        documentsMaster.setActive(documentTypeEntity.isActive());
         return documentsMaster;
     }
 
@@ -94,6 +102,7 @@ public class DocumentMapper {
             documentsMasterSubtype.setTitle(documentSubTypeEntity.getTitle());
             documentsMasterSubtype.setUuid(documentSubTypeEntity.getUuid());
             documentsMasterSubtype.setId(documentSubTypeEntity.getId());
+            documentsMasterSubtype.setActive(documentSubTypeEntity.isActive());
             documentsMasterSubtype.setDocTypeId(documentSubTypeEntity.getDocumentType().getId());
             documentsMasterSubtypes.add(documentsMasterSubtype);
         });
@@ -117,6 +126,7 @@ public class DocumentMapper {
         ret.setType(customerDocumentEntry.getType());
         ret.setSubType(customerDocumentEntry.getSubType());
         ret.setCreatedBy(documentEntity.getCreatedBy());
+        ret.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setDocument(documentEntity);
         return ret;
     }
@@ -137,6 +147,7 @@ public class DocumentMapper {
         documentsMaster.setUuid(documentTypeEntity.getUuid());
         documentsMaster.setUserType(documentTypeEntity.getUserType());
         documentsMaster.setTitle(documentTypeEntity.getTitle());
+        documentsMaster.setActive(documentTypeEntity.isActive());
         return documentsMaster;
     }
 
@@ -173,6 +184,7 @@ public class DocumentMapper {
         ret.setSubType(customerDocumentsBody.getSubType());
         ret.setCreatedBy(documentEntity.getCreatedBy());
         ret.setDocument(documentEntity);
+        ret.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
         return ret;
     }
 
@@ -213,6 +225,7 @@ public class DocumentMapper {
             documents.setCreatedBy(UserContextHolder.checkedGetUser());
             documents.setStatus(CustomerDocument.Status.PENDING.name());
             documents.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+            documents.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
             documents.setDocument(documentEntity);
             documentEntryEntityList.add(documents);
         });
@@ -221,9 +234,28 @@ public class DocumentMapper {
 
     public static DocumentTypeEntity map(DocumentsType documentsType) {
         DocumentTypeEntity documentTypeEntity = new DocumentTypeEntity();
-        documentTypeEntity.setTitle(documentsType.getType());
+        documentTypeEntity.setTitle(documentsType.getTitle());
         documentTypeEntity.setUserType(documentsType.getUserType());
+        documentTypeEntity.setActive(documentsType.isActive());
         return documentTypeEntity;
+    }
+
+    public static DocumentSubTypeEntity map(DocumentsMasterSubtype documentsMasterSubtype, DocumentTypeEntity documentTypeEntity) {
+        DocumentSubTypeEntity documentSubTypeEntity = new DocumentSubTypeEntity();
+        documentSubTypeEntity.setTitle(documentsMasterSubtype.getTitle());
+        documentSubTypeEntity.setDocumentType(documentTypeEntity);
+        documentSubTypeEntity.setActive(documentsMasterSubtype.isActive());
+        return documentSubTypeEntity;
+    }
+
+    public static DocumentsMasterSubtype map(DocumentSubTypeEntity documentSubTypeEntity) {
+        DocumentsMasterSubtype documentsSubType = new DocumentsMasterSubtype();
+        documentsSubType.setTitle(documentSubTypeEntity.getTitle());
+        documentsSubType.setUuid(documentSubTypeEntity.getUuid());
+        documentsSubType.setDocTypeId(documentSubTypeEntity.getDocumentType().getId());
+        documentsSubType.setActive(documentSubTypeEntity.isActive());
+        documentsSubType.setId(documentSubTypeEntity.getId());
+        return documentsSubType;
     }
 
 }

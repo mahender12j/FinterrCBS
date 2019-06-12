@@ -21,6 +21,7 @@ package org.apache.fineract.cn.customer.internal.repository;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
 import javax.persistence.*;
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 /**
@@ -56,6 +57,10 @@ public class DocumentEntryEntity {
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime createdOn;
 
+    @Column(name = "updated_on")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime updatedOn;
+
     @Column(name = "status")
     private String status;
 
@@ -84,6 +89,8 @@ public class DocumentEntryEntity {
 
 
     public DocumentEntryEntity() {
+        this.createdOn = LocalDateTime.now(Clock.systemUTC());
+        this.updatedOn = LocalDateTime.now(Clock.systemUTC());
     }
 
     public Long getId() {
@@ -128,6 +135,14 @@ public class DocumentEntryEntity {
 
     public String getType() {
         return type;
+    }
+
+    public LocalDateTime getUpdatedOn() {
+        return updatedOn;
+    }
+
+    public void setUpdatedOn(LocalDateTime updatedOn) {
+        this.updatedOn = updatedOn;
     }
 
     public void setType(String type) {

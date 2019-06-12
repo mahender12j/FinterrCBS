@@ -18,24 +18,34 @@
  */
 package org.apache.fineract.cn.cause.internal.command;
 
+import org.apache.fineract.cn.cause.api.v1.domain.CauseReject;
+
 public class RejectCauseCommand {
 
 
     private final String identifier;
-    private final String reason;
+    private final CauseReject causeReject;
 
     public RejectCauseCommand(final String identifier,
-                              final String reason) {
+                              final CauseReject causeReject) {
         super();
         this.identifier = identifier;
-        this.reason = reason;
+        this.causeReject = causeReject;
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public String getReason() {
-        return reason;
+    public CauseReject getCauseReject() {
+        return causeReject;
+    }
+
+    @Override
+    public String toString() {
+        return "RejectCauseCommand{" +
+                "identifier='" + identifier + '\'' +
+                ", causeReject=" + causeReject +
+                '}';
     }
 }
