@@ -41,7 +41,13 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     Optional<CauseEntity> findByIdentifier(final String identifier);
 
+    Page<CauseEntity> findByCurrentStateNotAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime, final Pageable pageable);
+
+    List<CauseEntity> findByCurrentStateNotAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime);
+
     Page<CauseEntity> findByCurrentStateAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime, final Pageable pageable);
+
+    List<CauseEntity> findByCurrentStateAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime);
 
     List<CauseEntity> findByCreatedByAndCurrentStateNot(final String createdBy, final String state);
 
@@ -52,6 +58,8 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
     Page<CauseEntity> findByCreatedByAndCurrentState(final String createdBy, final String state, final Pageable pageable);
 
     Page<CauseEntity> findByCategoryAndCurrentStateAndStartDateLessThanEqual(CategoryEntity entity, final String state, final LocalDateTime localDateTime, Pageable pageable);
+
+    List<CauseEntity> findByCategoryAndCurrentStateAndStartDateLessThanEqual(CategoryEntity entity, final String state, final LocalDateTime localDateTime);
 
     Page<CauseEntity> findAll(Pageable pageable);
 
