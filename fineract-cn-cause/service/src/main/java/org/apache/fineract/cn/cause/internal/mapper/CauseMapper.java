@@ -164,6 +164,20 @@ public final class CauseMapper {
         stateEntity.setNewDate(extended_date);
         stateEntity.setType(type);
         stateEntity.setStatus(Cause.State.PENDING.name());
+        stateEntity.setComment("NO COMMENT");
+        return stateEntity;
+    }
+
+
+    public static CauseStateEntity mapComment(CauseEntity causeEntity, String comment, String type) {
+        CauseStateEntity stateEntity = new CauseStateEntity();
+        stateEntity.setCause(causeEntity);
+        stateEntity.setCreatedBy(UserContextHolder.checkedGetUser());
+        stateEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        stateEntity.setModifiedAt(LocalDateTime.now(Clock.systemUTC()));
+        stateEntity.setType(type);
+        stateEntity.setStatus(Cause.State.PENDING.name());
+        stateEntity.setComment(comment);
         return stateEntity;
     }
 

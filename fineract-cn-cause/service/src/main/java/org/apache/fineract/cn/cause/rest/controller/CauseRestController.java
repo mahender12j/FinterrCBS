@@ -237,6 +237,29 @@ public class CauseRestController {
     }
 
 
+    // unpublished the cause
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/unpublish",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> unpublishedCause(@PathVariable("identifier") final String identifier,
+                                          @RequestBody String comment) {
+        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
+        throwIfCauseIsNotActive(causeEntity);
+        throwIfMin2DaysLeft(causeEntity);
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(UNPUBLISH.name())));
+
+        this.commandGateway.process(new UnpublishCauseCommand(identifier, comment));
+        return ResponseEntity.accepted().build();
+    }
+
+
     @Permittable(value = AcceptedTokenType.TENANT,
             groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(value = "/causes/expired", method = RequestMethod.PUT,

@@ -43,6 +43,7 @@ public interface CauseEventConstants {
     String INACTIVE_CAUSE = "inactive-cause";
     String REJECT_CAUSE = "reject-cause";
     String EXTEND_CAUSE = "extend-cause";
+    String UNPUBLISHED_CAUSE = "unpublished-cause";
     String RESUBMIT_CAUSE = "resubmit-cause";
     String APPROVE_CAUSE = "approve-cause";
     String APPROVE_EXTENDED_CAUSE = "approve-extended-cause";

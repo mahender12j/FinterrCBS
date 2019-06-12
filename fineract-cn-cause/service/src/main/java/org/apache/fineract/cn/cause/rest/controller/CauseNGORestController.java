@@ -22,6 +22,7 @@ import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.cause.ServiceConstants;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseState;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdate;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdateInfo;
 import org.apache.fineract.cn.cause.api.v1.domain.NGOStatistics;
@@ -44,7 +45,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
+
+import static org.apache.fineract.cn.cause.api.v1.domain.Cause.State.EXTENDED;
+import static org.apache.fineract.cn.cause.api.v1.domain.Cause.State.UNPUBLISH;
 
 @RestController
 @RequestMapping("/causes/ngo/{identifier}")
@@ -203,7 +211,6 @@ public class CauseNGORestController {
 
         return ResponseEntity.accepted().build();
     }
-
 
 //    utils function
 

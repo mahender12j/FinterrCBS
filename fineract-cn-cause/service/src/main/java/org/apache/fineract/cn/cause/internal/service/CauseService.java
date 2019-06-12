@@ -53,6 +53,7 @@ public class CauseService {
     private final TaskInstanceRepository taskInstanceRepository;
     private final AccountingAdaptor accountingAdaptor;
     private final CauseStateRepository causeStateRepository;
+    private final CauseUpdateRepository causeUpdateRepository;
 
     @Autowired
     public CauseService(final CauseRepository causeRepository,
@@ -66,7 +67,8 @@ public class CauseService {
                         final AccountingAdaptor accountingAdaptor,
                         final TaskDefinitionRepository taskDefinitionRepository,
                         final TaskInstanceRepository taskInstanceRepository,
-                        final CauseStateRepository causeStateRepository) {
+                        final CauseStateRepository causeStateRepository,
+                        final CauseUpdateRepository causeUpdateRepository) {
         super();
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
@@ -80,6 +82,7 @@ public class CauseService {
         this.accountingAdaptor = accountingAdaptor;
         this.documentRepository = documentRepository;
         this.causeStateRepository = causeStateRepository;
+        this.causeUpdateRepository = causeUpdateRepository;
     }
 
     public Boolean causeExists(final String identifier) {
@@ -93,7 +96,15 @@ public class CauseService {
 
     public Optional<Cause> findCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
+            List<CauseUpdateEntity> entities = this.causeUpdateRepository.findByCauseEntity(causeEntity);
             final Cause cause = CauseMapper.map(causeEntity);
+//            final int numberOfUpdateRequired = (causeEntity.getCauseImplementationDuration() * 4) / causeEntity.getFrequencyCauseImplementationUpdates();
+//            cause.setTotalNumberOfUpdates(numberOfUpdateRequired);
+            cause.setNumberOfUpdateProvided(entities.size());
+
+//            LocalDateTime dateTime = causeEntity.getEndDate().plusWeeks()
+//            cause.setNumberOfDaysLeftForNextUpdate(numberOfUpdateRequired - entities.size());
+//            cause.setCa
             setCauseDocuments(causeEntity, cause);
             AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
             cause.setAddress(AddressMapper.map(addressEntity));

@@ -263,6 +263,17 @@ public class CauseAggregate {
 
     @Transactional
     @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.UNPUBLISHED_CAUSE)
+    public String ExtendCause(final UnpublishCauseCommand unpublishCauseCommand) {
+        final CauseEntity causeEntity = findCauseEntityOrThrow(unpublishCauseCommand.getIdentifier());
+        CauseStateEntity stateEntity = CauseMapper.mapComment(causeEntity, unpublishCauseCommand.getComment(), Cause.State.UNPUBLISH.name());
+        this.causeStateRepository.save(stateEntity);
+        return unpublishCauseCommand.toString();
+    }
+
+
+    @Transactional
+    @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.APPROVE_CAUSE)
     public String ApproveCause(final ApproveCauseCommand approveCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(approveCauseCommand.getIdentifier());
