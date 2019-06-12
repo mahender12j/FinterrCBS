@@ -18,10 +18,10 @@ services:
 #  eureka:
 #    build: 
 #      context: ./eureka-server
-#      dockerfile: Dockerfile
-#    container_name: eureka
-#    ports:
-#      - "8761:8761"
+#     dockerfile: Dockerfile
+    container_name: eureka
+    ports:
+      - "8761:8761"
 
   provisioner-ms:
     build:
