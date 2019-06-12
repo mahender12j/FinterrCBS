@@ -160,11 +160,10 @@ public class CauseService {
             final List<CauseEntity> causeEntities;
             switch (sortBy) {
                 case 1:
-                    causeEntities = this.causeRepository.findByCurrentStateNotAndStartDateLessThanEqual(Cause.State.DELETED.name(), LocalDateTime.now(Clock.systemUTC()))
+                    causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()))
                             .stream()
                             .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.nullsLast(Comparator.reverseOrder())))
                             .collect(Collectors.toList());
-
                     final Page<CauseEntity> page = new PageImpl<>(causeEntities, pageable, causeEntities.size());
                     causePage.setTotalPages(page.getTotalPages());
                     causePage.setTotalElements(page.getTotalElements());
@@ -172,20 +171,18 @@ public class CauseService {
                     break;
                 case 2:
 
-                    causeEntities = this.causeRepository.findByCurrentStateNotAndStartDateLessThanEqual(Cause.State.DELETED.name(), LocalDateTime.now(Clock.systemUTC()));
+                    causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> topFundedcauses = causeArrayList(causeEntities)
                             .stream()
                             .sorted(Comparator.nullsLast((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised())))
                             .collect(Collectors.toList());
-
                     final Page<Cause> topFundedcausesPage = new PageImpl<>(topFundedcauses, pageable, causeEntities.size());
                     causePage.setTotalPages(topFundedcausesPage.getTotalPages());
                     causePage.setTotalElements(topFundedcausesPage.getTotalElements());
                     causePage.setCauses(topFundedcauses);
-
                     break;
                 case 3:
-                    causeEntities = this.causeRepository.findByCurrentStateNotAndStartDateLessThanEqual(Cause.State.DELETED.name(), LocalDateTime.now(Clock.systemUTC()));
+                    causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> popularCauses = causeArrayList(causeEntities)
                             .stream()
                             .sorted(Comparator.nullsLast((e1, e2) -> e2.getCauseStatistics().getTotalSupporter() - (e1.getCauseStatistics().getTotalSupporter())))
@@ -195,10 +192,9 @@ public class CauseService {
                     causePage.setTotalPages(popularCausesPage.getTotalPages());
                     causePage.setTotalElements(popularCausesPage.getTotalElements());
                     causePage.setCauses(popularCauses);
-
                     break;
                 default:
-                    final Page<CauseEntity> allPage = this.causeRepository.findByCurrentStateNotAndStartDateLessThanEqual(Cause.State.DELETED.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
+                    final Page<CauseEntity> allPage = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
                     causePage.setTotalPages(allPage.getTotalPages());
                     causePage.setTotalElements(allPage.getTotalElements());
                     causePage.setCauses(causeArrayList(allPage.getContent()));
