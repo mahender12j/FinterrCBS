@@ -225,6 +225,7 @@ public class CustomerService {
                 final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
                 customerEntities.forEach(entity -> {
                     Customer tCustomer = CustomerMapper.map(entity);
+                    this.setCustomerContactDetails(entity, tCustomer);
                     if (entity.getAccountNumbers() != null) {
                         Account acc = accountingAdaptor.findAccountByIdentifier(entity.getRefAccountNumber());
                         tCustomer.setRefferalBalance(acc.getBalance());
