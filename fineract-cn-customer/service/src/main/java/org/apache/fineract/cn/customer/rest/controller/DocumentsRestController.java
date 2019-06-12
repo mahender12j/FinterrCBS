@@ -222,7 +222,9 @@ public class DocumentsRestController {
             @PathVariable("customeridentifier") final String customerIdentifier,
             @RequestBody final @Valid DocumentsMasterSubtype instance) {
         throwIfCustomerNotExists(customerIdentifier);
-        throwIfMasterTypeNotExists(uuid);
+        throwIfMasterTypeNotExists(instance.getDocTypeUUID());
+        throwIfMasterSubTypeNotExists(uuid);
+
 
         commandGateway.process(new UpdateDocumentSubTypeCommand(uuid, instance));
         return ResponseEntity.accepted().build();
@@ -395,6 +397,12 @@ public class DocumentsRestController {
         }
     }
 
+
+    private void throwIfMasterSubTypeNotExists(String uuid) {
+        if (!this.customerService.masterSubTypeExists(uuid)) {
+            throw ServiceException.notFound("Document sub-type''{0}'' not found.", uuid);
+        }
+    }
 
     private void throwIfCustomerDocumentNotExists(final String customerIdentifier, final Long documentIdentifier) {
         if (!this.documentService.documentExists(customerIdentifier, documentIdentifier)) {

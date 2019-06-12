@@ -52,6 +52,7 @@ public class CustomerService {
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
     private final DocumentTypeRepository documentTypeRepository;
+    private final DocumentSubTypeRepository documentSubTypeRepository;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -63,7 +64,8 @@ public class CustomerService {
                            final CommandRepository commandRepository,
                            final TaskDefinitionRepository taskDefinitionRepository,
                            final TaskInstanceRepository taskInstanceRepository,
-                           final DocumentTypeRepository documentTypeRepository) {
+                           final DocumentTypeRepository documentTypeRepository,
+                           final DocumentSubTypeRepository documentSubTypeRepository) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -75,6 +77,7 @@ public class CustomerService {
         this.taskDefinitionRepository = taskDefinitionRepository;
         this.taskInstanceRepository = taskInstanceRepository;
         this.documentTypeRepository = documentTypeRepository;
+        this.documentSubTypeRepository = documentSubTypeRepository;
     }
 
     public Boolean customerExists(final String identifier) {
@@ -84,6 +87,11 @@ public class CustomerService {
     public Boolean masterTypeExists(final String uuid) {
         return this.documentTypeRepository.existsByIdentifier(uuid);
     }
+
+    public Boolean masterSubTypeExists(final String uuid) {
+        return this.documentSubTypeRepository.existsByIdentifier(uuid);
+    }
+
 
     public Boolean identificationCardExists(final String number) {
         return this.identificationCardRepository.existsByNumber(number);
