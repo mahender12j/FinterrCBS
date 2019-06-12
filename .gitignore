@@ -18,6 +18,3 @@ gradle-app.setting
 .env
 
 **/out/*
-
-docker-compose.yaml 
-docker-bash.sh
