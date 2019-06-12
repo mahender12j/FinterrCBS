@@ -1,27 +1,27 @@
 version: "3"
 services:
- activemq:
-   image: rmohr/activemq:5.14.5
-   container_name: activemq
-   restart: always
-   ports:
-     - "61616:61616"
-     - "8161:8161"
-   environment:
-     ACTIVEMQ_CONFIG_MINMEMORY: 512
-     ACTIVEMQ_CONFIG_MAXMEMORY: 1024
-   healthcheck:
-     test: curl -u admin:admin -s http://${ACTIVEMQ_BROKER_URL}:8161/admin
-     interval: 5s
-     retries: 20
-
- eureka:
-   build: 
-     context: ./eureka-server
-     dockerfile: Dockerfile
-   container_name: eureka
-   ports:
-     - "8761:8761"
+#  activemq:
+#    image: rmohr/activemq:5.14.5
+#    container_name: activemq
+#    restart: always
+#    ports:
+#      - "61616:61616"
+#      - "8161:8161"
+#    environment:
+#      ACTIVEMQ_CONFIG_MINMEMORY: 512
+#      ACTIVEMQ_CONFIG_MAXMEMORY: 1024
+#    healthcheck:
+#      test: curl -u admin:admin -s http://${ACTIVEMQ_BROKER_URL}:8161/admin
+#      interval: 5s
+#      retries: 20
+#
+#  eureka:
+#    build: 
+#      context: ./eureka-server
+#     dockerfile: Dockerfile
+    container_name: eureka
+    ports:
+      - "8761:8761"
 
   provisioner-ms:
     build:

@@ -28,6 +28,7 @@ ENV server.max-http-header-size=26384 \
     ribbon.listOfServers=${RIBBON_LIST_OF_SERVERS} \
     eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE} \
     spring.cloud.discovery.enabled=true \
+    eureka.instance.prefer-ip-address=true \
     eureka.instance.hostname=${EUREKA_INSTANCE_HOSTNAME} \
     eureka.client.fetchRegistry=true \
     eureka.registration.enabled=false \
