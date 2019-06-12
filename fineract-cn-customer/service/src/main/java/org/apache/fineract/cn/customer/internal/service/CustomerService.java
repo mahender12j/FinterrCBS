@@ -100,71 +100,68 @@ public class CustomerService {
     }
 
     public Optional<Customer> findCustomer(final String identifier) {
-        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifier(identifier);
-        if (customerEntity.isPresent()) {
-            return customerEntity.map(entity -> {
-                final Customer customer = CustomerMapper.map(entity);
-                customer.setAddress(AddressMapper.map(entity.getAddress()));
-                if (entity.getReferenceCustomer() != null) {
-                    Optional<CustomerEntity> reffCustomer = this.customerRepository.findByRefferalCodeIdentifier(entity.getReferenceCustomer());
-                    reffCustomer.ifPresent(reff -> customer.setRefferalUserIdentifier(reff.getIdentifier()));
-                }
-                SocialMatrix socialMatrix = new SocialMatrix();
-                String accountNumber = customerEntity.get().getAccountNumbers();
+        CustomerEntity customerEntity = customerRepository.findByIdentifier(identifier).orElseThrow(() -> ServiceException.notFound("Customer with identifier {0} not found in this system", identifier));
 
-                if (accountNumber != null) {
-                    List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(accountNumber);
-                    final LocalDateTime localDateTime = LocalDateTime.now();
-                    double totalBCDP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
-                            .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
-                                    Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
-                            .mapToDouble(AccountEntry::getAmount).sum();
+        Customer customer = CustomerMapper.map(customerEntity);
+        customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
 
+        if (customerEntity.getReferenceCustomer() != null) {
+            Optional<CustomerEntity> reffCustomer = this.customerRepository.findByRefferalCodeIdentifier(customerEntity.getReferenceCustomer());
+            reffCustomer.ifPresent(reff -> customer.setRefferalUserIdentifier(reff.getIdentifier()));
+        }
 
-                    double totalCHRP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
-                            .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
-                                    Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
-                            .mapToDouble(AccountEntry::getAmount).sum();
-
-                    socialMatrix.setMyPower((totalBCDP / 20 > 5) ? 5 : (totalBCDP / 20));
-                    socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
-
-
-                    socialMatrix.setTotalTrees((int) Math.floor(totalCHRP / 200));
-                    socialMatrix.setGoldenDonor((totalCHRP / 10) > 5 ? 5 : totalCHRP / 10);
-                    socialMatrix.setGreenContribution((totalCHRP / 40) > 5 ? 5 : totalCHRP / 40);
-
-
-                } else {
-                    socialMatrix.setMyPower(0.0);
-                    socialMatrix.setMyPowerPercentage(0.0);
-                    socialMatrix.setTotalTrees(0);
-                    socialMatrix.setGoldenDonor(0.0);
-                    socialMatrix.setGreenContribution(0.0);
-                }
-
-
-                socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
-                socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifierActive(customer.getRefferalCodeIdentifier()));
-                customer.setSocialMatrix(socialMatrix);
-
-//                System.out.println("----------------------social matrix---------------------" + socialMatrix.toString());
-
-                if (customer.getRefAccountNumber() != null) {
-                    Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
-                    customer.setRefferalBalance(account.getBalance());
-                }
-                final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(entity);
-                if (contactDetailEntities != null) {
-                    customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
-                }
+//        SocialMatrix socialMatrix = new SocialMatrix();
+//        String accountNumber = customerEntity.getAccountNumbers();
+//
+//        if (accountNumber != null) {
+//            List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(accountNumber);
+//            final LocalDateTime localDateTime = LocalDateTime.now();
+//            double totalBCDP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
+//                    .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
+//                            Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
+//                    .mapToDouble(AccountEntry::getAmount).sum();
+//
+//
+//            double totalCHRP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
+//                    .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
+//                            Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
+//                    .mapToDouble(AccountEntry::getAmount).sum();
+//
+//            socialMatrix.setMyPower((totalBCDP / 20 > 5) ? 5 : (totalBCDP / 20));
+//            socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
+//
+//
+//            socialMatrix.setTotalTrees((int) Math.floor(totalCHRP / 200));
+//            socialMatrix.setGoldenDonor((totalCHRP / 10) > 5 ? 5 : totalCHRP / 10);
+//            socialMatrix.setGreenContribution((totalCHRP / 40) > 5 ? 5 : totalCHRP / 40);
+//
+//
+//        } else {
+//            socialMatrix.setMyPower(0.0);
+//            socialMatrix.setMyPowerPercentage(0.0);
+//            socialMatrix.setTotalTrees(0);
+//            socialMatrix.setGoldenDonor(0.0);
+//            socialMatrix.setGreenContribution(0.0);
+//        }
+//
+//        socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
+//        socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifierActive(customer.getRefferalCodeIdentifier()));
+        customer.setSocialMatrix(getSocialMatrix(customerEntity));
+        if (customer.getRefAccountNumber() != null) {
+            Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
+            customer.setRefferalBalance(account.getBalance());
+        }
 
 
-                return customer;
-            });
+        setCustomerContactDetails(customerEntity, customer);
+        return Optional.of(customer);
 
-        } else {
-            throw ServiceException.notFound("Customer with identifier {0} not found in this system", identifier);
+    }
+
+    private void setCustomerContactDetails(CustomerEntity customerEntity, Customer customer) {
+        final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(customerEntity);
+        if (contactDetailEntities != null) {
+            customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
         }
     }
 
@@ -199,35 +196,31 @@ public class CustomerService {
         return customerPage;
     }
 
-    public CustomerRefPage fetchCustomerReferrals(final String refferalcode, final String term, final Boolean includeClosed, final Pageable pageable) {
+    public CustomerRefPage fetchCustomerReferrals(final String refferalcode, final String searchKey, final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
-        Optional<CustomerEntity> customerEntity = customerRepository.findByRefferalCodeIdentifier(refferalcode);
-        Customer customer = CustomerMapper.map(customerEntity.get());
-        if (includeClosed) {
-            if (term != null) {
-                customerEntities =
-                        this.customerRepository.findByReferenceCustomerAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, term, term, term, pageable);
-            } else {
-                customerEntities = this.customerRepository.findAllByReferenceCustomerAndIsDeposited(refferalcode, true, pageable);
-            }
+        CustomerEntity customerEntity = customerRepository.findByRefferalCodeIdentifier(refferalcode).orElseThrow(() -> ServiceException.notFound("Customer with refferal code {0} not found", refferalcode));
+
+        if (searchKey != null) {
+            customerEntities = this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, Customer.State.CLOSED.name(), searchKey, searchKey, searchKey, pageable);
         } else {
-            if (term != null) {
-                customerEntities =
-                        this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
-                                refferalcode, Customer.State.CLOSED.name(), term, term, term, pageable);
-            } else {
-                customerEntities = this.customerRepository.findByReferenceCustomerAndIsDepositedAndCurrentStateNot(refferalcode, true, Customer.State.CLOSED.name(), pageable);
-            }
+            customerEntities = this.customerRepository.findByReferenceCustomerAndIsDepositedAndCurrentStateNot(refferalcode, true, Customer.State.CLOSED.name(), pageable);
         }
+
 
         final CustomerRefPage customerRefPage = new CustomerRefPage();
         customerRefPage.setTotalPages(customerEntities.getTotalPages());
         customerRefPage.setTotalElements(customerEntities.getTotalElements());
-        customerRefPage.setRefAccountNumber(customer.getRefAccountNumber());
+        customerRefPage.setRefAccountNumber(customerEntity.getRefAccountNumber());
+        customerRefPage.setSocialMatrix(getSocialMatrix(customerEntity));
 
-        if (customer.getRefAccountNumber() != null) {
-            Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
+        this.contactDetailRepository.findByCustomer(customerEntity).stream().filter(contactDetailEntity -> contactDetailEntity.getType().equals("EMAIL")).findFirst().ifPresent(contactDetailEntity -> {
+            customerRefPage.setCustomerEmail(contactDetailEntity.getValue());
+        });
+
+        if (customerEntity.getRefAccountNumber() != null) {
+            Account account = accountingAdaptor.findAccountByIdentifier(customerEntity.getRefAccountNumber());
             customerRefPage.setRefferalBalance(account.getBalance());
+
             if (customerEntities.getSize() > 0) {
                 final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
                 customerEntities.forEach(entity -> {
@@ -235,6 +228,7 @@ public class CustomerService {
                     if (entity.getAccountNumbers() != null) {
                         Account acc = accountingAdaptor.findAccountByIdentifier(entity.getRefAccountNumber());
                         tCustomer.setRefferalBalance(acc.getBalance());
+                        tCustomer.setSocialMatrix(getSocialMatrix(entity));
                     }
                     customers.add(tCustomer);
                 });
@@ -244,6 +238,50 @@ public class CustomerService {
         return customerRefPage;
     }
 
+
+    private SocialMatrix getSocialMatrix(CustomerEntity entity) {
+        SocialMatrix socialMatrix = new SocialMatrix();
+        String accountNumber = entity.getAccountNumbers();
+
+        if (accountNumber != null) {
+            List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(accountNumber);
+            final LocalDateTime localDateTime = LocalDateTime.now();
+            double totalBCDP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
+                    .filter(d -> {
+                        System.out.println("Transaction Date()" + d.getTransactionDate());
+                        return Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
+                                Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue();
+                    })
+                    .mapToDouble(AccountEntry::getAmount).sum();
+
+            double totalCHRP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
+                    .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
+                            Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
+                    .mapToDouble(AccountEntry::getAmount).sum();
+
+            socialMatrix.setMyPower((totalBCDP / 20 > 5) ? 5 : (totalBCDP / 20));
+            socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
+
+
+            socialMatrix.setTotalTrees((int) Math.floor(totalCHRP / 200));
+            socialMatrix.setGoldenDonor((totalCHRP / 10) > 5 ? 5 : totalCHRP / 10);
+            socialMatrix.setGreenContribution((totalCHRP / 40) > 5 ? 5 : totalCHRP / 40);
+
+
+        } else {
+            socialMatrix.setMyPower(0.0);
+            socialMatrix.setMyPowerPercentage(0.0);
+            socialMatrix.setTotalTrees(0);
+            socialMatrix.setGoldenDonor(0.0);
+            socialMatrix.setGreenContribution(0.0);
+        }
+
+
+        socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
+        socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifierActive(entity.getRefferalCodeIdentifier()));
+        return socialMatrix;
+    }
+
     public Optional<Customer> fetchCustomerByReferralcode(final String refferalCode) {
 
         return customerRepository.findByRefferalCodeIdentifier(refferalCode)
@@ -251,15 +289,7 @@ public class CustomerService {
                     final Customer customer = CustomerMapper.map(customerEntity);
                     customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
 
-                    final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(customerEntity);
-                    if (contactDetailEntities != null) {
-                        customer.setContactDetails(
-                                contactDetailEntities
-                                        .stream()
-                                        .map(ContactDetailMapper::map)
-                                        .collect(Collectors.toList())
-                        );
-                    }
+                    setCustomerContactDetails(customerEntity, customer);
 
                     return customer;
                 });

@@ -22,54 +22,75 @@ import java.util.List;
 
 public class CustomerRefPage {
 
-  private List<Customer> customers;
-  private Integer totalPages;
-  private Long totalElements;
-  private String refAccountNumber ;
-  private Double refferalBalance;
+    private List<Customer> customers;
+    private Integer totalPages;
+    private Long totalElements;
+    private String refAccountNumber;
+    private Double refferalBalance;
+    private String customerEmail;
+    private SocialMatrix socialMatrix;
 
-  public CustomerRefPage() {
-    super();
-  }
+    public CustomerRefPage() {
+        super();
+    }
 
-  public List<Customer> getCustomers() {
-    return this.customers;
-  }
+    public List<Customer> getCustomers() {
+        return this.customers;
+    }
 
-  public void setCustomers(final List<Customer> customers) {
-    this.customers = customers;
-  }
+    public void setCustomers(final List<Customer> customers) {
+        this.customers = customers;
+    }
 
-  public Integer getTotalPages() {
-    return this.totalPages;
-  }
+    public Integer getTotalPages() {
+        return this.totalPages;
+    }
 
-  public void setTotalPages(final Integer totalPages) {
-    this.totalPages = totalPages;
-  }
+    public void setTotalPages(final Integer totalPages) {
+        this.totalPages = totalPages;
+    }
 
-  public Long getTotalElements() {
-    return this.totalElements;
-  }
+    public Long getTotalElements() {
+        return this.totalElements;
+    }
 
-  public void setTotalElements(final Long totalElements) {
-    this.totalElements = totalElements;
-  }
+    public void setTotalElements(final Long totalElements) {
+        this.totalElements = totalElements;
+    }
 
-  public String getReffAccountNumber() {
-    return this.refAccountNumber;
-  }
+    public String getReffAccountNumber() {
+        return this.refAccountNumber;
+    }
 
-  public void setRefAccountNumber(final String refAccountNumber) {
-    this.refAccountNumber = refAccountNumber;
-  }
+    public void setRefAccountNumber(final String refAccountNumber) {
+        this.refAccountNumber = refAccountNumber;
+    }
 
-  public Double getRefferalBalance() {
-    return this.refferalBalance;
-  }
+    public Double getRefferalBalance() {
+        return this.refferalBalance;
+    }
 
-  public void setRefferalBalance(final Double refferalBalance) {
-    this.refferalBalance = refferalBalance;
-  }
+    public void setRefferalBalance(final Double refferalBalance) {
+        this.refferalBalance = refferalBalance;
+    }
 
+    public String getRefAccountNumber() {
+        return refAccountNumber;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
+    public SocialMatrix getSocialMatrix() {
+        return socialMatrix;
+    }
+
+    public void setSocialMatrix(SocialMatrix socialMatrix) {
+        this.socialMatrix = socialMatrix;
+    }
 }

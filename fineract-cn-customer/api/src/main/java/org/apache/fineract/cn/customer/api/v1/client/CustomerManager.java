@@ -127,11 +127,11 @@ public interface CustomerManager {
     @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CustomerNotFoundException.class)
     CustomerPage fetchCustomerReferrals(@PathVariable("referralcode") final String referralcode,
                                         @RequestParam(value = "term", required = false) final String term,
-                                        @RequestParam(value = "includeClosed", required = false) final Boolean includeClosed,
                                         @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
                                         @RequestParam(value = "size", required = false) final Integer size,
                                         @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                         @RequestParam(value = "sortDirection", required = false) final String sortDirection);
+
 
     @RequestMapping(
             value = "/customers/{referralcode}/customer",
