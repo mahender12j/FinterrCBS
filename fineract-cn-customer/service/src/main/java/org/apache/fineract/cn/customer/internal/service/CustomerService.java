@@ -31,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -247,18 +248,22 @@ public class CustomerService {
         if (accountNumber != null) {
             List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(accountNumber);
             final LocalDateTime localDateTime = LocalDateTime.now();
-            double totalBCDP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
+            double totalBCDP = accountEntryList.stream()
+                    .filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
                     .filter(d -> {
-                        System.out.println("Transaction Date()" + d.getTransactionDate());
-                        return Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
-                                Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue();
-                    })
-                    .mapToDouble(AccountEntry::getAmount).sum();
+                        LocalDateTime transactionDate = LocalDateTime.parse(d.getTransactionDate().substring(0, d.getTransactionDate().length() - 1), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                        return transactionDate.getYear() == localDateTime.getYear() &&
+                                transactionDate.getMonth().getValue() == localDateTime.getMonth().getValue();
+                    }).mapToDouble(AccountEntry::getAmount).sum();
 
-            double totalCHRP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
-                    .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
-                            Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
-                    .mapToDouble(AccountEntry::getAmount).sum();
+            double totalCHRP = accountEntryList.stream()
+                    .filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
+                    .filter(d -> {
+                                LocalDateTime transactionDate = LocalDateTime.parse(d.getTransactionDate().substring(0, d.getTransactionDate().length() - 1), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                                return transactionDate.getYear() == localDateTime.getYear() &&
+                                        transactionDate.getMonth().getValue() == localDateTime.getMonth().getValue();
+                            }
+                    ).mapToDouble(AccountEntry::getAmount).sum();
 
             socialMatrix.setMyPower((totalBCDP / 20 > 5) ? 5 : (totalBCDP / 20));
             socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
