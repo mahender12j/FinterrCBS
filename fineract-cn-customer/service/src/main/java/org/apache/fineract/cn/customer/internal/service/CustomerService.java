@@ -61,7 +61,8 @@ public class CustomerService {
                            final AccountingAdaptor accountingAdaptor,
                            final CommandRepository commandRepository,
                            final TaskDefinitionRepository taskDefinitionRepository,
-                           final TaskInstanceRepository taskInstanceRepository, DocumentTypeRepository documentTypeRepository) {
+                           final TaskInstanceRepository taskInstanceRepository,
+                           final DocumentTypeRepository documentTypeRepository) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -104,6 +105,10 @@ public class CustomerService {
             return customerEntity.map(entity -> {
                 final Customer customer = CustomerMapper.map(entity);
                 customer.setAddress(AddressMapper.map(entity.getAddress()));
+                if (entity.getReferenceCustomer() != null) {
+                    Optional<CustomerEntity> reffCustomer = this.customerRepository.findByRefferalCodeIdentifier(entity.getReferenceCustomer());
+                    reffCustomer.ifPresent(reff -> customer.setRefferalUserIdentifier(reff.getIdentifier()));
+                }
                 SocialMatrix socialMatrix = new SocialMatrix();
                 String accountNumber = customerEntity.get().getAccountNumbers();
 
@@ -153,6 +158,8 @@ public class CustomerService {
                 if (contactDetailEntities != null) {
                     customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
                 }
+
+
                 return customer;
             });
 

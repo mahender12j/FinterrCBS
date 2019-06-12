@@ -51,8 +51,6 @@ public class CauseAggregate {
     private final DocumentRepository documentRepository;
     private final CauseStateRepository causeStateRepository;
     private final DocumentPageRepository documentPageRepository;
-    private final IdentificationCardRepository identificationCardRepository;
-    private final IdentificationCardScanRepository identificationCardScanRepository;
     private final PortraitRepository portraitRepository;
     private final CategoryRepository categoryRepository;
     private final RatingRepository ratingRepository;
@@ -63,8 +61,6 @@ public class CauseAggregate {
     public CauseAggregate(final AddressRepository addressRepository,
                           final CauseRepository causeRepository,
                           final DocumentRepository documentRepository,
-                          final IdentificationCardRepository identificationCardRepository,
-                          final IdentificationCardScanRepository identificationCardScanRepository,
                           final PortraitRepository portraitRepository,
                           final CauseStateRepository causeStateRepository,
                           final CategoryRepository categoryRepository,
@@ -75,8 +71,6 @@ public class CauseAggregate {
         super();
         this.addressRepository = addressRepository;
         this.causeRepository = causeRepository;
-        this.identificationCardRepository = identificationCardRepository;
-        this.identificationCardScanRepository = identificationCardScanRepository;
         this.portraitRepository = portraitRepository;
         this.categoryRepository = categoryRepository;
         this.ratingRepository = ratingRepository;
@@ -183,11 +177,14 @@ public class CauseAggregate {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.EXPIRE_CAUSE)
     public String expireCause(final ExpiredCauseCommand expiredCauseCommand) {
         List<CauseEntity> causes = causeRepository.findByEndDateAndCurrentState(Cause.State.ACTIVE.name(), Cause.State.EXTENDED.name());
-        causeRepository.save(causes.stream().map(causeEntity -> {
+
+        List<CauseEntity> mappedCauses = causes.stream().map(causeEntity -> {
             causeEntity.setCurrentState(Cause.State.CLOSED.name());
             causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
             return causeEntity;
-        }).collect(Collectors.toList()));
+        }).collect(Collectors.toList());
+
+        causeRepository.save(mappedCauses);
 
         return causes.toString();
     }
@@ -229,10 +226,10 @@ public class CauseAggregate {
     public String RejectCause(final RejectCauseCommand rejectCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(rejectCauseCommand.getIdentifier());
         causeEntity.setCurrentState(Cause.State.REJECTED.name());
-        causeEntity.setRejectedReason(rejectCauseCommand.getReason());
+        causeEntity.setRejectedReason(rejectCauseCommand.getCauseReject().getRejectedReason());
+        causeEntity.setFeeRevisionRequired(rejectCauseCommand.getCauseReject().isFeeRevisionRequired());
         causeEntity.setRejectedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
-
 
 //        set the pending status to zero
         Set<String> stateTypes = new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()));
@@ -370,8 +367,8 @@ public class CauseAggregate {
         return unlockCauseCommand.identifier();
     }
 
-    private void setStateAndTimestamp(CauseEntity causeEntity, Cause.State active) {
-        causeEntity.setCurrentState(active.name());
+    private void setStateAndTimestamp(CauseEntity causeEntity, Cause.State state) {
+        causeEntity.setCurrentState(state.name());
         causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
     }

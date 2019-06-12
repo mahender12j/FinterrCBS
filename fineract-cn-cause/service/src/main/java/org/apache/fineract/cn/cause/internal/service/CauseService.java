@@ -27,7 +27,9 @@ import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAd
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -84,6 +86,10 @@ public class CauseService {
         return this.causeRepository.existsByIdentifier(identifier);
     }
 
+
+    public Optional<CauseEntity> findCauseByIdentifier(final String identifier) {
+        return this.causeRepository.findByIdentifier(identifier);
+    }
 
     public Optional<Cause> findCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
@@ -165,6 +171,23 @@ public class CauseService {
         return causePage;
     }
 
+    public CausePage fetchAllCause(final String param, final Pageable pageable) {
+        final Page<CauseEntity> causeEntities;
+        CausePage causePage = new CausePage();
+        if (param == null) {
+            causeEntities = this.causeRepository.findAll(pageable);
+            causePage.setTotalPages(causeEntities.getTotalPages());
+            causePage.setTotalElements(causeEntities.getTotalElements());
+            causePage.setCauses(causeArrayList(causeEntities));
+        } else {
+            causeEntities = this.causeRepository.findByCurrentState(param, pageable);
+            causePage.setTotalPages(causeEntities.getTotalPages());
+            causePage.setTotalElements(causeEntities.getTotalElements());
+            causePage.setCauses(causeArrayList(causeEntities));
+        }
+        return causePage;
+    }
+
 
     private CausePage fetchCauseByCategory(final String categoryIdentifier, final Pageable pageable) {
         final CausePage causePage = new CausePage();
@@ -226,6 +249,27 @@ public class CauseService {
     private void setCauseExtendedAndResubmitValue(CauseEntity causeEntity, Cause cause) {
         cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name()))));
         cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()))));
+    }
+
+
+    public CaAdminCauseData findAllCauseData() {
+        CaAdminCauseData caAdminCauseData = new CaAdminCauseData();
+        List<CauseEntity> causeEntities = this.causeRepository.findAll();
+
+//        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
+//        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).minusDays(7);
+        caAdminCauseData.setNoOfCause((long) causeEntities.size());
+        caAdminCauseData.setActiveCause(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.ACTIVE.name())).count());
+        caAdminCauseData.setCausePending(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.ACTIVE.name())).count());
+        caAdminCauseData.setNoOfCauseThisWeek(causeEntities.stream().filter(causeEntity -> causeEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        caAdminCauseData.setCauseCompleted(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.CLOSED.name())).count());
+
+        caAdminCauseData.setCausePerMonth(CauseMapper.mapAll(causeEntities));
+        caAdminCauseData.setActiveCausePerMonth(CauseMapper.map(causeEntities, Cause.State.ACTIVE));
+        caAdminCauseData.setInactiveCausePerMonth(CauseMapper.map(causeEntities, Cause.State.INACTIVE));
+
+        return caAdminCauseData;
     }
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
@@ -334,5 +378,15 @@ public class CauseService {
 
         return processStep;
     }
+
+
+    public Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
+        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
+        final int sizeToUse = size != null ? size : 20;
+        final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
+        final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
+        return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);
+    }
+
 }
 

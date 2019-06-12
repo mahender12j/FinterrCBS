@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 /**
@@ -25,10 +27,14 @@ import java.util.List;
  */
 public class DocumentsMasterSubtype {
 
+    @JsonIgnore
     private Long id;
     private String title;
     private String uuid;
+    @JsonIgnore
     private Long docTypeId;
+    private String docTypeUUID;
+    private boolean isActive;
 
     public DocumentsMasterSubtype() {
     }
@@ -63,6 +69,22 @@ public class DocumentsMasterSubtype {
 
     public void setDocTypeId(Long docTypeId) {
         this.docTypeId = docTypeId;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public String getDocTypeUUID() {
+        return docTypeUUID;
+    }
+
+    public void setDocTypeUUID(String docTypeUUID) {
+        this.docTypeUUID = docTypeUUID;
     }
 
     @Override

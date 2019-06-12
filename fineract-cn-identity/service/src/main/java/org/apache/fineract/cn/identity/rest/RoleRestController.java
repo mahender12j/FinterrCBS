@@ -21,8 +21,10 @@ package org.apache.fineract.cn.identity.rest;
 import org.apache.fineract.cn.identity.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.identity.api.v1.domain.Role;
 import org.apache.fineract.cn.identity.api.v1.validation.CheckRoleChangeable;
+
 import java.util.List;
 import javax.validation.Valid;
+
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
@@ -49,94 +51,94 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("unused")
 @RestController
 @RequestMapping("/roles")
-public class RoleRestController
-{
-  private final RoleService service;
-  private final CommandGateway commandGateway;
+public class RoleRestController {
+    private final RoleService service;
+    private final CommandGateway commandGateway;
 
-  @Autowired public RoleRestController(
-      final CommandGateway commandGateway,
-      final RoleService service)
-  {
-    this.commandGateway = commandGateway;
-    this.service = service;
-  }
+    @Autowired
+    public RoleRestController(
+            final CommandGateway commandGateway,
+            final RoleService service) {
+        this.commandGateway = commandGateway;
+        this.service = service;
+    }
 
-  @RequestMapping(method = RequestMethod.POST,
-          consumes = {MediaType.APPLICATION_JSON_VALUE},
-          produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
-  public @ResponseBody ResponseEntity<Void> create(@RequestBody @Valid final Role instance)
-  {
-    if (instance == null)
-      throw ServiceException.badRequest("Instance may not be null.");
+    @RequestMapping(method = RequestMethod.POST,
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
+    public @ResponseBody
+    ResponseEntity<Void> create(@RequestBody @Valid final Role instance) {
+        if (instance == null)
+            throw ServiceException.badRequest("Instance may not be null.");
 
-    if (service.findByIdentifier(instance.getIdentifier()).isPresent())
-      throw ServiceException.conflict("Instance already exists with identifier:" + instance.getIdentifier());
+        if (service.findByIdentifier(instance.getIdentifier()).isPresent())
+            throw ServiceException.conflict("Instance already exists with identifier:" + instance.getIdentifier());
 
-    final CreateRoleCommand createCommand = new CreateRoleCommand(instance);
-    this.commandGateway.process(createCommand);
-    return new ResponseEntity<>(HttpStatus.ACCEPTED);
-  }
+        final CreateRoleCommand createCommand = new CreateRoleCommand(instance);
+        this.commandGateway.process(createCommand);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 
-  @RequestMapping(method = RequestMethod.GET,
-      consumes = {MediaType.ALL_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
-  public @ResponseBody List<Role> findAll() {
-    return service.findAll();
-  }
+    @RequestMapping(method = RequestMethod.GET,
+            consumes = {MediaType.ALL_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
+    public @ResponseBody
+    List<Role> findAll() {
+        return service.findAll();
+    }
 
-  @RequestMapping(value= PathConstants.IDENTIFIER_RESOURCE_STRING, method = RequestMethod.GET,
-      consumes = {MediaType.ALL_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
-  public @ResponseBody ResponseEntity<Role> get(@PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String identifier)
-  {
-    return new ResponseEntity<>(checkIdentifier(identifier), HttpStatus.OK);
-  }
+    @RequestMapping(value = PathConstants.IDENTIFIER_RESOURCE_STRING, method = RequestMethod.GET,
+            consumes = {MediaType.ALL_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
+    public @ResponseBody
+    ResponseEntity<Role> get(@PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String identifier) {
+        return new ResponseEntity<>(checkIdentifier(identifier), HttpStatus.OK);
+    }
 
-  @RequestMapping(value= PathConstants.IDENTIFIER_RESOURCE_STRING, method = RequestMethod.DELETE,
-      consumes = {MediaType.ALL_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
-  public @ResponseBody ResponseEntity<Void> delete(@PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String identifier)
-  {
-    if (!CheckRoleChangeable.isChangeableRoleIdentifier(identifier))
-      throw ServiceException.badRequest("Role with identifier: " + identifier + " cannot be deleted.");
+    @RequestMapping(value = PathConstants.IDENTIFIER_RESOURCE_STRING, method = RequestMethod.DELETE,
+            consumes = {MediaType.ALL_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
+    public @ResponseBody
+    ResponseEntity<Void> delete(@PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String identifier) {
+        if (!CheckRoleChangeable.isChangeableRoleIdentifier(identifier))
+            throw ServiceException.badRequest("Role with identifier: " + identifier + " cannot be deleted.");
 
-    checkIdentifier(identifier);
+        checkIdentifier(identifier);
 
-    final DeleteRoleCommand deleteCommand = new DeleteRoleCommand(identifier);
-    this.commandGateway.process(deleteCommand);
-    return new ResponseEntity<>(HttpStatus.ACCEPTED);
-  }
+        final DeleteRoleCommand deleteCommand = new DeleteRoleCommand(identifier);
+        this.commandGateway.process(deleteCommand);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 
-  @RequestMapping(value= PathConstants.IDENTIFIER_RESOURCE_STRING,method = RequestMethod.PUT,
-      consumes = {MediaType.APPLICATION_JSON_VALUE},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
-  public @ResponseBody ResponseEntity<Void> change(
-          @PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String identifier, @RequestBody @Valid final Role instance)
-  {
-    if (!CheckRoleChangeable.isChangeableRoleIdentifier(identifier))
-      throw ServiceException.badRequest("Role with identifier: " + identifier + " cannot be changed.");
+    @RequestMapping(value = PathConstants.IDENTIFIER_RESOURCE_STRING, method = RequestMethod.PUT,
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.ROLE_MANAGEMENT)
+    public @ResponseBody
+    ResponseEntity<Void> change(
+            @PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String identifier, @RequestBody @Valid final Role instance) {
+        if (!CheckRoleChangeable.isChangeableRoleIdentifier(identifier))
+            throw ServiceException.badRequest("Role with identifier: " + identifier + " cannot be changed.");
 
-    checkIdentifier(identifier);
+        checkIdentifier(identifier);
 
-    if (!identifier.equals(instance.getIdentifier()))
-      throw ServiceException.badRequest("Instance identifiers may not be changed.");
+        if (!identifier.equals(instance.getIdentifier()))
+            throw ServiceException.badRequest("Instance identifiers may not be changed.");
 
-    final ChangeRoleCommand changeCommand = new ChangeRoleCommand(identifier, instance);
-    this.commandGateway.process(changeCommand);
-    return new ResponseEntity<>(HttpStatus.ACCEPTED);
-  }
+        final ChangeRoleCommand changeCommand = new ChangeRoleCommand(identifier, instance);
+        this.commandGateway.process(changeCommand);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 
-  private Role checkIdentifier(final String identifier) {
-    if (identifier == null)
-      throw ServiceException.badRequest("identifier may not be null.");
+    private Role checkIdentifier(final String identifier) {
+        if (identifier == null)
+            throw ServiceException.badRequest("identifier may not be null.");
 
-    return service.findByIdentifier(identifier)
-            .orElseThrow(() -> ServiceException.notFound("Instance with identifier " + identifier + " doesn't exist."));
-  }
+        return service.findByIdentifier(identifier)
+                .orElseThrow(() -> ServiceException.notFound("Instance with identifier " + identifier + " doesn't exist."));
+    }
 }

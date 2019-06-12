@@ -36,9 +36,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -128,7 +125,7 @@ public class CauseRestController {
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
 
         return ResponseEntity.ok(this.causeService.fetchCause((includeClosed != null ? includeClosed : Boolean.TRUE), param,
-                this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+                this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
@@ -141,15 +138,13 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> deleteCause(@PathVariable("identifier") final String identifier) {
+        throwIfCauseNotExists(identifier);
 
-        final Optional<Cause> cause = this.causeService.findCause(identifier);
-        if (!cause.isPresent()) {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
-        }
-
-        if (!CauseService.isRemovableState(cause.get().getCurrentState())) {
-            throw ServiceException.conflict("Unable to delete this cause!");
-        }
+        this.causeService.findCause(identifier).ifPresent(cause -> {
+            if (!CauseService.isRemovableState(cause.getCurrentState())) {
+                throw ServiceException.conflict("Unable to delete this cause!");
+            }
+        });
 
         this.commandGateway.process(new DeleteCauseCommand(identifier, "DELETING CAUSE"));
         return ResponseEntity.accepted().build();
@@ -171,19 +166,6 @@ public class CauseRestController {
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
-    }
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
-            value = "/causes/ngo/{identifier}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<NGOStatistics> findCausebyCreatedBy(@PathVariable("identifier") final String createdBy) {
-        return ResponseEntity.ok(this.causeService.fetchCauseByCreatedBy(createdBy));
     }
 
 
@@ -210,7 +192,8 @@ public class CauseRestController {
 
     //    publish cause
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @Permittable(value = AcceptedTokenType.TENANT,
+            groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/{identifier}/publish",
             method = RequestMethod.PUT,
@@ -220,6 +203,7 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> publishCause(@PathVariable("identifier") final String identifier) {
+
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
         if (causeEntity.getCurrentState().toLowerCase().equals(Cause.State.APPROVED.name().toLowerCase())) {
             this.commandGateway.process(new PublishCauseCommand(identifier));
@@ -251,19 +235,6 @@ public class CauseRestController {
         return ResponseEntity.accepted().build();
     }
 
-    private void throwIfCauseIsNotActive(CauseEntity causeEntity) {
-        if (!causeEntity.getCurrentState().toLowerCase().equals(Cause.State.ACTIVE.name().toLowerCase()))
-            throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", causeEntity.getIdentifier(), causeEntity.getCurrentState());
-    }
-
-
-    private void throwIfMin2DaysLeft(final CauseEntity causeEntity) {
-        LocalDateTime causeEndDate = causeEntity.getEndDate().minusDays(2);
-        if (causeEndDate.isBefore(LocalDateTime.now(Clock.systemDefaultZone()))) {
-            throw ServiceException.conflict("Cause {0} required minimum two days at least. Current end date: {1}", causeEntity.getIdentifier(), causeEntity.getEndDate());
-        }
-    }
-
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
@@ -277,7 +248,7 @@ public class CauseRestController {
     ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
                                       @RequestBody final CauseApprove cause) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
-        throwIfActionMoreThan2Times(identifier, new HashSet<>(Arrays.asList(APPROVED.name())));
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(APPROVED.name())));
 
         if (causeEntity.getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
             this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate(), cause.getSuccessFees()));
@@ -289,7 +260,8 @@ public class CauseRestController {
     }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @Permittable(value = AcceptedTokenType.TENANT,
+            groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(value = "/causes/expired", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -323,12 +295,12 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> RejectCause(@PathVariable("identifier") final String identifier,
-                                     @RequestBody final Cause cause) {
+                                     @RequestBody final CauseReject causeReject) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
-        throwIfActionMoreThan2Times(identifier, new HashSet<>(Arrays.asList(Cause.State.REJECTED.name())));
+        throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(REJECTED.name())));
 
         if (PENDING.name().toLowerCase().equals(causeEntity.getCurrentState().toLowerCase())) {
-            this.commandGateway.process(new RejectCauseCommand(identifier, cause.getRejectedReason()));
+            this.commandGateway.process(new RejectCauseCommand(identifier, causeReject));
         } else {
             throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }
@@ -720,14 +692,8 @@ public class CauseRestController {
         return ResponseEntity.ok(this.causeService.getProcessSteps(causeIdentifier));
     }
 
-    private Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
-        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
-        final int sizeToUse = size != null ? size : 20;
-        final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
-        final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
-        return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);
-    }
 
+//    helper functions
 
     private void throwIfCauseNotExists(final String identifier) {
         if (!this.causeService.causeExists(identifier)) {
@@ -779,4 +745,18 @@ public class CauseRestController {
             throw ServiceException.badRequest("Only content type {0} and {1} allowed", MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE);
         }
     }
+
+    private void throwIfCauseIsNotActive(CauseEntity causeEntity) {
+        if (!causeEntity.getCurrentState().toLowerCase().equals(Cause.State.ACTIVE.name().toLowerCase()))
+            throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", causeEntity.getIdentifier(), causeEntity.getCurrentState());
+    }
+
+
+    private void throwIfMin2DaysLeft(final CauseEntity causeEntity) {
+        LocalDateTime causeEndDate = causeEntity.getEndDate().minusDays(2);
+        if (causeEndDate.isBefore(LocalDateTime.now(Clock.systemDefaultZone()))) {
+            throw ServiceException.conflict("Cause {0} required minimum two days at least. Current end date: {1}", causeEntity.getIdentifier(), causeEntity.getEndDate());
+        }
+    }
+
 }

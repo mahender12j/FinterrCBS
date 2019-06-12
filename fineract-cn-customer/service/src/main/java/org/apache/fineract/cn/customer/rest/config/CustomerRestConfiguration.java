@@ -22,6 +22,7 @@ import org.apache.fineract.cn.accounting.api.v1.client.AccountManager;
 import org.apache.fineract.cn.anubis.config.EnableAnubis;
 import org.apache.fineract.cn.async.config.EnableAsync;
 import org.apache.fineract.cn.cassandra.config.EnableCassandra;
+import org.apache.fineract.cn.cause.api.v1.client.CAdminCauseManager;
 import org.apache.fineract.cn.command.config.EnableCommandProcessing;
 import org.apache.fineract.cn.customer.ServiceConstants;
 import org.apache.fineract.cn.customer.catalog.rest.config.CatalogRestConfiguration;
@@ -55,7 +56,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableApplicationName
 @EnableFeignClients(
         clients = {
-                AccountManager.class
+                AccountManager.class,
+                CAdminCauseManager.class
         }
 )
 @ComponentScan({

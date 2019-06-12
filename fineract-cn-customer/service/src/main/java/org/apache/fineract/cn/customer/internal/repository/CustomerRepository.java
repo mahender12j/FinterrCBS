@@ -25,6 +25,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -35,6 +36,9 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CustomerEntity c WHERE c.identifier = :identifier")
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
+
+//    @Query("select c from CustomerEntity  as c where  c.createdOn  >= :dateTime  ORDER BY c.createdOn")
+//    List<CustomerEntity> findAllByCreatedOn(final LocalDateTime dateTime);
 
     Page<CustomerEntity> findAllByTypeIn(final Set<String> type, Pageable pageable);
 
@@ -54,7 +58,7 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
 
     Page<CustomerEntity> findAllByReferenceCustomer(final String refferalCodeIdentifier, final Pageable pageable);
 
-    Page<CustomerEntity> findAllByReferenceCustomerAndIsDeposited(final String refferalCodeIdentifier, final Boolean isDeposited,final Pageable pageable);
+    Page<CustomerEntity> findAllByReferenceCustomerAndIsDeposited(final String refferalCodeIdentifier, final Boolean isDeposited, final Pageable pageable);
 
     Optional<CustomerEntity> findByIdentifier(final String identifier);
 
