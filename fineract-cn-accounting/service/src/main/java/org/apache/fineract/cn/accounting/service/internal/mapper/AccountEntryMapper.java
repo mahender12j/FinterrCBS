@@ -37,6 +37,7 @@ public class AccountEntryMapper {
         entry.setMessage(accountEntity.getMessage());
         entry.setTransactionType(accountEntity.getTransactionType());
         entry.setTransactionDate(DateConverter.toIsoString(accountEntity.getTransactionDate()));
+        entry.setAnonymous(accountEntity.isAnonymous());
         return entry;
     }
 

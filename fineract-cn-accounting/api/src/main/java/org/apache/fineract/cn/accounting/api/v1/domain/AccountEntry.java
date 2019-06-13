@@ -29,6 +29,7 @@ public final class AccountEntry {
     private Double amount;
     private Double balance;
     private String transactionType;
+    private boolean anonymous;
 
     public void setType(Type type) {
         this.type = type;
@@ -80,6 +81,14 @@ public final class AccountEntry {
 
     public void setBalance(final Double balance) {
         this.balance = balance;
+    }
+
+    public boolean isAnonymous() {
+        return anonymous;
+    }
+
+    public void setAnonymous(boolean anonymous) {
+        this.anonymous = anonymous;
     }
 
     public enum Type {
