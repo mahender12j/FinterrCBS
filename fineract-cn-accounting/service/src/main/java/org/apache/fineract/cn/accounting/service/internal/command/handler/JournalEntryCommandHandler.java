@@ -98,7 +98,7 @@ public class JournalEntryCommandHandler {
     journalEntryEntity.setCreatedBy(UserContextHolder.checkedGetUser());
     journalEntryEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
     journalEntryRepository.saveJournalEntry(journalEntryEntity);
-    this.commandGateway.process(new BookJournalEntryCommand(journalEntry.getTransactionIdentifier()));
+    this.commandGateway.process(new BookJournalEntryCommand(journalEntry.getTransactionIdentifier(), createJournalEntryCommand.isAnonymous()));
     return journalEntry.getTransactionIdentifier();
   }
 

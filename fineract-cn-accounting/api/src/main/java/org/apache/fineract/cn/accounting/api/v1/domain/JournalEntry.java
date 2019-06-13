@@ -50,6 +50,8 @@ public final class JournalEntry {
   private State state;
   @Length(max=2048)
   private String message;
+  @Valid
+  private boolean isAnonymous;
 
   public JournalEntry() {
     super();
@@ -125,6 +127,14 @@ public final class JournalEntry {
 
   public void setMessage(final String message) {
     this.message = message;
+  }
+
+  public boolean isAnonymous() {
+    return isAnonymous;
+  }
+
+  public void setAnonymous(boolean anonymous) {
+    isAnonymous = anonymous;
   }
 
   @SuppressWarnings("WeakerAccess")

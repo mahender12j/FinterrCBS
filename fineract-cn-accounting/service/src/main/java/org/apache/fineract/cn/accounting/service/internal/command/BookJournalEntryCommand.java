@@ -21,14 +21,21 @@ package org.apache.fineract.cn.accounting.service.internal.command;
 public class BookJournalEntryCommand {
 
   private final String transactionIdentifier;
+  private final boolean isAnonymous;
 
-  public BookJournalEntryCommand(final String transactionIdentifier) {
+  public BookJournalEntryCommand(final String transactionIdentifier,
+                                 final boolean isAnonymous) {
     super();
     this.transactionIdentifier = transactionIdentifier;
+    this.isAnonymous = isAnonymous;
   }
 
   public String transactionIdentifier() {
     return this.transactionIdentifier;
+  }
+
+  public boolean isAnonymous() {
+    return isAnonymous;
   }
 
   @Override

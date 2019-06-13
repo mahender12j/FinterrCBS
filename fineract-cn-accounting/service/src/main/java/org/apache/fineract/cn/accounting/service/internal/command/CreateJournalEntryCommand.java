@@ -22,20 +22,27 @@ import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 
 public class CreateJournalEntryCommand {
 
-  private final JournalEntry journalEntry;
+    private final JournalEntry journalEntry;
+    private final boolean isAnonymous;
 
-  public CreateJournalEntryCommand(final JournalEntry journalEntry) {
-    this.journalEntry = journalEntry;
-  }
+    public CreateJournalEntryCommand(final JournalEntry journalEntry,
+                                     final boolean isAnonymous) {
+        this.journalEntry = journalEntry;
+        this.isAnonymous = isAnonymous;
+    }
 
-  public JournalEntry journalEntry() {
-    return this.journalEntry;
-  }
+    public JournalEntry journalEntry() {
+        return this.journalEntry;
+    }
 
-  @Override
-  public String toString() {
-    return "CreateJournalEntryCommand{" +
-            "journalEntry=" + journalEntry.getTransactionIdentifier() +
-            '}';
-  }
+    public boolean isAnonymous() {
+        return isAnonymous;
+    }
+
+    @Override
+    public String toString() {
+        return "CreateJournalEntryCommand{" +
+                "journalEntry=" + journalEntry.getTransactionIdentifier() +
+                '}';
+    }
 }

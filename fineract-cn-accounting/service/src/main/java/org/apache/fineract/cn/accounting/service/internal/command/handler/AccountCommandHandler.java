@@ -366,6 +366,7 @@ public class AccountCommandHandler {
                         accountEntryEntity.setMessage(journalEntryEntity.getMessage());
                         accountEntryEntity.setTransactionDate(journalEntryEntity.getTransactionDate());
                         accountEntryEntity.setTransactionType(journalEntryEntity.getTransactionType());
+                        accountEntryEntity.setAnonymous(bookJournalEntryCommand.isAnonymous());
                         this.accountEntryRepository.save(accountEntryEntity);
                         this.adjustLedgerTotals(savedAccountEntity.getLedger().getIdentifier(), amount);
                     });

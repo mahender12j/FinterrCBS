@@ -29,6 +29,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
 @SuppressWarnings({"unused"})
@@ -56,62 +57,64 @@ public class AccountEntryEntity {
     private Double balance;
     @Column(name = "transaction_type")
     private String transactionType;
+    @Column(name = "is_anonymous")
+    private boolean isAnonymous;
 
-  public AccountEntryEntity() {
-    super();
-  }
+    public AccountEntryEntity() {
+        super();
+    }
 
-  public Long getId() {
-    return this.id;
-  }
+    public Long getId() {
+        return this.id;
+    }
 
-  public void setId(final Long id) {
-    this.id = id;
-  }
+    public void setId(final Long id) {
+        this.id = id;
+    }
 
-  public AccountEntity getAccount() {
-    return this.account;
-  }
+    public AccountEntity getAccount() {
+        return this.account;
+    }
 
-  public void setAccount(final AccountEntity account) {
-    this.account = account;
-  }
+    public void setAccount(final AccountEntity account) {
+        this.account = account;
+    }
 
-  public String getType() {
-    return this.type;
-  }
+    public String getType() {
+        return this.type;
+    }
 
-  public void setType(final String type) {
-    this.type = type;
-  }
+    public void setType(final String type) {
+        this.type = type;
+    }
 
-  public LocalDateTime getTransactionDate() {
-    return this.transactionDate;
-  }
+    public LocalDateTime getTransactionDate() {
+        return this.transactionDate;
+    }
 
-  public void setTransactionDate(final LocalDateTime transactionDate) {
-    this.transactionDate = transactionDate;
-  }
+    public void setTransactionDate(final LocalDateTime transactionDate) {
+        this.transactionDate = transactionDate;
+    }
 
-  public String getMessage() {
-    return this.message;
-  }
+    public String getMessage() {
+        return this.message;
+    }
 
-  public void setMessage(final String message) {
-    this.message = message;
-  }
+    public void setMessage(final String message) {
+        this.message = message;
+    }
 
-  public Double getAmount() {
-    return this.amount;
-  }
+    public Double getAmount() {
+        return this.amount;
+    }
 
-  public void setAmount(final Double amount) {
-    this.amount = amount;
-  }
+    public void setAmount(final Double amount) {
+        this.amount = amount;
+    }
 
-  public Double getBalance() {
-    return this.balance;
-  }
+    public Double getBalance() {
+        return this.balance;
+    }
 
     public void setBalance(final Double balance) {
         this.balance = balance;
@@ -125,4 +128,11 @@ public class AccountEntryEntity {
         this.transactionType = transactionType;
     }
 
+    public boolean isAnonymous() {
+        return isAnonymous;
+    }
+
+    public void setAnonymous(boolean anonymous) {
+        isAnonymous = anonymous;
+    }
 }
