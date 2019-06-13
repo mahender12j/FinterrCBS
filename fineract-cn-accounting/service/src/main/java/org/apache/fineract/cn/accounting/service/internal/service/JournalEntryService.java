@@ -65,22 +65,14 @@ public class JournalEntryService {
     public List<JournalEntry> fetchJournalEntriesForStatistics(final String creditorsAccountNumber) {
         final DateRange range = new DateRange(LocalDate.of(2019, 02, 01), LocalDate.now());
         System.out.println(range.toString());
-        List<JournalEntry> aJournalEntry = this.fetchJournalEntries(range, null, null)
+        return this.fetchJournalEntries(range, null, null)
                 .stream()
                 .filter(journalEntry -> {
                     Optional<Creditor> creditor = journalEntry.getCreditors().stream().findFirst();
-                    if (creditor.isPresent()) {
-                        return creditor.get().getAccountNumber().equals(creditorsAccountNumber);
-                    } else {
-                        throw ServiceException.notFound("Creditors Account Account {0} not found in the system.", creditorsAccountNumber);
-                    }
+                    return creditor.get().getAccountNumber().equals(creditorsAccountNumber);
                 })
                 .sorted(Comparator.comparing(JournalEntry::getTransactionDate).reversed())
                 .collect(Collectors.toList());
-
-        System.out.println("fetchJournalEntriesForStatistics method .....");
-        System.out.println(aJournalEntry);
-        return aJournalEntry;
     }
 
 

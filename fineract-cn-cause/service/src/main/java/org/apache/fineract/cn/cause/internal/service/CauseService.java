@@ -113,10 +113,7 @@ public class CauseService {
             }
             cause.setCauseRatingList(RatingMapper.map(ratingRepository.findByCause(causeEntity)));
             final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
-            if (avgRatingValue != null) cause.setAvgRating(avgRatingValue.toString());
-            else cause.setAvgRating("0");
-
-
+            cause.setAvgRating(avgRatingValue != null ? avgRatingValue.toString() : "0");
             return cause;
         });
     }
@@ -133,7 +130,6 @@ public class CauseService {
 
     public List<CauseDocumentPage> causeDocumentPages(final String identifier) {
         Optional<CauseEntity> causeEntity = causeRepository.findByIdentifier(identifier);
-
         if (causeEntity.isPresent()) {
             DocumentEntity entity = documentRepository.findByCauseAndCreatedBy(causeEntity.get(), UserContextHolder.checkedGetUser());
             return documentPageRepository.findByDocument(entity).stream().map(DocumentMapper::map).collect(Collectors.toList());

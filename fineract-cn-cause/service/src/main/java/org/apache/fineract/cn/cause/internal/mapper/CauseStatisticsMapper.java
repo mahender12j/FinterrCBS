@@ -35,7 +35,13 @@ public final class CauseStatisticsMapper {
     }
 
     public static CauseStatistics map(final List<JournalEntry> journalEntry) {
-        final Map<String, List<JournalEntry>> groupedEntry = journalEntry.stream().collect(groupingBy(JournalEntry::getClerk, toList()));
+        final Map<String, List<JournalEntry>> groupedEntry = journalEntry.stream()
+                .peek(entry -> {
+                    if (entry.isAnonymous()) {
+                        entry.setClerk("Anonymous");
+                    }
+                })
+                .collect(groupingBy(JournalEntry::getClerk, toList()));
         CauseStatistics causeStatistics = new CauseStatistics();
 
         if (groupedEntry.isEmpty()) {
@@ -45,12 +51,11 @@ public final class CauseStatisticsMapper {
         } else {
             List<JournalEntry> causejournalEntry = groupedEntry.entrySet().iterator().next().getValue();
             causeStatistics.setJournalEntry(causejournalEntry);
-            causeStatistics.setTotalRaised(causejournalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().get().getAmount())).sum());
+            causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().get().getAmount())).sum());
             causeStatistics.setTotalSupporter(groupedEntry.size());
         }
         return causeStatistics;
     }
-
 
 
 }
