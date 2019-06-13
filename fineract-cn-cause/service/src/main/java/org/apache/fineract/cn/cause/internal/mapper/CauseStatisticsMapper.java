@@ -21,12 +21,9 @@ package org.apache.fineract.cn.cause.internal.mapper;
 import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseStatistics;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class CauseStatisticsMapper {
 
@@ -35,25 +32,15 @@ public final class CauseStatisticsMapper {
     }
 
     public static CauseStatistics map(final List<JournalEntry> journalEntry) {
-        final Map<String, List<JournalEntry>> groupedEntry = journalEntry.stream()
-                .peek(entry -> {
-                    if (entry.isAnonymous()) {
-                        entry.setClerk("Anonymous");
-                    }
-                })
-                .collect(groupingBy(JournalEntry::getClerk, toList()));
+        Set<String> uniqueClerk = journalEntry.stream().map(JournalEntry::getClerk).collect(Collectors.toSet());
         CauseStatistics causeStatistics = new CauseStatistics();
-
-        if (groupedEntry.isEmpty()) {
-            causeStatistics.setJournalEntry(Collections.emptyList());
-            causeStatistics.setTotalSupporter(0);
-            causeStatistics.setTotalRaised(0.0);
-        } else {
-            List<JournalEntry> causejournalEntry = groupedEntry.entrySet().iterator().next().getValue();
-            causeStatistics.setJournalEntry(causejournalEntry);
-            causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().get().getAmount())).sum());
-            causeStatistics.setTotalSupporter(groupedEntry.size());
-        }
+        causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().get().getAmount())).sum());
+        causeStatistics.setJournalEntry(journalEntry.stream().peek(entry -> {
+            if (entry.isAnonymous()) {
+                entry.setClerk("Anonymous");
+            }
+        }).collect(Collectors.toList()));
+        causeStatistics.setTotalSupporter(uniqueClerk.size());
         return causeStatistics;
     }
 

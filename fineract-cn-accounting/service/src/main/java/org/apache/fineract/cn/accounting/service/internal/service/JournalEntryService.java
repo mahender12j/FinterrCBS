@@ -65,14 +65,15 @@ public class JournalEntryService {
     public List<JournalEntry> fetchJournalEntriesForStatistics(final String creditorsAccountNumber) {
         final DateRange range = new DateRange(LocalDate.of(2019, 02, 01), LocalDate.now());
         System.out.println(range.toString());
-        return this.fetchJournalEntries(range, null, null)
+        List<JournalEntry> journalEntries = this.fetchJournalEntries(range, null, null)
                 .stream()
                 .filter(journalEntry -> {
                     Optional<Creditor> creditor = journalEntry.getCreditors().stream().findFirst();
-                    return creditor.get().getAccountNumber().equals(creditorsAccountNumber);
+                    return creditor.map(creditor1 -> creditor1.getAccountNumber().equals(creditorsAccountNumber)).orElse(false);
                 })
                 .sorted(Comparator.comparing(JournalEntry::getTransactionDate).reversed())
                 .collect(Collectors.toList());
+        return journalEntries;
     }
 
 
