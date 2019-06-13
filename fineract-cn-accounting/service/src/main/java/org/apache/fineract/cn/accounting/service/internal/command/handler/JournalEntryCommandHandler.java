@@ -101,7 +101,6 @@ public class JournalEntryCommandHandler {
         journalEntryEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         journalEntryEntity.setAnonymous(journalEntry.isAnonymous());
         journalEntryRepository.saveJournalEntry(journalEntryEntity);
-        System.out.println("is isAnonymous:" + journalEntry.isAnonymous());
         this.commandGateway.process(new BookJournalEntryCommand(journalEntry.getTransactionIdentifier()));
         return journalEntry.getTransactionIdentifier();
     }
