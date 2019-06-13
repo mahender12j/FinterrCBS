@@ -57,8 +57,8 @@ public class AccountEntryEntity {
     private Double balance;
     @Column(name = "transaction_type")
     private String transactionType;
-    @Column(name = "is_anonymous")
-    private boolean isAnonymous;
+    @Column(name = "anonymous")
+    private boolean anonymous;
 
     public AccountEntryEntity() {
         super();
@@ -129,10 +129,10 @@ public class AccountEntryEntity {
     }
 
     public boolean isAnonymous() {
-        return isAnonymous;
+        return anonymous;
     }
 
     public void setAnonymous(boolean anonymous) {
-        isAnonymous = anonymous;
+        this.anonymous = anonymous;
     }
 }

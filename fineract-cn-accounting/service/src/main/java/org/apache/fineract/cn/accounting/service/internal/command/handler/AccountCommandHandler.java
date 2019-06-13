@@ -366,7 +366,7 @@ public class AccountCommandHandler {
                         accountEntryEntity.setMessage(journalEntryEntity.getMessage());
                         accountEntryEntity.setTransactionDate(journalEntryEntity.getTransactionDate());
                         accountEntryEntity.setTransactionType(journalEntryEntity.getTransactionType());
-                        accountEntryEntity.setAnonymous(bookJournalEntryCommand.isAnonymous());
+                        accountEntryEntity.setAnonymous(journalEntryEntity.isAnonymous());
                         this.accountEntryRepository.save(accountEntryEntity);
                         this.adjustLedgerTotals(savedAccountEntity.getLedger().getIdentifier(), amount);
                     });
@@ -392,12 +392,14 @@ public class AccountCommandHandler {
                             default:
                                 amount = BigDecimal.ZERO;
                         }
+
                         final AccountEntity savedAccountEntity = this.accountRepository.save(accountEntity);
                         final AccountEntryEntity accountEntryEntity = new AccountEntryEntity();
                         accountEntryEntity.setType(AccountEntry.Type.CREDIT.name());
                         accountEntryEntity.setAccount(savedAccountEntity);
                         accountEntryEntity.setBalance(savedAccountEntity.getBalance());
                         accountEntryEntity.setAmount(creditor.getAmount());
+                        accountEntryEntity.setAnonymous(journalEntryEntity.isAnonymous());
                         accountEntryEntity.setMessage(journalEntryEntity.getMessage());
                         accountEntryEntity.setTransactionDate(journalEntryEntity.getTransactionDate());
                         accountEntryEntity.setTransactionType(journalEntryEntity.getTransactionType());

@@ -60,6 +60,7 @@ public class JournalEntryMapper {
             })
             .collect(Collectors.toSet())
     );
+    journalEntry.setAnonymous(journalEntryEntity.isAnonymous());
     journalEntry.setMessage(journalEntryEntity.getMessage());
     journalEntry.setState(journalEntryEntity.getState());
     return journalEntry;

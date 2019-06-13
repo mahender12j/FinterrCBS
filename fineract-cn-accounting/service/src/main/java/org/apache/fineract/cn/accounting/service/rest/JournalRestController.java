@@ -117,6 +117,8 @@ public class JournalRestController {
                     "Sum of debtor and sum of creditor amounts must be equals.");
         }
 
+        System.out.println("is anonymous" + journalEntry.isAnonymous());
+
         this.commandGateway.process(new CreateJournalEntryCommand(journalEntry, journalEntry.isAnonymous()));
         return ResponseEntity.accepted().build();
     }

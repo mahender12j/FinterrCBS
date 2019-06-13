@@ -29,11 +29,13 @@ import org.apache.fineract.cn.accounting.service.internal.repository.CreditorTyp
 import org.apache.fineract.cn.accounting.service.internal.repository.DebtorType;
 import org.apache.fineract.cn.accounting.service.internal.repository.JournalEntryEntity;
 import org.apache.fineract.cn.accounting.service.internal.repository.JournalEntryRepository;
+
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.command.annotation.Aggregate;
 import org.apache.fineract.cn.command.annotation.CommandHandler;
@@ -48,69 +50,71 @@ import org.springframework.transaction.annotation.Transactional;
 @Aggregate
 public class JournalEntryCommandHandler {
 
-  private final CommandGateway commandGateway;
-  private final JournalEntryRepository journalEntryRepository;
+    private final CommandGateway commandGateway;
+    private final JournalEntryRepository journalEntryRepository;
 
-  @Autowired
-  public JournalEntryCommandHandler(final CommandGateway commandGateway,
-                                    final JournalEntryRepository journalEntryRepository) {
-    this.commandGateway = commandGateway;
-    this.journalEntryRepository = journalEntryRepository;
-  }
-
-  @Transactional
-  @CommandHandler(logStart = CommandLogLevel.NONE, logFinish = CommandLogLevel.NONE)
-  @EventEmitter(selectorName = EventConstants.SELECTOR_NAME, selectorValue = EventConstants.POST_JOURNAL_ENTRY)
-  public String createJournalEntry(final CreateJournalEntryCommand createJournalEntryCommand) {
-    final JournalEntry journalEntry = createJournalEntryCommand.journalEntry();
-    final Set<Debtor> debtors = journalEntry.getDebtors();
-    final Set<DebtorType> debtorTypes = debtors
-        .stream()
-        .map(debtor -> {
-          final DebtorType debtorType = new DebtorType();
-          debtorType.setAccountNumber(debtor.getAccountNumber());
-          debtorType.setAmount(Double.valueOf(debtor.getAmount()));
-          return debtorType;
-        })
-        .collect(Collectors.toSet());
-    final Set<Creditor> creditors = journalEntry.getCreditors();
-    final Set<CreditorType> creditorTypes = creditors
-        .stream()
-        .map(creditor -> {
-          final CreditorType creditorType = new CreditorType();
-          creditorType.setAccountNumber(creditor.getAccountNumber());
-          creditorType.setAmount(Double.valueOf(creditor.getAmount()));
-          return creditorType;
-        })
-        .collect(Collectors.toSet());
-    final JournalEntryEntity journalEntryEntity = new JournalEntryEntity();
-    journalEntryEntity.setTransactionIdentifier(journalEntry.getTransactionIdentifier());
-    final LocalDateTime transactionDate = DateConverter.fromIsoString(journalEntry.getTransactionDate());
-    journalEntryEntity.setDateBucket(DateConverter.toIsoString(DateConverter.toLocalDate(transactionDate)));
-    journalEntryEntity.setTransactionDate(transactionDate);
-    journalEntryEntity.setTransactionType(journalEntry.getTransactionType());
-    journalEntryEntity.setClerk(journalEntry.getClerk() != null ? journalEntry.getClerk() : UserContextHolder.checkedGetUser());
-    journalEntryEntity.setNote(journalEntry.getNote());
-    journalEntryEntity.setDebtors(debtorTypes);
-    journalEntryEntity.setCreditors(creditorTypes);
-    journalEntryEntity.setMessage(journalEntry.getMessage());
-    journalEntryEntity.setState(JournalEntry.State.PENDING.name());
-    journalEntryEntity.setCreatedBy(UserContextHolder.checkedGetUser());
-    journalEntryEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-    journalEntryRepository.saveJournalEntry(journalEntryEntity);
-    this.commandGateway.process(new BookJournalEntryCommand(journalEntry.getTransactionIdentifier(), createJournalEntryCommand.isAnonymous()));
-    return journalEntry.getTransactionIdentifier();
-  }
-
-  @Transactional
-  @CommandHandler(logStart = CommandLogLevel.NONE, logFinish = CommandLogLevel.NONE)
-  public void releaseJournalEntry(final ReleaseJournalEntryCommand releaseJournalEntryCommand) {
-    final String transactionIdentifier = releaseJournalEntryCommand.transactionIdentifier();
-    final Optional<JournalEntryEntity> optionalJournalEntry = this.journalEntryRepository.findJournalEntry(transactionIdentifier);
-    if (optionalJournalEntry.isPresent()) {
-      final JournalEntryEntity journalEntryEntity = optionalJournalEntry.get();
-      journalEntryEntity.setState(JournalEntry.State.PROCESSED.name());
-      this.journalEntryRepository.saveJournalEntry(journalEntryEntity);
+    @Autowired
+    public JournalEntryCommandHandler(final CommandGateway commandGateway,
+                                      final JournalEntryRepository journalEntryRepository) {
+        this.commandGateway = commandGateway;
+        this.journalEntryRepository = journalEntryRepository;
     }
-  }
+
+    @Transactional
+    @CommandHandler(logStart = CommandLogLevel.NONE, logFinish = CommandLogLevel.NONE)
+    @EventEmitter(selectorName = EventConstants.SELECTOR_NAME, selectorValue = EventConstants.POST_JOURNAL_ENTRY)
+    public String createJournalEntry(final CreateJournalEntryCommand createJournalEntryCommand) {
+        final JournalEntry journalEntry = createJournalEntryCommand.journalEntry();
+        final Set<Debtor> debtors = journalEntry.getDebtors();
+        final Set<DebtorType> debtorTypes = debtors
+                .stream()
+                .map(debtor -> {
+                    final DebtorType debtorType = new DebtorType();
+                    debtorType.setAccountNumber(debtor.getAccountNumber());
+                    debtorType.setAmount(Double.valueOf(debtor.getAmount()));
+                    return debtorType;
+                })
+                .collect(Collectors.toSet());
+        final Set<Creditor> creditors = journalEntry.getCreditors();
+        final Set<CreditorType> creditorTypes = creditors
+                .stream()
+                .map(creditor -> {
+                    final CreditorType creditorType = new CreditorType();
+                    creditorType.setAccountNumber(creditor.getAccountNumber());
+                    creditorType.setAmount(Double.valueOf(creditor.getAmount()));
+                    return creditorType;
+                })
+                .collect(Collectors.toSet());
+        final JournalEntryEntity journalEntryEntity = new JournalEntryEntity();
+        journalEntryEntity.setTransactionIdentifier(journalEntry.getTransactionIdentifier());
+        final LocalDateTime transactionDate = DateConverter.fromIsoString(journalEntry.getTransactionDate());
+        journalEntryEntity.setDateBucket(DateConverter.toIsoString(DateConverter.toLocalDate(transactionDate)));
+        journalEntryEntity.setTransactionDate(transactionDate);
+        journalEntryEntity.setTransactionType(journalEntry.getTransactionType());
+        journalEntryEntity.setClerk(journalEntry.getClerk() != null ? journalEntry.getClerk() : UserContextHolder.checkedGetUser());
+        journalEntryEntity.setNote(journalEntry.getNote());
+        journalEntryEntity.setDebtors(debtorTypes);
+        journalEntryEntity.setCreditors(creditorTypes);
+        journalEntryEntity.setMessage(journalEntry.getMessage());
+        journalEntryEntity.setState(JournalEntry.State.PENDING.name());
+        journalEntryEntity.setCreatedBy(UserContextHolder.checkedGetUser());
+        journalEntryEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        journalEntryEntity.setAnonymous(journalEntry.isAnonymous());
+        journalEntryRepository.saveJournalEntry(journalEntryEntity);
+        System.out.println("is isAnonymous:" + journalEntry.isAnonymous());
+        this.commandGateway.process(new BookJournalEntryCommand(journalEntry.getTransactionIdentifier()));
+        return journalEntry.getTransactionIdentifier();
+    }
+
+    @Transactional
+    @CommandHandler(logStart = CommandLogLevel.NONE, logFinish = CommandLogLevel.NONE)
+    public void releaseJournalEntry(final ReleaseJournalEntryCommand releaseJournalEntryCommand) {
+        final String transactionIdentifier = releaseJournalEntryCommand.transactionIdentifier();
+        final Optional<JournalEntryEntity> optionalJournalEntry = this.journalEntryRepository.findJournalEntry(transactionIdentifier);
+        if (optionalJournalEntry.isPresent()) {
+            final JournalEntryEntity journalEntryEntity = optionalJournalEntry.get();
+            journalEntryEntity.setState(JournalEntry.State.PROCESSED.name());
+            this.journalEntryRepository.saveJournalEntry(journalEntryEntity);
+        }
+    }
 }

@@ -61,6 +61,8 @@ public class JournalEntryEntity {
   private LocalDateTime createdOn;
   @Column(name = "created_by")
   private String createdBy;
+  @Column(name = "anonymous")
+  private boolean anonymous;
 
   public JournalEntryEntity() {
     super();
@@ -160,5 +162,13 @@ public class JournalEntryEntity {
 
   public void setCreatedBy(final String createdBy) {
     this.createdBy = createdBy;
+  }
+
+  public boolean isAnonymous() {
+    return anonymous;
+  }
+
+  public void setAnonymous(boolean anonymous) {
+    this.anonymous = anonymous;
   }
 }

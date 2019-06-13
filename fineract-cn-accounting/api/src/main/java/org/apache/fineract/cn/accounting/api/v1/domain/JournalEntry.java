@@ -22,160 +22,162 @@ import java.util.Objects;
 import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
 import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public final class JournalEntry {
-  //This maxLength is the maximum message length plus a buffer.  portfolio places
-  // the message here, plus the service name, and a random suffix.  This makes
-  // it possible to match the transaction id on activemq messages used in integration
-  // tests.
-  @ValidIdentifier(maxLength = 2200)
-  private String transactionIdentifier;
-  @NotNull
-  private String transactionDate;
-  @ValidIdentifier
-  private String transactionType;
-  @NotEmpty
-  private String clerk;
-  private String note;
-  @NotNull
-  @Valid
-  private Set<Debtor> debtors;
-  @NotNull
-  @Valid
-  private Set<Creditor> creditors;
-  private State state;
-  @Length(max=2048)
-  private String message;
-  @Valid
-  private boolean isAnonymous;
+    //This maxLength is the maximum message length plus a buffer.  portfolio places
+    // the message here, plus the service name, and a random suffix.  This makes
+    // it possible to match the transaction id on activemq messages used in integration
+    // tests.
+    @ValidIdentifier(maxLength = 2200)
+    private String transactionIdentifier;
+    @NotNull
+    private String transactionDate;
+    @ValidIdentifier
+    private String transactionType;
+    @NotEmpty
+    private String clerk;
+    private String note;
+    @NotNull
+    @Valid
+    private Set<Debtor> debtors;
+    @NotNull
+    @Valid
+    private Set<Creditor> creditors;
+    private State state;
+    @Length(max = 2048)
+    private String message;
+    @NotNull
+    @Valid
+    private boolean anonymous;
 
-  public JournalEntry() {
-    super();
-  }
+    public JournalEntry() {
+        super();
+    }
 
-  public String getTransactionIdentifier() {
-    return this.transactionIdentifier;
-  }
+    public String getTransactionIdentifier() {
+        return this.transactionIdentifier;
+    }
 
-  public void setTransactionIdentifier(final String transactionIdentifier) {
-    this.transactionIdentifier = transactionIdentifier;
-  }
+    public void setTransactionIdentifier(final String transactionIdentifier) {
+        this.transactionIdentifier = transactionIdentifier;
+    }
 
-  public String getTransactionDate() {
-    return this.transactionDate;
-  }
+    public String getTransactionDate() {
+        return this.transactionDate;
+    }
 
-  public void setTransactionDate(final String transactionDate) {
-    this.transactionDate = transactionDate;
-  }
+    public void setTransactionDate(final String transactionDate) {
+        this.transactionDate = transactionDate;
+    }
 
-  public String getTransactionType() {
-    return this.transactionType;
-  }
+    public String getTransactionType() {
+        return this.transactionType;
+    }
 
-  public void setTransactionType(final String transactionType) {
-    this.transactionType = transactionType;
-  }
+    public void setTransactionType(final String transactionType) {
+        this.transactionType = transactionType;
+    }
 
-  public String getClerk() {
-    return this.clerk;
-  }
+    public String getClerk() {
+        return this.clerk;
+    }
 
-  public void setClerk(final String clerk) {
-    this.clerk = clerk;
-  }
+    public void setClerk(final String clerk) {
+        this.clerk = clerk;
+    }
 
-  public String getNote() {
-    return this.note;
-  }
+    public String getNote() {
+        return this.note;
+    }
 
-  public void setNote(final String note) {
-    this.note = note;
-  }
+    public void setNote(final String note) {
+        this.note = note;
+    }
 
-  public Set<Debtor> getDebtors() {
-    return this.debtors;
-  }
+    public Set<Debtor> getDebtors() {
+        return this.debtors;
+    }
 
-  public void setDebtors(final Set<Debtor> debtors) {
-    this.debtors = debtors;
-  }
+    public void setDebtors(final Set<Debtor> debtors) {
+        this.debtors = debtors;
+    }
 
-  public Set<Creditor> getCreditors() {
-    return this.creditors;
-  }
+    public Set<Creditor> getCreditors() {
+        return this.creditors;
+    }
 
-  public void setCreditors(final Set<Creditor> creditors) {
-    this.creditors = creditors;
-  }
+    public void setCreditors(final Set<Creditor> creditors) {
+        this.creditors = creditors;
+    }
 
-  public String getState() {
-    return this.state.name();
-  }
+    public String getState() {
+        return this.state.name();
+    }
 
-  public void setState(final String state) {
-    this.state = State.valueOf(state);
-  }
+    public void setState(final String state) {
+        this.state = State.valueOf(state);
+    }
 
-  public String getMessage() {
-    return this.message;
-  }
+    public String getMessage() {
+        return this.message;
+    }
 
-  public void setMessage(final String message) {
-    this.message = message;
-  }
+    public void setMessage(final String message) {
+        this.message = message;
+    }
 
-  public boolean isAnonymous() {
-    return isAnonymous;
-  }
+    public boolean isAnonymous() {
+        return anonymous;
+    }
 
-  public void setAnonymous(boolean anonymous) {
-    isAnonymous = anonymous;
-  }
+    public void setAnonymous(boolean anonymous) {
+        this.anonymous = anonymous;
+    }
 
-  @SuppressWarnings("WeakerAccess")
-  public enum State {
-    PENDING,
-    PROCESSED
-  }
+    @SuppressWarnings("WeakerAccess")
+    public enum State {
+        PENDING,
+        PROCESSED
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    JournalEntry that = (JournalEntry) o;
-    return Objects.equals(transactionIdentifier, that.transactionIdentifier) &&
-            Objects.equals(transactionDate, that.transactionDate) &&
-            Objects.equals(transactionType, that.transactionType) &&
-            Objects.equals(clerk, that.clerk) &&
-            Objects.equals(note, that.note) &&
-            Objects.equals(debtors, that.debtors) &&
-            Objects.equals(creditors, that.creditors) &&
-            state == that.state &&
-            Objects.equals(message, that.message);
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JournalEntry that = (JournalEntry) o;
+        return Objects.equals(transactionIdentifier, that.transactionIdentifier) &&
+                Objects.equals(transactionDate, that.transactionDate) &&
+                Objects.equals(transactionType, that.transactionType) &&
+                Objects.equals(clerk, that.clerk) &&
+                Objects.equals(note, that.note) &&
+                Objects.equals(debtors, that.debtors) &&
+                Objects.equals(creditors, that.creditors) &&
+                state == that.state &&
+                Objects.equals(message, that.message);
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(transactionIdentifier, transactionDate, transactionType, clerk, note, debtors, creditors, state, message);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(transactionIdentifier, transactionDate, transactionType, clerk, note, debtors, creditors, state, message);
+    }
 
-  @Override
-  public String toString() {
-    return "JournalEntry{" +
-            "transactionIdentifier='" + transactionIdentifier + '\'' +
-            ", transactionDate='" + transactionDate + '\'' +
-            ", transactionType='" + transactionType + '\'' +
-            ", clerk='" + clerk + '\'' +
-            ", note='" + note + '\'' +
-            ", debtors=" + debtors +
-            ", creditors=" + creditors +
-            ", state=" + state +
-            ", message='" + message + '\'' +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "JournalEntry{" +
+                "transactionIdentifier='" + transactionIdentifier + '\'' +
+                ", transactionDate='" + transactionDate + '\'' +
+                ", transactionType='" + transactionType + '\'' +
+                ", clerk='" + clerk + '\'' +
+                ", note='" + note + '\'' +
+                ", debtors=" + debtors +
+                ", creditors=" + creditors +
+                ", state=" + state +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }
