@@ -38,7 +38,7 @@ public class JournalEntryMapper {
         journalEntry.setTransactionIdentifier(journalEntryEntity.getTransactionIdentifier());
         journalEntry.setTransactionDate(DateConverter.toIsoString(journalEntryEntity.getTransactionDate()));
         journalEntry.setTransactionType(journalEntryEntity.getTransactionType());
-        journalEntry.setClerk(journalEntryEntity.getClerk());
+        journalEntry.setClerk(journalEntryEntity.isAnonymous() ? "Anonymous" : journalEntryEntity.getClerk());
         journalEntry.setNote(journalEntryEntity.getNote());
         journalEntry.setDebtors(
                 journalEntryEntity.getDebtors()
@@ -62,7 +62,6 @@ public class JournalEntryMapper {
                         })
                         .collect(Collectors.toSet())
         );
-        System.out.println("is transaction anonymous" + journalEntryEntity.isAnonymous());
         journalEntry.setAnonymous(journalEntryEntity.isAnonymous());
         journalEntry.setMessage(journalEntryEntity.getMessage());
         journalEntry.setState(journalEntryEntity.getState());
