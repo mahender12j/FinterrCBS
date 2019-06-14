@@ -22,47 +22,50 @@ import org.apache.fineract.cn.accounting.api.v1.domain.Creditor;
 import org.apache.fineract.cn.accounting.api.v1.domain.Debtor;
 import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 import org.apache.fineract.cn.accounting.service.internal.repository.JournalEntryEntity;
+
 import java.util.stream.Collectors;
+
 import org.apache.fineract.cn.lang.DateConverter;
 
 public class JournalEntryMapper {
 
-  private JournalEntryMapper() {
-    super();
-  }
+    private JournalEntryMapper() {
+        super();
+    }
 
-  public static JournalEntry map(final JournalEntryEntity journalEntryEntity) {
-    final JournalEntry journalEntry = new JournalEntry();
-    journalEntry.setTransactionIdentifier(journalEntryEntity.getTransactionIdentifier());
-    journalEntry.setTransactionDate(DateConverter.toIsoString(journalEntryEntity.getTransactionDate()));
-    journalEntry.setTransactionType(journalEntryEntity.getTransactionType());
-    journalEntry.setClerk(journalEntryEntity.getClerk());
-    journalEntry.setNote(journalEntryEntity.getNote());
-    journalEntry.setDebtors(
-        journalEntryEntity.getDebtors()
-            .stream()
-            .map(debtorType -> {
-              final Debtor debtor = new Debtor();
-              debtor.setAccountNumber(debtorType.getAccountNumber());
-              debtor.setAmount(Double.toString(debtorType.getAmount()));
-              return debtor;
-            })
-            .collect(Collectors.toSet())
-    );
-    journalEntry.setCreditors(
-        journalEntryEntity.getCreditors()
-            .stream()
-            .map(creditorType -> {
-              final Creditor creditor = new Creditor();
-              creditor.setAccountNumber(creditorType.getAccountNumber());
-              creditor.setAmount(Double.toString(creditorType.getAmount()));
-              return creditor;
-            })
-            .collect(Collectors.toSet())
-    );
-    journalEntry.setAnonymous(journalEntryEntity.isAnonymous());
-    journalEntry.setMessage(journalEntryEntity.getMessage());
-    journalEntry.setState(journalEntryEntity.getState());
-    return journalEntry;
-  }
+    public static JournalEntry map(final JournalEntryEntity journalEntryEntity) {
+        final JournalEntry journalEntry = new JournalEntry();
+        journalEntry.setTransactionIdentifier(journalEntryEntity.getTransactionIdentifier());
+        journalEntry.setTransactionDate(DateConverter.toIsoString(journalEntryEntity.getTransactionDate()));
+        journalEntry.setTransactionType(journalEntryEntity.getTransactionType());
+        journalEntry.setClerk(journalEntryEntity.getClerk());
+        journalEntry.setNote(journalEntryEntity.getNote());
+        journalEntry.setDebtors(
+                journalEntryEntity.getDebtors()
+                        .stream()
+                        .map(debtorType -> {
+                            final Debtor debtor = new Debtor();
+                            debtor.setAccountNumber(debtorType.getAccountNumber());
+                            debtor.setAmount(Double.toString(debtorType.getAmount()));
+                            return debtor;
+                        })
+                        .collect(Collectors.toSet())
+        );
+        journalEntry.setCreditors(
+                journalEntryEntity.getCreditors()
+                        .stream()
+                        .map(creditorType -> {
+                            final Creditor creditor = new Creditor();
+                            creditor.setAccountNumber(creditorType.getAccountNumber());
+                            creditor.setAmount(Double.toString(creditorType.getAmount()));
+                            return creditor;
+                        })
+                        .collect(Collectors.toSet())
+        );
+        System.out.println("is transaction anonymous" + journalEntryEntity.isAnonymous());
+        journalEntry.setAnonymous(journalEntryEntity.isAnonymous());
+        journalEntry.setMessage(journalEntryEntity.getMessage());
+        journalEntry.setState(journalEntryEntity.getState());
+        return journalEntry;
+    }
 }

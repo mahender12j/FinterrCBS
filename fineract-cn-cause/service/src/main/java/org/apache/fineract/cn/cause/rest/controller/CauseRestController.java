@@ -108,6 +108,13 @@ public class CauseRestController {
     }
 
 
+     /*
+            ALL = 0
+            RECENT_CAUSE = 1
+            Top-Funded = 2
+            Most Popular = 3
+            */
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes",
@@ -124,42 +131,16 @@ public class CauseRestController {
                                           @RequestParam(value = "size", required = false) final Integer size,
                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
+//        System.out.println("fetch cause");
 
         if (includeClosed != null ? includeClosed : Boolean.TRUE) {
+//            System.out.println("fetch for NGO");
             return ResponseEntity.ok(this.causeService.fetchCauseForNGO(param, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
         } else {
-
-            /*
-            ALL = 0
-            RECENT_CAUSE = 1
-            Top-Funded = 2
-            Most Popular = 3
-            */
-
+//            System.out.println("fetch for Customer");
             return ResponseEntity.ok(this.causeService.fetchCauseForCustomer(param, sortBy == null ? 0 : sortBy, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
         }
-
-//        return ResponseEntity.ok(this.causeService.fetchCause((includeClosed != null ? includeClosed : Boolean.TRUE), param,
-//                this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
-
-
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-//    @RequestMapping(
-//            value = "/causes/filter/{}",
-//            method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.ALL_VALUE
-//    )
-//    public
-//    @ResponseBody
-//    ResponseEntity<CausePage> fetchCausesWithFilter(@RequestParam(value = "param", required = false) final String param,
-//                                                    @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
-//                                                    @RequestParam(value = "size", required = false) final Integer size,
-//                                                    @RequestParam(value = "sortColumn", required = false) final String sortColumn,
-//                                                    @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
-//        return ResponseEntity.ok(this.causeService.fetchCauseForCustomerWithFilter(param, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
-//    }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
     @RequestMapping(

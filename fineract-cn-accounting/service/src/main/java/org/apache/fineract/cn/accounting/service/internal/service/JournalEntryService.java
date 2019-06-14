@@ -64,7 +64,6 @@ public class JournalEntryService {
 
     public List<JournalEntry> fetchJournalEntriesForStatistics(final String creditorsAccountNumber) {
         final DateRange range = new DateRange(LocalDate.of(2019, 02, 01), LocalDate.now());
-        System.out.println(range.toString());
         List<JournalEntry> journalEntries = this.fetchJournalEntries(range, null, null)
                 .stream()
                 .filter(journalEntry -> {

@@ -281,7 +281,7 @@ public class DocumentsRestController {
 
     private void throwIfCauseNotExists(final String causeIdentifier) {
         if (!this.causeService.causeExists(causeIdentifier)) {
-            System.out.println("Cause not found from here------------------------->");
+//            System.out.println("Cause not found from here------------------------->");
             throw ServiceException.notFound("Cause ''{0}'' not found.", causeIdentifier);
         }
     }

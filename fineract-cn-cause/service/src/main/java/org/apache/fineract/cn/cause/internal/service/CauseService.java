@@ -154,11 +154,13 @@ public class CauseService {
         if (param == null) {
             CausePage causePage = new CausePage();
             final List<CauseEntity> causeEntities;
+//            System.out.println("sort by " + sortBy);
             switch (sortBy) {
                 case 1:
+//                    System.out.println("sort bt createdOn");
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()))
                             .stream()
-                            .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.nullsLast(Comparator.reverseOrder())))
+                            .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.nullsFirst(Comparator.reverseOrder())))
                             .collect(Collectors.toList());
                     final Page<CauseEntity> page = new PageImpl<>(causeEntities, pageable, causeEntities.size());
                     causePage.setTotalPages(page.getTotalPages());
@@ -166,11 +168,11 @@ public class CauseService {
                     causePage.setCauses(causeArrayList(page.getContent()));
                     break;
                 case 2:
-
+//                    System.out.println("sort bt getTotalRaised");
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> topFundedcauses = causeArrayList(causeEntities)
                             .stream()
-                            .sorted(Comparator.nullsLast((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised())))
+                            .sorted((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised()))
                             .collect(Collectors.toList());
                     final Page<Cause> topFundedcausesPage = new PageImpl<>(topFundedcauses, pageable, causeEntities.size());
                     causePage.setTotalPages(topFundedcausesPage.getTotalPages());
@@ -178,10 +180,11 @@ public class CauseService {
                     causePage.setCauses(topFundedcauses);
                     break;
                 case 3:
+//                    System.out.println("sort bt getAvgRating");
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> popularCauses = causeArrayList(causeEntities)
                             .stream()
-                            .sorted(Comparator.nullsLast(Comparator.comparing(Cause::getAvgRating)))
+                            .sorted(Comparator.comparing(Cause::getAvgRating))
                             .collect(Collectors.toList());
 
                     final Page<Cause> popularCausesPage = new PageImpl<>(popularCauses, pageable, causeEntities.size());
@@ -190,6 +193,7 @@ public class CauseService {
                     causePage.setCauses(popularCauses);
                     break;
                 default:
+//                    System.out.println("sort by default");
                     final Page<CauseEntity> allPage = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
                     causePage.setTotalPages(allPage.getTotalPages());
                     causePage.setTotalElements(allPage.getTotalElements());
@@ -259,7 +263,7 @@ public class CauseService {
                     case 1:
                         causeEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()))
                                 .stream()
-                                .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.nullsLast(Comparator.reverseOrder())))
+                                .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.nullsFirst(Comparator.reverseOrder())))
                                 .collect(Collectors.toList());
 
                         final Page<CauseEntity> page = new PageImpl<>(causeEntities, pageable, causeEntities.size());
@@ -272,7 +276,7 @@ public class CauseService {
                         causeEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                         List<Cause> topFundedcauses = causeArrayList(causeEntities)
                                 .stream()
-                                .sorted(Comparator.nullsLast((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised())))
+                                .sorted((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised()))
                                 .collect(Collectors.toList());
 
                         final Page<Cause> topFundedcausesPage = new PageImpl<>(topFundedcauses, pageable, causeEntities.size());
@@ -285,7 +289,7 @@ public class CauseService {
                         causeEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                         List<Cause> popularCauses = causeArrayList(causeEntities)
                                 .stream()
-                                .sorted(Comparator.nullsLast(Comparator.comparing(Cause::getAvgRating)))
+                                .sorted(Comparator.comparing(Cause::getAvgRating, Comparator.nullsFirst(Comparator.reverseOrder())))
                                 .collect(Collectors.toList());
 
                         final Page<Cause> popularCausesPage = new PageImpl<>(popularCauses, pageable, causeEntities.size());
@@ -321,7 +325,7 @@ public class CauseService {
                 case 1:
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()))
                             .stream()
-                            .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.nullsLast(Comparator.reverseOrder())))
+                            .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.nullsFirst(Comparator.reverseOrder())))
                             .collect(Collectors.toList());
 
                     final Page<CauseEntity> page = new PageImpl<>(causeEntities, pageable, causeEntities.size());
@@ -333,7 +337,7 @@ public class CauseService {
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> topFundedcauses = causeArrayList(causeEntities)
                             .stream()
-                            .sorted(Comparator.nullsLast((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised())))
+                            .sorted((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised()))
                             .collect(Collectors.toList());
 
                     final Page<Cause> topFundedcausesPage = new PageImpl<>(topFundedcauses, pageable, causeEntities.size());
@@ -346,7 +350,7 @@ public class CauseService {
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> popularCauses = causeArrayList(causeEntities)
                             .stream()
-                            .sorted(Comparator.nullsLast(Comparator.comparing(Cause::getAvgRating)))
+                            .sorted(Comparator.comparing(Cause::getAvgRating, Comparator.nullsFirst(Comparator.reverseOrder())))
                             .collect(Collectors.toList());
 
                     final Page<Cause> popularCausesPage = new PageImpl<>(popularCauses, pageable, causeEntities.size());

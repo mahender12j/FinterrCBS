@@ -116,7 +116,7 @@ public class IdentificationApiDocumentation extends AbstractCustomerTest {
                 });
 
         final List<IdentificationCard> cards = this.customerManager.fetchIdentificationCards(customerIdentifier);
-        System.out.println("Number of cards is " + cards.size());
+//        System.out.println("Number of cards is " + cards.size());
         Assert.assertTrue(cards.size() == 2);
 
         this.mockMvc.perform(get("/customers/" + customerIdentifier + "/identifications")
