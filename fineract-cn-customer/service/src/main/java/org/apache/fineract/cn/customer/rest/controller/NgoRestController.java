@@ -24,6 +24,8 @@ import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
 import org.apache.fineract.cn.customer.api.v1.domain.CAdminPage;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
+import org.apache.fineract.cn.customer.api.v1.domain.NgoProfile;
+import org.apache.fineract.cn.customer.internal.command.CreateNGOCommand;
 import org.apache.fineract.cn.customer.internal.service.CAdminService;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.NGOService;
@@ -33,67 +35,70 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/")
-public class CAdminRestController {
+public class NgoRestController {
 
 
     private final CommandGateway commandGateway;
-    private final CAdminService cAdminService;
     private final CustomerService customerService;
     private final NGOService ngoService;
 
     @Autowired
-    public CAdminRestController(final CommandGateway commandGateway,
-                                final CAdminService cAdminService,
-                                final CustomerService customerService,
-                                final NGOService ngoService) {
+    public NgoRestController(final CommandGateway commandGateway,
+                             final CustomerService customerService,
+                             final NGOService ngoService) {
         super();
         this.commandGateway = commandGateway;
-        this.cAdminService = cAdminService;
         this.customerService = customerService;
         this.ngoService = ngoService;
     }
 
-    //    GET NGO statistics
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CADMIN)
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.NGO)
     @RequestMapping(
-            value = "/cadmin/{identifier}/statistics",
+            value = "/ngo/{identifier}/profile",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
     public
     @ResponseBody
-    ResponseEntity<CAdminPage> getCadminStatistics(@PathVariable("identifier") final String identifier) {
-        this.throwIfCustomerNotExists(identifier);
-        return ResponseEntity.ok(this.cAdminService.getCaAdminStatistics());
+    ResponseEntity<NgoProfile> getNgoProfile(@PathVariable("identifier") final String identifier) {
+        throwIfNGONotExists(identifier);
+        return ResponseEntity.ok(ngoService.getNgoProfile(identifier));
     }
 
 
-    //    GET NGO users list
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CADMIN)
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.NGO)
     @RequestMapping(
-            value = "/cadmin/users/filter",
-            method = RequestMethod.GET,
+            value = "/ngo/{identifier}/profile",
+            method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
+            consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public
     @ResponseBody
-    ResponseEntity<List<Customer>> getCadminCustomersByType(
-            @RequestParam(value = "userType") final String userType) {
-        return ResponseEntity.ok(this.cAdminService.findCustomerByType(userType));
+    ResponseEntity<Void> createCustomer(@RequestBody @Valid final NgoProfile ngoProfile) {
+        throwIfNGONotExists(ngoProfile.getNgoIdentifier());
+        throwIfNGOProfileExist(ngoProfile.getNgoIdentifier());
+
+        this.commandGateway.process(new CreateNGOCommand(ngoProfile, ngoProfile.getNgoIdentifier()));
+        return ResponseEntity.accepted().build();
+    }
+
+    private void throwIfNGOProfileExist(String ngoIdentifier) {
+        if (this.ngoService.ngoProfileExist(ngoIdentifier)) {
+            throw ServiceException.conflict("Sorry !! NGO Profile already exist !!!");
+        }
     }
 
 
-    private void throwIfCustomerNotExists(final String identifier) {
-        if (!this.customerService.customerExists(identifier)) {
-            throw ServiceException.notFound("Invalid Username");
+    private void throwIfNGONotExists(final String identifier) {
+        if (!this.customerService.ngoExist(identifier)) {
+            throw ServiceException.notFound("Invalid Username or NGO not available");
         }
     }
 
