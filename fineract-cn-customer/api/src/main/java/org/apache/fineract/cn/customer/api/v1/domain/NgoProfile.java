@@ -35,6 +35,7 @@ public class NgoProfile {
     @Valid
     @NotNull
     private String about;
+    private List<String> category;
     private String facebookUrl;
     private String twitterUrl;
     private String instagramUrl;
@@ -143,6 +144,14 @@ public class NgoProfile {
 
     public Customer getNgoDetails() {
         return ngoDetails;
+    }
+
+    public List<String> getCategory() {
+        return category;
+    }
+
+    public void setCategory(List<String> category) {
+        this.category = category;
     }
 
     public void setNgoDetails(Customer ngoDetails) {

@@ -18,10 +18,12 @@
  */
 package org.apache.fineract.cn.customer.internal.repository;
 
+import org.apache.fineract.cn.customer.internal.config.StringArrayToStringConverter;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "maat_ngo_profile")
@@ -38,6 +40,11 @@ public class NgoProfileEntity {
     private String bannerImage;
     @Column(name = "about")
     private String about;
+
+    @Column(name = "category")
+    @Convert(converter = StringArrayToStringConverter.class)
+    private List<String> category;
+
     @Column(name = "facebook_url")
     private String facebookUrl;
     @Column(name = "twitter_url")
@@ -136,6 +143,14 @@ public class NgoProfileEntity {
 
     public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public List<String> getCategory() {
+        return category;
+    }
+
+    public void setCategory(List<String> category) {
+        this.category = category;
     }
 
     @Override

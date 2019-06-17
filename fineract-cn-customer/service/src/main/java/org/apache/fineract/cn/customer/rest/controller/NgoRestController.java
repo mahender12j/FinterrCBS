@@ -81,12 +81,22 @@ public class NgoRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> createCustomer(@RequestBody @Valid final NgoProfile ngoProfile) {
-        throwIfNGONotExists(ngoProfile.getNgoIdentifier());
-        throwIfNGOProfileExist(ngoProfile.getNgoIdentifier());
+    ResponseEntity<Void> createCustomer(
+            @PathVariable("identifier") final String identifier,
+            @RequestBody @Valid final NgoProfile ngoProfile) {
 
-        this.commandGateway.process(new CreateNGOCommand(ngoProfile, ngoProfile.getNgoIdentifier()));
+        throwIfIdentifierNotMatch(identifier, ngoProfile.getNgoIdentifier());
+        throwIfNGONotExists(identifier);
+        throwIfNGOProfileExist(identifier);
+
+        this.commandGateway.process(new CreateNGOCommand(ngoProfile, identifier));
         return ResponseEntity.accepted().build();
+    }
+
+    private void throwIfIdentifierNotMatch(String identifier, String ngoIdentifier) {
+        if (!identifier.equals(ngoIdentifier)) {
+            throw ServiceException.conflict("Sorry !! identifier didn't match!!!");
+        }
     }
 
     private void throwIfNGOProfileExist(String ngoIdentifier) {

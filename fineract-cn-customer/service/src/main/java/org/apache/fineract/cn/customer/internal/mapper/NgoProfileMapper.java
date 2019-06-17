@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.customer.internal.mapper;
 
+import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.NgoFile;
 import org.apache.fineract.cn.customer.api.v1.domain.NgoProfile;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
@@ -44,7 +45,9 @@ public final class NgoProfileMapper {
         profile.setInstagramUrl(profileEntity.getInstagramUrl());
         profile.setLinkedinUrl(profileEntity.getLinkedinUrl());
         profile.setPrintrestUrl(profileEntity.getPrintrestUrl());
-        profile.setTwitterUrl(profile.getTwitterUrl());
+        profile.setTwitterUrl(profileEntity.getTwitterUrl());
+        profile.setCategory(profileEntity.getCategory());
+        profile.setNgoIdentifier(UserContextHolder.checkedGetUser());
         return profile;
     }
 
@@ -59,6 +62,7 @@ public final class NgoProfileMapper {
         profileEntity.setLinkedinUrl(profile.getLinkedinUrl());
         profileEntity.setPrintrestUrl(profile.getPrintrestUrl());
         profileEntity.setTwitterUrl(profile.getTwitterUrl());
+        profileEntity.setCategory(profile.getCategory());
         return profileEntity;
     }
 
@@ -72,7 +76,7 @@ public final class NgoProfileMapper {
         return entity;
     }
 
-    public static NgoFile map(final NgoFileEntity entity){
+    public static NgoFile map(final NgoFileEntity entity) {
         NgoFile ngoFile = new NgoFile();
         ngoFile.setCreatedOn(entity.getCreatedOn().toString());
         ngoFile.setId(entity.getId());
