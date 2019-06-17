@@ -35,6 +35,8 @@ public class NgoProfile {
     @Valid
     @NotNull
     private String about;
+    @Valid
+    @NotNull
     private List<String> category;
     private String facebookUrl;
     private String twitterUrl;
