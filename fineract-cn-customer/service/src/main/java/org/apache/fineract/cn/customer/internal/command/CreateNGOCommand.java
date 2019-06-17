@@ -18,18 +18,25 @@
  */
 package org.apache.fineract.cn.customer.internal.command;
 
-import org.apache.fineract.cn.customer.api.v1.domain.Customer;
+import org.apache.fineract.cn.customer.api.v1.domain.NgoProfile;
 
-public class CreateCustomerCommand {
+public class CreateNGOCommand {
 
-    private final Customer customer;
+    private final NgoProfile ngoProfile;
+    private final String identifier;
 
-    public CreateCustomerCommand(final Customer customer) {
+    public CreateNGOCommand(final NgoProfile ngoProfile,
+                            final String identifier) {
         super();
-        this.customer = customer;
+        this.ngoProfile = ngoProfile;
+        this.identifier = identifier;
     }
 
-    public Customer customer() {
-        return this.customer;
+    public NgoProfile getNgoProfile() {
+        return ngoProfile;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 }

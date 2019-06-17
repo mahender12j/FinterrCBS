@@ -60,6 +60,8 @@ public final class Customer {
     }
 
     @NotBlank
+    private Long id;
+    @NotBlank
     private String identifier;
     @NotNull
     private Type type;
@@ -411,6 +413,38 @@ public final class Customer {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public void setRegistrationType(RegistrationType registrationType) {
+        this.registrationType = registrationType;
+    }
+
+    public void setCurrentState(State currentState) {
+        this.currentState = currentState;
+    }
+
+    public Boolean getDeposited() {
+        return isDeposited;
+    }
+
+    public void setDeposited(Boolean deposited) {
+        isDeposited = deposited;
+    }
+
+    public void setKycStatus(KycStatus kycStatus) {
+        this.kycStatus = kycStatus;
     }
 
     @Override

@@ -84,6 +84,10 @@ public class CustomerService {
         return this.customerRepository.existsByIdentifier(identifier);
     }
 
+    public Boolean ngoExist(final String identifier) {
+        return this.customerRepository.existsNGOByIdentifier(identifier);
+    }
+
     public Boolean masterTypeExists(final String uuid) {
         return this.documentTypeRepository.existsByIdentifier(uuid);
     }
@@ -119,42 +123,6 @@ public class CustomerService {
             reffCustomer.ifPresent(reff -> customer.setRefferalUserIdentifier(reff.getIdentifier()));
         }
 
-//        SocialMatrix socialMatrix = new SocialMatrix();
-//        String accountNumber = customerEntity.getAccountNumbers();
-//
-//        if (accountNumber != null) {
-//            List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(accountNumber);
-//            final LocalDateTime localDateTime = LocalDateTime.now();
-//            double totalBCDP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
-//                    .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
-//                            Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
-//                    .mapToDouble(AccountEntry::getAmount).sum();
-//
-//
-//            double totalCHRP = accountEntryList.stream().filter(d -> d.getTransactionType().equals("CHRP") && d.getType().equals("DEBIT"))
-//                    .filter(d -> Integer.parseInt(d.getTransactionDate().substring(0, 4)) == localDateTime.getYear() &&
-//                            Integer.parseInt(d.getTransactionDate().substring(5, 7)) == localDateTime.getMonth().getValue())
-//                    .mapToDouble(AccountEntry::getAmount).sum();
-//
-//            socialMatrix.setMyPower((totalBCDP / 20 > 5) ? 5 : (totalBCDP / 20));
-//            socialMatrix.setMyPowerPercentage(socialMatrix.getMyPower() * 20);
-//
-//
-//            socialMatrix.setTotalTrees((int) Math.floor(totalCHRP / 200));
-//            socialMatrix.setGoldenDonor((totalCHRP / 10) > 5 ? 5 : totalCHRP / 10);
-//            socialMatrix.setGreenContribution((totalCHRP / 40) > 5 ? 5 : totalCHRP / 40);
-//
-//
-//        } else {
-//            socialMatrix.setMyPower(0.0);
-//            socialMatrix.setMyPowerPercentage(0.0);
-//            socialMatrix.setTotalTrees(0);
-//            socialMatrix.setGoldenDonor(0.0);
-//            socialMatrix.setGreenContribution(0.0);
-//        }
-//
-//        socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
-//        socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifierActive(customer.getRefferalCodeIdentifier()));
         customer.setSocialMatrix(getSocialMatrix(customerEntity));
         if (customer.getRefAccountNumber() != null) {
             Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());

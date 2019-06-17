@@ -33,6 +33,9 @@ import java.util.Set;
 @Repository
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
 
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CustomerEntity c WHERE c.identifier = :identifier and c.type='BUSINESS'")
+    Boolean existsNGOByIdentifier(@Param("identifier") final String identifier);
+
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CustomerEntity c WHERE c.identifier = :identifier")
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
@@ -45,11 +48,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
 
     Page<CustomerEntity> findByIdentifierContainingOrGivenNameContainingOrSurnameContaining(
             final String identifier, final String givenName, final String surname, final Pageable pageable);
-
-    Page<CustomerEntity> findByReferenceCustomerAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
-            final String refferalCodeIdentifier, final String identifier, final String givenName, final String surname, final Pageable pageable);
-
-    Page<CustomerEntity> findAllByReferenceCustomerAndIsDeposited(final String refferalCodeIdentifier, final Boolean isDeposited, final Pageable pageable);
 
     Optional<CustomerEntity> findByIdentifier(final String identifier);
 

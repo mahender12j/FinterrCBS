@@ -19,7 +19,6 @@
 package org.apache.fineract.cn.cause.api.v1.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.Valid;
@@ -45,7 +44,6 @@ public final class CauseUpdate {
     private String updatedAt;
     private String createOn;
 
-    @JsonIgnore
     private List<CauseUpdatePage> causeUpdatePages;
 
     private Map<String, List<CauseUpdatePage>> causeUpdatePagesMap;

@@ -98,6 +98,7 @@ public final class CustomerMapper {
 
     public static Customer map(final CustomerEntity customerEntity) {
         final Customer customer = new Customer();
+        customer.setId(customerEntity.getId());
         customer.setIdentifier(customerEntity.getIdentifier());
         customer.setType(customerEntity.getType());
         customer.setRegistrationType(customerEntity.getRegistrationType());

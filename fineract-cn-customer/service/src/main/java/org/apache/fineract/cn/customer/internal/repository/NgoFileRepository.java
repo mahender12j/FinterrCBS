@@ -16,20 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.customer.internal.command;
+package org.apache.fineract.cn.customer.internal.repository;
 
-import org.apache.fineract.cn.customer.api.v1.domain.Customer;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-public class CreateCustomerCommand {
+import java.util.List;
 
-    private final Customer customer;
+@Repository
+public interface NgoFileRepository extends JpaRepository<NgoFileEntity, Long> {
 
-    public CreateCustomerCommand(final Customer customer) {
-        super();
-        this.customer = customer;
-    }
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM NgoFileEntity c WHERE c.id = :id")
+    Boolean existsByIdentifier(@Param("id") final Long id);
 
-    public Customer customer() {
-        return this.customer;
-    }
+    List<NgoFileEntity> findAllByProfileEntity(final NgoProfileEntity profileEntity);
 }

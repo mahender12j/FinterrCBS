@@ -36,6 +36,8 @@ public interface CustomerEventConstants {
   String PUT_IDENTIFICATION_CARD = "put-identification-card";
   String DELETE_IDENTIFICATION_CARD = "delete-identification-card";
 
+  String POST_NGO_PROFILE = "post-ngo-profile";
+
   String POST_IDENTIFICATION_CARD_SCAN = "post-identification-card-scan";
   String DELETE_IDENTIFICATION_CARD_SCAN = "delete-identification-card-scan";
 

@@ -18,43 +18,51 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 /**
  * @author Md Robiul Hassan
  */
-public class KycDocuments {
-
-    private String docName;
-    private String uuid;
-    private String description;
+public class NgoFile {
+    private Long id;
+    @Valid
+    @NotNull
+    private String ref;
+    @Valid
+    @NotNull
+    private String title;
+    @Valid
+    @NotNull
     private String type;
-    private String subType;
+    private String createdOn;
 
-
-    public KycDocuments() {
+    public NgoFile() {
+        super();
     }
 
-    public String getDocName() {
-        return docName;
+    public Long getId() {
+        return id;
     }
 
-    public void setDocName(String docName) {
-        this.docName = docName;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getRef() {
+        return ref;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setRef(String ref) {
+        this.ref = ref;
     }
 
-    public String getDescription() {
-        return description;
+    public String getTitle() {
+        return title;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getType() {
@@ -65,22 +73,23 @@ public class KycDocuments {
         this.type = type;
     }
 
-    public String getSubType() {
-        return subType;
+    public String getCreatedOn() {
+        return createdOn;
     }
 
-    public void setSubType(String subType) {
-        this.subType = subType;
+    public void setCreatedOn(String createdOn) {
+        this.createdOn = createdOn;
     }
 
     @Override
     public String toString() {
-        return "KycDocuments{" +
-                "docName='" + docName + '\'' +
-                ", uuid='" + uuid + '\'' +
-                ", description='" + description + '\'' +
+        return "NgoFileEntity{" +
+                "id=" + id +
+                ", ref='" + ref + '\'' +
+                ", title='" + title + '\'' +
                 ", type='" + type + '\'' +
-                ", subtype='" + subType + '\'' +
+                ", createdOn=" + createdOn +
                 '}';
     }
 }
+
