@@ -131,13 +131,9 @@ public class CauseRestController {
                                           @RequestParam(value = "size", required = false) final Integer size,
                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
-//        System.out.println("fetch cause");
-
         if (includeClosed != null ? includeClosed : Boolean.TRUE) {
-//            System.out.println("fetch for NGO");
             return ResponseEntity.ok(this.causeService.fetchCauseForNGO(param, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
         } else {
-//            System.out.println("fetch for Customer");
             return ResponseEntity.ok(this.causeService.fetchCauseForCustomer(param, sortBy == null ? 0 : sortBy, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
         }
     }

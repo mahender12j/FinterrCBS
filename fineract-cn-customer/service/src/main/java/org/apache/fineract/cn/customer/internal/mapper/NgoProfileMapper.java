@@ -26,8 +26,6 @@ import org.apache.fineract.cn.customer.internal.repository.NgoFileEntity;
 import org.apache.fineract.cn.customer.internal.repository.NgoProfileEntity;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 public final class NgoProfileMapper {
 

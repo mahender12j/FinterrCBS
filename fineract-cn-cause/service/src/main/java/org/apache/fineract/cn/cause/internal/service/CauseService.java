@@ -430,19 +430,33 @@ public class CauseService {
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
         final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(identifier, Cause.State.DELETED.name());
-        ArrayList<CauseStatistics> causeStatistics = new ArrayList<>(causeEntities.size());
-        for (CauseEntity causeEntity : causeEntities) {
-            if (causeEntity.getAccountNumber() != null) {
-                final CauseStatistics causeStatistic = CauseStatisticsMapper.map(accountingAdaptor.fetchJournalEntriesJournalEntries(causeEntity.getAccountNumber()));
-                causeStatistics.add(causeStatistic);
-            }
-        }
-
+        ArrayList<CauseStatistics> causeStatistics = causeEntities.stream().filter(causeEntity -> causeEntity.getAccountNumber() != null).map(causeEntity -> CauseStatisticsMapper.map(accountingAdaptor.fetchJournalEntriesJournalEntries(causeEntity.getAccountNumber()))).collect(Collectors.toCollection(() -> new ArrayList<>(causeEntities.size())));
         final NGOStatistics ngoStatistics = new NGOStatistics();
         ngoStatistics.setTotalRaisedAmount(causeStatistics.stream().mapToDouble(CauseStatistics::getTotalRaised).sum());
         ngoStatistics.setTotalSupporter(causeStatistics.stream().mapToInt(CauseStatistics::getTotalSupporter).sum());
         ngoStatistics.setTotalCause(causeEntities.size());
         return ngoStatistics;
+    }
+
+    public NGOProfileStatistics findCausebyCreatedByForNgoProfile(final String identifier) {
+        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(identifier, Cause.State.DELETED.name());
+        ArrayList<CauseStatistics> causeStatistics = causeEntities
+                .stream()
+                .filter(causeEntity -> causeEntity.getAccountNumber() != null)
+                .map(causeEntity -> accountingAdaptor.fetchJournalEntriesJournalEntries(causeEntity.getAccountNumber()))
+                .map(CauseStatisticsMapper::map)
+                .collect(Collectors.toCollection(() -> new ArrayList<>(causeEntities.size())));
+
+        final NGOStatistics ngoStatistics = new NGOStatistics();
+        ngoStatistics.setTotalRaisedAmount(causeStatistics.stream().mapToDouble(CauseStatistics::getTotalRaised).sum());
+        ngoStatistics.setTotalSupporter(causeStatistics.stream().mapToInt(CauseStatistics::getTotalSupporter).sum());
+        ngoStatistics.setTotalCause(causeEntities.size());
+//set value
+        NGOProfileStatistics statistics = new NGOProfileStatistics();
+        statistics.setNgoStatistics(ngoStatistics);
+        statistics.setCauseList(this.causeArrayList(causeEntities));
+
+        return statistics;
     }
 
 
