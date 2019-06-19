@@ -45,6 +45,16 @@ public class DocumentStorage {
     public DocumentStorage() {
     }
 
+    public DocumentStorage(Long id, String uuid, String createdBy, String documentName, String contentType, Long size, String docType) {
+        this.id = id;
+        this.uuid = uuid;
+        this.createdBy = createdBy;
+        this.documentName = documentName;
+        this.contentType = contentType;
+        this.size = size;
+        this.docType = docType;
+    }
+
     public Long getId() {
         return id;
     }

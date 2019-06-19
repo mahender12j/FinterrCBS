@@ -202,13 +202,13 @@ public class DocumentMapper {
         return documentStorage;
     }
 
-    public static DocumentStorageEntity map(final MultipartFile multipartFile, final String createdBy, final String docType) throws IOException {
+    public static DocumentStorageEntity map(final MultipartFile multipartFile, final String docType) throws IOException {
         DocumentStorageEntity storageEntity = new DocumentStorageEntity();
         storageEntity.setContentType(multipartFile.getContentType());
         storageEntity.setDocumentName(multipartFile.getOriginalFilename());
         storageEntity.setImage(multipartFile.getBytes());
         storageEntity.setSize(multipartFile.getSize());
-        storageEntity.setCreatedBy(createdBy);
+        storageEntity.setCreatedBy(UserContextHolder.checkedGetUser());
         storageEntity.setDocType(docType);
         return storageEntity;
     }

@@ -237,9 +237,6 @@ public class AuthenticationCommandHandler {
                                                                     final String refreshToken,
                                                                     final LocalDateTime refreshTokenExpiration) {
         final Optional<LocalDateTime> passwordExpiration = getExpiration(user);
-
-        System.out.println("-------------------password expiration---------" + passwordExpiration);
-
         final int gracePeriod = privateTenantInfo.getTimeToChangePasswordAfterExpirationInDays();
         if (pastGracePeriod(passwordExpiration, gracePeriod))
             throw AmitAuthenticationException.passwordExpired();
@@ -249,7 +246,6 @@ public class AuthenticationCommandHandler {
         if (sourceApplicationName.equals(applicationName.toString())) { //ie, this is a token for the identity manager.
             if (pastExpiration(passwordExpiration)) {
                 tokenPermissions = identityEndpointsAllowedEvenWithExpiredPassword();
-                System.out.println("-------------password expired-----------------");
                 logger.info("Password expired {}", passwordExpiration.map(LocalDateTime::toString).orElse("empty"));
             } else {
                 tokenPermissions = getUserTokenPermissions(user);

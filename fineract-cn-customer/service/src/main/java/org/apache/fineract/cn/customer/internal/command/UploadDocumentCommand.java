@@ -18,35 +18,25 @@
  */
 package org.apache.fineract.cn.customer.internal.command;
 
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
- * @author Myrle Krantz
+ * @author MD Robiul Hassan
  */
-public class CreateDocumentCommand {
-    private final String customerIdentifier;
-    private final CustomerDocument customerDocument;
+public class UploadDocumentCommand {
+    private final String docType;
+    private final MultipartFile file;
 
-    public CreateDocumentCommand(
-            final String customerIdentifier,
-            final CustomerDocument customerDocument) {
-        this.customerIdentifier = customerIdentifier;
-        this.customerDocument = customerDocument;
+    public UploadDocumentCommand(String docType, MultipartFile file) {
+        this.docType = docType;
+        this.file = file;
     }
 
-    public String getCustomerIdentifier() {
-        return customerIdentifier;
+    public String getDocType() {
+        return docType;
     }
 
-    public CustomerDocument getCustomerDocument() {
-        return customerDocument;
-    }
-
-    @Override
-    public String toString() {
-        return "CreateDocumentCommand{" +
-                "customerIdentifier='" + customerIdentifier + '\'' +
-                ", customerDocument=" + customerDocument.getIdentifier() +
-                '}';
+    public MultipartFile getFile() {
+        return file;
     }
 }

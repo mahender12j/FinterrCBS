@@ -59,6 +59,9 @@ public interface CustomerEventConstants {
   String POST_DOCUMENT_SUB_TYPE = "post-document_sub_type";
   String PUT_DOCUMENT_SUB_TYPE = "put-document_sub_type";
 
+
+  String UPLOAD_DOCUMENT = "upload-document";
+
   String POST_DOCUMENT = "post-document";
   String PUT_DOCUMENT = "put-document";
   String UNDO_DOCUMENT = "undo-document";

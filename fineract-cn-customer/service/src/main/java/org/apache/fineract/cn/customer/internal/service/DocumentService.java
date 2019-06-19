@@ -72,11 +72,11 @@ public class DocumentService {
     }
 
 
-    public DocumentStorage addNewDocument(final MultipartFile multipartFile, final String customeridentifier, final String docType) throws IOException {
-        DocumentStorageEntity storageEntity = DocumentMapper.map(multipartFile, customeridentifier, docType);
-        DocumentStorageEntity entity = this.documentStorageRepository.save(storageEntity);
-        return DocumentMapper.map(entity);
-    }
+//    public DocumentStorage addNewDocument(final MultipartFile multipartFile, final String customeridentifier, final String docType) throws IOException {
+//        DocumentStorageEntity storageEntity = DocumentMapper.map(multipartFile, customeridentifier, docType);
+//        DocumentStorageEntity entity = this.documentStorageRepository.save(storageEntity);
+//        return DocumentMapper.map(entity);
+//    }
 
     public Optional<DocumentStorageEntity> findDocumentStorageByUUID(final String uuid) {
         return this.documentStorageRepository.findByUuid(uuid);

@@ -20,6 +20,8 @@ package org.apache.fineract.cn.customer.rest.controller;
 
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
+import org.apache.fineract.cn.command.domain.CommandCallback;
+import org.apache.fineract.cn.command.domain.CommandProcessingException;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
@@ -39,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Myrle Krantz
@@ -116,6 +119,7 @@ public class DocumentsRestController {
         throwIfCustomerNotExists(customerIdentifier);
         if (!instance.getIdentifier().equals(documentIdentifier))
             throw ServiceException.badRequest("Document identifier in request body must match document identifier in request path.");
+
         commandGateway.process(new CreateDocumentCommand(customerIdentifier, instance));
         return ResponseEntity.accepted().build();
     }
@@ -140,13 +144,18 @@ public class DocumentsRestController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> createDocumentType(
+    ResponseEntity<CreateDocumentTypeCommandResponse> createDocumentType(
             @PathVariable("customeridentifier") final String customerIdentifier,
             @RequestBody final @Valid DocumentsType instance) {
         throwIfCustomerNotExists(customerIdentifier);
 
-        commandGateway.process(new CreateDocumentTypeCommand(customerIdentifier, instance));
-        return ResponseEntity.accepted().build();
+        try {
+            final CommandCallback<CreateDocumentTypeCommandResponse> commandCallback = commandGateway.process(new CreateDocumentTypeCommand(customerIdentifier, instance), CreateDocumentTypeCommandResponse.class);
+            return ResponseEntity.ok(commandCallback.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Sorry! Something went wrong");
+        }
+//        return ResponseEntity.accepted().build();
     }
 
 
@@ -312,8 +321,7 @@ public class DocumentsRestController {
 
         return ResponseEntity.accepted().build();
     }
-
-
+    
     //    upload document on each and return the document from the storage
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
@@ -322,13 +330,19 @@ public class DocumentsRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public @ResponseBody
-    DocumentStorage uploadNewDocument(
+    public ResponseEntity<DocumentStorage> uploadNewDocument(
             @PathVariable(value = "customeridentifier") final String customeridentifier,
             @RequestParam(value = "file") final MultipartFile file,
-            @RequestParam("docType") String docType) throws IOException {
+            @RequestParam("docType") String docType) {
+        throwIfCustomerNotExists(customeridentifier);
 
-        return this.documentService.addNewDocument(file, customeridentifier, docType);
+        try {
+            final CommandCallback<DocumentStorage> commandCallback = commandGateway.process(new UploadDocumentCommand(docType, file), DocumentStorage.class);
+            return ResponseEntity.ok(commandCallback.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.badRequest("Sorry! Something went wrong");
+        }
+//        return this.documentService.addNewDocument(file, customeridentifier, docType);
     }
 
 
@@ -344,6 +358,7 @@ public class DocumentsRestController {
     public ResponseEntity<byte[]> getStorageDocument(
             @PathVariable("customeridentifier") final String customerIdentifier,
             @PathVariable("uuid") final String uuid) {
+        throwIfCustomerNotExists(customerIdentifier);
 
         final DocumentStorageEntity storageEntity = documentService.findDocumentStorageByUUID(uuid)
                 .orElseThrow(() -> ServiceException.notFound("document ''{0}'' not found.", uuid));

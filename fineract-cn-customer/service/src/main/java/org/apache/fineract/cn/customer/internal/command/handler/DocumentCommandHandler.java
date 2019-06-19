@@ -20,8 +20,8 @@ package org.apache.fineract.cn.customer.internal.command.handler;
 
 import org.apache.fineract.cn.customer.api.v1.CustomerEventConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
+import org.apache.fineract.cn.customer.api.v1.domain.DocumentStorage;
 import org.apache.fineract.cn.customer.api.v1.domain.DocumentsMasterSubtype;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentsSubType;
 import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentEvent;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentPageEvent;
@@ -52,17 +52,22 @@ public class DocumentCommandHandler {
     private final DocumentEntryRepository documentEntryRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final DocumentSubTypeRepository documentSubTypeRepository;
+    private final DocumentStorageRepository documentStorageRepository;
 
     @Autowired
     public DocumentCommandHandler(
             final DocumentRepository documentRepository,
             final DocumentEntryRepository documentEntryRepository,
-            final CustomerRepository customerRepository, DocumentTypeRepository documentTypeRepository, DocumentSubTypeRepository documentSubTypeRepository) {
+            final CustomerRepository customerRepository,
+            final DocumentTypeRepository documentTypeRepository,
+            final DocumentSubTypeRepository documentSubTypeRepository,
+            final DocumentStorageRepository documentStorageRepository) {
         this.documentRepository = documentRepository;
         this.customerRepository = customerRepository;
         this.documentEntryRepository = documentEntryRepository;
         this.documentTypeRepository = documentTypeRepository;
         this.documentSubTypeRepository = documentSubTypeRepository;
+        this.documentStorageRepository = documentStorageRepository;
     }
 
     @Transactional
@@ -110,6 +115,16 @@ public class DocumentCommandHandler {
 
     @Transactional
     @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.UPLOAD_DOCUMENT)
+    public DocumentStorage process(final UploadDocumentCommand command) throws IOException {
+        DocumentStorageEntity storageEntity = DocumentMapper.map(command.getFile(), command.getDocType());
+        DocumentStorageEntity entity = this.documentStorageRepository.save(storageEntity);
+        return new DocumentStorage(entity.getId(), entity.getUuid(), entity.getCreatedBy(), entity.getDocumentName(), entity.getContentType(), entity.getSize(), entity.getDocType());
+    }
+
+
+    @Transactional
+    @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.UNDO_DOCUMENT)
     public DocumentEvent process(final UndoDocumentStatusCommand command) throws IOException {
 
@@ -127,11 +142,11 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_TYPE)
-    public DocumentEvent process(final CreateDocumentTypeCommand command) throws IOException {
+    public CreateDocumentTypeCommandResponse process(final CreateDocumentTypeCommand command) throws IOException {
 
         final DocumentTypeEntity documentTypeEntity = DocumentMapper.map(command.getDocumentsType());
-        this.documentTypeRepository.save(documentTypeEntity);
-        return new DocumentEvent(command.getCustomerIdentifier(), command.getDocumentsType().toString());
+        DocumentTypeEntity typeEntity = this.documentTypeRepository.save(documentTypeEntity);
+        return new CreateDocumentTypeCommandResponse(typeEntity.getTitle(), typeEntity.getUserType(), typeEntity.isActive(), typeEntity.getUuid());
     }
 
 
