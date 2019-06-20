@@ -61,21 +61,27 @@ public class Cause {
     @NotNull
     private Double hardTarget;
 
-    private Boolean isTaxExamption;
-    private Boolean isResubmited;
+    private Boolean isTaxExemption;
+    private Boolean isResubmitted;
     private Boolean isExtended;
 
-    private Double actualRaisedFiat;
-    private Double actualRaisedFin;
-    @NotNull
-    private Double minAmount;
-    @NotNull
-    private Double maxAmount;
+
+    //    todo comment out for unused value
+//    private Double actualRaisedFiat;
+//    private Double actualRaisedFin;
+//    @NotNull
+//    private Double minAmount;
+//    @NotNull
+//    private Double maxAmount;
     @NotNull
     private String acceptedDenominationAmounts;
     private Double successFees;
+
+    //    todo for the node side calculation
     private Double finCollLimit;
     private String finRate;
+
+
     private String approvedBy;
     private String approvedOn;
     private String createdBy;
@@ -108,7 +114,7 @@ public class Cause {
     @Valid
     private int frequencyCauseImplementationUpdates;
 
-//    new 1a requirements
+    //    new 1a requirements
     private int totalNumberOfUpdates;
     private int NumberOfUpdateProvided;
     private int NumberOfDaysLeftForNextUpdate;
@@ -218,44 +224,12 @@ public class Cause {
         this.hardTarget = hardTarget;
     }
 
-    public Boolean getIsTaxExamption() {
-        return isTaxExamption;
+    public Boolean getIsTaxExemption() {
+        return isTaxExemption;
     }
 
-    public void setIsTaxExamption(Boolean isTaxExamption) {
-        this.isTaxExamption = isTaxExamption;
-    }
-
-    public Double getActualRaisedFiat() {
-        return actualRaisedFiat;
-    }
-
-    public void setActualRaisedFiat(Double actualRaisedFiat) {
-        this.actualRaisedFiat = actualRaisedFiat;
-    }
-
-    public Double getActualRaisedFin() {
-        return actualRaisedFin;
-    }
-
-    public void setActualRaisedFin(Double actualRaisedFin) {
-        this.actualRaisedFin = actualRaisedFin;
-    }
-
-    public Double getMinAmount() {
-        return minAmount;
-    }
-
-    public void setMinAmount(Double minAmount) {
-        this.minAmount = minAmount;
-    }
-
-    public Double getMaxAmount() {
-        return maxAmount;
-    }
-
-    public void setMaxAmount(Double maxAmount) {
-        this.maxAmount = maxAmount;
+    public void setIsTaxExemption(Boolean isTaxExemption) {
+        this.isTaxExemption = isTaxExemption;
     }
 
     public String getAcceptedDenominationAmounts() {
@@ -339,11 +313,11 @@ public class Cause {
     }
 
     public Boolean getTaxExamption() {
-        return isTaxExamption;
+        return isTaxExemption;
     }
 
     public void setTaxExamption(Boolean taxExamption) {
-        isTaxExamption = taxExamption;
+        isTaxExemption = taxExamption;
     }
 
     public CauseCategory getCauseCategories() {
@@ -443,11 +417,11 @@ public class Cause {
     }
 
     public Boolean getResubmited() {
-        return isResubmited;
+        return isResubmitted;
     }
 
     public void setResubmited(Boolean resubmited) {
-        isResubmited = resubmited;
+        isResubmitted = resubmited;
     }
 
     public Boolean getExtended() {
@@ -540,18 +514,54 @@ public class Cause {
 
     @Override
     public String toString() {
-        return "Cause [identifier=" + identifier + ", title=" + title + ", description=" + description + ", startDate="
-                + startDate + ", endDate=" + endDate + ", completedDate=" + completedDate + ", softTarget=" + softTarget
-                + ", hardTarget=" + hardTarget + ", isTaxExamption=" + isTaxExamption + ", actualRaisedFiat="
-                + actualRaisedFiat + ", actualRaisedFin=" + actualRaisedFin + ", minAmount=" + minAmount
-                + ", maxAmount=" + maxAmount + ", acceptedDenominationAmounts=" + acceptedDenominationAmounts
-                + ", successFees=" + successFees + ", finCollLimit=" + finCollLimit + ", finRate=" + finRate
-                + ", approvedBy=" + approvedBy + ", approvedOn=" + approvedOn + ", createdBy=" + createdBy
-                + ", createdOn=" + createdOn + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedOn="
-                + lastModifiedOn + ", taxExemptionPercentage=" + taxExemptionPercentage + ", websiteUrl=" + websiteUrl
-                + ", smediaLinks=" + smediaLinks + ", videoUrls=" + videoUrls + ", avgRating=" + avgRating
-                + ", causeTxHash=" + causeTxHash + ", accountNumber=" + accountNumber + ", ethAddress=" + ethAddress
-                + " , toString()=" + super.toString() + "]";
+        return "Cause{" +
+                "identifier='" + identifier + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", completedDate='" + completedDate + '\'' +
+                ", address=" + address +
+                ", currentState='" + currentState + '\'' +
+                ", softTarget=" + softTarget +
+                ", hardTarget=" + hardTarget +
+                ", isTaxExemption=" + isTaxExemption +
+                ", isResubmitted=" + isResubmitted +
+                ", isExtended=" + isExtended +
+                ", acceptedDenominationAmounts='" + acceptedDenominationAmounts + '\'' +
+                ", successFees=" + successFees +
+                ", finCollLimit=" + finCollLimit +
+                ", finRate='" + finRate + '\'' +
+                ", approvedBy='" + approvedBy + '\'' +
+                ", approvedOn='" + approvedOn + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdOn='" + createdOn + '\'' +
+                ", lastModifiedBy='" + lastModifiedBy + '\'' +
+                ", lastModifiedOn='" + lastModifiedOn + '\'' +
+                ", isFeeRevisionRequired=" + isFeeRevisionRequired +
+                ", causeCategories=" + causeCategories +
+                ", taxExemptionPercentage='" + taxExemptionPercentage + '\'' +
+                ", websiteUrl='" + websiteUrl + '\'' +
+                ", smediaLinks='" + smediaLinks + '\'' +
+                ", videoUrls='" + videoUrls + '\'' +
+                ", avgRating='" + avgRating + '\'' +
+                ", causeTxHash='" + causeTxHash + '\'' +
+                ", accountNumber='" + accountNumber + '\'' +
+                ", ethAddress='" + ethAddress + '\'' +
+                ", causeStatistics=" + causeStatistics +
+                ", causeDocument=" + causeDocument +
+                ", causeImplementationDuration=" + causeImplementationDuration +
+                ", frequencyCauseImplementationUpdates=" + frequencyCauseImplementationUpdates +
+                ", totalNumberOfUpdates=" + totalNumberOfUpdates +
+                ", NumberOfUpdateProvided=" + NumberOfUpdateProvided +
+                ", NumberOfDaysLeftForNextUpdate=" + NumberOfDaysLeftForNextUpdate +
+                ", rejectedReason='" + rejectedReason + '\'' +
+                ", publishDate=" + publishDate +
+                ", causeRatingList=" + causeRatingList +
+                ", causeFiles=" + causeFiles +
+                ", numberOfResubmit=" + numberOfResubmit +
+                ", numberOfExtended=" + numberOfExtended +
+                '}';
     }
 }
 

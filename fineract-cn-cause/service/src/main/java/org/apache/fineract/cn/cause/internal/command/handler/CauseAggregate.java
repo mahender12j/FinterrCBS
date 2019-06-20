@@ -119,8 +119,6 @@ public class CauseAggregate {
                 savedCauseEntity.getSoftTarget(),
                 savedCauseEntity.getHardTarget(),
                 savedCauseEntity.getIsTaxExamption(),
-                savedCauseEntity.getMinAmount(),
-                savedCauseEntity.getMaxAmount(),
                 savedCauseEntity.getAcceptedDenominationAmounts(),
                 savedCauseEntity.getCreatedBy(),
                 savedCauseEntity.getCreatedOn().toString(),
@@ -163,8 +161,8 @@ public class CauseAggregate {
         causeEntity.setTaxExamption(cause.getTaxExamption());
         causeEntity.setTaxExemptionPercentage(cause.getTaxExemptionPercentage());
         causeEntity.setFinRate(cause.getFinRate());
-        causeEntity.setActualRaisedFiat(cause.getActualRaisedFiat());
-        causeEntity.setActualRaisedFin(cause.getActualRaisedFiat());
+//        causeEntity.setActualRaisedFiat(cause.getActualRaisedFiat());
+//        causeEntity.setActualRaisedFin(cause.getActualRaisedFiat());
         causeEntity.setHardTarget(cause.getHardTarget());
         causeEntity.setSoftTarget(cause.getSoftTarget());
         causeEntity.setCurrentState(Cause.State.PENDING.name());

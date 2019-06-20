@@ -83,14 +83,18 @@ public class CauseEntity {
     private Boolean isExtended;
 
 
-    @Column(name = "actual_raised_fiat")
-    private Double actualRaisedFiat;
-    @Column(name = "actual_raised_fin")
-    private Double actualRaisedFin;
-    @Column(name = "min_amount")
-    private Double minAmount;
-    @Column(name = "max_amount")
-    private Double maxAmount;
+//    todo comment out on 20 Jun, 2019
+//
+//    @Column(name = "actual_raised_fiat")
+//    private Double actualRaisedFiat;
+//    @Column(name = "actual_raised_fin")
+//    private Double actualRaisedFin;
+//    @Column(name = "min_amount")
+//    private Double minAmount;
+//    @Column(name = "max_amount")
+//    private Double maxAmount;
+
+
     @Column(name = "accepted_denomination_amounts")
     private String acceptedDenominationAmounts;
     @Column(name = "management_fee")
@@ -273,37 +277,37 @@ public class CauseEntity {
         this.isTaxExamption = isTaxExamption;
     }
 
-    public Double getActualRaisedFiat() {
-        return actualRaisedFiat;
-    }
-
-    public void setActualRaisedFiat(Double actualRaisedFiat) {
-        this.actualRaisedFiat = actualRaisedFiat;
-    }
-
-    public Double getActualRaisedFin() {
-        return actualRaisedFin;
-    }
-
-    public void setActualRaisedFin(Double actualRaisedFin) {
-        this.actualRaisedFin = actualRaisedFin;
-    }
-
-    public Double getMinAmount() {
-        return minAmount;
-    }
-
-    public void setMinAmount(Double minAmount) {
-        this.minAmount = minAmount;
-    }
-
-    public Double getMaxAmount() {
-        return maxAmount;
-    }
-
-    public void setMaxAmount(Double maxAmount) {
-        this.maxAmount = maxAmount;
-    }
+//    public Double getActualRaisedFiat() {
+//        return actualRaisedFiat;
+//    }
+//
+//    public void setActualRaisedFiat(Double actualRaisedFiat) {
+//        this.actualRaisedFiat = actualRaisedFiat;
+//    }
+//
+//    public Double getActualRaisedFin() {
+//        return actualRaisedFin;
+//    }
+//
+//    public void setActualRaisedFin(Double actualRaisedFin) {
+//        this.actualRaisedFin = actualRaisedFin;
+//    }
+//
+//    public Double getMinAmount() {
+//        return minAmount;
+//    }
+//
+//    public void setMinAmount(Double minAmount) {
+//        this.minAmount = minAmount;
+//    }
+//
+//    public Double getMaxAmount() {
+//        return maxAmount;
+//    }
+//
+//    public void setMaxAmount(Double maxAmount) {
+//        this.maxAmount = maxAmount;
+//    }
 
     public String getAcceptedDenominationAmounts() {
         return acceptedDenominationAmounts;
@@ -540,10 +544,6 @@ public class CauseEntity {
                 ", isTaxExamption=" + isTaxExamption +
                 ", isResubmited=" + isResubmited +
                 ", isExtended=" + isExtended +
-                ", actualRaisedFiat=" + actualRaisedFiat +
-                ", actualRaisedFin=" + actualRaisedFin +
-                ", minAmount=" + minAmount +
-                ", maxAmount=" + maxAmount +
                 ", acceptedDenominationAmounts='" + acceptedDenominationAmounts + '\'' +
                 ", managementFee=" + managementFee +
                 ", finCollLimit=" + finCollLimit +

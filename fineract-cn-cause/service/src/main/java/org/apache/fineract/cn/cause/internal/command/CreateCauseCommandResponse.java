@@ -42,8 +42,6 @@ public class CreateCauseCommandResponse {
     private Double hardTarget;
 
     private Boolean isTaxExamption;
-    private Double minAmount;
-    private Double maxAmount;
     private String acceptedDenominationAmounts;
     private String createdBy;
     private String createdOn;
@@ -64,7 +62,7 @@ public class CreateCauseCommandResponse {
     }
 
 
-    public CreateCauseCommandResponse(String identifier, String title, String description, String startDate, String endDate, String currentState, Double softTarget, Double hardTarget, Boolean isTaxExamption, Double minAmount, Double maxAmount, String acceptedDenominationAmounts, String createdBy, String createdOn, boolean isFeeRevisionRequired, String taxExemptionPercentage, String websiteUrl, String smediaLinks, String videoUrls, String causeTxHash, String accountNumber, String ethAddress, String rejectedReason) {
+    public CreateCauseCommandResponse(String identifier, String title, String description, String startDate, String endDate, String currentState, Double softTarget, Double hardTarget, Boolean isTaxExamption, String acceptedDenominationAmounts, String createdBy, String createdOn, boolean isFeeRevisionRequired, String taxExemptionPercentage, String websiteUrl, String smediaLinks, String videoUrls, String causeTxHash, String accountNumber, String ethAddress, String rejectedReason) {
         this.identifier = identifier;
         this.title = title;
         this.description = description;
@@ -74,8 +72,6 @@ public class CreateCauseCommandResponse {
         this.softTarget = softTarget;
         this.hardTarget = hardTarget;
         this.isTaxExamption = isTaxExamption;
-        this.minAmount = minAmount;
-        this.maxAmount = maxAmount;
         this.acceptedDenominationAmounts = acceptedDenominationAmounts;
         this.createdBy = createdBy;
         this.createdOn = createdOn;
@@ -124,14 +120,6 @@ public class CreateCauseCommandResponse {
 
     public Boolean getTaxExamption() {
         return isTaxExamption;
-    }
-
-    public Double getMinAmount() {
-        return minAmount;
-    }
-
-    public Double getMaxAmount() {
-        return maxAmount;
     }
 
     public String getAcceptedDenominationAmounts() {
