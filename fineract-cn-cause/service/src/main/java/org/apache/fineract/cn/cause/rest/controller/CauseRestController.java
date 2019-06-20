@@ -30,6 +30,8 @@ import org.apache.fineract.cn.cause.internal.repository.CauseStateRepository;
 import org.apache.fineract.cn.cause.internal.repository.PortraitEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
+import org.apache.fineract.cn.command.domain.CommandCallback;
+import org.apache.fineract.cn.command.domain.CommandProcessingException;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.slf4j.Logger;
@@ -46,6 +48,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static org.apache.fineract.cn.cause.api.v1.domain.Cause.State.*;
@@ -99,12 +102,17 @@ public class CauseRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> createCause(@RequestBody final Cause cause) {
+    ResponseEntity<CreateCauseCommandResponse> createCause(@RequestBody final Cause cause) {
         throwIfCauseExists(cause.getIdentifier());
         throwIfDocumentNotValid(cause);
 
-        this.commandGateway.process(new CreateCauseCommand(cause));
-        return ResponseEntity.accepted().build();
+        try {
+            CommandCallback<CreateCauseCommandResponse> commandCallback = this.commandGateway.process(new CreateCauseCommand(cause), CreateCauseCommandResponse.class);
+            return ResponseEntity.ok(commandCallback.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Sorry ! Something went wrong");
+        }
+//        return ResponseEntity.accepted().build();
     }
 
 
@@ -137,6 +145,7 @@ public class CauseRestController {
             return ResponseEntity.ok(this.causeService.fetchCauseForCustomer(param, sortBy == null ? 0 : sortBy, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
         }
     }
+
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
     @RequestMapping(

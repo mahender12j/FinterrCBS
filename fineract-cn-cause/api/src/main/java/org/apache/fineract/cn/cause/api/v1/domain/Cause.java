@@ -67,8 +67,11 @@ public class Cause {
 
     private Double actualRaisedFiat;
     private Double actualRaisedFin;
+    @NotNull
     private Double minAmount;
+    @NotNull
     private Double maxAmount;
+    @NotNull
     private String acceptedDenominationAmounts;
     private Double managementFee;
     private Double finCollLimit;
@@ -91,7 +94,9 @@ public class Cause {
     private String videoUrls;
     private String avgRating;
     private String causeTxHash;
+    @NotNull
     private String accountNumber;
+    @NotNull
     private String ethAddress;
     private CauseStatistics causeStatistics;
     private CauseDocument causeDocument;

@@ -84,7 +84,7 @@ public class CauseAggregate {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CAUSE)
-    public String createCause(final CreateCauseCommand createCauseCommand) throws IOException {
+    public CreateCauseCommandResponse createCause(final CreateCauseCommand createCauseCommand) throws IOException {
         final Cause cause = createCauseCommand.getCause();
         final CategoryEntity categoryEntity;
 
@@ -109,7 +109,30 @@ public class CauseAggregate {
         documentPageRepository.save(DocumentMapper.map(cause, documentEntity));
 
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.ACTIVATE);
-        return cause.getIdentifier();
+        return new CreateCauseCommandResponse(
+                savedCauseEntity.getIdentifier(),
+                savedCauseEntity.getTitle(),
+                savedCauseEntity.getDescription(),
+                savedCauseEntity.getStartDate().toString(),
+                savedCauseEntity.getEndDate().toString(),
+                savedCauseEntity.getCurrentState(),
+                savedCauseEntity.getSoftTarget(),
+                savedCauseEntity.getHardTarget(),
+                savedCauseEntity.getIsTaxExamption(),
+                savedCauseEntity.getMinAmount(),
+                savedCauseEntity.getMaxAmount(),
+                savedCauseEntity.getAcceptedDenominationAmounts(),
+                savedCauseEntity.getCreatedBy(),
+                savedCauseEntity.getCreatedOn().toString(),
+                savedCauseEntity.isFeeRevisionRequired(),
+                savedCauseEntity.getTaxExemptionPercentage(),
+                savedCauseEntity.getWebsiteUrl(),
+                savedCauseEntity.getSmediaLinks(),
+                savedCauseEntity.getVideoUrls(),
+                savedCauseEntity.getCauseTxHash(),
+                savedCauseEntity.getAccountNumber(),
+                savedCauseEntity.getEthAddress(),
+                savedCauseEntity.getRejectedReason());
     }
 
     @Transactional
