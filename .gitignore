@@ -21,3 +21,19 @@ gradle-app.setting
 
 docker-compose.yaml 
 docker-bash.sh
+fineract-cn-rhythm/api/.classpath
+fineract-cn-rhythm/api/.project
+fineract-cn-rhythm/api/.settings/
+fineract-cn-rhythm/api/bin/
+fineract-cn-rhythm/component-test/.classpath
+fineract-cn-rhythm/component-test/.project
+fineract-cn-rhythm/component-test/.settings/
+fineract-cn-rhythm/component-test/bin/
+fineract-cn-rhythm/service/.classpath
+fineract-cn-rhythm/service/.project
+fineract-cn-rhythm/service/.settings/
+fineract-cn-rhythm/service/bin/
+fineract-cn-rhythm/spi/.classpath
+fineract-cn-rhythm/spi/.project
+fineract-cn-rhythm/spi/.settings/
+fineract-cn-rhythm/spi/bin/
