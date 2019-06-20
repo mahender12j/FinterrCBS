@@ -111,75 +111,85 @@ public class DocumentService {
 
 
     public UserContactVerificationStatus findCustomersContactDetails(final String identifier) {
-        final ContactDetailEntity contactDetailEntity = this.contactDetailRepository.findAllByValue(identifier).stream().findFirst().orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
-        UserContactVerificationStatus userContactVerificationStatus = new UserContactVerificationStatus();
+//        final ContactDetailEntity contactDetailEntity = this.contactDetailRepository.findAllByValue(identifier).stream().findFirst().orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
+        return this.contactDetailRepository.findAllByValue(identifier).stream().findFirst().map(contactDetailEntity -> {
+            UserContactVerificationStatus userContactVerificationStatus = new UserContactVerificationStatus();
+            switch (contactDetailEntity.getType()) {
+                case "EMAIL":
+                    userContactVerificationStatus.setEmail(contactDetailEntity.getValue());
+                    boolean isEmailValid = this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL");
+                    userContactVerificationStatus.setEmailVerified(isEmailValid);
+                    CustomerEntity customerEntity = contactDetailEntity.getCustomer();
+                    if (isEmailValid) {
+                        ContactDetailEntity e = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL", true).stream().findFirst().get();
+                        userContactVerificationStatus.setUsername(e.getCustomer().getIdentifier());
+                    }
+                    Optional<ContactDetailEntity> mobileContactDetail = contactDetailRepository.findByCustomerAndType(customerEntity, "MOBILE").stream().findFirst();
 
-        switch (contactDetailEntity.getType()) {
-            case "EMAIL":
-                userContactVerificationStatus.setEmail(contactDetailEntity.getValue());
-                boolean isEmailValid = this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL");
-                userContactVerificationStatus.setEmailVerified(isEmailValid);
-                CustomerEntity customerEntity = contactDetailEntity.getCustomer();
-                if (isEmailValid) {
-                    ContactDetailEntity e = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "EMAIL", true).stream().findFirst().get();
-                    userContactVerificationStatus.setUsername(e.getCustomer().getIdentifier());
-                }
-                Optional<ContactDetailEntity> mobileContactDetail = contactDetailRepository.findByCustomerAndType(customerEntity, "MOBILE").stream().findFirst();
+                    if (mobileContactDetail.isPresent()) {
+                        Optional<ContactDetailEntity> contactDetailData = contactDetailRepository.findAllByValue(mobileContactDetail.get().getValue()).stream().findFirst();
+                        if (contactDetailData.isPresent()) {
+                            userContactVerificationStatus.setMobile(contactDetailData.get().getValue());
+                            userContactVerificationStatus.setMobileVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailData.get().getValue(), "MOBILE"));
+                        } else {
+                            userContactVerificationStatus.setMobile(null);
+                            userContactVerificationStatus.setMobileVerified(false);
+                        }
 
-                if (mobileContactDetail.isPresent()) {
-                    Optional<ContactDetailEntity> contactDetailData = contactDetailRepository.findAllByValue(mobileContactDetail.get().getValue()).stream().findFirst();
-                    if (contactDetailData.isPresent()) {
-                        userContactVerificationStatus.setMobile(contactDetailData.get().getValue());
-                        userContactVerificationStatus.setMobileVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailData.get().getValue(), "MOBILE"));
+
                     } else {
-                        userContactVerificationStatus.setMobile("");
+                        userContactVerificationStatus.setMobile(null);
                         userContactVerificationStatus.setMobileVerified(false);
                     }
 
-
-                } else {
-                    userContactVerificationStatus.setMobile("");
-                    userContactVerificationStatus.setMobileVerified(false);
-                }
-
-                break;
-            case "MOBILE":
-                userContactVerificationStatus.setMobile(contactDetailEntity.getValue());
-                boolean isMobileValid = this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE");
-                userContactVerificationStatus.setMobileVerified(isMobileValid);
-                CustomerEntity customerEntity1 = contactDetailEntity.getCustomer();
-                if (isMobileValid) {
-                    ContactDetailEntity d = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE", true).stream().findFirst().get();
-                    userContactVerificationStatus.setUsername(d.getCustomer().getIdentifier());
-                }
-                Optional<ContactDetailEntity> detailEntity = contactDetailRepository.findByCustomerAndType(customerEntity1, "EMAIL").stream().findFirst();
-
-                if (detailEntity.isPresent()) {
-                    detailEntity = contactDetailRepository.findAllByValue(detailEntity.get().getValue()).stream().findFirst();
+                    break;
+                case "MOBILE":
+                    userContactVerificationStatus.setMobile(contactDetailEntity.getValue());
+                    boolean isMobileValid = this.contactDetailRepository.existsByIdentifierAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE");
+                    userContactVerificationStatus.setMobileVerified(isMobileValid);
+                    CustomerEntity customerEntity1 = contactDetailEntity.getCustomer();
+                    if (isMobileValid) {
+                        ContactDetailEntity d = contactDetailRepository.findAllByValueAndTypeAndValid(contactDetailEntity.getValue(), "MOBILE", true).stream().findFirst().get();
+                        userContactVerificationStatus.setUsername(d.getCustomer().getIdentifier());
+                    }
+                    Optional<ContactDetailEntity> detailEntity = contactDetailRepository.findByCustomerAndType(customerEntity1, "EMAIL").stream().findFirst();
 
                     if (detailEntity.isPresent()) {
-                        userContactVerificationStatus.setEmail(detailEntity.get().getValue());
-                        userContactVerificationStatus.setEmailVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(detailEntity.get().getValue(), "EMAIL"));
+                        detailEntity = contactDetailRepository.findAllByValue(detailEntity.get().getValue()).stream().findFirst();
+
+                        if (detailEntity.isPresent()) {
+                            userContactVerificationStatus.setEmail(detailEntity.get().getValue());
+                            userContactVerificationStatus.setEmailVerified(this.contactDetailRepository.existsByIdentifierAndTypeAndValid(detailEntity.get().getValue(), "EMAIL"));
+
+                        } else {
+                            userContactVerificationStatus.setEmail(null);
+                            userContactVerificationStatus.setEmailVerified(false);
+
+                        }
 
                     } else {
-                        userContactVerificationStatus.setEmail("");
+                        userContactVerificationStatus.setEmail(null);
                         userContactVerificationStatus.setEmailVerified(false);
-
                     }
-
-                } else {
-                    userContactVerificationStatus.setEmail("");
+                    break;
+                default:
+                    userContactVerificationStatus.setEmail(null);
+                    userContactVerificationStatus.setMobile(null);
+                    userContactVerificationStatus.setMobileVerified(false);
                     userContactVerificationStatus.setEmailVerified(false);
-                }
-                break;
-            default:
-                userContactVerificationStatus.setEmail("");
-                userContactVerificationStatus.setMobile("");
-                userContactVerificationStatus.setMobileVerified(false);
-                userContactVerificationStatus.setEmailVerified(false);
-        }
+            }
+            return userContactVerificationStatus;
 
-        return userContactVerificationStatus;
+        }).orElseGet(() -> {
+            UserContactVerificationStatus userContactVerificationStatus = new UserContactVerificationStatus();
+            userContactVerificationStatus.setEmail(null);
+            userContactVerificationStatus.setMobile(null);
+            userContactVerificationStatus.setUsername(null);
+            userContactVerificationStatus.setMobileVerified(false);
+            userContactVerificationStatus.setEmailVerified(false);
+            return userContactVerificationStatus;
+
+        });
     }
 
 //
