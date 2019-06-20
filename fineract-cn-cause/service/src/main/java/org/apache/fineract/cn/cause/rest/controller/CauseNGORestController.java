@@ -97,6 +97,7 @@ public class CauseNGORestController {
     }
 
 
+    //    add success fee to cause
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/success-fee",
