@@ -18,6 +18,3 @@ gradle-app.setting
 *.log
 
 *.toDelete
-
-fineract-cn-rhythm/api/bin/**
-fineract-cn-rhythm/spi/bin/**
