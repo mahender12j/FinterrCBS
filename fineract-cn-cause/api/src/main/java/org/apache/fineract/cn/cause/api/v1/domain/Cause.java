@@ -73,7 +73,7 @@ public class Cause {
     private Double maxAmount;
     @NotNull
     private String acceptedDenominationAmounts;
-    private Double managementFee;
+    private Double successFees;
     private Double finCollLimit;
     private String finRate;
     private String approvedBy;
@@ -266,12 +266,12 @@ public class Cause {
         this.acceptedDenominationAmounts = acceptedDenominationAmounts;
     }
 
-    public Double getManagementFee() {
-        return managementFee;
+    public Double getSuccessFees() {
+        return successFees;
     }
 
-    public void setManagementFee(Double managementFee) {
-        this.managementFee = managementFee;
+    public void setSuccessFees(Double successFees) {
+        this.successFees = successFees;
     }
 
     public Double getFinCollLimit() {
@@ -545,7 +545,7 @@ public class Cause {
                 + ", hardTarget=" + hardTarget + ", isTaxExamption=" + isTaxExamption + ", actualRaisedFiat="
                 + actualRaisedFiat + ", actualRaisedFin=" + actualRaisedFin + ", minAmount=" + minAmount
                 + ", maxAmount=" + maxAmount + ", acceptedDenominationAmounts=" + acceptedDenominationAmounts
-                + ", managementFee=" + managementFee + ", finCollLimit=" + finCollLimit + ", finRate=" + finRate
+                + ", successFees=" + successFees + ", finCollLimit=" + finCollLimit + ", finRate=" + finRate
                 + ", approvedBy=" + approvedBy + ", approvedOn=" + approvedOn + ", createdBy=" + createdBy
                 + ", createdOn=" + createdOn + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedOn="
                 + lastModifiedOn + ", taxExemptionPercentage=" + taxExemptionPercentage + ", websiteUrl=" + websiteUrl
