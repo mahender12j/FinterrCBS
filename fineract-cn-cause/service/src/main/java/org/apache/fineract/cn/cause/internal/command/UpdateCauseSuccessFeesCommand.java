@@ -18,34 +18,22 @@
  */
 package org.apache.fineract.cn.cause.internal.command;
 
-public class ApproveCauseCommand {
+public class UpdateCauseSuccessFeesCommand {
 
-
+    private final Double successFee;
     private final String identifier;
-    private final Double finRate;
 
-
-    public ApproveCauseCommand(final String identifier,
-                               final Double finRate) {
+    public UpdateCauseSuccessFeesCommand(final String identifier, final Double successFee) {
         super();
+        this.successFee = successFee;
         this.identifier = identifier;
-        this.finRate = finRate;
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public Double getFinRate() {
-        return finRate;
-    }
-
-
-    @Override
-    public String toString() {
-        return "ApproveCauseCommand{" +
-                "identifier='" + identifier + '\'' +
-                ", finRate=" + finRate +
-                '}';
+    public Double getSuccessFee() {
+        return successFee;
     }
 }

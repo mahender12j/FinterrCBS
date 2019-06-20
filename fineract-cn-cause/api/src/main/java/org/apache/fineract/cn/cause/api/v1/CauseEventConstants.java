@@ -46,6 +46,7 @@ public interface CauseEventConstants {
     String UNPUBLISHED_CAUSE = "unpublished-cause";
     String RESUBMIT_CAUSE = "resubmit-cause";
     String APPROVE_CAUSE = "approve-cause";
+    String ADD_CAUSE_SUCCESS_FEE = "add-cause-success-fees";
     String APPROVE_EXTENDED_CAUSE = "approve-extended-cause";
     String PUT_ADDRESS = "put-address";
     String PUT_CONTACT_DETAILS = "put-contact-details";

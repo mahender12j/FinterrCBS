@@ -16,36 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.command;
+package org.apache.fineract.cn.cause.api.v1.domain;
 
-public class ApproveCauseCommand {
+import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
-    private final String identifier;
-    private final Double finRate;
+/**
+ * @author Padma Raju Sattineni
+ */
 
+public class CauseSuccessFee {
+    @NotNull(message = "success fees is required")
+    private Double successFees;
 
-    public ApproveCauseCommand(final String identifier,
-                               final Double finRate) {
-        super();
-        this.identifier = identifier;
-        this.finRate = finRate;
+    public CauseSuccessFee() {
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public Double getSuccessFees() {
+        return successFees;
     }
 
-    public Double getFinRate() {
-        return finRate;
+    public void setSuccessFees(Double successFees) {
+        this.successFees = successFees;
     }
-
 
     @Override
     public String toString() {
-        return "ApproveCauseCommand{" +
-                "identifier='" + identifier + '\'' +
-                ", finRate=" + finRate +
+        return "CauseApprove{" +
+                ", successFees=" + successFees +
                 '}';
     }
 }
+

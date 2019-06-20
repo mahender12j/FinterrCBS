@@ -31,8 +31,10 @@ import java.util.List;
 
 public class CauseApprove {
 
+    @NotNull
+    @Valid
     private Double finRate;
-    private Double successFees;
+//    private Double successFees;
 
     public CauseApprove() {
     }
@@ -45,19 +47,19 @@ public class CauseApprove {
         this.finRate = finRate;
     }
 
-    public Double getSuccessFees() {
-        return successFees;
-    }
+//    public Double getSuccessFees() {
+//        return successFees;
+//    }
 
-    public void setSuccessFees(Double successFees) {
-        this.successFees = successFees;
-    }
+//    public void setSuccessFees(Double successFees) {
+//        this.successFees = successFees;
+//    }
 
     @Override
     public String toString() {
         return "CauseApprove{" +
                 "finRate=" + finRate +
-                ", successFees=" + successFees +
+//                ", successFees=" + successFees +
                 '}';
     }
 }

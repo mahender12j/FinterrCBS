@@ -22,10 +22,7 @@ import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.cause.ServiceConstants;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdate;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseUpdateInfo;
-import org.apache.fineract.cn.cause.api.v1.domain.NGOProfileStatistics;
-import org.apache.fineract.cn.cause.api.v1.domain.NGOStatistics;
+import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.DocumentStorageEntity;
@@ -45,6 +42,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -96,6 +94,27 @@ public class CauseNGORestController {
     @ResponseBody
     ResponseEntity<NGOProfileStatistics> findCausebyCreatedByForNgoProfile(@PathVariable("identifier") final String identifier) {
         return ResponseEntity.ok(this.causeService.findCausebyCreatedByForNgoProfile(identifier));
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/success-fee",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> updateCause(@PathVariable("identifier") final String identifier,
+                                     @Valid @RequestBody final CauseSuccessFee successFee) {
+        CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
+        if (causeEntity.getCurrentState().equals(Cause.State.PENDING.name())) {
+            this.commandGateway.process(new UpdateCauseSuccessFeesCommand(identifier, successFee.getSuccessFees()));
+            return ResponseEntity.accepted().build();
+        } else {
+            throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
+        }
     }
 
 

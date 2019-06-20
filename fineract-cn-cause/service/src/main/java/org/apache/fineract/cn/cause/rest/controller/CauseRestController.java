@@ -112,7 +112,6 @@ public class CauseRestController {
         } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
             throw ServiceException.internalError("Sorry ! Something went wrong");
         }
-//        return ResponseEntity.accepted().build();
     }
 
 
@@ -226,11 +225,11 @@ public class CauseRestController {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
         if (causeEntity.getCurrentState().toLowerCase().equals(Cause.State.APPROVED.name().toLowerCase())) {
             this.commandGateway.process(new PublishCauseCommand(identifier));
+            return ResponseEntity.accepted().build();
         } else {
             throw ServiceException.conflict("Cause {0} not APPROVED state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }
 
-        return ResponseEntity.accepted().build();
     }
 
 
@@ -320,10 +319,10 @@ public class CauseRestController {
 
         if (PENDING.name().toLowerCase().equals(causeEntity.getCurrentState().toLowerCase())) {
             this.commandGateway.process(new RejectCauseCommand(identifier, causeReject));
+            return ResponseEntity.accepted().build();
         } else {
             throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }
-        return ResponseEntity.accepted().build();
     }
 
 
@@ -342,12 +341,12 @@ public class CauseRestController {
         throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(APPROVED.name())));
 
         if (causeEntity.getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
-            this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate(), cause.getSuccessFees()));
+            this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate()));
+            return ResponseEntity.accepted().build();
         } else {
             throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }
 
-        return ResponseEntity.accepted().build();
     }
 
 
@@ -366,11 +365,11 @@ public class CauseRestController {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
         if (causeEntity.getCurrentState().toLowerCase().equals(ACTIVE.name().toLowerCase())) {
             this.commandGateway.process(new ApproveExtendedCauseCommand(identifier));
+            return ResponseEntity.accepted().build();
         } else {
             throw ServiceException.conflict("Cause {0} not ACTIVE state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
         }
 
-        return ResponseEntity.accepted().build();
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
@@ -458,10 +457,10 @@ public class CauseRestController {
 
         if (this.causeService.causeExists(identifier)) {
             this.commandGateway.process(new CreateRatingCommand(identifier, rating));
+            return ResponseEntity.accepted().build();
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
-        return ResponseEntity.accepted().build();
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
@@ -497,13 +496,13 @@ public class CauseRestController {
         if (this.causeService.causeExists(identifier)) {
             if (this.taskService.taskDefinitionExists(taskIdentifier)) {
                 this.commandGateway.process(new AddTaskDefinitionToCauseCommand(identifier, taskIdentifier));
+                return ResponseEntity.accepted().build();
             } else {
                 throw ServiceException.notFound("Task definition {0} not found.", taskIdentifier);
             }
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
-        return ResponseEntity.accepted().build();
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
@@ -533,13 +532,13 @@ public class CauseRestController {
                         break;
                 }
                 this.commandGateway.process(new ExecuteTaskForCauseCommand(identifier, taskIdentifier));
+                return ResponseEntity.accepted().build();
             } else {
                 throw ServiceException.notFound("Task definition {0} not found.", taskIdentifier);
             }
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
-        return ResponseEntity.accepted().build();
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
@@ -573,10 +572,10 @@ public class CauseRestController {
                                     @RequestBody @Valid final Address address) {
         if (this.causeService.causeExists(identifier)) {
             this.commandGateway.process(new UpdateAddressCommand(identifier, address));
+            return ResponseEntity.accepted().build();
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
-        return ResponseEntity.accepted().build();
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
@@ -592,10 +591,10 @@ public class CauseRestController {
                                            @RequestBody final List<ContactDetail> contactDetails) {
         if (this.causeService.causeExists(identifier)) {
             this.commandGateway.process(new UpdateContactDetailsCommand(identifier, contactDetails));
+            return ResponseEntity.accepted().build();
         } else {
             throw ServiceException.notFound("Cause {0} not found.", identifier);
         }
-        return ResponseEntity.accepted().build();
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
@@ -610,9 +609,7 @@ public class CauseRestController {
     ResponseEntity<Void> deleteIdentificationCard(@PathVariable("identifier") final String identifier,
                                                   @PathVariable("number") final String number) {
         this.throwIfCauseNotExists(identifier);
-
         this.commandGateway.process(new DeleteIdentificationCardCommand(number));
-
         return ResponseEntity.accepted().build();
     }
 
@@ -690,8 +687,8 @@ public class CauseRestController {
             throw ServiceException.conflict("Task definition {0} already exists.", taskDefinition.getIdentifier());
         } else {
             this.commandGateway.process(new CreateTaskDefinitionCommand(taskDefinition));
+            return ResponseEntity.accepted().build();
         }
-        return ResponseEntity.accepted().build();
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.TASK)
@@ -737,10 +734,10 @@ public class CauseRestController {
     ResponseEntity<Void> updateTask(@PathVariable("identifier") final String identifier, @RequestBody final TaskDefinition taskDefinition) {
         if (this.taskService.taskDefinitionExists(identifier)) {
             this.commandGateway.process(new UpdateTaskDefinitionCommand(identifier, taskDefinition));
+            return ResponseEntity.accepted().build();
         } else {
             throw ServiceException.notFound("Task {0} not found.", identifier);
         }
-        return ResponseEntity.accepted().build();
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)

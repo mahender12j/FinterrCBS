@@ -302,7 +302,7 @@ public class CauseAggregate {
         final CauseEntity causeEntity = findCauseEntityOrThrow(approveCauseCommand.getIdentifier());
         causeEntity.setCurrentState(Cause.State.APPROVED.name());
         causeEntity.setFinRate(approveCauseCommand.getFinRate().toString());
-        causeEntity.setManagementFee(approveCauseCommand.getSuccessFees());
+//        causeEntity.setManagementFee(approveCauseCommand.getSuccessFees());
         causeEntity.setApprovedOn(LocalDateTime.now(Clock.systemUTC()));
         causeEntity.setApprovedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
@@ -313,6 +313,19 @@ public class CauseAggregate {
         this.causeStateRepository.save(stateEntity);
 
         return approveCauseCommand.getIdentifier();
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.ADD_CAUSE_SUCCESS_FEE)
+    public String ApproveCause(final UpdateCauseSuccessFeesCommand causeSuccessFeesCommand) {
+        final CauseEntity causeEntity = findCauseEntityOrThrow(causeSuccessFeesCommand.getIdentifier());
+        causeEntity.setManagementFee(causeSuccessFeesCommand.getSuccessFee());
+        causeEntity.setLastModifiedOn(LocalDateTime.now());
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
+        this.causeRepository.save(causeEntity);
+        return causeSuccessFeesCommand.toString();
     }
 
 
