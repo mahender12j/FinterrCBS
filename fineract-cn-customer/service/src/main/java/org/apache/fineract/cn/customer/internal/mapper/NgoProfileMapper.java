@@ -42,7 +42,7 @@ public final class NgoProfileMapper {
         profile.setFacebookUrl(profileEntity.getFacebookUrl());
         profile.setInstagramUrl(profileEntity.getInstagramUrl());
         profile.setLinkedinUrl(profileEntity.getLinkedinUrl());
-        profile.setPrintrestUrl(profileEntity.getPrintrestUrl());
+        profile.setPinterestUrl(profileEntity.getPrintrestUrl());
         profile.setTwitterUrl(profileEntity.getTwitterUrl());
         profile.setCategory(profileEntity.getCategory());
         profile.setNgoIdentifier(UserContextHolder.checkedGetUser());
@@ -58,7 +58,7 @@ public final class NgoProfileMapper {
         profileEntity.setFacebookUrl(profile.getFacebookUrl());
         profileEntity.setInstagramUrl(profile.getInstagramUrl());
         profileEntity.setLinkedinUrl(profile.getLinkedinUrl());
-        profileEntity.setPrintrestUrl(profile.getPrintrestUrl());
+        profileEntity.setPrintrestUrl(profile.getPinterestUrl());
         profileEntity.setTwitterUrl(profile.getTwitterUrl());
         profileEntity.setCategory(profile.getCategory());
         return profileEntity;
