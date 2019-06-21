@@ -41,4 +41,6 @@ public interface NgoProfileRepository extends JpaRepository<NgoProfileEntity, Lo
     @Query("SELECT c FROM NgoProfileEntity c WHERE c.customer.id = :id")
     Optional<NgoProfileEntity> findByCustomerId(@Param("id") final Long id);
 
+    Optional<NgoProfileEntity> findByCustomer(CustomerEntity entity);
+
 }

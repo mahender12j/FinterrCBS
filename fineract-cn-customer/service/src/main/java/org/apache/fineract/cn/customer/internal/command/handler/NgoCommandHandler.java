@@ -23,7 +23,9 @@ import org.apache.fineract.cn.command.annotation.CommandHandler;
 import org.apache.fineract.cn.command.annotation.EventEmitter;
 import org.apache.fineract.cn.customer.api.v1.CustomerEventConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.NgoFile;
+import org.apache.fineract.cn.customer.api.v1.domain.NgoProfile;
 import org.apache.fineract.cn.customer.internal.command.CreateNGOCommand;
+import org.apache.fineract.cn.customer.internal.command.UpdateNGOCommand;
 import org.apache.fineract.cn.customer.internal.mapper.NgoProfileMapper;
 import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.lang.ServiceException;
@@ -33,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -67,14 +70,39 @@ public class NgoCommandHandler {
         Map<String, List<NgoFile>> ngoFileMap = ngoCommand.getNgoProfile().getNgoFiles();
 
         List<NgoFileEntity> entities = new ArrayList<>();
-
-        ngoFileMap.forEach((k, v) -> {
-            v.forEach(ngoFile -> {
-                NgoFileEntity fileEntity = NgoProfileMapper.map(ngoFile, profileEntity);
-                entities.add(fileEntity);
-            });
-        });
+        ngoFileMap.forEach((k, v) -> v.stream().map(ngoFile -> NgoProfileMapper.map(ngoFile, profileEntity)).forEach(entities::add));
         this.ngoFileRepository.save(entities);
         return ngoCommand.toString();
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_NGO_PROFILE)
+    public String PutNGOProfile(final UpdateNGOCommand updateNGOCommand) {
+        CustomerEntity customerEntity = this.customerRepository.findByIdentifier(updateNGOCommand.getIdentifier()).orElseThrow(() -> ServiceException.notFound("NGO not found"));
+        NgoProfileEntity profileEntity = this.profileRepository.findByCustomer(customerEntity).orElseThrow(() -> ServiceException.notFound("NGO not found"));
+
+        NgoProfile ngoProfile = updateNGOCommand.getNgoProfile();
+
+        profileEntity.setTwitterUrl(ngoProfile.getTwitterUrl());
+        profileEntity.setPrintrestUrl(ngoProfile.getPinterestUrl());
+        profileEntity.setLinkedinUrl(ngoProfile.getLinkedinUrl());
+        profileEntity.setInstagramUrl(ngoProfile.getInstagramUrl());
+        profileEntity.setFacebookUrl(ngoProfile.getFacebookUrl());
+        profileEntity.setBannerImage(ngoProfile.getBannerImage());
+        profileEntity.setAbout(ngoProfile.getAbout());
+        profileEntity.setCategory(ngoProfile.getCategory());
+        this.profileRepository.save(profileEntity);
+
+
+        List<NgoFileEntity> fileEntities = this.ngoFileRepository.findAllByProfileEntity(profileEntity);
+        this.ngoFileRepository.delete(fileEntities);
+
+        Map<String, List<NgoFile>> ngoFileMap = ngoProfile.getNgoFiles();
+        List<NgoFileEntity> entities = new ArrayList<>();
+        ngoFileMap.forEach((k, v) -> v.stream().map(ngoFile -> NgoProfileMapper.map(ngoFile, profileEntity)).forEach(entities::add));
+        this.ngoFileRepository.save(entities);
+        return updateNGOCommand.toString();
     }
 }
