@@ -59,7 +59,6 @@ public final class Customer {
         PROCESSING
     }
 
-    @NotBlank
     private Long id;
     @NotBlank
     private String identifier;
