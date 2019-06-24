@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cn.rhythm.service.internal.command.handler;
 
-import javax.sql.DataSource;
 import org.apache.fineract.cn.command.annotation.Aggregate;
 import org.apache.fineract.cn.command.annotation.CommandHandler;
 import org.apache.fineract.cn.command.annotation.CommandLogLevel;
@@ -29,6 +28,8 @@ import org.apache.fineract.cn.rhythm.service.internal.command.InitializeServiceC
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.DataSource;
+
 /**
  * @author Myrle Krantz
  */
@@ -36,23 +37,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Aggregate
 public class InitializeCommandHandler {
 
-  private final DataSource dataSource;
-  private final FlywayFactoryBean flywayFactoryBean;
+    private final DataSource dataSource;
+    private final FlywayFactoryBean flywayFactoryBean;
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
-  @Autowired
-  public InitializeCommandHandler(final DataSource dataSource,
-                                  final FlywayFactoryBean flywayFactoryBean) {
-    super();
-    this.dataSource = dataSource;
-    this.flywayFactoryBean = flywayFactoryBean;
-  }
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    public InitializeCommandHandler(final DataSource dataSource,
+                                    final FlywayFactoryBean flywayFactoryBean) {
+        super();
+        this.dataSource = dataSource;
+        this.flywayFactoryBean = flywayFactoryBean;
+    }
 
-  @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
-  @Transactional
-  @EventEmitter(selectorName = EventConstants.SELECTOR_NAME, selectorValue = EventConstants.INITIALIZE)
-  public String initialize(final InitializeServiceCommand initializeServiceCommand) {
-    this.flywayFactoryBean.create(this.dataSource).migrate();
-    return EventConstants.INITIALIZE;
-  }
+    @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
+    @Transactional
+    @EventEmitter(selectorName = EventConstants.SELECTOR_NAME, selectorValue = EventConstants.INITIALIZE)
+    public String initialize(final InitializeServiceCommand initializeServiceCommand) {
+        this.flywayFactoryBean.create(this.dataSource).migrate();
+        return EventConstants.INITIALIZE;
+    }
 }

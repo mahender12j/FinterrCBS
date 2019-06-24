@@ -20,12 +20,12 @@
 CREATE TABLE cass_documents (
   id BIGINT NOT NULL AUTO_INCREMENT,
   cause_id BIGINT NOT NULL,
-  identifier VARCHAR(32) NOT NULL,
+  rating VARCHAR(32) NOT NULL,
   is_completed BOOLEAN NOT NULL,
   created_on TIMESTAMP(3) NOT NULL,
   created_by VARCHAR(32) NOT NULL,
   CONSTRAINT cass_documents_pk PRIMARY KEY (id),
-  CONSTRAINT cass_documents_uq UNIQUE (cause_id, identifier),
+  CONSTRAINT cass_documents_uq UNIQUE (cause_id, rating),
   CONSTRAINT cass_documents_fk FOREIGN KEY (cause_id) REFERENCES cass_causes (id) ON UPDATE RESTRICT
 );
 

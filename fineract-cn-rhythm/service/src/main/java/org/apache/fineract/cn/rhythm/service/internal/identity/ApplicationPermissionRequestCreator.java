@@ -19,8 +19,10 @@
 package org.apache.fineract.cn.rhythm.service.internal.identity;
 
 import javax.validation.Valid;
+
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.annotation.ThrowsException;
+import org.apache.fineract.cn.identity.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.identity.api.v1.client.ApplicationPermissionAlreadyExistsException;
 import org.apache.fineract.cn.identity.api.v1.domain.Permission;
 import org.apache.fineract.cn.permittedfeignclient.annotation.EndpointSet;
@@ -37,14 +39,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Myrle Krantz
  */
 @EndpointSet(identifier = "rhythm__v1__identity__v1")
-@FeignClient(name="identity-v1", path="/identity/v1", configuration=PermittedFeignClientsConfiguration.class)
+@FeignClient(name = "identity-v1", path = "/identity/v1", configuration = PermittedFeignClientsConfiguration.class)
 public interface ApplicationPermissionRequestCreator {
 
-  @RequestMapping(value = "/applications/{applicationidentifier}/permissions", method = RequestMethod.POST,
-          consumes = {MediaType.APPLICATION_JSON_VALUE},
-          produces = {MediaType.ALL_VALUE})
-  @ThrowsException(status = HttpStatus.CONFLICT, exception = ApplicationPermissionAlreadyExistsException.class)
-  @Permittable(groupId = org.apache.fineract.cn.identity.api.v1.PermittableGroupIds.APPLICATION_SELF_MANAGEMENT)
-  void createApplicationPermission(@PathVariable("applicationidentifier") String applicationIdentifier,
-                                   @RequestBody @Valid Permission permission);
+    @RequestMapping(value = "/applications/{applicationidentifier}/permissions", method = RequestMethod.POST,
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.ALL_VALUE})
+    @ThrowsException(status = HttpStatus.CONFLICT, exception = ApplicationPermissionAlreadyExistsException.class)
+    @Permittable(groupId = PermittableGroupIds.APPLICATION_SELF_MANAGEMENT)
+    void createApplicationPermission(@PathVariable("applicationidentifier") String applicationIdentifier,
+                                     @RequestBody @Valid Permission permission);
 }

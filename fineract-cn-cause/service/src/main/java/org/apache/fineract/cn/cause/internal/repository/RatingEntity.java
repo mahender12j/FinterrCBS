@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * @author Padma Raju Sattineni
+ * @author Md Robiul Hassan
  */
 @Entity
 @Table(name = "cass_rating")
@@ -40,18 +40,20 @@ public class RatingEntity {
     @JoinColumn(name = "cause_id")
     private CauseEntity cause;
 
-    @Column(name = "identifier", nullable = false)
-    private String identifier;
+    @Column(name = "rating", nullable = false)
+    private int rating;
 
-    @SuppressWarnings("DefaultAnnotationParam")
-    @Column(name = "description", nullable = true)
-    private String description;
+    @Column(name = "comment", nullable = true)
+    private String comment;
 
     @Column(name = "is_active", nullable = false)
     private Boolean active;
 
     @Column(name = "created_by")
     private String createdBy;
+
+    @Column(name = "ref")
+    private Long ref;
 
     @Column(name = "created_on")
     @Convert(converter = LocalDateTimeConverter.class)
@@ -76,20 +78,20 @@ public class RatingEntity {
         this.cause = cause;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public int getRating() {
+        return rating;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
-    public String getDescription() {
-        return description;
+    public String getComment() {
+        return comment;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public Boolean getActive() {
@@ -116,18 +118,26 @@ public class RatingEntity {
         this.createdOn = createdOn;
     }
 
+    public Long getRef() {
+        return ref;
+    }
+
+    public void setRef(Long ref) {
+        this.ref = ref;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RatingEntity that = (RatingEntity) o;
         return Objects.equals(cause, that.cause) &&
-                Objects.equals(identifier, that.identifier);
+                Objects.equals(rating, that.rating);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cause, identifier);
+        return Objects.hash(cause, rating);
     }
 }
 

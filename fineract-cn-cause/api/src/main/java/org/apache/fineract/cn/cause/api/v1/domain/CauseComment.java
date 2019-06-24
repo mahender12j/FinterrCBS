@@ -18,47 +18,22 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
-import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Padma Raju Sattineni
  */
-public class CauseRating {
-    private Long id;
-    @Max(value = 5, message = "rating range must be between 0-5")
-    @Min(value = 0, message = "rating range must be between 0-5")
-    private int rating;
-    @Length(max = 500, message = "message max length is 500")
+public class CauseComment {
+
     private String comment;
-    private boolean active = true;
+    private boolean active;
     private Long ref;
     private String createdBy;
     private String createdOn;
-    private List<CauseComment> causeComments;
+    private List<CauseComment> subComments;
 
-    public CauseRating() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
+    public CauseComment() {
     }
 
     public String getComment() {
@@ -101,33 +76,31 @@ public class CauseRating {
         this.ref = ref;
     }
 
-    public List<CauseComment> getCauseComments() {
-        return causeComments;
+    public List<CauseComment> getSubComments() {
+        return subComments;
     }
 
-    public void setCauseComments(List<CauseComment> causeComments) {
-        this.causeComments = causeComments;
+    public void setSubComments(List<CauseComment> subComments) {
+        this.subComments = subComments;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CauseRating that = (CauseRating) o;
+        CauseComment that = (CauseComment) o;
         return active == that.active &&
-                Objects.equals(rating, that.rating) &&
                 Objects.equals(comment, that.comment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(rating, comment, active);
+        return Objects.hash(comment, active);
     }
 
     @Override
     public String toString() {
         return "CauseRating{" +
-                "rating='" + rating + '\'' +
                 ", comment='" + comment + '\'' +
                 ", active=" + active +
                 ", createdBy='" + createdBy + '\'' +

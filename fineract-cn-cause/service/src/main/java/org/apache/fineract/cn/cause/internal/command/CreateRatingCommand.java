@@ -46,7 +46,7 @@ public class CreateRatingCommand {
     public String toString() {
         return "CreateRatingCommand{" +
                 "causeIdentifier ='" + causeIdentifier + '\'' +
-                ", CauseRating =" + rating.getIdentifier() +
+                ", CauseRating =" + rating.getRating() +
                 '}';
     }
 }

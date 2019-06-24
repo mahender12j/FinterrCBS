@@ -33,23 +33,25 @@ import java.util.List;
 @Repository
 public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
 
-    @Query("SELECT d FROM RatingEntity d WHERE d.cause.identifier = :causeIdentifier AND d.identifier = :ratingIdentifier")
-    Optional<RatingEntity> findByCauseIdAndRatingIdentifier(@Param("causeIdentifier") String causeIdentifier, @Param("ratingIdentifier") String ratingIdentifier);
-
-    @Query("SELECT d FROM RatingEntity d WHERE d.cause.identifier = :causeIdentifier")
-    Stream<RatingEntity> findByCauseId(@Param("causeIdentifier") String causeIdentifier);
-
-    @Query("SELECT avg(d.identifier) FROM RatingEntity d WHERE d.cause.identifier = :causeIdentifier")
+    @Query("SELECT avg(d.rating) FROM RatingEntity d WHERE d.cause.identifier = :causeIdentifier")
     Double findAvgRatingByCauseId(@Param("causeIdentifier") String causeIdentifier);
 
     Stream<RatingEntity> findByCause(final CauseEntity causeEntity);
 
     Stream<RatingEntity> findByCauseAndActive(final CauseEntity causeEntity, Boolean active);
 
-    Stream<RatingEntity> findByCauseAndCreatedBy(final CauseEntity causeEntity, final String createdBy);
 
-    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN 'true' ELSE 'false' END FROM RatingEntity r WHERE r.cause.identifier = :causeIdentifier AND r.createdBy = :createdBy")
-    Boolean existsByCreatedBy(@Param("causeIdentifier") final String causeIdentifier, @Param("createdBy") final String createdBy);
+    //    @Query("SELECT d FROM RatingEntity d WHERE d.cause.identifier = :causeIdentifier AND d.identifier = :ratingIdentifier")
+
+//    Optional<RatingEntity> findByCauseIdAndRatingIdentifier(@Param("causeIdentifier") Long causeIdentifier, @Param("ratingIdentifier") String ratingIdentifier);
+//    @Query("SELECT d FROM RatingEntity d WHERE d.cause.identifier = :causeIdentifier")
+
+//    Stream<RatingEntity> findByCauseId(@Param("causeIdentifier") Long causeIdentifier);
+//
+//    Stream<RatingEntity> findByCauseAndCreatedBy(final CauseEntity causeEntity, final String createdBy);
+//
+//    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN 'true' ELSE 'false' END FROM RatingEntity r WHERE r.cause.identifier = :causeIdentifier AND r.createdBy = :createdBy")
+//    Boolean existsByCreatedBy(@Param("causeIdentifier") final String causeIdentifier, @Param("createdBy") final String createdBy);
 
 //    List<RatingEntity> findByCause(CauseEntity causeEntity);
 }

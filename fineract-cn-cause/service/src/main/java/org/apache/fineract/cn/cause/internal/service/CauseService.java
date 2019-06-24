@@ -95,13 +95,7 @@ public class CauseService {
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
             List<CauseUpdateEntity> entities = this.causeUpdateRepository.findByCauseEntity(causeEntity);
             final Cause cause = CauseMapper.map(causeEntity);
-//            final int numberOfUpdateRequired = (causeEntity.getCauseImplementationDuration() * 4) / causeEntity.getFrequencyCauseImplementationUpdates();
-//            cause.setTotalNumberOfUpdates(numberOfUpdateRequired);
             cause.setNumberOfUpdateProvided(entities.size());
-
-//            LocalDateTime dateTime = causeEntity.getEndDate().plusWeeks()
-//            cause.setNumberOfDaysLeftForNextUpdate(numberOfUpdateRequired - entities.size());
-//            cause.setCa
             setCauseDocuments(causeEntity, cause);
             AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
             cause.setAddress(AddressMapper.map(addressEntity));
@@ -111,9 +105,11 @@ public class CauseService {
                 final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
             }
-            cause.setCauseRatingList(RatingMapper.map(ratingRepository.findByCause(causeEntity)));
-            final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
-            cause.setAvgRating(avgRatingValue != null ? avgRatingValue.toString() : "0");
+
+            List<CauseRating> causeRatings = RatingMapper.map(ratingRepository.findByCause(causeEntity));
+            cause.setCauseRatingList(causeRatings);
+//            final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
+            cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
             return cause;
         });
     }
@@ -377,6 +373,7 @@ public class CauseService {
         final ArrayList<Cause> causes = new ArrayList<>(causeEntities.size());
         for (CauseEntity causeEntity : causeEntities) {
             final Cause cause = CauseMapper.map(causeEntity);
+
             if (cause.getAccountNumber() != null) {
                 final List<JournalEntry> journalEntry = this.accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
@@ -384,18 +381,11 @@ public class CauseService {
 
             cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
-
             setCauseExtendedAndResubmitValue(causeEntity, cause);
-
             setCauseDocuments(causeEntity, cause);
-            final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
-
-            if (avgRatingValue != null) {
-                cause.setAvgRating(avgRatingValue.toString());
-            } else {
-                cause.setAvgRating("0");
-            }
-
+            List<CauseRating> causeRatings = RatingMapper.map(ratingRepository.findByCause(causeEntity));
+            cause.setCauseRatingList(causeRatings);
+            cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
             causes.add(cause);
         }
 

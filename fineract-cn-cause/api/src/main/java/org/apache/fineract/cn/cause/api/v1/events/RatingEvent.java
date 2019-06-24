@@ -27,11 +27,11 @@ public class RatingEvent {
 
     private String causeIdentifier;
 
-    private String ratingIdentifier;
+    private int rating;
 
-    public RatingEvent(String causeIdentifier, String ratingIdentifier) {
+    public RatingEvent(String causeIdentifier, int rating) {
         this.causeIdentifier = causeIdentifier;
-        this.ratingIdentifier = ratingIdentifier;
+        this.rating = rating;
     }
 
     public String getCauseIdentifier() {
@@ -42,12 +42,12 @@ public class RatingEvent {
         this.causeIdentifier = causeIdentifier;
     }
 
-    public String getRatingIdentifier() {
-        return ratingIdentifier;
+    public int getRating() {
+        return rating;
     }
 
-    public void setRatingIdentifier(String ratingIdentifier) {
-        this.ratingIdentifier = ratingIdentifier;
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     @Override
@@ -56,19 +56,19 @@ public class RatingEvent {
         if (o == null || getClass() != o.getClass()) return false;
         RatingEvent that = (RatingEvent) o;
         return Objects.equals(causeIdentifier, that.causeIdentifier) &&
-                Objects.equals(ratingIdentifier, that.ratingIdentifier);
+                Objects.equals(rating, that.rating);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(causeIdentifier, ratingIdentifier);
+        return Objects.hash(causeIdentifier, rating);
     }
 
     @Override
     public String toString() {
         return "RatingEvent{" +
                 "causeIdentifier='" + causeIdentifier + '\'' +
-                ", ratingIdentifier='" + ratingIdentifier + '\'' +
+                ", rating='" + rating + '\'' +
                 '}';
     }
 }

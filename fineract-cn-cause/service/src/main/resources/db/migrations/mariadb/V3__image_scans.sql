@@ -19,8 +19,8 @@
 
 CREATE TABLE cass_image_scans (
   id BIGINT NOT NULL AUTO_INCREMENT,
-  identifier VARCHAR(32) NOT NULL,
-  description VARCHAR(4096) NOT NULL,
+  rating VARCHAR(32) NOT NULL,
+  comment VARCHAR(4096) NOT NULL,
   image_id BIGINT NOT NULL,
   content_type VARCHAR(256) NOT NULL,
   size BIGINT NOT NULL,
@@ -28,6 +28,6 @@ CREATE TABLE cass_image_scans (
   created_on TIMESTAMP(3) NOT NULL,
   created_by VARCHAR(32) NOT NULL,
   CONSTRAINT cass_image_scans_pk PRIMARY KEY (id),
-  CONSTRAINT cass_image_scans_ident_uq UNIQUE (identifier, image_id),
+  CONSTRAINT cass_image_scans_ident_uq UNIQUE (rating, image_id),
   CONSTRAINT cass_image_scans_fk FOREIGN KEY (image_id) REFERENCES cass_images (id)
 );

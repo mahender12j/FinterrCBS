@@ -98,7 +98,7 @@ public class Cause {
     private String websiteUrl;
     private String smediaLinks;
     private String videoUrls;
-    private String avgRating;
+    private double avgRating;
     private String causeTxHash;
     @NotNull
     private String accountNumber;
@@ -360,11 +360,11 @@ public class Cause {
         this.videoUrls = videoUrls;
     }
 
-    public String getAvgRating() {
+    public double getAvgRating() {
         return avgRating;
     }
 
-    public void setAvgRating(String avgRating) {
+    public void setAvgRating(double avgRating) {
         this.avgRating = avgRating;
     }
 

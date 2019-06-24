@@ -689,13 +689,13 @@ public class CustomerRestController {
             consumes = MediaType.ALL_VALUE
     )
     public ResponseEntity<byte[]> getPortrait(@PathVariable("identifier") final String identifier) {
-        final PortraitEntity portrait = this.customerService.findPortrait(identifier).orElseThrow(() -> ServiceException.notFound("Portrait for Customer ''{0}'' not found.", identifier));
-
-        return ResponseEntity
+        return this.customerService.findPortrait(identifier).map(portrait -> ResponseEntity
                 .ok()
                 .contentType(MediaType.parseMediaType(portrait.getContentType()))
                 .contentLength(portrait.getImage().length)
-                .body(portrait.getImage());
+                .body(portrait.getImage())).orElse(null);
+
+
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)

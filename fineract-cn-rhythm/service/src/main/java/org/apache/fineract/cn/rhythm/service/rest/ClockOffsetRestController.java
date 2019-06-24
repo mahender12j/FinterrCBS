@@ -18,9 +18,6 @@
  */
 package org.apache.fineract.cn.rhythm.service.rest;
 
-import static org.apache.fineract.cn.lang.config.TenantHeaderFilter.TENANT_HEADER;
-
-import javax.validation.Valid;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
@@ -30,12 +27,11 @@ import org.apache.fineract.cn.rhythm.service.internal.service.ClockOffsetService
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+import static org.apache.fineract.cn.lang.config.TenantHeaderFilter.TENANT_HEADER;
 
 /**
  * @author Myrle Krantz
@@ -43,42 +39,42 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/clockoffset")
 public class ClockOffsetRestController {
-  private final CommandGateway commandGateway;
-  private final ClockOffsetService clockOffsetService;
+    private final CommandGateway commandGateway;
+    private final ClockOffsetService clockOffsetService;
 
-  @Autowired
-  public ClockOffsetRestController(
-      final CommandGateway commandGateway,
-      final ClockOffsetService clockOffsetService) {
-    super();
-    this.commandGateway = commandGateway;
-    this.clockOffsetService = clockOffsetService;
-  }
+    @Autowired
+    public ClockOffsetRestController(
+            final CommandGateway commandGateway,
+            final ClockOffsetService clockOffsetService) {
+        super();
+        this.commandGateway = commandGateway;
+        this.clockOffsetService = clockOffsetService;
+    }
 
-  @Permittable(value = AcceptedTokenType.SYSTEM)
-  @RequestMapping(
-      method = RequestMethod.GET,
-      consumes = MediaType.ALL_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<ClockOffset> getClockOffset(@RequestHeader(TENANT_HEADER) final String tenantIdentifier) {
-    return ResponseEntity.ok(this.clockOffsetService.findByTenantIdentifier(tenantIdentifier));
-  }
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(
+            method = RequestMethod.GET,
+            consumes = MediaType.ALL_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<ClockOffset> getClockOffset(@RequestHeader(TENANT_HEADER) final String tenantIdentifier) {
+        return ResponseEntity.ok(this.clockOffsetService.findByTenantIdentifier(tenantIdentifier));
+    }
 
-  @Permittable(value = AcceptedTokenType.SYSTEM)
-  @RequestMapping(
-      method = RequestMethod.PUT,
-      consumes = MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<Void> setClockOffset(
-      @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
-      @RequestBody @Valid final ClockOffset instance) throws InterruptedException {
-    this.commandGateway.process(new ChangeClockOffsetCommand(tenantIdentifier, instance));
-    return ResponseEntity.accepted().build();
-  }
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> setClockOffset(
+            @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
+            @RequestBody @Valid final ClockOffset instance) throws InterruptedException {
+        this.commandGateway.process(new ChangeClockOffsetCommand(tenantIdentifier, instance));
+        return ResponseEntity.accepted().build();
+    }
 }

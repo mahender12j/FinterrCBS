@@ -453,7 +453,7 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> causeRating(@PathVariable("identifier") final String identifier,
-                                     @RequestBody final CauseRating rating) {
+                                     @Valid @RequestBody final CauseRating rating) {
 
         if (this.causeService.causeExists(identifier)) {
             this.commandGateway.process(new CreateRatingCommand(identifier, rating));

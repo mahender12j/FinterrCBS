@@ -179,13 +179,14 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT_SUB_TYPE)
-    public DocumentEvent process(final UpdateDocumentSubTypeCommand command) throws IOException {
-        DocumentsMasterSubtype documentsType = command.getDocumentsType();
-        final DocumentSubTypeEntity documentSubTypeEntity = documentSubTypeRepository.findByUuid(command.getuuid()).orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
+    public DocumentEvent process(final UpdateDocumentSubTypeCommand subTypeCommand) throws IOException {
+        DocumentsMasterSubtype documentsType = subTypeCommand.getDocumentsType();
+
+        final DocumentSubTypeEntity documentSubTypeEntity = documentSubTypeRepository.findByUuid(subTypeCommand.getuuid()).orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
         documentSubTypeEntity.setTitle(documentsType.getTitle());
         documentSubTypeEntity.setActive(documentsType.isActive());
         this.documentSubTypeRepository.save(documentSubTypeEntity);
-        return new DocumentEvent(command.getuuid(), command.getDocumentsType().toString());
+        return new DocumentEvent(subTypeCommand.getuuid(), subTypeCommand.getDocumentsType().toString());
     }
 
 

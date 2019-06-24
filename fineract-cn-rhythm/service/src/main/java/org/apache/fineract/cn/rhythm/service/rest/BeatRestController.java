@@ -22,6 +22,7 @@ import static org.apache.fineract.cn.lang.config.TenantHeaderFilter.TENANT_HEADE
 
 import java.util.List;
 import javax.validation.Valid;
+
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
@@ -49,80 +50,81 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/applications/{applicationidentifier}/beats")
 public class BeatRestController {
 
-  private final CommandGateway commandGateway;
-  private final BeatService beatService;
+    private final CommandGateway commandGateway;
+    private final BeatService beatService;
 
-  @Autowired
-  public BeatRestController(final CommandGateway commandGateway,
-                            final BeatService beatService) {
-    super();
-    this.commandGateway = commandGateway;
-    this.beatService = beatService;
-  }
+    @Autowired
+    public BeatRestController(final CommandGateway commandGateway,
+                              final BeatService beatService) {
+        super();
+        this.commandGateway = commandGateway;
+        this.beatService = beatService;
+    }
 
-  @Permittable(value = AcceptedTokenType.SYSTEM)
-  @RequestMapping(
-          method = RequestMethod.GET,
-          consumes = MediaType.ALL_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE
-  )
-  public
-  @ResponseBody
-  List<Beat> getAllBeatsForApplication(
-          @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
-          @PathVariable("applicationidentifier") final String applicationIdentifier) {
-    return this.beatService.findAllEntities(tenantIdentifier, applicationIdentifier);
-  }
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(
+            method = RequestMethod.GET,
+            consumes = MediaType.ALL_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    List<Beat> getAllBeatsForApplication(
+            @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
+            @PathVariable("applicationidentifier") final String applicationIdentifier) {
+        return this.beatService.findAllEntities(tenantIdentifier, applicationIdentifier);
+    }
 
-  @Permittable(value = AcceptedTokenType.SYSTEM)
-  @RequestMapping(
-          value = "/{beatidentifier}",
-          method = RequestMethod.GET,
-          consumes = MediaType.ALL_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<Beat> getBeat(
-          @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
-          @PathVariable("applicationidentifier") final String applicationIdentifier,
-          @PathVariable("beatidentifier") final String beatIdentifier) {
-    return this.beatService.findByIdentifier(tenantIdentifier, applicationIdentifier, beatIdentifier)
-            .map(ResponseEntity::ok)
-            .orElseThrow(() -> ServiceException
-                .notFound("Instance with identifier ''" + applicationIdentifier + "'' doesn''t exist."));
-  }
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(
+            value = "/{beatidentifier}",
+            method = RequestMethod.GET,
+            consumes = MediaType.ALL_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Beat> getBeat(
+            @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
+            @PathVariable("applicationidentifier") final String applicationIdentifier,
+            @PathVariable("beatidentifier") final String beatIdentifier) {
+        return this.beatService.findByIdentifier(tenantIdentifier, applicationIdentifier, beatIdentifier)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> ServiceException
+                        .notFound("Instance with identifier ''" + applicationIdentifier + "'' doesn''t exist."));
+    }
 
-  @Permittable(value = AcceptedTokenType.SYSTEM, permittedEndpoint = "/applications/{applicationidentifier}/beats", acceptTokenIntendedForForeignApplication = true) //Allow apps to use this endpoint in their provisioning code.
-  @RequestMapping(
-          method = RequestMethod.POST,
-          consumes = MediaType.APPLICATION_JSON_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<Void> createBeat(
-          @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
-          @PathVariable("applicationidentifier") final String applicationIdentifier,
-          @RequestBody @Valid final Beat instance) throws InterruptedException {
-    this.commandGateway.process(new CreateBeatCommand(tenantIdentifier, applicationIdentifier, instance));
-    return ResponseEntity.accepted().build();
-  }
+    @Permittable(value = AcceptedTokenType.SYSTEM, permittedEndpoint = "/applications/{applicationidentifier}/beats", acceptTokenIntendedForForeignApplication = true)
+    //Allow apps to use this endpoint in their provisioning code.
+    @RequestMapping(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> createBeat(
+            @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
+            @PathVariable("applicationidentifier") final String applicationIdentifier,
+            @RequestBody @Valid final Beat instance) throws InterruptedException {
+        this.commandGateway.process(new CreateBeatCommand(tenantIdentifier, applicationIdentifier, instance));
+        return ResponseEntity.accepted().build();
+    }
 
-  @Permittable(value = AcceptedTokenType.SYSTEM)
-  @RequestMapping(
-          value = "/{beatidentifier}",
-          method = RequestMethod.DELETE,
-          consumes = MediaType.ALL_VALUE,
-          produces = MediaType.ALL_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<Void> deleteBeat(
-          @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
-          @PathVariable("applicationidentifier") final String applicationIdentifier,
-          @PathVariable("beatidentifier") final String beatIdentifier) throws InterruptedException {
-    this.commandGateway.process(new DeleteBeatCommand(tenantIdentifier, applicationIdentifier, beatIdentifier));
-    return ResponseEntity.accepted().build();
-  }
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(
+            value = "/{beatidentifier}",
+            method = RequestMethod.DELETE,
+            consumes = MediaType.ALL_VALUE,
+            produces = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> deleteBeat(
+            @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
+            @PathVariable("applicationidentifier") final String applicationIdentifier,
+            @PathVariable("beatidentifier") final String beatIdentifier) throws InterruptedException {
+        this.commandGateway.process(new DeleteBeatCommand(tenantIdentifier, applicationIdentifier, beatIdentifier));
+        return ResponseEntity.accepted().build();
+    }
 }
