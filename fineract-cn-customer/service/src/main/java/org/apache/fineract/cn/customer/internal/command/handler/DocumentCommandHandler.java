@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.command.annotation.Aggregate;
@@ -83,7 +84,12 @@ public class DocumentCommandHandler {
         }
 
         final DocumentEntity documentEntity = documentRepository.findByCustomer(customerEntity);
-        List<DocumentEntryEntity> documentEntryEntityList = DocumentMapper.map(command.getCustomerDocument().getKycDocuments(), documentEntity);
+        List<DocumentEntryEntity> documentEntryEntityList = command.getCustomerDocument().getKycDocuments()
+                .stream()
+                .map(kycDocuments -> DocumentMapper.map(kycDocuments, documentEntity))
+                .collect(Collectors.toList());
+
+//                DocumentMapper.map(command.getCustomerDocument().getKycDocuments(), documentEntity);
         this.documentEntryRepository.save(documentEntryEntityList);
         return new DocumentPageEvent(command.getCustomeridentifier(), command.getCustomeridentifier(), 1);
     }
@@ -92,7 +98,7 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT)
-    public DocumentEvent process(final ChangeDocumentStatusCommand command) throws IOException {
+    public DocumentEvent process(final ChangeDocumentStatusCommand command) {
 
         final DocumentEntryEntity existingDocument = documentEntryRepository.findByCustomerIdAndDocumentId(
                 command.getCustomerIdentifier(), command.getCustomerDocumentId())
@@ -126,7 +132,7 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.UNDO_DOCUMENT)
-    public DocumentEvent process(final UndoDocumentStatusCommand command) throws IOException {
+    public DocumentEvent process(final UndoDocumentStatusCommand command) {
 
         final DocumentEntryEntity existingDocument = documentEntryRepository.findByCustomerIdAndDocumentId(
                 command.getCustomerIdentifier(), command.getCustomerDocumentId())
@@ -142,7 +148,7 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_TYPE)
-    public CreateDocumentTypeCommandResponse process(final CreateDocumentTypeCommand command) throws IOException {
+    public CreateDocumentTypeCommandResponse process(final CreateDocumentTypeCommand command) {
 
         final DocumentTypeEntity documentTypeEntity = DocumentMapper.map(command.getDocumentsType());
         DocumentTypeEntity typeEntity = this.documentTypeRepository.save(documentTypeEntity);
@@ -153,13 +159,14 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT_TYPE)
-    public DocumentEvent process(final UpdateDocumentTypeCommand command) throws IOException {
+    public DocumentEvent process(final UpdateDocumentTypeCommand command) {
         DocumentsType documentsType = command.getDocumentsType();
 
         final DocumentTypeEntity documentTypeEntity = documentTypeRepository.findByUuid(command.getuuid()).orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
         documentTypeEntity.setTitle(documentsType.getTitle());
         documentTypeEntity.setActive(documentsType.isActive());
         documentTypeEntity.setUserType(documentsType.getUserType());
+        documentTypeEntity.setMaxUpload(documentsType.getMaxUpload());
         this.documentTypeRepository.save(documentTypeEntity);
         return new DocumentEvent(command.getuuid(), command.getDocumentsType().toString());
     }
@@ -168,7 +175,7 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_SUB_TYPE)
-    public DocumentEvent process(final CreateDocumentSubTypeCommand command) throws IOException {
+    public DocumentEvent process(final CreateDocumentSubTypeCommand command) {
         DocumentTypeEntity documentTypeEntity = documentTypeRepository.findByUuid(command.getUuid()).orElseThrow(() -> ServiceException.notFound("Document not found"));
         final DocumentSubTypeEntity documentSubTypeEntity = DocumentMapper.map(command.getDocumentsSubType(), documentTypeEntity);
         this.documentSubTypeRepository.save(documentSubTypeEntity);
@@ -179,7 +186,7 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT_SUB_TYPE)
-    public DocumentEvent process(final UpdateDocumentSubTypeCommand subTypeCommand) throws IOException {
+    public DocumentEvent process(final UpdateDocumentSubTypeCommand subTypeCommand) {
         DocumentsMasterSubtype documentsType = subTypeCommand.getDocumentsType();
 
         final DocumentSubTypeEntity documentSubTypeEntity = documentSubTypeRepository.findByUuid(subTypeCommand.getuuid()).orElseThrow(() -> ServiceException.notFound("NOT FOUND"));
@@ -193,7 +200,7 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT)
-    public DocumentEvent process(final RejectDocumentCommand command) throws IOException {
+    public DocumentEvent process(final RejectDocumentCommand command) {
 
         final DocumentEntryEntity existingDocument = documentEntryRepository.findByCustomerIdAndDocumentId(
                 command.getCustomerIdentifier(), command.getCustomerDocumentId())
@@ -212,7 +219,7 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.DELETE_DOCUMENT)
-    public DocumentEvent process(final DeleteDocumentCommand command) throws IOException {
+    public DocumentEvent process(final DeleteDocumentCommand command) {
         final DocumentEntryEntity existingDocument = documentEntryRepository.findByCustomerIdAndDocumentId(command.getCustomerIdentifier(), command.getDocumentIdentifier())
                 .orElseThrow(() ->
                         ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found",
@@ -227,7 +234,7 @@ public class DocumentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_COMPLETE)
-    public DocumentEvent process(final CompleteDocumentCommand command) throws IOException {
+    public DocumentEvent process(final CompleteDocumentCommand command) {
         final DocumentEntity documentEntity = documentRepository.findByCustomerIdAndDocumentIdentifier(
                 command.getCustomerIdentifier(),
                 command.getDocumentIdentifier())

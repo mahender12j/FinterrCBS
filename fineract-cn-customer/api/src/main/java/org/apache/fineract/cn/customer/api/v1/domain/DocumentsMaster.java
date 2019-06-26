@@ -33,6 +33,7 @@ public class DocumentsMaster {
     private String uuid;
     private String userType;
     private boolean isActive;
+    private int maxUpload;
     private List<DocumentsMasterSubtype> documentsMasterSubtypes;
 
     public DocumentsMaster() {
@@ -84,6 +85,14 @@ public class DocumentsMaster {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public int getMaxUpload() {
+        return maxUpload;
+    }
+
+    public void setMaxUpload(int maxUpload) {
+        this.maxUpload = maxUpload;
     }
 
     @Override

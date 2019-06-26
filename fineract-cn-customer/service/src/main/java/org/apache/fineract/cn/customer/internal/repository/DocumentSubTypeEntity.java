@@ -43,7 +43,7 @@ public class DocumentSubTypeEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "active", nullable = false)
     private boolean isActive;
 
 

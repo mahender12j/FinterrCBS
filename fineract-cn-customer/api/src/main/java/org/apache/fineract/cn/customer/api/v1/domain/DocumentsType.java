@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -33,7 +32,8 @@ public class DocumentsType {
     private String userType;
     private String status;
     @NotNull
-    private boolean isActive;
+    private boolean active;
+    private int maxUpload;
     private List<DocumentsSubType> documentsSubType;
 
     public DocumentsType() {
@@ -56,15 +56,23 @@ public class DocumentsType {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     public List<DocumentsSubType> getDocumentsSubType() {
         return documentsSubType;
+    }
+
+    public int getMaxUpload() {
+        return maxUpload;
+    }
+
+    public void setMaxUpload(int maxUpload) {
+        this.maxUpload = maxUpload;
     }
 
     public void setDocumentsSubType(List<DocumentsSubType> documentsSubType) {

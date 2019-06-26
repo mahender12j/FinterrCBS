@@ -154,7 +154,6 @@ public class DocumentsRestController {
         } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
             throw ServiceException.internalError("Sorry! Something went wrong");
         }
-//        return ResponseEntity.accepted().build();
     }
 
 
@@ -320,7 +319,7 @@ public class DocumentsRestController {
 
         return ResponseEntity.accepted().build();
     }
-    
+
     //    upload document on each and return the document from the storage
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(

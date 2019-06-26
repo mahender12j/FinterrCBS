@@ -38,7 +38,7 @@ public class DocumentsMasterSubtype {
     @NotNull
     private String docTypeUUID;
     @NotNull
-    private boolean isActive;
+    private boolean active;
 
     public DocumentsMasterSubtype() {
     }
@@ -76,11 +76,11 @@ public class DocumentsMasterSubtype {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     public String getDocTypeUUID() {

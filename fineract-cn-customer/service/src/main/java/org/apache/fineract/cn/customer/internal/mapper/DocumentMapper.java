@@ -39,30 +39,6 @@ public class DocumentMapper {
     }
 
 
-//    public static List<DocumentsType> map(Map<String, List<DocumentEntryEntity>> documentEntryEntity) {
-//        final List<DocumentsType> ret = new ArrayList<>();
-//
-//        documentEntryEntity.forEach((key, val) -> {
-//            final List<DocumentsSubType> documentsSubTypeList = new ArrayList<>();
-//            final DocumentsType d = new DocumentsType();
-//            val.forEach(doc -> {
-//                final DocumentsSubType documentsSubType = new DocumentsSubType();
-//                documentsSubType.setId(doc.getId());
-//                documentsSubType.setCreated_by(doc.getCreatedBy());
-//                documentsSubType.setStatus(doc.getStatus());
-//                documentsSubType.setType(doc.getType());
-//                documentsSubType.setSubType(doc.getSubType());
-//                DocumentService.setKycDocumentMapper(documentsSubTypeList, doc, documentsSubType);
-//            });
-//
-//            setDocumentTypeStatus(val, d);
-//            d.setType(key);
-//            d.setDocumentsSubType(documentsSubTypeList);
-//            ret.add(d);
-//        });
-//        return ret;
-//    }
-
     public static void setDocumentTypeStatus(List<DocumentEntryEntity> val, DocumentsType d) {
         if (val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
             d.setStatus(CustomerDocument.Status.APPROVED.name());
@@ -92,6 +68,7 @@ public class DocumentMapper {
         documentsMaster.setDocumentsMasterSubtypes(documentsMasterSubtypes);
         documentsMaster.setId(documentTypeEntity.getId());
         documentsMaster.setActive(documentTypeEntity.isActive());
+        documentsMaster.setMaxUpload(documentTypeEntity.getMaxUpload());
         return documentsMaster;
     }
 
@@ -133,7 +110,6 @@ public class DocumentMapper {
 
     public static CustomerDocument map(final DocumentEntity documentEntity) {
         final CustomerDocument ret = new CustomerDocument();
-//        ret.setCompleted(documentEntity.getCompleted());
         ret.setCreatedBy(documentEntity.getCreatedBy());
         ret.setCreatedOn(DateConverter.toIsoString(documentEntity.getCreatedOn()));
         ret.setIdentifier(documentEntity.getIdentifier());
@@ -148,6 +124,7 @@ public class DocumentMapper {
         documentsMaster.setUserType(documentTypeEntity.getUserType());
         documentsMaster.setTitle(documentTypeEntity.getTitle());
         documentsMaster.setActive(documentTypeEntity.isActive());
+        documentsMaster.setMaxUpload(documentTypeEntity.getMaxUpload());
         return documentsMaster;
     }
 
@@ -212,24 +189,40 @@ public class DocumentMapper {
         storageEntity.setDocType(docType);
         return storageEntity;
     }
+//
+//    public static List<DocumentEntryEntity> map(List<KycDocuments> kycDocuments, DocumentEntity documentEntity) {
+//        List<DocumentEntryEntity> documentEntryEntityList = new ArrayList<>();
+//        kycDocuments.forEach(doc -> {
+//            DocumentEntryEntity documents = new DocumentEntryEntity();
+//            documents.setDescription(doc.getDescription());
+//            documents.setDocumentName(doc.getDocName());
+//            documents.setSubType(doc.getSubType());
+//            documents.setType(doc.getType());
+//            documents.setDocRef(doc.getUuid());
+//            documents.setCreatedBy(UserContextHolder.checkedGetUser());
+//            documents.setStatus(CustomerDocument.Status.PENDING.name());
+//            documents.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+//            documents.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
+//            documents.setDocument(documentEntity);
+//            documentEntryEntityList.add(documents);
+//        });
+//        return documentEntryEntityList;
+//    }
 
-    public static List<DocumentEntryEntity> map(List<KycDocuments> kycDocuments, DocumentEntity documentEntity) {
-        List<DocumentEntryEntity> documentEntryEntityList = new ArrayList<>();
-        kycDocuments.forEach(doc -> {
-            DocumentEntryEntity documents = new DocumentEntryEntity();
-            documents.setDescription(doc.getDescription());
-            documents.setDocumentName(doc.getDocName());
-            documents.setSubType(doc.getSubType());
-            documents.setType(doc.getType());
-            documents.setDocRef(doc.getUuid());
-            documents.setCreatedBy(UserContextHolder.checkedGetUser());
-            documents.setStatus(CustomerDocument.Status.PENDING.name());
-            documents.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-            documents.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
-            documents.setDocument(documentEntity);
-            documentEntryEntityList.add(documents);
-        });
-        return documentEntryEntityList;
+
+    public static DocumentEntryEntity map(KycDocuments kycDocuments, DocumentEntity documentEntity) {
+        DocumentEntryEntity documents = new DocumentEntryEntity();
+        documents.setDescription(kycDocuments.getDescription());
+        documents.setDocumentName(kycDocuments.getDocName());
+        documents.setSubType(kycDocuments.getSubType());
+        documents.setType(kycDocuments.getType());
+        documents.setDocRef(kycDocuments.getUuid());
+        documents.setCreatedBy(UserContextHolder.checkedGetUser());
+        documents.setStatus(CustomerDocument.Status.PENDING.name());
+        documents.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        documents.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
+        documents.setDocument(documentEntity);
+        return documents;
     }
 
     public static DocumentTypeEntity map(DocumentsType documentsType) {
@@ -237,6 +230,7 @@ public class DocumentMapper {
         documentTypeEntity.setTitle(documentsType.getTitle());
         documentTypeEntity.setUserType(documentsType.getUserType());
         documentTypeEntity.setActive(documentsType.isActive());
+        documentTypeEntity.setMaxUpload(documentsType.getMaxUpload());
         return documentTypeEntity;
     }
 
