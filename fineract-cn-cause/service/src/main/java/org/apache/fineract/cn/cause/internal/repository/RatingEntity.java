@@ -43,23 +43,18 @@ public class RatingEntity {
     @Column(name = "rating", nullable = false)
     private int rating;
 
-    @Column(name = "comment", nullable = true)
-    private String comment;
-
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "active", nullable = false)
     private Boolean active;
 
     @Column(name = "created_by")
     private String createdBy;
-
-    @Column(name = "ref")
-    private Long ref;
 
     @Column(name = "created_on")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime createdOn;
 
     public RatingEntity() {
+        this.createdOn = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -86,14 +81,6 @@ public class RatingEntity {
         this.rating = rating;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     public Boolean getActive() {
         return active;
     }
@@ -116,14 +103,6 @@ public class RatingEntity {
 
     public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
-    }
-
-    public Long getRef() {
-        return ref;
-    }
-
-    public void setRef(Long ref) {
-        this.ref = ref;
     }
 
     @Override

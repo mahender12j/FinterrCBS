@@ -20,9 +20,7 @@ package org.apache.fineract.cn.cause.internal.command.handler;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
-import org.apache.fineract.cn.cause.api.v1.domain.Cause;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseFiles;
-import org.apache.fineract.cn.cause.api.v1.domain.Command;
+import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.cause.internal.command.*;
 import org.apache.fineract.cn.cause.internal.mapper.*;
 import org.apache.fineract.cn.cause.internal.repository.*;
@@ -53,7 +51,6 @@ public class CauseAggregate {
     private final DocumentPageRepository documentPageRepository;
     private final PortraitRepository portraitRepository;
     private final CategoryRepository categoryRepository;
-    private final RatingRepository ratingRepository;
     private final CommandRepository commandRepository;
     private final TaskAggregate taskAggregate;
 
@@ -64,7 +61,6 @@ public class CauseAggregate {
                           final PortraitRepository portraitRepository,
                           final CauseStateRepository causeStateRepository,
                           final CategoryRepository categoryRepository,
-                          final RatingRepository ratingRepository,
                           final CommandRepository commandRepository,
                           final DocumentPageRepository documentPageRepository,
                           final TaskAggregate taskAggregate) {
@@ -73,7 +69,6 @@ public class CauseAggregate {
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
         this.categoryRepository = categoryRepository;
-        this.ratingRepository = ratingRepository;
         this.commandRepository = commandRepository;
         this.causeStateRepository = causeStateRepository;
         this.taskAggregate = taskAggregate;
@@ -199,10 +194,9 @@ public class CauseAggregate {
     public String expireCause(final ExpiredCauseCommand expiredCauseCommand) {
         List<CauseEntity> causes = causeRepository.findByEndDateAndCurrentState(Cause.State.ACTIVE.name(), Cause.State.EXTENDED.name());
 
-        List<CauseEntity> mappedCauses = causes.stream().map(causeEntity -> {
+        List<CauseEntity> mappedCauses = causes.stream().peek(causeEntity -> {
             causeEntity.setCurrentState(Cause.State.CLOSED.name());
             causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
-            return causeEntity;
         }).collect(Collectors.toList());
 
         causeRepository.save(mappedCauses);
@@ -216,7 +210,7 @@ public class CauseAggregate {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.INACTIVE_CAUSE)
     public String expireCause(final InactiveCauseCommand inactiveCauseCommand) {
         List<CauseEntity> causes = causeRepository.findByApproveDate(LocalDateTime.now(Clock.systemUTC()).minusDays(12), Cause.State.APPROVED.name())
-                .stream().map(causeEntity -> {
+                .stream().peek(causeEntity -> {
                     causeEntity.setCurrentState(Cause.State.INACTIVE.name());
 
 
@@ -225,17 +219,13 @@ public class CauseAggregate {
                     List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes);
                     this.causeStateRepository.save(stateEntity
                             .stream()
-                            .map(entity -> {
-                                entity.setType(entity.getType() + "-" + Cause.State.INACTIVE.name());
-                                return entity;
-                            }).collect(Collectors.toList()));
+                            .peek(entity -> entity.setType(entity.getType() + "-" + Cause.State.INACTIVE.name())).collect(Collectors.toList()));
 
                     //        add the status to state
                     CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, null, Cause.State.INACTIVE.name());
                     this.causeStateRepository.save(causeStateEntity);
 
 
-                    return causeEntity;
                 }).collect(Collectors.toList());
         causeRepository.save(causes);
         return causes.toString();
@@ -255,10 +245,7 @@ public class CauseAggregate {
 //        set the pending status to zero
         Set<String> stateTypes = new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()));
         List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes);
-        this.causeStateRepository.save(stateEntity.stream().map(entity -> {
-            entity.setType(Cause.State.PENDING.name() + "-" + Cause.State.PENDING.name() + "-" + Cause.State.REJECTED.name());
-            return entity;
-        }).collect(Collectors.toList()));
+        this.causeStateRepository.save(stateEntity.stream().peek(entity -> entity.setType(Cause.State.PENDING.name() + "-" + Cause.State.PENDING.name() + "-" + Cause.State.REJECTED.name())).collect(Collectors.toList()));
 
 //        add the status to state
         CauseStateEntity causeStateEntity = CauseMapper.map(causeEntity, null, Cause.State.REJECTED.name());
@@ -340,10 +327,7 @@ public class CauseAggregate {
         causeEntity.setEndDate(latestStateEntity.getNewDate());
         this.causeRepository.save(causeEntity);
 
-        this.causeStateRepository.save(stateEntity.stream().map(entity -> {
-            entity.setStatus(Cause.State.APPROVED.name());
-            return entity;
-        }).collect(Collectors.toList()));
+        this.causeStateRepository.save(stateEntity.stream().peek(entity -> entity.setStatus(Cause.State.APPROVED.name())).collect(Collectors.toList()));
 
 
         return approveExtendedCauseCommand.getIdentifier();
@@ -353,10 +337,9 @@ public class CauseAggregate {
         Set<String> stateTypes = new HashSet<>(Arrays.asList(Cause.State.REJECTED.name(), Cause.State.PENDING.name()));
         List<CauseStateEntity> stateEntity = this.causeStateRepository.findByCauseAndTypeIn(causeEntity, stateTypes)
                 .stream()
-                .map(entity -> {
+                .peek(entity -> {
                     entity.setType(entity.getType() + "-" + Cause.State.APPROVED.name());
                     entity.setStatus(Cause.State.APPROVED.name());
-                    return entity;
                 })
                 .collect(Collectors.toList());
 
@@ -502,19 +485,6 @@ public class CauseAggregate {
         return updateAddressCommand.identifier();
     }
 
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_RATING)
-    public String createRating(final CreateRatingCommand createRatingCommand) {
-        final CauseEntity causeEntity = findCauseEntityOrThrow(createRatingCommand.getCauseIdentifier());
-
-        final RatingEntity ratingEntity = RatingMapper.map(createRatingCommand.getCauseRating());
-        ratingEntity.setCause(causeEntity);
-        ratingEntity.setCreatedBy(UserContextHolder.checkedGetUser());
-        ratingEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-        this.ratingRepository.save(ratingEntity);
-        return ratingEntity.toString();
-    }
 
     @Transactional
     @CommandHandler

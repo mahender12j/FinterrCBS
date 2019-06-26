@@ -82,7 +82,6 @@ public class CauseEntity {
     @Column(name = "is_extended", nullable = false)
     private Boolean isExtended;
 
-
 //    todo comment out on 20 Jun, 2019
 //
 //    @Column(name = "actual_raised_fiat")
@@ -156,10 +155,22 @@ public class CauseEntity {
     @Column(name = "frequency_cause_implementation_updates")
     private int frequencyCauseImplementationUpdates;
 
+    // todo added on 25th Jun # ticket issue: 226
+    @Column(name = "adjustment_factor")
+    private double adjustmentFactor = 1;
+
 
 //    @Column(name = "rejected_by")
 //    private String rejectedBy;
 
+
+    public double getAdjustmentFactor() {
+        return adjustmentFactor;
+    }
+
+    public void setAdjustmentFactor(double adjustmentFactor) {
+        this.adjustmentFactor = adjustmentFactor;
+    }
 
     public int getCauseImplementationDuration() {
         return causeImplementationDuration;

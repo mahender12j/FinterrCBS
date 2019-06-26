@@ -25,34 +25,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.stream.Stream;
-import java.util.List;
 
 /**
- * @author Padma Raju Sattineni
+ * @author Md Robiul hassan
  */
 @Repository
 public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
 
-    @Query("SELECT avg(d.rating) FROM RatingEntity d WHERE d.cause.identifier = :causeIdentifier")
-    Double findAvgRatingByCauseId(@Param("causeIdentifier") String causeIdentifier);
+    Optional<RatingEntity> findByCause(final CauseEntity causeEntity);
 
-    Stream<RatingEntity> findByCause(final CauseEntity causeEntity);
-
-    Stream<RatingEntity> findByCauseAndActive(final CauseEntity causeEntity, Boolean active);
-
-
-    //    @Query("SELECT d FROM RatingEntity d WHERE d.cause.identifier = :causeIdentifier AND d.identifier = :ratingIdentifier")
-
-//    Optional<RatingEntity> findByCauseIdAndRatingIdentifier(@Param("causeIdentifier") Long causeIdentifier, @Param("ratingIdentifier") String ratingIdentifier);
-//    @Query("SELECT d FROM RatingEntity d WHERE d.cause.identifier = :causeIdentifier")
-
-//    Stream<RatingEntity> findByCauseId(@Param("causeIdentifier") Long causeIdentifier);
-//
-//    Stream<RatingEntity> findByCauseAndCreatedBy(final CauseEntity causeEntity, final String createdBy);
-//
-//    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN 'true' ELSE 'false' END FROM RatingEntity r WHERE r.cause.identifier = :causeIdentifier AND r.createdBy = :createdBy")
-//    Boolean existsByCreatedBy(@Param("causeIdentifier") final String causeIdentifier, @Param("createdBy") final String createdBy);
-
-//    List<RatingEntity> findByCause(CauseEntity causeEntity);
+    Stream<RatingEntity> findAllByCause(final CauseEntity causeEntity);
 }
 

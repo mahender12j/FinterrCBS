@@ -16,24 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.api.v1.domain;
+package org.apache.fineract.cn.cause.internal.repository;
 
-import org.hibernate.validator.constraints.Length;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
- * @author Md Robiul Hassan
+ * @author Padma Raju Sattineni
  */
-public class CauseRatingPage {
-
-    private double averageRating;
-    private List<CauseRating> causeRatings;
-
-    public CauseRatingPage() {
-    }
-
-
+@Repository
+public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
+    Stream<CommentEntity> findByCause(final CauseEntity causeEntity);
 }
 

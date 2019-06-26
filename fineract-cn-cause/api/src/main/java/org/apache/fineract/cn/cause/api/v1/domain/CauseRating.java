@@ -18,26 +18,21 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
-import org.hibernate.validator.constraints.Length;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * @author Padma Raju Sattineni
+ * @author Md Robiul Hassan
  */
 public class CauseRating {
     private Long id;
     @Max(value = 5, message = "rating range must be between 0-5")
     @Min(value = 0, message = "rating range must be between 0-5")
+    @NotNull
     private int rating;
-    @Length(max = 500, message = "message max length is 500")
-    private String comment;
     private boolean active = true;
-    private Long ref;
     private String createdBy;
     private String createdOn;
     private List<CauseComment> causeComments;
@@ -59,14 +54,6 @@ public class CauseRating {
 
     public void setRating(int rating) {
         this.rating = rating;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
     }
 
     public boolean isActive() {
@@ -93,14 +80,6 @@ public class CauseRating {
         this.createdOn = createdOn;
     }
 
-    public Long getRef() {
-        return ref;
-    }
-
-    public void setRef(Long ref) {
-        this.ref = ref;
-    }
-
     public List<CauseComment> getCauseComments() {
         return causeComments;
     }
@@ -110,25 +89,9 @@ public class CauseRating {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CauseRating that = (CauseRating) o;
-        return active == that.active &&
-                Objects.equals(rating, that.rating) &&
-                Objects.equals(comment, that.comment);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(rating, comment, active);
-    }
-
-    @Override
     public String toString() {
         return "CauseRating{" +
                 "rating='" + rating + '\'' +
-                ", comment='" + comment + '\'' +
                 ", active=" + active +
                 ", createdBy='" + createdBy + '\'' +
                 ", createdOn='" + createdOn + '\'' +

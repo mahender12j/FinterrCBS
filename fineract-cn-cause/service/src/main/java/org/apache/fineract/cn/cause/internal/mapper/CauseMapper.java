@@ -63,7 +63,7 @@ public final class CauseMapper {
         causeEntity.setCurrentState(cause.getCurrentState());
         causeEntity.setSoftTarget(cause.getSoftTarget());
         causeEntity.setHardTarget(cause.getHardTarget());
-        causeEntity.setIsTaxExamption(cause.getIsTaxExemption());
+        causeEntity.setIsTaxExamption(cause.getTaxExemption());
 //        causeEntity.setActualRaisedFiat(cause.getActualRaisedFiat());
 //        causeEntity.setActualRaisedFin(cause.getActualRaisedFin());
 //        causeEntity.setMinAmount(cause.getMinAmount());
@@ -92,7 +92,6 @@ public final class CauseMapper {
         causeEntity.setResubmited(cause.getResubmited());
         causeEntity.setCauseImplementationDuration(cause.getFrequencyCauseImplementationUpdates());
         causeEntity.setFrequencyCauseImplementationUpdates(cause.getFrequencyCauseImplementationUpdates());
-
         return causeEntity;
     }
 
@@ -115,7 +114,7 @@ public final class CauseMapper {
         cause.setCurrentState(causeEntity.getCurrentState());
         cause.setSoftTarget(causeEntity.getSoftTarget());
         cause.setHardTarget(causeEntity.getHardTarget());
-        cause.setIsTaxExemption(causeEntity.getIsTaxExamption());
+        cause.setTaxExemption(causeEntity.getIsTaxExamption());
         cause.setAcceptedDenominationAmounts(causeEntity.getAcceptedDenominationAmounts());
         cause.setSuccessFees(causeEntity.getManagementFee());
         cause.setFinCollLimit(causeEntity.getFinCollLimit());

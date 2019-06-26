@@ -20,60 +20,50 @@ package org.apache.fineract.cn.cause.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseComment;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
-import org.apache.fineract.cn.cause.internal.repository.RatingEntity;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
+import org.apache.fineract.cn.cause.internal.repository.CommentEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author Padma Raju Sattineni
+ * @author Md Robiul Hassan
  */
-public class RatingMapper {
-    private RatingMapper() {
+public class CommentMapper {
+    private CommentMapper() {
         super();
     }
 
-    public static CauseRating map(final RatingEntity ratingEntity) {
-        final CauseRating ret = new CauseRating();
-        ret.setId(ratingEntity.getId());
-        ret.setActive(ratingEntity.getActive());
-        ret.setCreatedBy(ratingEntity.getCreatedBy());
-        ret.setCreatedOn(DateConverter.toIsoString(ratingEntity.getCreatedOn()));
-        ret.setRating(ratingEntity.getRating());
+    public static CauseComment map(final CommentEntity entity) {
+        final CauseComment ret = new CauseComment();
+        ret.setId(entity.getId());
+        ret.setActive(entity.getActive());
+        ret.setCreatedBy(entity.getCreatedBy());
+        ret.setCreatedOn(DateConverter.toIsoString(entity.getCreatedOn()));
+        ret.setComment(entity.getComment());
+        ret.setRef(entity.getRef());
         return ret;
     }
 
-    public static RatingEntity map(final CauseRating rating) {
-        final RatingEntity ret = new RatingEntity();
-        ret.setActive(rating.isActive());
+    public static CommentEntity map(final CauseComment comment, final CauseEntity causeEntity) {
+        final CommentEntity ret = new CommentEntity();
+        ret.setActive(comment.isActive());
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-        ret.setRating(rating.getRating());
-        return ret;
-    }
-
-    public static RatingEntity map(final CauseRating rating, final CauseEntity causeEntity) {
-        final RatingEntity ret = new RatingEntity();
+        ret.setComment(comment.getComment());
+        ret.setRef(comment.getRef());
         ret.setCause(causeEntity);
-        ret.setActive(rating.isActive());
-        ret.setCreatedBy(UserContextHolder.checkedGetUser());
-        ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-        ret.setRating(rating.getRating());
         return ret;
     }
-
 
 //    public static CauseComment
 
-    public static List<CauseRating> map(Stream<RatingEntity> byCause) {
-        return byCause.map(RatingMapper::map).collect(Collectors.toList());
+    public static List<CauseComment> map(Stream<CommentEntity> byCause) {
+        return byCause.map(CommentMapper::map).collect(Collectors.toList());
     }
 }
 

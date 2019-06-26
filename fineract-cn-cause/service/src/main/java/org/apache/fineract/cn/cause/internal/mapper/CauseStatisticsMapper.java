@@ -18,8 +18,8 @@
  */
 package org.apache.fineract.cn.cause.internal.mapper;
 
-import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseStatistics;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseJournalEntry;
 
 import java.util.List;
 import java.util.Set;
@@ -31,8 +31,8 @@ public final class CauseStatisticsMapper {
         super();
     }
 
-    public static CauseStatistics map(final List<JournalEntry> journalEntry) {
-        Set<String> uniqueClerk = journalEntry.stream().map(JournalEntry::getClerk).collect(Collectors.toSet());
+    public static CauseStatistics map(final List<CauseJournalEntry> journalEntry) {
+        Set<String> uniqueClerk = journalEntry.stream().map(CauseJournalEntry::getClerk).collect(Collectors.toSet());
         CauseStatistics causeStatistics = new CauseStatistics();
         causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().get().getAmount())).sum());
         causeStatistics.setJournalEntry(journalEntry.stream().peek(entry -> {

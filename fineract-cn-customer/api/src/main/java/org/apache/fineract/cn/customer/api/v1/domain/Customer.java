@@ -92,7 +92,7 @@ public final class Customer {
     private String refferalCodeIdentifier;
     private String refferalUserIdentifier;
     private String ethAddress;
-    private Boolean isDeposited;
+    private Boolean deposited;
     private String depositedOn;
     private KycStatus kycStatus;
     private String accountNumbers;
@@ -294,22 +294,6 @@ public final class Customer {
         this.ethAddress = ethAddress;
     }
 
-    public Boolean getIsDeposited() {
-        return this.isDeposited;
-    }
-
-    public void setIsDeposited(final Boolean isDeposited) {
-        this.isDeposited = isDeposited;
-    }
-
-    public String getDepositedOn() {
-        return this.depositedOn;
-    }
-
-    public void setDepositedOn(final String depositedOn) {
-        this.depositedOn = depositedOn;
-    }
-
     public String getKycStatus() {
         return this.kycStatus != null ? this.kycStatus.name() : null;
     }
@@ -435,11 +419,19 @@ public final class Customer {
     }
 
     public Boolean getDeposited() {
-        return isDeposited;
+        return deposited;
     }
 
     public void setDeposited(Boolean deposited) {
-        isDeposited = deposited;
+        this.deposited = deposited;
+    }
+
+    public String getDepositedOn() {
+        return depositedOn;
+    }
+
+    public void setDepositedOn(String depositedOn) {
+        this.depositedOn = depositedOn;
     }
 
     public void setKycStatus(KycStatus kycStatus) {
@@ -455,7 +447,7 @@ public final class Customer {
                 + ", currentState=" + currentState + ", applicationDate=" + applicationDate + ", createdBy="
                 + createdBy + ", createdOn=" + createdOn + ", lastModifiedBy=" + lastModifiedBy
                 + ", lastModifiedOn=" + lastModifiedOn + ", refferalCodeIdentifier=" + refferalCodeIdentifier
-                + ", ethAddress=" + ethAddress + ", isDeposited=" + isDeposited + ", depositedOn=" + depositedOn + ", kycStatus=" + kycStatus
+                + ", ethAddress=" + ethAddress + ", isDeposited=" + deposited + ", depositedOn=" + depositedOn + ", kycStatus=" + kycStatus
                 + ", accountNumbers=" + accountNumbers + ", avgMonthlyIncome=" + avgMonthlyIncome + ", ngoName=" + ngoName + ", designation=" + designation + ", ngoRegistrationNumber="
                 + ngoRegistrationNumber + ", dateOfRegistration=" + dateOfRegistration + ",  refAccountNumber=" + refAccountNumber + ", refferalBalance= " + refferalBalance
                 + ", toString()=" + super.toString() + "]";

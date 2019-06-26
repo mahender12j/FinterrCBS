@@ -157,10 +157,11 @@ public class CauseRestController {
     @ResponseBody
     ResponseEntity<Void> deleteCause(@PathVariable("identifier") final String identifier) {
         throwIfCauseNotExists(identifier);
-
-        this.causeService.findCause(identifier).ifPresent(cause -> {
-            if (!CauseService.isRemovableState(cause.getCurrentState())) {
+        this.causeService.findCauseEntity(identifier).map(causeEntity -> {
+            if (Arrays.stream(Cause.RemovableCauseState.values()).anyMatch(c -> c.name().equals(causeEntity.getCurrentState()))) {
                 throw ServiceException.conflict("Unable to delete this cause!");
+            } else {
+                return causeEntity;
             }
         });
 
@@ -454,18 +455,32 @@ public class CauseRestController {
     @ResponseBody
     ResponseEntity<Void> causeRating(@PathVariable("identifier") final String identifier,
                                      @Valid @RequestBody final CauseRating rating) {
+        this.throwIfCauseNotExists(identifier);
+        this.commandGateway.process(new CreateRatingCommand(identifier, rating));
+        return ResponseEntity.accepted().build();
+    }
 
-        if (this.causeService.causeExists(identifier)) {
-            this.commandGateway.process(new CreateRatingCommand(identifier, rating));
-            return ResponseEntity.accepted().build();
-        } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
-        }
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/comments",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+
+    public
+    @ResponseBody
+    ResponseEntity<Void> causeComment(@PathVariable("identifier") final String identifier,
+                                      @Valid @RequestBody final CauseComment causeComment) {
+        throwIfCauseNotExists(identifier);
+        this.commandGateway.process(new CreateCommentCommand(identifier, causeComment));
+        return ResponseEntity.accepted().build();
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/{identifier}/ratings",
+            value = "/causes/{identifier}/feedback",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
@@ -474,11 +489,8 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<List<CauseRating>> fetchCauseRatings(@PathVariable("identifier") final String identifier) {
-        if (this.causeService.causeExists(identifier)) {
-            return ResponseEntity.ok(this.causeService.fetchActiveRatingsByCause(identifier, Boolean.TRUE).collect(Collectors.toList()));
-        } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
-        }
+        throwIfCauseNotExists(identifier);
+        return ResponseEntity.ok(this.causeService.fetchRatingsAndCommentsByCause(identifier).collect(Collectors.toList()));
     }
 
 

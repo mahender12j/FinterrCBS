@@ -20,6 +20,7 @@ package org.apache.fineract.cn.customer.api.v1.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -29,11 +30,14 @@ public class DocumentsMasterSubtype {
 
     @JsonIgnore
     private Long id;
+    @NotNull
     private String title;
     private String uuid;
     @JsonIgnore
     private Long docTypeId;
+    @NotNull
     private String docTypeUUID;
+    @NotNull
     private boolean isActive;
 
     public DocumentsMasterSubtype() {

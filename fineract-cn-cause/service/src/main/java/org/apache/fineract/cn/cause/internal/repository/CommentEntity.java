@@ -16,26 +16,48 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.api.v1.domain;
+package org.apache.fineract.cn.cause.internal.repository;
 
-import java.util.List;
+import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
  * @author Md Robiul Hassan
  */
-public class CauseComment {
+@Entity
+@Table(name = "cass_rating")
+public class CommentEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    private String comment;
-    private boolean active;
-    private Long ref;
-    private String createdBy;
-    private String createdOn;
-    //    ignore to post
-    private List<CauseComment> subComments;
 
-    public CauseComment() {
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cause_id")
+    private CauseEntity cause;
+
+    @Column(name = "comment")
+    private String comment;
+
+    @Column(name = "ref")
+    private Long ref;
+
+    @Column(name = "active", nullable = false)
+    private Boolean active;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "created_on")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime createdOn;
+
+    public CommentEntity() {
+        this.createdOn = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -46,6 +68,14 @@ public class CauseComment {
         this.id = id;
     }
 
+    public CauseEntity getCause() {
+        return cause;
+    }
+
+    public void setCause(CauseEntity cause) {
+        this.cause = cause;
+    }
+
     public String getComment() {
         return comment;
     }
@@ -54,11 +84,11 @@ public class CauseComment {
         this.comment = comment;
     }
 
-    public boolean isActive() {
+    public Boolean getActive() {
         return active;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 
@@ -70,11 +100,11 @@ public class CauseComment {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedOn() {
+    public LocalDateTime getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(String createdOn) {
+    public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
     }
 
@@ -86,35 +116,16 @@ public class CauseComment {
         this.ref = ref;
     }
 
-    public List<CauseComment> getSubComments() {
-        return subComments;
-    }
-
-    public void setSubComments(List<CauseComment> subComments) {
-        this.subComments = subComments;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CauseComment that = (CauseComment) o;
-        return active == that.active &&
-                Objects.equals(comment, that.comment);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(comment, active);
-    }
-
     @Override
     public String toString() {
-        return "CauseRating{" +
+        return "CommentEntity{" +
+                "id=" + id +
+                ", cause=" + cause +
                 ", comment='" + comment + '\'' +
                 ", active=" + active +
+                ", ref=" + ref +
                 ", createdBy='" + createdBy + '\'' +
-                ", createdOn='" + createdOn + '\'' +
+                ", createdOn=" + createdOn +
                 '}';
     }
 }

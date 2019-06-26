@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -25,9 +27,12 @@ import java.util.List;
  */
 public class DocumentsType {
 
+    @NotNull
     private String title;
+    @NotNull
     private String userType;
     private String status;
+    @NotNull
     private boolean isActive;
     private List<DocumentsSubType> documentsSubType;
 

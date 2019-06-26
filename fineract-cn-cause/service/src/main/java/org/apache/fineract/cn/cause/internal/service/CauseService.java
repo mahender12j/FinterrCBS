@@ -18,13 +18,11 @@
  */
 package org.apache.fineract.cn.cause.internal.service;
 
-import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.cause.internal.mapper.*;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAdaptor;
-import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -91,29 +89,6 @@ public class CauseService {
         return this.causeRepository.findByIdentifier(identifier);
     }
 
-    public Optional<Cause> findCause(final String identifier) {
-        return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
-            List<CauseUpdateEntity> entities = this.causeUpdateRepository.findByCauseEntity(causeEntity);
-            final Cause cause = CauseMapper.map(causeEntity);
-            cause.setNumberOfUpdateProvided(entities.size());
-            setCauseDocuments(causeEntity, cause);
-            AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
-            cause.setAddress(AddressMapper.map(addressEntity));
-            cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
-            setCauseExtendedAndResubmitValue(causeEntity, cause);
-            if (cause.getAccountNumber() != null) {
-                final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
-            }
-
-            List<CauseRating> causeRatings = RatingMapper.map(ratingRepository.findByCause(causeEntity));
-            cause.setCauseRatingList(causeRatings);
-//            final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
-            cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
-            return cause;
-        });
-    }
-
     private void setCauseDocuments(CauseEntity causeEntity, Cause cause) {
         final DocumentEntity documentEntity = this.documentRepository.findByCause(causeEntity);
         final CauseDocument causeDocument = DocumentMapper.map(documentEntity);
@@ -121,17 +96,6 @@ public class CauseService {
         causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
         cause.setCauseDocument(causeDocument);
         cause.setCauseFiles(DocumentMapper.mapFile(pageEntity));
-    }
-
-
-    public List<CauseDocumentPage> causeDocumentPages(final String identifier) {
-        Optional<CauseEntity> causeEntity = causeRepository.findByIdentifier(identifier);
-        if (causeEntity.isPresent()) {
-            DocumentEntity entity = documentRepository.findByCauseAndCreatedBy(causeEntity.get(), UserContextHolder.checkedGetUser());
-            return documentPageRepository.findByDocument(entity).stream().map(DocumentMapper::map).collect(Collectors.toList());
-        } else {
-            throw ServiceException.notFound("Cause not found");
-        }
     }
 
 
@@ -150,10 +114,8 @@ public class CauseService {
         if (param == null) {
             CausePage causePage = new CausePage();
             final List<CauseEntity> causeEntities;
-//            System.out.println("sort by " + sortBy);
             switch (sortBy) {
                 case 1:
-//                    System.out.println("sort bt createdOn");
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()))
                             .stream()
                             .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.reverseOrder()))
@@ -165,7 +127,6 @@ public class CauseService {
                     causePage.setCauses(causeArrayList(page.getContent()));
                     break;
                 case 2:
-//                    System.out.println("sort bt getTotalRaised");
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> topFundedcauses = causeArrayList(causeEntities)
                             .stream()
@@ -178,7 +139,6 @@ public class CauseService {
                     causePage.setCauses(topFundedcauses);
                     break;
                 case 3:
-//                    System.out.println("sort bt getAvgRating");
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> popularCauses = causeArrayList(causeEntities)
                             .stream()
@@ -191,7 +151,6 @@ public class CauseService {
                     causePage.setCauses(popularCauses);
                     break;
                 default:
-//                    System.out.println("sort by default");
                     final Page<CauseEntity> allPage = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
                     causePage.setTotalPages(allPage.getTotalPages());
                     causePage.setTotalElements(allPage.getTotalElements());
@@ -375,7 +334,7 @@ public class CauseService {
             final Cause cause = CauseMapper.map(causeEntity);
 
             if (cause.getAccountNumber() != null) {
-                final List<JournalEntry> journalEntry = this.accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                final List<CauseJournalEntry> journalEntry = this.accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
             }
 
@@ -383,14 +342,33 @@ public class CauseService {
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
             setCauseExtendedAndResubmitValue(causeEntity, cause);
             setCauseDocuments(causeEntity, cause);
-            List<CauseRating> causeRatings = RatingMapper.map(ratingRepository.findByCause(causeEntity));
-            cause.setCauseRatingList(causeRatings);
-            cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
+            setRatingsAndAverage(causeEntity, cause);
             causes.add(cause);
         }
 
         return causes;
     }
+
+    public Optional<Cause> findCause(final String identifier) {
+        return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
+            List<CauseUpdateEntity> entities = this.causeUpdateRepository.findByCauseEntity(causeEntity);
+            final Cause cause = CauseMapper.map(causeEntity);
+            Address address = AddressMapper.map(this.addressRepository.findByCause(causeEntity));
+            cause.setAddress(address);
+            cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
+            cause.setNumberOfUpdateProvided(entities.size());
+            if (cause.getAccountNumber() != null) {
+                final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+            }
+            setCauseDocuments(causeEntity, cause);
+            setCauseExtendedAndResubmitValue(causeEntity, cause);
+            setRatingsAndAverage(causeEntity, cause);
+
+            return cause;
+        });
+    }
+
 
     private void setCauseExtendedAndResubmitValue(CauseEntity causeEntity, Cause cause) {
         cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name()))));
@@ -401,9 +379,6 @@ public class CauseService {
     public CaAdminCauseData findAllCauseData() {
         CaAdminCauseData caAdminCauseData = new CaAdminCauseData();
         List<CauseEntity> causeEntities = this.causeRepository.findAll();
-
-//        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
-//        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
         final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).minusDays(7);
         caAdminCauseData.setNoOfCause((long) causeEntities.size());
         caAdminCauseData.setActiveCause(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.ACTIVE.name())).count());
@@ -441,21 +416,32 @@ public class CauseService {
         ngoStatistics.setTotalRaisedAmount(causeStatistics.stream().mapToDouble(CauseStatistics::getTotalRaised).sum());
         ngoStatistics.setTotalSupporter(causeStatistics.stream().mapToInt(CauseStatistics::getTotalSupporter).sum());
         ngoStatistics.setTotalCause(causeEntities.size());
-//set value
+
         NGOProfileStatistics statistics = new NGOProfileStatistics();
         statistics.setNgoStatistics(ngoStatistics);
         statistics.setCauseList(this.causeArrayList(causeEntities));
 
+        List<CauseJournalEntry> causeJournalEntries = causeStatistics.stream()
+                .flatMap(entry -> entry.getJournalEntry().stream()).collect(Collectors.toList());
+        statistics.setCauseJournalEntries(causeJournalEntries);
         return statistics;
     }
 
 
-    public final Stream<CauseRating> fetchActiveRatingsByCause(final String identifier, final Boolean active) {
+    public final Stream<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
-                .map(causeEntity -> this.ratingRepository.findByCauseAndActive(causeEntity, active))
+                .map(this.ratingRepository::findAllByCause)
                 .orElse(Stream.empty())
                 .map(RatingMapper::map);
     }
+
+    private void setRatingsAndAverage(CauseEntity causeEntity, Cause cause) {
+        List<CauseRating> causeRatings = this.ratingRepository.findAllByCause(causeEntity).map(RatingMapper::map).collect(Collectors.toList());
+        cause.setCauseRatings(causeRatings);
+        cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
+    }
+
+    //    todo recursion of cause rating in nasted comments
 
     public final Stream<Command> fetchCommandsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
@@ -469,14 +455,9 @@ public class CauseService {
                 .map(portraitRepository::findByCause);
     }
 
-    public static boolean isRemovableState(String val) {
-        for (Cause.RemovableCauseState c : Cause.RemovableCauseState.values()) {
-            if (c.name().equals(val)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public static boolean isRemovableState(String val) {
+//        return ;
+//    }
 
     public List<ProcessStep> getProcessSteps(final String causeIdentifier) {
         return causeRepository.findByIdentifier(causeIdentifier)

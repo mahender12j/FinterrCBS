@@ -28,6 +28,7 @@ public final class NGOProfileStatistics {
 
     private NGOStatistics ngoStatistics;
     private List<Cause> causeList;
+    private List<CauseJournalEntry> causeJournalEntries;
 
     public NGOProfileStatistics() {
     }
@@ -46,6 +47,23 @@ public final class NGOProfileStatistics {
 
     public void setCauseList(List<Cause> causeList) {
         this.causeList = causeList;
+    }
+
+    public List<CauseJournalEntry> getCauseJournalEntries() {
+        return causeJournalEntries;
+    }
+
+    public void setCauseJournalEntries(List<CauseJournalEntry> causeJournalEntries) {
+        this.causeJournalEntries = causeJournalEntries;
+    }
+
+    @Override
+    public String toString() {
+        return "NGOProfileStatistics{" +
+                "ngoStatistics=" + ngoStatistics +
+                ", causeList=" + causeList +
+                ", causeJournalEntries=" + causeJournalEntries +
+                '}';
     }
 }
 

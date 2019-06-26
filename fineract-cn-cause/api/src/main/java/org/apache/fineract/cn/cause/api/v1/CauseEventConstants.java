@@ -75,6 +75,8 @@ public interface CauseEventConstants {
     String DELETE_CATEGORY = "delete-category";
     String POST_CATEGORY_COMPLETE = "post-category-complete";
 
+    String POST_COMMENTS = "post-comments";
+
     String POST_RATING = "post-rating";
     String PUT_RATING = "put-rating";
     String DELETE_RATING = "delete-rating";

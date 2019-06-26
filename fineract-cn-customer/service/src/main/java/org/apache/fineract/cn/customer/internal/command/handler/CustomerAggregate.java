@@ -223,8 +223,8 @@ public class CustomerAggregate {
         if (customer.getEthAddress() != null) {
             customerEntity.setEthAddress(customer.getEthAddress());
         }
-        if (customer.getIsDeposited() != null) {
-            customerEntity.setIsDeposited(customer.getIsDeposited());
+        if (customer.getDeposited() != null) {
+            customerEntity.setIsDeposited(customer.getDeposited());
         }
 
         if (customer.getDepositedOn() != null) {

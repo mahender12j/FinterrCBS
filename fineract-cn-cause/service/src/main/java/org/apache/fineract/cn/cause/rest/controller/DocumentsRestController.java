@@ -110,18 +110,18 @@ public class DocumentsRestController {
 //    }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
-            value = "/inactive",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<List<CauseDocumentPage>> fetchCauses(@PathVariable("causeidentifier") final String causeidentifier) {
-        return ResponseEntity.ok(this.causeService.causeDocumentPages(causeidentifier));
-    }
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+//    @RequestMapping(
+//            value = "/inactive",
+//            method = RequestMethod.GET,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.ALL_VALUE
+//    )
+//    public
+//    @ResponseBody
+//    ResponseEntity<List<CauseDocumentPage>> fetchCauses(@PathVariable("causeidentifier") final String causeidentifier) {
+//        return ResponseEntity.ok(this.causeService.causeDocumentPages(causeidentifier));
+//    }
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
