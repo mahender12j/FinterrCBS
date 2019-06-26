@@ -33,6 +33,7 @@ public class DocumentsType {
     private String status;
     @NotNull
     private boolean active;
+    @NotNull
     private int maxUpload;
     private List<DocumentsSubType> documentsSubType;
 
