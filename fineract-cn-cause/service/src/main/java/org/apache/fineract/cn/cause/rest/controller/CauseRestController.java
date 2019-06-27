@@ -445,7 +445,7 @@ public class CauseRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/{identifier}/ratings/{useridentifier}",
+            value = "/causes/{identifier}/ratings",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
@@ -454,10 +454,9 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> causeRating(@PathVariable("identifier") final String identifier,
-                                     @PathVariable("useridentifier") final String useridentifier,
                                      @Valid @RequestBody final CauseRating rating) {
         this.throwIfCauseNotExists(identifier);
-        this.commandGateway.process(new CreateRatingCommand(identifier, useridentifier, rating));
+        this.commandGateway.process(new CreateRatingCommand(identifier, UserContextHolder.checkedGetUser(), rating));
         return ResponseEntity.accepted().build();
     }
 
