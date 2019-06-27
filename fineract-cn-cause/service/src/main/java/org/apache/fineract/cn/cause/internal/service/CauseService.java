@@ -457,7 +457,12 @@ public class CauseService {
         return causeRepository.findByIdentifier(identifier)
                 .map(this.ratingRepository::findAllByCause)
                 .orElse(Stream.empty())
-                .map(RatingMapper::map);
+                .map(ratingEntity -> {
+                    CauseRating rating = RatingMapper.map(ratingEntity);
+                    Stream<CauseComment> entityStream = this.commentRepository.findByRating(ratingEntity).map(CommentMapper::map);
+                    rating.setCauseComments(entityStream.collect(Collectors.toList()));
+                    return rating;
+                });
     }
 
     public final Optional<PortraitEntity> findPortrait(final String identifier) {
