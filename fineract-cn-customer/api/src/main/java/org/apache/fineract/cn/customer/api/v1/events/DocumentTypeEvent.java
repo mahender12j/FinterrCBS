@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.cn.customer.api.v1.events;
 
-import java.util.Objects;
-
 /**
  * @author Md Robiul Hassan
  */
@@ -28,7 +26,7 @@ public class DocumentTypeEvent {
     private String title;
     private String userType;
     private String status;
-    private boolean isActive;
+    private boolean active;
 
     public DocumentTypeEvent() {
     }
@@ -37,7 +35,7 @@ public class DocumentTypeEvent {
         this.title = title;
         this.userType = userType;
         this.status = status;
-        this.isActive = isActive;
+        this.active = isActive;
     }
 
     public String getTitle() {
@@ -65,11 +63,11 @@ public class DocumentTypeEvent {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     @Override
@@ -78,7 +76,7 @@ public class DocumentTypeEvent {
                 "title='" + title + '\'' +
                 ", userType='" + userType + '\'' +
                 ", status='" + status + '\'' +
-                ", isActive=" + isActive +
+                ", active=" + active +
                 '}';
     }
 }

@@ -18,19 +18,13 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
-import org.hibernate.validator.constraints.NotBlank;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
 public final class UserContactVerificationStatus {
 
 
     private String email;
-    private boolean isEmailVerified;
+    private boolean emailVerified;
     private String mobile;
-    private boolean isMobileVerified;
+    private boolean mobileVerified;
     private String username;
 
     public UserContactVerificationStatus() {
@@ -41,7 +35,7 @@ public final class UserContactVerificationStatus {
     }
 
     public void setEmailVerified(boolean emailVerified) {
-        isEmailVerified = emailVerified;
+        this.emailVerified = emailVerified;
     }
 
     public String getMobile() {
@@ -53,11 +47,11 @@ public final class UserContactVerificationStatus {
     }
 
     public boolean isMobileVerified() {
-        return isMobileVerified;
+        return mobileVerified;
     }
 
     public void setMobileVerified(boolean mobileVerified) {
-        isMobileVerified = mobileVerified;
+        this.mobileVerified = mobileVerified;
     }
 
     public String getEmail() {
@@ -65,7 +59,7 @@ public final class UserContactVerificationStatus {
     }
 
     public boolean isEmailVerified() {
-        return isEmailVerified;
+        return emailVerified;
     }
 
     public String getUsername() {

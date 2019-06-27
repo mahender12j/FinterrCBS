@@ -41,12 +41,12 @@ public class CreateCauseCommandResponse {
     @NotNull
     private Double hardTarget;
 
-    private Boolean isTaxExamption;
+    private Boolean taxExamption;
     private String acceptedDenominationAmounts;
     private String createdBy;
     private String createdOn;
     @NotNull
-    private boolean isFeeRevisionRequired;
+    private boolean feeRevisionRequired;
 
     private String taxExemptionPercentage;
     private String websiteUrl;
@@ -71,11 +71,11 @@ public class CreateCauseCommandResponse {
         this.currentState = currentState;
         this.softTarget = softTarget;
         this.hardTarget = hardTarget;
-        this.isTaxExamption = isTaxExamption;
+        this.taxExamption = isTaxExamption;
         this.acceptedDenominationAmounts = acceptedDenominationAmounts;
         this.createdBy = createdBy;
         this.createdOn = createdOn;
-        this.isFeeRevisionRequired = isFeeRevisionRequired;
+        this.feeRevisionRequired = isFeeRevisionRequired;
         this.taxExemptionPercentage = taxExemptionPercentage;
         this.websiteUrl = websiteUrl;
         this.smediaLinks = smediaLinks;
@@ -119,7 +119,7 @@ public class CreateCauseCommandResponse {
     }
 
     public Boolean getTaxExamption() {
-        return isTaxExamption;
+        return taxExamption;
     }
 
     public String getAcceptedDenominationAmounts() {
@@ -137,7 +137,7 @@ public class CreateCauseCommandResponse {
 
 
     public boolean isFeeRevisionRequired() {
-        return isFeeRevisionRequired;
+        return feeRevisionRequired;
     }
 
     public String getTaxExemptionPercentage() {

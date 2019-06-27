@@ -89,7 +89,7 @@ public class Cause {
     private String lastModifiedBy;
     private String lastModifiedOn;
     @NotNull
-    private boolean isFeeRevisionRequired;
+    private boolean feeRevisionRequired;
 
 
     @Valid
@@ -488,11 +488,11 @@ public class Cause {
     }
 
     public boolean isFeeRevisionRequired() {
-        return isFeeRevisionRequired;
+        return feeRevisionRequired;
     }
 
     public void setFeeRevisionRequired(boolean feeRevisionRequired) {
-        isFeeRevisionRequired = feeRevisionRequired;
+        this.feeRevisionRequired = feeRevisionRequired;
     }
 
     public int getTotalNumberOfUpdates() {
@@ -545,7 +545,7 @@ public class Cause {
                 ", createdOn='" + createdOn + '\'' +
                 ", lastModifiedBy='" + lastModifiedBy + '\'' +
                 ", lastModifiedOn='" + lastModifiedOn + '\'' +
-                ", isFeeRevisionRequired=" + isFeeRevisionRequired +
+                ", isFeeRevisionRequired=" + feeRevisionRequired +
                 ", causeCategories=" + causeCategories +
                 ", taxExemptionPercentage='" + taxExemptionPercentage + '\'' +
                 ", websiteUrl='" + websiteUrl + '\'' +

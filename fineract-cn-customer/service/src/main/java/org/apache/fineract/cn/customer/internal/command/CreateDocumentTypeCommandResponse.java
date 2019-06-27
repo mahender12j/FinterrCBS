@@ -24,7 +24,7 @@ package org.apache.fineract.cn.customer.internal.command;
 public class CreateDocumentTypeCommandResponse {
     private String title;
     private String userType;
-    private boolean isActive;
+    private boolean active;
     private String ref;
 
     public CreateDocumentTypeCommandResponse() {
@@ -33,7 +33,7 @@ public class CreateDocumentTypeCommandResponse {
     public CreateDocumentTypeCommandResponse(String title, String userType, boolean isActive, String ref) {
         this.title = title;
         this.userType = userType;
-        this.isActive = isActive;
+        this.active = isActive;
         this.ref = ref;
     }
 
@@ -54,11 +54,11 @@ public class CreateDocumentTypeCommandResponse {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     public String getRef() {
