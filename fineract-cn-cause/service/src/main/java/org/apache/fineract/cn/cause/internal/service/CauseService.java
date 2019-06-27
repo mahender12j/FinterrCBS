@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -458,23 +459,32 @@ public class CauseService {
                 .orElse(Stream.empty())
                 .map(ratingEntity -> {
                     CauseRating rating = RatingMapper.map(ratingEntity);
-                    Stream<CauseComment> entityStream = this.commentRepository.findByRating(ratingEntity).map(CommentMapper::map);
-                    rating.setCauseComments(this.fetchNastedComments(entityStream));
+                    List<CommentEntity> commentEntities = this.commentRepository.findByRating(ratingEntity).collect(Collectors.toList());
+                    rating.setCauseComments(this.fetchNastedComments(commentEntities, null));
                     return rating;
                 });
     }
 
 
-    private List<CauseComment> fetchNastedComments(Stream<CauseComment> causeCommentStream) {
+    private List<CauseComment> fetchNastedComments(List<CommentEntity> commentEntities, final Long ref) {
+        return commentEntities
+                .stream()
+                .filter(ent -> ent.getRef() == ref)
+                .map(entity -> {
 
-        return causeCommentStream
-                .filter(ent -> ent.getRef() == null)
-                .peek(comment -> {
-                    Stream<CauseComment> childComment = causeCommentStream
-                            .filter(cdata -> cdata.getId().equals(comment.getId()));
+                    CauseComment causeComment = CommentMapper.map(entity);
+                    Stream<CommentEntity> childComment = commentEntities
+                            .stream()
+                            .filter(cdata -> cdata.getRef() == entity.getId());
+
                     if (childComment.findAny().isPresent()) {
-                        comment.setChildComments(fetchNastedComments(causeCommentStream));
+                        System.out.println("child comment present or not");
+                        causeComment.setChildComments(fetchNastedComments(commentEntities, entity.getId()));
                     }
+
+                    return causeComment;
+
+
                 })
                 .collect(Collectors.toList());
     }
