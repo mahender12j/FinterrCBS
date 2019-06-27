@@ -445,7 +445,7 @@ public class CauseRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/{identifier}/ratings",
+            value = "/causes/{identifier}/ratings/{useridentifier}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
@@ -454,16 +454,17 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> causeRating(@PathVariable("identifier") final String identifier,
+                                     @PathVariable("useridentifier") final String useridentifier,
                                      @Valid @RequestBody final CauseRating rating) {
         this.throwIfCauseNotExists(identifier);
-        this.commandGateway.process(new CreateRatingCommand(identifier, rating));
+        this.commandGateway.process(new CreateRatingCommand(identifier, useridentifier, rating));
         return ResponseEntity.accepted().build();
     }
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/{identifier}/comments",
+            value = "/causes/{identifier}/comments/{ratingid}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
@@ -472,9 +473,11 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> causeComment(@PathVariable("identifier") final String identifier,
+                                      @PathVariable("ratingid") final Long ratingid,
                                       @Valid @RequestBody final CauseComment causeComment) {
         throwIfCauseNotExists(identifier);
-        this.commandGateway.process(new CreateCommentCommand(identifier, causeComment));
+        throwIfRatingNotExists(ratingid);
+        this.commandGateway.process(new CreateCommentCommand(identifier, ratingid, causeComment));
         return ResponseEntity.accepted().build();
     }
 
@@ -794,6 +797,12 @@ public class CauseRestController {
         }
     }
 
+
+    private void throwIfRatingNotExists(Long id) {
+        if (!this.causeService.ratingExists(id)) {
+            throw ServiceException.notFound("Cause {0} not found.", id);
+        }
+    }
 
     private void throwIfDocumentNotValid(Cause cause) {
         if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("terms"))) {

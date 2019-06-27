@@ -47,6 +47,7 @@ public class RatingMapper {
         ret.setCreatedBy(ratingEntity.getCreatedBy());
         ret.setCreatedOn(DateConverter.toIsoString(ratingEntity.getCreatedOn()));
         ret.setRating(ratingEntity.getRating());
+        ret.setComment(ratingEntity.getComment());
         return ret;
     }
 
@@ -56,6 +57,7 @@ public class RatingMapper {
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setRating(rating.getRating());
+        ret.setComment(rating.getComment());
         return ret;
     }
 
@@ -66,6 +68,7 @@ public class RatingMapper {
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setRating(rating.getRating());
+        ret.setComment(rating.getComment());
         return ret;
     }
 

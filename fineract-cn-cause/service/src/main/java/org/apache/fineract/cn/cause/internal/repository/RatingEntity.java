@@ -36,12 +36,15 @@ public class RatingEntity {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cause_id")
     private CauseEntity cause;
 
     @Column(name = "rating", nullable = false)
     private int rating;
+
+    @Column(name = "comment")
+    private String comment;
 
     @Column(name = "active", nullable = false)
     private Boolean active;
@@ -91,6 +94,14 @@ public class RatingEntity {
 
     public String getCreatedBy() {
         return createdBy;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public void setCreatedBy(String createdBy) {

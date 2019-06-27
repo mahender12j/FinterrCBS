@@ -32,7 +32,12 @@ import java.util.stream.Stream;
 @Repository
 public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
 
-    Optional<RatingEntity> findByCause(final CauseEntity causeEntity);
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM RatingEntity c WHERE c.id = :identifier")
+    Boolean existsByid(@Param("id") final Long id);
+
+    Optional<RatingEntity> findById(final Long id);
+
+    Optional<RatingEntity> findByCauseAndCreatedBy(final CauseEntity causeEntity, final String createdBy);
 
     Stream<RatingEntity> findAllByCause(final CauseEntity causeEntity);
 }

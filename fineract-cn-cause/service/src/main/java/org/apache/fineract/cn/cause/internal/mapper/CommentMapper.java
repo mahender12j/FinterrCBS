@@ -22,6 +22,7 @@ import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseComment;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.cause.internal.repository.CommentEntity;
+import org.apache.fineract.cn.cause.internal.repository.RatingEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 
 import java.time.Clock;
@@ -49,14 +50,14 @@ public class CommentMapper {
         return ret;
     }
 
-    public static CommentEntity map(final CauseComment comment, final CauseEntity causeEntity) {
+    public static CommentEntity map(final CauseComment comment, final RatingEntity ratingEntity) {
         final CommentEntity ret = new CommentEntity();
         ret.setActive(comment.isActive());
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setComment(comment.getComment());
         ret.setRef(comment.getRef());
-        ret.setCause(causeEntity);
+        ret.setRating(ratingEntity);
         return ret;
     }
 

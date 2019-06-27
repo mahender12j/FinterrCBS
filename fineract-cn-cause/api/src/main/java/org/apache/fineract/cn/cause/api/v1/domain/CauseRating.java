@@ -32,6 +32,7 @@ public class CauseRating {
     @Min(value = 0, message = "rating range must be between 0-5")
     @NotNull
     private int rating;
+    private String comment;
     private boolean active = true;
     private String createdBy;
     private String createdOn;
@@ -86,6 +87,14 @@ public class CauseRating {
 
     public void setCauseComments(List<CauseComment> causeComments) {
         this.causeComments = causeComments;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override

@@ -22,7 +22,6 @@ import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 /**
  * @author Md Robiul Hassan
@@ -36,9 +35,9 @@ public class CommentEntity {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cause_id")
-    private CauseEntity cause;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rating_id")
+    private RatingEntity rating;
 
     @Column(name = "comment")
     private String comment;
@@ -68,12 +67,12 @@ public class CommentEntity {
         this.id = id;
     }
 
-    public CauseEntity getCause() {
-        return cause;
+    public RatingEntity getRating() {
+        return rating;
     }
 
-    public void setCause(CauseEntity cause) {
-        this.cause = cause;
+    public void setRating(RatingEntity rating) {
+        this.rating = rating;
     }
 
     public String getComment() {
@@ -120,7 +119,7 @@ public class CommentEntity {
     public String toString() {
         return "CommentEntity{" +
                 "id=" + id +
-                ", cause=" + cause +
+                ", rating=" + rating +
                 ", comment='" + comment + '\'' +
                 ", active=" + active +
                 ", ref=" + ref +

@@ -21,7 +21,6 @@ package org.apache.fineract.cn.cause.internal.command.handler;
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseComment;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
-import org.apache.fineract.cn.cause.api.v1.events.RatingEvent;
 import org.apache.fineract.cn.cause.internal.command.CreateCommentCommand;
 import org.apache.fineract.cn.cause.internal.command.CreateRatingCommand;
 import org.apache.fineract.cn.cause.internal.mapper.CommentMapper;
@@ -34,7 +33,6 @@ import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -57,25 +55,17 @@ public class RatingAndCommentCommandHandler {
         this.commentRepository = commentRepository;
     }
 
-//    @Transactional
-//    @CommandHandler
-//    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_RATING)
-//    public RatingEvent process(final CreateRatingCommand command) throws IOException {
-//        causeRepository.findByIdentifier(command.getCauseIdentifier())
-//                .map(causeEntity -> RatingMapper.map(command.getCauseRating(), causeEntity))
-//                .ifPresent(ratingRepository::save);
-//
-//        return new RatingEvent(command.getCauseIdentifier(), command.getCauseRating().getRating());
-//    }
-
 
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_COMMENTS)
     public String createComment(final CreateCommentCommand commentCommand) {
-        final CauseEntity causeEntity = findCauseEntityOrThrow(commentCommand.getCauseIdentifier());
         CauseComment causeComment = commentCommand.getCauseComment();
-        CommentEntity commentEntity = CommentMapper.map(causeComment, causeEntity);
+
+        findCauseEntityOrThrow(commentCommand.getCauseIdentifier());
+        RatingEntity entity = this.ratingRepository.findById(commentCommand.getRatingid()).orElseThrow(() -> ServiceException.notFound("Rating Not found {0}", commentCommand.getRatingid()));
+
+        CommentEntity commentEntity = CommentMapper.map(causeComment, entity);
         this.commentRepository.save(commentEntity);
         return causeComment.toString();
     }
@@ -90,14 +80,14 @@ public class RatingAndCommentCommandHandler {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_RATING)
     public String createRating(final CreateRatingCommand createRatingCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(createRatingCommand.getCauseIdentifier());
+        CauseRating causeRating = createRatingCommand.getRating();
 
-        Optional<RatingEntity> optionalRatingEntity = this.ratingRepository.findByCause(causeEntity);
-        CauseRating causeRating = createRatingCommand.getCauseRating();
-
-        RatingEntity ratingEntity = optionalRatingEntity.map(entity -> {
+        RatingEntity ratingEntity = this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createRatingCommand.getUserIdentifier()).map(entity -> {
             entity.setRating(causeRating.getRating());
             return entity;
         }).orElseGet(() -> RatingMapper.map(causeRating, causeEntity));
+
+//        save the data if not exist otherwise update
         this.ratingRepository.save(ratingEntity);
         return ratingEntity.toString();
     }

@@ -19,7 +19,6 @@
 package org.apache.fineract.cn.cause.internal.command;
 
 import org.apache.fineract.cn.cause.api.v1.domain.CauseComment;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
 
 /**
  * @author Md Robiul Hassan
@@ -27,12 +26,14 @@ import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
 public class CreateCommentCommand {
     private final String causeIdentifier;
     private final CauseComment causeComment;
+    private final Long ratingid;
 
-    public CreateCommentCommand(
-            final String causeIdentifier,
-            final CauseComment causeComment) {
+    public CreateCommentCommand(final String causeIdentifier,
+                                final Long ratingid,
+                                final CauseComment causeComment) {
         this.causeIdentifier = causeIdentifier;
         this.causeComment = causeComment;
+        this.ratingid = ratingid;
     }
 
     public String getCauseIdentifier() {
@@ -43,6 +44,9 @@ public class CreateCommentCommand {
         return causeComment;
     }
 
+    public Long getRatingid() {
+        return ratingid;
+    }
 
     @Override
     public String toString() {
