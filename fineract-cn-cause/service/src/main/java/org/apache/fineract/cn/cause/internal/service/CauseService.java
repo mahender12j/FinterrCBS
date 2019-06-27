@@ -90,6 +90,11 @@ public class CauseService {
     }
 
 
+    public Boolean commentExists(final Long id) {
+        return this.commentRepository.existsByid(id);
+    }
+
+
     public Optional<CauseEntity> findCauseByIdentifier(final String identifier) {
         return this.causeRepository.findByIdentifier(identifier);
     }

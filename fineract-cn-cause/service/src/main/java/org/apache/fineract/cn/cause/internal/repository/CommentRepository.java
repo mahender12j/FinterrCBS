@@ -19,6 +19,8 @@
 package org.apache.fineract.cn.cause.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.stream.Stream;
@@ -28,6 +30,10 @@ import java.util.stream.Stream;
  */
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
+
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CommentEntity c WHERE c.id = :id")
+    Boolean existsByid(@Param("id") final Long id);
+
     Stream<CommentEntity> findByRating(final RatingEntity ratingEntity);
 }
 

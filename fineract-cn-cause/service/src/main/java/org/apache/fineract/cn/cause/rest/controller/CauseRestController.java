@@ -477,6 +477,9 @@ public class CauseRestController {
                                       @Valid @RequestBody final CauseComment causeComment) {
         throwIfCauseNotExists(identifier);
         throwIfRatingNotExists(ratingid);
+        if (causeComment.getRef() != null)
+            throwIfCommentNotExists(causeComment.getRef());
+
         this.commandGateway.process(new CreateCommentCommand(identifier, ratingid, causeComment));
         return ResponseEntity.accepted().build();
     }
@@ -801,6 +804,12 @@ public class CauseRestController {
     private void throwIfRatingNotExists(Long ratingid) {
         if (!this.causeService.ratingExists(ratingid)) {
             throw ServiceException.notFound("Rating {0} not found.", ratingid);
+        }
+    }
+
+    private void throwIfCommentNotExists(Long ref) {
+        if (!this.causeService.commentExists(ref)) {
+            throw ServiceException.notFound("Comment for ref {0} not found.", ref);
         }
     }
 
