@@ -78,19 +78,21 @@ public class RatingAndCommentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_RATING)
-    public String createRating(final CreateRatingCommand createRatingCommand) {
+    public CauseRating createRating(final CreateRatingCommand createRatingCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(createRatingCommand.getCauseIdentifier());
         CauseRating causeRating = createRatingCommand.getRating();
 
         RatingEntity ratingEntity = this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createRatingCommand.getUserIdentifier()).map(entity -> {
             entity.setRating(causeRating.getRating());
             entity.setComment(causeRating.getComment());
+            if (causeRating.isActive())
+                entity.setActive(causeRating.isActive());
             return entity;
         }).orElseGet(() -> RatingMapper.map(causeRating, causeEntity));
 
 //        save the data if not exist otherwise update
-        this.ratingRepository.save(ratingEntity);
-        return ratingEntity.toString();
+        RatingEntity entity = this.ratingRepository.save(ratingEntity);
+        return new CauseRating(entity.getId(), entity.getRating(), entity.getComment(), entity.getActive(), entity.getCreatedBy(), entity.getCreatedOn().toString());
     }
 
 

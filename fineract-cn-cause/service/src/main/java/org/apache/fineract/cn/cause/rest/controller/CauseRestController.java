@@ -453,11 +453,16 @@ public class CauseRestController {
 
     public
     @ResponseBody
-    ResponseEntity<Void> causeRating(@PathVariable("identifier") final String identifier,
-                                     @Valid @RequestBody final CauseRating rating) {
+    ResponseEntity<CauseRating> causeRating(@PathVariable("identifier") final String identifier,
+                                            @Valid @RequestBody final CauseRating rating) {
         this.throwIfCauseNotExists(identifier);
-        this.commandGateway.process(new CreateRatingCommand(identifier, UserContextHolder.checkedGetUser(), rating));
-        return ResponseEntity.accepted().build();
+        try {
+            CommandCallback<CauseRating> commandCallback = this.commandGateway.process(new CreateRatingCommand(identifier, UserContextHolder.checkedGetUser(), rating), CauseRating.class);
+            return ResponseEntity.ok(commandCallback.get());
+//            return ResponseEntity.accepted().build();
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Something went wrong");
+        }
     }
 
 
