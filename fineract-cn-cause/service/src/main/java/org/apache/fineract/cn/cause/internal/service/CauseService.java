@@ -469,22 +469,16 @@ public class CauseService {
     private List<CauseComment> fetchNastedComments(List<CommentEntity> commentEntities, final Long ref) {
         return commentEntities
                 .stream()
-                .filter(ent -> ent.getRef() == ref)
+                .filter(ent -> ent.getRef() == ref)  //equal equal is used cause ref value can be null value which can cause null pointer issue
                 .map(entity -> {
-
                     CauseComment causeComment = CommentMapper.map(entity);
                     Stream<CommentEntity> childComment = commentEntities
                             .stream()
-                            .filter(cdata -> cdata.getRef() == entity.getId());
-
+                            .filter(cdata -> cdata.getRef() == entity.getId()); //equal equal is used cause ref value can be null value which can cause null pointer issue
                     if (childComment.findAny().isPresent()) {
-                        System.out.println("child comment present or not");
                         causeComment.setChildComments(fetchNastedComments(commentEntities, entity.getId()));
                     }
-
                     return causeComment;
-
-
                 })
                 .collect(Collectors.toList());
     }
