@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
  * @author Md Robiul Hassan
  */
 @Entity
-@Table(name = "cass_rating")
+@Table(name = "cass_comments")
 public class CommentEntity {
 
     @Id
@@ -46,7 +46,7 @@ public class CommentEntity {
     private Long ref;
 
     @Column(name = "active", nullable = false)
-    private Boolean active;
+    private Boolean active = true;
 
     @Column(name = "created_by")
     private String createdBy;

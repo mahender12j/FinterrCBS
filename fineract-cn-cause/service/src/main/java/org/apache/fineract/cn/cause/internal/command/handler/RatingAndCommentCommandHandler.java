@@ -84,6 +84,7 @@ public class RatingAndCommentCommandHandler {
 
         RatingEntity ratingEntity = this.ratingRepository.findByCauseAndCreatedBy(causeEntity, createRatingCommand.getUserIdentifier()).map(entity -> {
             entity.setRating(causeRating.getRating());
+            entity.setComment(causeRating.getComment());
             return entity;
         }).orElseGet(() -> RatingMapper.map(causeRating, causeEntity));
 

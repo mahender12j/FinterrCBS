@@ -43,12 +43,12 @@ public class CauseService {
     private final PortraitRepository portraitRepository;
     private final CategoryRepository categoryRepository;
     private final RatingRepository ratingRepository;
-    private final CommandRepository commandRepository;
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
     private final AccountingAdaptor accountingAdaptor;
     private final CauseStateRepository causeStateRepository;
     private final CauseUpdateRepository causeUpdateRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
     public CauseService(final CauseRepository causeRepository,
@@ -58,18 +58,18 @@ public class CauseService {
                         final DocumentPageRepository documentPageRepository,
                         final RatingRepository ratingRepository,
                         final DocumentRepository documentRepository,
-                        final CommandRepository commandRepository,
                         final AccountingAdaptor accountingAdaptor,
                         final TaskDefinitionRepository taskDefinitionRepository,
                         final TaskInstanceRepository taskInstanceRepository,
                         final CauseStateRepository causeStateRepository,
-                        final CauseUpdateRepository causeUpdateRepository) {
+                        final CauseUpdateRepository causeUpdateRepository,
+                        final CommentRepository commentRepository) {
         super();
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
         this.categoryRepository = categoryRepository;
         this.ratingRepository = ratingRepository;
-        this.commandRepository = commandRepository;
+        this.commentRepository = commentRepository;
         this.addressRepository = addressRepository;
         this.documentPageRepository = documentPageRepository;
         this.taskDefinitionRepository = taskDefinitionRepository;
@@ -433,12 +433,12 @@ public class CauseService {
     }
 
 
-    public final Stream<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
-        return causeRepository.findByIdentifier(identifier)
-                .map(this.ratingRepository::findAllByCause)
-                .orElse(Stream.empty())
-                .map(RatingMapper::map);
-    }
+//    public final Stream<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
+//        return causeRepository.findByIdentifier(identifier)
+//                .map(this.ratingRepository::findAllByCause)
+//                .orElse(Stream.empty())
+//                .map(RatingMapper::map);
+//    }
 
     private void setRatingsAndAverage(CauseEntity causeEntity, Cause cause) {
         List<CauseRating> causeRatings = this.ratingRepository.findAllByCause(causeEntity).map(RatingMapper::map).collect(Collectors.toList());
@@ -448,11 +448,11 @@ public class CauseService {
 
     //    todo recursion of cause rating in nasted comments
 
-    public final Stream<Command> fetchCommandsByCause(final String identifier) {
+    public final Stream<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
-                .map(commandRepository::findByCause)
+                .map(this.ratingRepository::findAllByCause)
                 .orElse(Stream.empty())
-                .map(CommandMapper::map);
+                .map(RatingMapper::map);
     }
 
     public final Optional<PortraitEntity> findPortrait(final String identifier) {

@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,6 +28,7 @@ import java.util.Objects;
 public class CauseComment {
 
     private Long id;
+    @NotNull
     private String comment;
     private boolean active;
     private Long ref;

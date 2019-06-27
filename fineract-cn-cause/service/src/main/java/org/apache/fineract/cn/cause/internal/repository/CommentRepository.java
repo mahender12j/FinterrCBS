@@ -24,10 +24,10 @@ import org.springframework.stereotype.Repository;
 import java.util.stream.Stream;
 
 /**
- * @author Padma Raju Sattineni
+ * @author Md Robiul Hassan
  */
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
-    Stream<CommentEntity> findByCause(final CauseEntity causeEntity);
+    Stream<CommentEntity> findByRating(final RatingEntity ratingEntity);
 }
 

@@ -426,22 +426,22 @@ public class CauseRestController {
         return ResponseEntity.accepted().build();
     }
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
-            value = "/causes/{identifier}/commands",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<List<Command>> fetchCauseCommands(@PathVariable("identifier") final String identifier) {
-        if (this.causeService.causeExists(identifier)) {
-            return ResponseEntity.ok(this.causeService.fetchCommandsByCause(identifier).collect(Collectors.toList()));
-        } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
-        }
-    }
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+//    @RequestMapping(
+//            value = "/causes/{identifier}/commands",
+//            method = RequestMethod.GET,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.ALL_VALUE
+//    )
+//    public
+//    @ResponseBody
+//    ResponseEntity<List<Command>> fetchCauseCommands(@PathVariable("identifier") final String identifier) {
+//        if (this.causeService.causeExists(identifier)) {
+//            return ResponseEntity.ok(this.causeService.fetchCommandsByCause(identifier).collect(Collectors.toList()));
+//        } else {
+//            throw ServiceException.notFound("Cause {0} not found.", identifier);
+//        }
+//    }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
@@ -798,9 +798,9 @@ public class CauseRestController {
     }
 
 
-    private void throwIfRatingNotExists(Long id) {
-        if (!this.causeService.ratingExists(id)) {
-            throw ServiceException.notFound("Cause {0} not found.", id);
+    private void throwIfRatingNotExists(Long ratingid) {
+        if (!this.causeService.ratingExists(ratingid)) {
+            throw ServiceException.notFound("Cause {0} not found.", ratingid);
         }
     }
 

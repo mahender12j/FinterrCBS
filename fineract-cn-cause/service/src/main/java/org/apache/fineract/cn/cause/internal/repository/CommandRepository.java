@@ -22,7 +22,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.stream.Stream;
 
-public interface CommandRepository extends JpaRepository<CommandEntity, Long> {
+public interface CommandRepository extends JpaRepository<CommentEntity, Long> {
 
-    Stream<CommandEntity> findByCause(final CauseEntity causeEntity);
+    Stream<CommentEntity> findByRating(final RatingEntity ratingEntity);
 }

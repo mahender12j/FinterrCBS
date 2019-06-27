@@ -353,7 +353,7 @@ public class CauseAggregate {
         final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseCommand.getCauseIdentifier());
         setStateAndTimestamp(causeEntity, Cause.State.DELETED);
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
-        this.commandRepository.save(CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), deleteCauseCommand.comment()));
+//        this.commandRepository.save(CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), deleteCauseCommand.comment()));
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.UNLOCK);
         return deleteCauseCommand.getCauseIdentifier();
     }
@@ -372,9 +372,9 @@ public class CauseAggregate {
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
-        this.commandRepository.save(
-                CommandMapper.create(savedCauseEntity, Command.Action.ACTIVATE.name(), activateCauseCommand.comment())
-        );
+//        this.commandRepository.save(
+//                CommandMapper.create(savedCauseEntity, Command.Action.ACTIVATE.name(), activateCauseCommand.comment())
+//        );
 
         return activateCauseCommand.identifier();
     }
@@ -389,9 +389,9 @@ public class CauseAggregate {
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
-        this.commandRepository.save(
-                CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), lockCauseCommand.comment())
-        );
+//        this.commandRepository.save(
+//                CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), lockCauseCommand.comment())
+//        );
 
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.UNLOCK);
 
@@ -412,9 +412,9 @@ public class CauseAggregate {
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
-        this.commandRepository.save(
-                CommandMapper.create(savedCauseEntity, Command.Action.UNLOCK.name(), unlockCauseCommand.comment())
-        );
+//        this.commandRepository.save(
+//                CommandMapper.create(savedCauseEntity, Command.Action.UNLOCK.name(), unlockCauseCommand.comment())
+//        );
 
         return unlockCauseCommand.identifier();
     }
@@ -435,9 +435,9 @@ public class CauseAggregate {
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
-        this.commandRepository.save(
-                CommandMapper.create(savedCauseEntity, Command.Action.CLOSE.name(), closeCauseCommand.comment())
-        );
+//        this.commandRepository.save(
+//                CommandMapper.create(savedCauseEntity, Command.Action.CLOSE.name(), closeCauseCommand.comment())
+//        );
 
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.REOPEN);
 
@@ -458,9 +458,9 @@ public class CauseAggregate {
 
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
-        this.commandRepository.save(
-                CommandMapper.create(savedCauseEntity, Command.Action.REOPEN.name(), reopenCauseCommand.comment())
-        );
+//        this.commandRepository.save(
+//                CommandMapper.create(savedCauseEntity, Command.Action.REOPEN.name(), reopenCauseCommand.comment())
+//        );
 
         return reopenCauseCommand.identifier();
     }
