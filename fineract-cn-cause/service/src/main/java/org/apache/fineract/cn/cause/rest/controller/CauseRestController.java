@@ -800,7 +800,7 @@ public class CauseRestController {
 
     private void throwIfRatingNotExists(Long ratingid) {
         if (!this.causeService.ratingExists(ratingid)) {
-            throw ServiceException.notFound("Cause {0} not found.", ratingid);
+            throw ServiceException.notFound("Rating {0} not found.", ratingid);
         }
     }
 
