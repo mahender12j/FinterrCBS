@@ -451,7 +451,6 @@ public class CauseService {
         cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
     }
 
-    //    todo recursion of cause rating in nasted comments
 
     public final Stream<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
@@ -460,19 +459,30 @@ public class CauseService {
                 .map(ratingEntity -> {
                     CauseRating rating = RatingMapper.map(ratingEntity);
                     Stream<CauseComment> entityStream = this.commentRepository.findByRating(ratingEntity).map(CommentMapper::map);
-                    rating.setCauseComments(entityStream.collect(Collectors.toList()));
+                    rating.setCauseComments(this.fetchNastedComments(entityStream));
                     return rating;
                 });
+    }
+
+
+    private List<CauseComment> fetchNastedComments(Stream<CauseComment> causeCommentStream) {
+
+        return causeCommentStream
+                .filter(ent -> ent.getRef() == null)
+                .peek(comment -> {
+                    Stream<CauseComment> childComment = causeCommentStream
+                            .filter(cdata -> cdata.getId().equals(comment.getId()));
+                    if (childComment.findAny().isPresent()) {
+                        comment.setChildComments(fetchNastedComments(causeCommentStream));
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public final Optional<PortraitEntity> findPortrait(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
                 .map(portraitRepository::findByCause);
     }
-
-//    public static boolean isRemovableState(String val) {
-//        return ;
-//    }
 
     public List<ProcessStep> getProcessSteps(final String causeIdentifier) {
         return causeRepository.findByIdentifier(causeIdentifier)

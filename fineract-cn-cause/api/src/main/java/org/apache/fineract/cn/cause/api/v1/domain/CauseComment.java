@@ -35,7 +35,7 @@ public class CauseComment {
     private String createdBy;
     private String createdOn;
     //    ignore to post
-    private List<CauseComment> subComments;
+    private List<CauseComment> childComments;
 
     public CauseComment() {
     }
@@ -88,12 +88,12 @@ public class CauseComment {
         this.ref = ref;
     }
 
-    public List<CauseComment> getSubComments() {
-        return subComments;
+    public List<CauseComment> getChildComments() {
+        return childComments;
     }
 
-    public void setSubComments(List<CauseComment> subComments) {
-        this.subComments = subComments;
+    public void setChildComments(List<CauseComment> childComments) {
+        this.childComments = childComments;
     }
 
     @Override
