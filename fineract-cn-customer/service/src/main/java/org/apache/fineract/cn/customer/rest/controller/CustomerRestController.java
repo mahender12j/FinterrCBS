@@ -701,7 +701,7 @@ public class CustomerRestController {
         } else {
             return ResponseEntity
                     .ok()
-                    .contentType(MediaType.parseMediaType(MediaType.APPLICATION_JSON_VALUE))
+                    .contentType(MediaType.parseMediaType(null))
                     .body(null);
         }
     }
