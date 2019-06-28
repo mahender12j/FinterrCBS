@@ -30,8 +30,16 @@ public final class UserContactVerificationStatus {
     public UserContactVerificationStatus() {
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
     }
 
     public void setEmailVerified(boolean emailVerified) {
@@ -54,19 +62,22 @@ public final class UserContactVerificationStatus {
         this.mobileVerified = mobileVerified;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public boolean isEmailVerified() {
-        return emailVerified;
-    }
-
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public String toString() {
+        return "UserContactVerificationStatus{" +
+                "email='" + email + '\'' +
+                ", emailVerified=" + emailVerified +
+                ", mobile='" + mobile + '\'' +
+                ", mobileVerified=" + mobileVerified +
+                ", username='" + username + '\'' +
+                '}';
     }
 }

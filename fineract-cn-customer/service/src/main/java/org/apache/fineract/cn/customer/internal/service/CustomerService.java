@@ -292,10 +292,7 @@ public class CustomerService {
     }
 
     public final Optional<PortraitEntity> findPortrait(final String identifier) {
-        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifier(identifier);
-        if (!customerEntity.isPresent()) {
-            throw ServiceException.notFound("Customer {0} not found.", identifier);
-        } else return customerEntity.map(portraitRepository::findByCustomer);
+        return this.customerRepository.findByIdentifier(identifier).map(this.portraitRepository::findByCustomer);
 
     }
 
