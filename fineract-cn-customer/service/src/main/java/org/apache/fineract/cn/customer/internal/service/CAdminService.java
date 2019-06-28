@@ -131,17 +131,19 @@ public class CAdminService {
 
     }
 
-    CustomerDocument findCustomerDocuments(CustomerEntity customerEntity, List<DocumentTypeEntity> documentTypeEntities, List<DocumentSubTypeEntity> documentSubTypeEntities) {
-        final Optional<DocumentEntity> documentEntity = this.documentRepository.findByCustomerId(customerEntity.getIdentifier());
-        CustomerDocument customerDocument = new CustomerDocument();
-        List<DocumentsType> documentsType = new ArrayList<>();
+    CustomerDocument findCustomerDocuments(CustomerEntity customerEntity, List<DocumentTypeEntity> documentTypeEntities,
+                                           List<DocumentSubTypeEntity> documentSubTypeEntities) {
 
-        if (documentEntity.isPresent()) {
-//                start document entity
-            customerDocument = DocumentMapper.map(documentEntity.get());
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity.get(), CustomerDocument.Status.DELETED.name())
+        List<DocumentTypeEntity> allTypeEntities = this.documentTypeRepository.findAll();
+        List<DocumentSubTypeEntity> allSubTypeRepository = this.documentSubTypeRepository.findAll();
+
+        return this.documentRepository.findByCustomerId(customerEntity.getIdentifier()).map(documentEntity -> {
+            CustomerDocument customerDocument = DocumentMapper.map(documentEntity);
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
                     .stream()
                     .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+
+            List<DocumentsType> documentsType = new ArrayList<>();
 
             documentEntryEntity.forEach((key, documentEntryEntities) -> {
                 final List<DocumentsSubType> documentsSubTypeList = documentEntryEntities.stream().map(entity -> {
@@ -149,8 +151,8 @@ public class CAdminService {
                     documentsSubType.setId(entity.getId());
                     documentsSubType.setCreated_by(entity.getCreatedBy());
                     documentsSubType.setStatus(entity.getStatus());
-                    documentsSubType.setType(this.getDocumentTypeTitle(documentTypeEntities, entity.getType()));
-                    documentsSubType.setSubType(this.getDocumentSubTypeTitle(documentSubTypeEntities, entity.getSubType()));
+                    documentsSubType.setType(this.getDocumentTypeTitle(allTypeEntities, entity.getType()));
+                    documentsSubType.setSubType(this.getDocumentSubTypeTitle(allSubTypeRepository, entity.getSubType()));
                     documentsSubType.setUpdatedOn(entity.getUpdatedOn().toString());
                     documentsSubType.setApprovedBy(entity.getApprovedBy());
                     documentsSubType.setRejectedBy(entity.getRejectedBy());
@@ -163,7 +165,7 @@ public class CAdminService {
 
                 final DocumentsType type = new DocumentsType();
                 DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
-                type.setTitle(this.getDocumentTypeTitle(documentTypeEntities, key));
+                type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
                 type.setDocumentsSubType(documentsSubTypeList);
                 documentsType.add(type);
             });
@@ -178,6 +180,7 @@ public class CAdminService {
             if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())) && isDocAvailable) {
                 customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
                 customerDocument.setKycStatus(true);
+
             } else if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
                     && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))
                     && isDocAvailable) {
@@ -187,35 +190,44 @@ public class CAdminService {
                 customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
                 customerDocument.setKycStatus(false);
             }
+            return customerDocument;
 
-
-        } else {
+        }).orElseGet(() -> {
+            CustomerDocument customerDocument = new CustomerDocument();
             customerDocument.setKycStatus(false);
             customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
+            return customerDocument;
 
-        }
-        return customerDocument;
+        });
+
+//        if (documentEntity.isPresent()) {
+////                start document entity
+//
+//
+//        } else {
+//
+//
+//        }
+//        return customerDocument;
     }
 
 
     private String getDocumentTypeTitle(List<DocumentTypeEntity> documentTypeEntities, final String uuid) {
+        return documentTypeEntities
+                .stream()
+                .filter(typeEntity -> typeEntity.getUuid().equals(uuid))
+                .findFirst()
+                .map(DocumentTypeEntity::getTitle)
+                .orElse(null);
 
-        final Optional<DocumentTypeEntity> documentTypeEntity = documentTypeEntities.stream().filter(typeEntity -> typeEntity.getUuid().equals(uuid)).findFirst();
-
-        if (documentTypeEntity.isPresent()) {
-            return documentTypeEntity.get().getTitle();
-        } else {
-            return "NOT-FOUND";
-        }
     }
 
     private String getDocumentSubTypeTitle(List<DocumentSubTypeEntity> documentSubTypeEntities, final String uuid) {
-        final Optional<DocumentSubTypeEntity> documentSubTypeEntity = documentSubTypeEntities.stream().filter(subTypeEntity -> subTypeEntity.getUuid().equals(uuid)).findFirst();
-        if (documentSubTypeEntity.isPresent()) {
-            return documentSubTypeEntity.get().getTitle();
-        } else {
-            return "NOT-FOUND";
-        }
+        return documentSubTypeEntities
+                .stream()
+                .filter(subTypeEntity -> subTypeEntity.getUuid().equals(uuid)).findFirst()
+                .map(DocumentSubTypeEntity::getTitle)
+                .orElse(null);
     }
 
 }

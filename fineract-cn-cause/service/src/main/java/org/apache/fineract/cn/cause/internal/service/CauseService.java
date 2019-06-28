@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -415,7 +414,7 @@ public class CauseService {
     }
 
     public NGOProfileStatistics findCausebyCreatedByForNgoProfile(final String identifier) {
-        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(identifier, Cause.State.DELETED.name());
+        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentState(identifier, Cause.State.ACTIVE.name());
         ArrayList<CauseStatistics> causeStatistics = causeEntities
                 .stream()
                 .filter(causeEntity -> causeEntity.getAccountNumber() != null)

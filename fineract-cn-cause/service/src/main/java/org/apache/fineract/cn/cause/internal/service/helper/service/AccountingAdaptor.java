@@ -47,7 +47,8 @@ public class AccountingAdaptor {
     public List<CauseJournalEntry> fetchJournalEntriesJournalEntries(final String creditorsAccountNumber) {
         return this.journalManager.fetchJournalEntriesForStatistics(creditorsAccountNumber)
                 .stream()
-                .map(CauseJournalEntryMapper::map).collect(Collectors.toList());
+                .map(CauseJournalEntryMapper::map)
+                .collect(Collectors.toList());
     }
 }
 

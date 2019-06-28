@@ -41,9 +41,9 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     Optional<CauseEntity> findByIdentifier(final String identifier);
 
-    Page<CauseEntity> findByCurrentStateNotAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime, final Pageable pageable);
+//    Page<CauseEntity> findByCurrentStateNotAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime, final Pageable pageable);
 
-    List<CauseEntity> findByCurrentStateNotAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime);
+//    List<CauseEntity> findByCurrentStateNotAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime);
 
     Page<CauseEntity> findByCurrentStateAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime, final Pageable pageable);
 

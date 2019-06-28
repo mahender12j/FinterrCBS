@@ -62,17 +62,6 @@ public class DocumentsRestController {
         this.documentService = documentService;
     }
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/master",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public ResponseEntity<List<DocumentsMaster>> getMasterDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
-        throwIfCustomerNotExists(customerIdentifier);
-        return ResponseEntity.ok(documentService.findDocumentsTypesMaster(customerIdentifier));
-    }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
@@ -88,7 +77,19 @@ public class DocumentsRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
-            value = "/{documentidentifier}",
+            value = "/master",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<List<DocumentsMaster>> getMasterDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
+        throwIfCustomerNotExists(customerIdentifier);
+        return ResponseEntity.ok(documentService.findDocumentsTypesMaster(customerIdentifier));
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(value = "/{documentidentifier}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
@@ -96,6 +97,7 @@ public class DocumentsRestController {
     public ResponseEntity<CustomerDocumentEntry> getDocument(
             @PathVariable("customeridentifier") final String customerIdentifier,
             @PathVariable("documentidentifier") final Long documentIdentifier) {
+
         return ResponseEntity
                 .ok(documentService.findDocument(customerIdentifier, documentIdentifier)
                         .orElseThrow(() -> ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found.",
@@ -267,9 +269,8 @@ public class DocumentsRestController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> undoDocumentStatus(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final Long documentIdentifier) {
+    ResponseEntity<Void> undoDocumentStatus(@PathVariable("customeridentifier") final String customerIdentifier,
+                                            @PathVariable("documentidentifier") final Long documentIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
         throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
         throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
@@ -287,10 +288,9 @@ public class DocumentsRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> rejectCustomerDocument(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final Long documentIdentifier,
-            @RequestBody final RejectDocument reason) {
+    ResponseEntity<Void> rejectCustomerDocument(@PathVariable("customeridentifier") final String customerIdentifier,
+                                                @PathVariable("documentidentifier") final Long documentIdentifier,
+                                                @RequestBody final RejectDocument reason) {
         throwIfCustomerNotExists(customerIdentifier);
         throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
         throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
@@ -301,16 +301,14 @@ public class DocumentsRestController {
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}",
+    @RequestMapping(value = "/{documentidentifier}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> deleteDocument(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final Long documentIdentifier) {
+    ResponseEntity<Void> deleteDocument(@PathVariable("customeridentifier") final String customerIdentifier,
+                                        @PathVariable("documentidentifier") final Long documentIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
         throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
         throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
@@ -377,19 +375,20 @@ public class DocumentsRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> submitKycDocuments(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @RequestBody CustomerDocument customerDocument) {
+    ResponseEntity<Void> submitKycDocuments(@PathVariable("customeridentifier") final String customerIdentifier,
+                                            @RequestBody CustomerDocument customerDocument) {
         CustomerEntity customerEntity = this.customerService.getCustomerEntity(customerIdentifier);
-
-        customerDocument.getKycDocuments().forEach(kycDocuments -> {
+        for (KycDocuments kycDocuments : customerDocument.getKycDocuments()) {
             DocumentTypeEntity documentTypeEntity = this.documentService.findDocumentTypeEntityByUserTypeAndUuid(customerEntity.getType(), kycDocuments.getType()).orElseThrow(() -> ServiceException.notFound("Document types not available"));
             this.documentService.findDocumentSubTypeEntityByUuid(documentTypeEntity, kycDocuments.getSubType()).orElseThrow(() -> ServiceException.notFound("Document sub-types not available"));
-        });
+        }
 
         commandGateway.process(new CreateDocumentEntryCommand(customerDocument, customerIdentifier));
         return ResponseEntity.accepted().build();
     }
+
+
+//    util fucntion
 
     private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier) {
         if (this.documentService.isDocumentExistByCustomerIdentifier(customerIdentifier)) {
