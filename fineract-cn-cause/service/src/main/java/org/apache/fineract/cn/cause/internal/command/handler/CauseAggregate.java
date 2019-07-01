@@ -82,13 +82,9 @@ public class CauseAggregate {
     public CreateCauseCommandResponse createCause(final CreateCauseCommand createCauseCommand) throws IOException {
         final Cause cause = createCauseCommand.getCause();
         final CategoryEntity categoryEntity;
+        categoryEntity = this.categoryRepository.findByIdentifier(cause.getCauseCategories().getIdentifier())
+                .orElseGet(() -> this.categoryRepository.save(CategoryMapper.map(cause.getCauseCategories())));
 
-        if (!categoryRepository.existsByIdentifier(cause.getCauseCategories().getIdentifier())) {
-
-            categoryEntity = this.categoryRepository.save(CategoryMapper.map(cause.getCauseCategories()));
-        } else {
-            categoryEntity = this.categoryRepository.findByIdentifier(cause.getCauseCategories().getIdentifier()).get();
-        }
         final CauseEntity causeEntity = CauseMapper.map(cause);
         causeEntity.setResubmited(false);
         causeEntity.setExtended(false);

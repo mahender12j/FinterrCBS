@@ -47,7 +47,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -701,7 +704,7 @@ public class CustomerRestController {
         } else {
             return ResponseEntity
                     .ok()
-                    .contentType(MediaType.parseMediaType(null))
+                    .contentType(MediaType.parseMediaType(MediaType.APPLICATION_JSON_VALUE))
                     .body(null);
         }
     }

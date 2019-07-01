@@ -39,19 +39,15 @@ import java.util.List;
 @RequestMapping("/")
 public class CAdminRestController {
 
-
-    private final CommandGateway commandGateway;
     private final CAdminService cAdminService;
     private final CustomerService customerService;
     private final NGOService ngoService;
 
     @Autowired
-    public CAdminRestController(final CommandGateway commandGateway,
-                                final CAdminService cAdminService,
+    public CAdminRestController(final CAdminService cAdminService,
                                 final CustomerService customerService,
                                 final NGOService ngoService) {
         super();
-        this.commandGateway = commandGateway;
         this.cAdminService = cAdminService;
         this.customerService = customerService;
         this.ngoService = ngoService;

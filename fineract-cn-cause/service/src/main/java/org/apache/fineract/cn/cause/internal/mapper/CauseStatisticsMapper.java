@@ -18,8 +18,9 @@
  */
 package org.apache.fineract.cn.cause.internal.mapper;
 
-import org.apache.fineract.cn.cause.api.v1.domain.CauseStatistics;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseCreditor;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseJournalEntry;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseStatistics;
 
 import java.util.List;
 import java.util.Set;
@@ -34,11 +35,9 @@ public final class CauseStatisticsMapper {
     public static CauseStatistics map(final List<CauseJournalEntry> journalEntry) {
         Set<String> uniqueClerk = journalEntry.stream().map(CauseJournalEntry::getClerk).collect(Collectors.toSet());
         CauseStatistics causeStatistics = new CauseStatistics();
-        causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().get().getAmount())).sum());
+        causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().map(CauseCreditor::getAmount).orElse("0"))).sum());
         causeStatistics.setJournalEntry(journalEntry.stream().peek(entry -> {
-            if (entry.isAnonymous()) {
-                entry.setClerk("Anonymous");
-            }
+            if (entry.isAnonymous()) entry.setClerk("Anonymous");
         }).collect(Collectors.toList()));
         causeStatistics.setTotalSupporter(uniqueClerk.size());
         return causeStatistics;

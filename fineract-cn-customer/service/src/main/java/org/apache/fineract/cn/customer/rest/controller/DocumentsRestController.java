@@ -39,6 +39,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -62,17 +66,28 @@ public class DocumentsRestController {
         this.documentService = documentService;
     }
 
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
-            value = "/master",
+            value = "/countries",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-    public ResponseEntity<List<DocumentsMaster>> getMasterDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
+    public ResponseEntity<HashMap<String, String>> fetchBankList(@PathVariable("customeridentifier") final String customerIdentifier) throws NoSuchAlgorithmException, IOException, KeyManagementException {
         throwIfCustomerNotExists(customerIdentifier);
-        return ResponseEntity.ok(documentService.findDocumentsTypesMaster(customerIdentifier));
+
+        //        default value
+        String final_checkSum = "566DACEE09ADFA8D65733CC05E7599964556E8FE1E7396A84717CAEA79DEC96022C226593B35B1E4EF441A8052C636861E1DC298CB3BA3C5FA1F6F7D409AE01DB0A9BBD26EA27F6DC98BFFE1758C1746922C6A9A8BA18120C15B4B8C05F994767A715C834C09B313895AEDB25E8CBA36B5CB7A82CB5496BA1857F4AB0BAEDD3E5239B5B5441729A683199B90C7AD9B537AD9DBE9168EDA1D1E82ECC0F111BA33DD4A6FB097FDA38DB80CFBF9FB8B7773E062C11545F6C7B94FBAC3707AF72297D11DF4A21C5E70C07F242ADA8F597F0C3BC16C14D840A0010B46BE96F8B5BA6CDAF21B9514B71D332B3543B19DBDDF6DCAF8A4EBE31A0445F9AD4A0C5C9BDC60";
+        String fpx_msgType = "BE";
+        String fpx_msgToken = "01";
+        String fpx_sellerExId = "EX00009694";
+        String fpx_version = "7.0";
+
+
+        return ResponseEntity.ok(this.customerService.fetchBankList(final_checkSum, fpx_msgType, fpx_msgToken, fpx_sellerExId, fpx_version));
     }
+
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
@@ -88,7 +103,40 @@ public class DocumentsRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
     @RequestMapping(
-            value = "/{documentidentifier}",
+            value = "/submit",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> submitKycDocuments(@PathVariable("customeridentifier") final String customerIdentifier,
+                                            @RequestBody CustomerDocument customerDocument) {
+        CustomerEntity customerEntity = this.customerService.getCustomerEntity(customerIdentifier);
+        for (KycDocuments kycDocuments : customerDocument.getKycDocuments()) {
+            DocumentTypeEntity documentTypeEntity = this.documentService.findDocumentTypeEntityByUserTypeAndUuid(customerEntity.getType(), kycDocuments.getType()).orElseThrow(() -> ServiceException.notFound("Document types not available"));
+            this.documentService.findDocumentSubTypeEntityByUuid(documentTypeEntity, kycDocuments.getSubType()).orElseThrow(() -> ServiceException.notFound("Document sub-types not available"));
+        }
+
+        commandGateway.process(new CreateDocumentEntryCommand(customerDocument, customerIdentifier));
+        return ResponseEntity.accepted().build();
+    }
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(
+            value = "/master",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<List<DocumentsMaster>> getMasterDocuments(@PathVariable("customeridentifier") final String customerIdentifier) {
+        throwIfCustomerNotExists(customerIdentifier);
+        return ResponseEntity.ok(documentService.findDocumentsTypesMaster(customerIdentifier));
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
+    @RequestMapping(value = "/{documentidentifier}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
@@ -96,6 +144,7 @@ public class DocumentsRestController {
     public ResponseEntity<CustomerDocumentEntry> getDocument(
             @PathVariable("customeridentifier") final String customerIdentifier,
             @PathVariable("documentidentifier") final Long documentIdentifier) {
+
         return ResponseEntity
                 .ok(documentService.findDocument(customerIdentifier, documentIdentifier)
                         .orElseThrow(() -> ServiceException.notFound("Document ''{0}'' for customer ''{1}'' not found.",
@@ -267,9 +316,8 @@ public class DocumentsRestController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> undoDocumentStatus(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final Long documentIdentifier) {
+    ResponseEntity<Void> undoDocumentStatus(@PathVariable("customeridentifier") final String customerIdentifier,
+                                            @PathVariable("documentidentifier") final Long documentIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
         throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
         throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
@@ -287,10 +335,9 @@ public class DocumentsRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> rejectCustomerDocument(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final Long documentIdentifier,
-            @RequestBody final RejectDocument reason) {
+    ResponseEntity<Void> rejectCustomerDocument(@PathVariable("customeridentifier") final String customerIdentifier,
+                                                @PathVariable("documentidentifier") final Long documentIdentifier,
+                                                @RequestBody final RejectDocument reason) {
         throwIfCustomerNotExists(customerIdentifier);
         throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
         throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
@@ -301,16 +348,14 @@ public class DocumentsRestController {
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/{documentidentifier}",
+    @RequestMapping(value = "/{documentidentifier}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> deleteDocument(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @PathVariable("documentidentifier") final Long documentIdentifier) {
+    ResponseEntity<Void> deleteDocument(@PathVariable("customeridentifier") final String customerIdentifier,
+                                        @PathVariable("documentidentifier") final Long documentIdentifier) {
         throwIfCustomerNotExists(customerIdentifier);
         throwIfCustomerDocumentNotExists(customerIdentifier, documentIdentifier);
         throwIfDocumentCompleted(customerIdentifier, documentIdentifier);
@@ -368,28 +413,7 @@ public class DocumentsRestController {
     }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/submit",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<Void> submitKycDocuments(
-            @PathVariable("customeridentifier") final String customerIdentifier,
-            @RequestBody CustomerDocument customerDocument) {
-        CustomerEntity customerEntity = this.customerService.getCustomerEntity(customerIdentifier);
-
-        customerDocument.getKycDocuments().forEach(kycDocuments -> {
-            DocumentTypeEntity documentTypeEntity = this.documentService.findDocumentTypeEntityByUserTypeAndUuid(customerEntity.getType(), kycDocuments.getType()).orElseThrow(() -> ServiceException.notFound("Document types not available"));
-            this.documentService.findDocumentSubTypeEntityByUuid(documentTypeEntity, kycDocuments.getSubType()).orElseThrow(() -> ServiceException.notFound("Document sub-types not available"));
-        });
-
-        commandGateway.process(new CreateDocumentEntryCommand(customerDocument, customerIdentifier));
-        return ResponseEntity.accepted().build();
-    }
+//    util fucntion
 
     private void throwIfCustomerDocumentAlreadyExist(String customerIdentifier) {
         if (this.documentService.isDocumentExistByCustomerIdentifier(customerIdentifier)) {

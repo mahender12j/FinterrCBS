@@ -109,8 +109,6 @@ public class NgoRestController {
 
         throwIfIdentifierNotMatch(identifier, ngoProfile.getNgoIdentifier());
         throwIfNGONotExists(identifier);
-//        throwIfNGOProfileExist(identifier);
-
         commandGateway.process(new UpdateNGOCommand(ngoProfile, identifier));
         return ResponseEntity.accepted().build();
     }

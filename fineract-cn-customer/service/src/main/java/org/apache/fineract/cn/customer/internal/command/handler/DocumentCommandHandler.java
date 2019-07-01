@@ -75,21 +75,19 @@ public class DocumentCommandHandler {
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_PAGE)
     public DocumentPageEvent process(final CreateDocumentEntryCommand command) {
-        CustomerEntity customerEntity = customerRepository.findByIdentifier(command.getCustomeridentifier())
+
+        final DocumentEntity documentEntity = customerRepository.findByIdentifier(command.getCustomeridentifier())
+                .map(entity -> this.documentRepository.findByCustomer(entity)
+                        .orElseGet(() -> documentRepository.save(DocumentMapper
+                                .map(command.getCustomerDocument(), entity))))
                 .orElseThrow(() -> ServiceException.notFound("Customer {0} not found", command.getCustomeridentifier()));
 
-        Boolean findDocument = documentRepository.findByIdentifierAndCustomer(command.getCustomeridentifier());
-        if (!findDocument) {
-            documentRepository.save(DocumentMapper.map(command.getCustomerDocument(), customerEntity));
-        }
 
-        final DocumentEntity documentEntity = documentRepository.findByCustomer(customerEntity);
         List<DocumentEntryEntity> documentEntryEntityList = command.getCustomerDocument().getKycDocuments()
                 .stream()
                 .map(kycDocuments -> DocumentMapper.map(kycDocuments, documentEntity))
                 .collect(Collectors.toList());
 
-//                DocumentMapper.map(command.getCustomerDocument().getKycDocuments(), documentEntity);
         this.documentEntryRepository.save(documentEntryEntityList);
         return new DocumentPageEvent(command.getCustomeridentifier(), command.getCustomeridentifier(), 1);
     }
