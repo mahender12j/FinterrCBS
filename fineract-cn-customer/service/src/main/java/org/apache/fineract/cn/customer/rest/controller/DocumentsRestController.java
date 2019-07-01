@@ -26,7 +26,9 @@ import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.command.*;
-import org.apache.fineract.cn.customer.internal.repository.*;
+import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
+import org.apache.fineract.cn.customer.internal.repository.DocumentStorageEntity;
+import org.apache.fineract.cn.customer.internal.repository.DocumentTypeEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.lang.ServiceException;
@@ -37,10 +39,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -63,25 +61,6 @@ public class DocumentsRestController {
         this.commandGateway = commandGateway;
         this.customerService = customerService;
         this.documentService = documentService;
-    }
-
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.DOCUMENTS)
-    @RequestMapping(
-            value = "/countries",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public ResponseEntity<HashMap<String, String>> fetchBankList(@PathVariable("customeridentifier") final String customerIdentifier) throws NoSuchAlgorithmException, IOException, KeyManagementException {
-//        throwIfCustomerNotExists(customerIdentifier);
-        //        default value
-        String final_checkSum = "566DACEE09ADFA8D65733CC05E7599964556E8FE1E7396A84717CAEA79DEC96022C226593B35B1E4EF441A8052C636861E1DC298CB3BA3C5FA1F6F7D409AE01DB0A9BBD26EA27F6DC98BFFE1758C1746922C6A9A8BA18120C15B4B8C05F994767A715C834C09B313895AEDB25E8CBA36B5CB7A82CB5496BA1857F4AB0BAEDD3E5239B5B5441729A683199B90C7AD9B537AD9DBE9168EDA1D1E82ECC0F111BA33DD4A6FB097FDA38DB80CFBF9FB8B7773E062C11545F6C7B94FBAC3707AF72297D11DF4A21C5E70C07F242ADA8F597F0C3BC16C14D840A0010B46BE96F8B5BA6CDAF21B9514B71D332B3543B19DBDDF6DCAF8A4EBE31A0445F9AD4A0C5C9BDC60";
-        String fpx_msgType = "BE";
-        String fpx_msgToken = "01";
-        String fpx_sellerExId = "EX00009694";
-        String fpx_version = "7.0";
-        return ResponseEntity.ok(this.customerService.fetchBankList(final_checkSum, fpx_msgType, fpx_msgToken, fpx_sellerExId, fpx_version));
     }
 
 
