@@ -447,7 +447,7 @@ public class DocumentsRestController {
 
 
             if (documentTypeEntity.getMaxUpload() < (docSize + uploadedDocSize)) {
-                throw ServiceException.conflict("Sorry ! You have reached max documents for {0}. Your current document uploaded number {1} and max number {2}", documentTypeEntity.getTitle(), uploadedDocSize, documentTypeEntity.getMaxUpload());
+                throw ServiceException.conflict("Sorry ! You have reached max documents for {0}.", documentTypeEntity.getTitle());
             }
 
 
