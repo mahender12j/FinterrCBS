@@ -40,8 +40,10 @@ public interface DocumentSubTypeRepository extends JpaRepository<DocumentSubType
 
     List<DocumentSubTypeEntity> findByDocumentType(final DocumentTypeEntity documentTypeEntity);
 
-    @Query("SELECT c FROM DocumentSubTypeEntity c WHERE c.isActive = true")
-    List<DocumentSubTypeEntity> findByisActive();
+    List<DocumentSubTypeEntity> findByDocumentTypeAndActiveIsTrue(final DocumentTypeEntity documentTypeEntity);
+
+    //    @Query("SELECT c FROM DocumentSubTypeEntity c WHERE c.active = true")
+    List<DocumentSubTypeEntity> findByActiveIsTrue();
 
     Optional<DocumentSubTypeEntity> findByUuid(final String uuid);
 

@@ -44,7 +44,7 @@ public class DocumentSubTypeEntity {
     private String title;
 
     @Column(name = "active", nullable = false)
-    private boolean isActive;
+    private boolean active;
 
 
     public DocumentSubTypeEntity() {
@@ -84,11 +84,11 @@ public class DocumentSubTypeEntity {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     @Override
