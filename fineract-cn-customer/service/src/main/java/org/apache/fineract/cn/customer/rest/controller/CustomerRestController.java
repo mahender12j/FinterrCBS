@@ -47,10 +47,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -91,10 +91,29 @@ public class CustomerRestController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Void>
-    initialize() throws InterruptedException {
+    initialize() {
         this.commandGateway.process(new InitializeServiceCommand());
         return ResponseEntity.accepted().build();
     }
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.SADMIN)
+    @RequestMapping(
+            value = "/countries",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<HashMap<String, String>> fetchBankList(
+            @RequestBody @Valid PaynetDetails paynetDetails) throws NoSuchAlgorithmException, IOException, KeyManagementException {
+        //        default value
+//        String final_checkSum = "566DACEE09ADFA8D65733CC05E7599964556E8FE1E7396A84717CAEA79DEC96022C226593B35B1E4EF441A8052C636861E1DC298CB3BA3C5FA1F6F7D409AE01DB0A9BBD26EA27F6DC98BFFE1758C1746922C6A9A8BA18120C15B4B8C05F994767A715C834C09B313895AEDB25E8CBA36B5CB7A82CB5496BA1857F4AB0BAEDD3E5239B5B5441729A683199B90C7AD9B537AD9DBE9168EDA1D1E82ECC0F111BA33DD4A6FB097FDA38DB80CFBF9FB8B7773E062C11545F6C7B94FBAC3707AF72297D11DF4A21C5E70C07F242ADA8F597F0C3BC16C14D840A0010B46BE96F8B5BA6CDAF21B9514B71D332B3543B19DBDDF6DCAF8A4EBE31A0445F9AD4A0C5C9BDC60";
+//        String fpx_msgType = "BE";
+//        String fpx_msgToken = "01";
+//        String fpx_sellerExId = "EX00009694";
+//        String fpx_version = "7.0";
+        return ResponseEntity.ok(this.customerService.fetchBankList(paynetDetails));
+    }
+
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
     @RequestMapping(

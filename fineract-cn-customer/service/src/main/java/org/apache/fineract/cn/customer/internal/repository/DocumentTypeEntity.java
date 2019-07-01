@@ -43,7 +43,7 @@ public class DocumentTypeEntity {
     private String userType;
 
     @Column(name = "active", nullable = false)
-    private boolean isActive;
+    private boolean active;
 
     @Column(name = "max_upload", nullable = false)
     private int maxUpload;
@@ -86,11 +86,11 @@ public class DocumentTypeEntity {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     public int getMaxUpload() {

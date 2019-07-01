@@ -37,10 +37,12 @@ public interface DocumentTypeRepository extends JpaRepository<DocumentTypeEntity
 
     List<DocumentTypeEntity> findByUserType(final String userType);
 
-    @Query("SELECT c FROM DocumentTypeEntity c WHERE c.isActive = true")
-    List<DocumentTypeEntity> findByisActive();
+    //    @Query("SELECT c FROM DocumentTypeEntity c WHERE c.active = true")
+    List<DocumentTypeEntity> findByActiveIsTrue();
 
     Optional<DocumentTypeEntity> findByUserTypeAndUuid(final String userType, final String uuid);
+
+    Optional<DocumentTypeEntity> findByUserTypeAndUuidAndActiveIsTrue(final String userType, final String uuid);
 
     Optional<DocumentTypeEntity> findByUuid(final String uuid);
 
