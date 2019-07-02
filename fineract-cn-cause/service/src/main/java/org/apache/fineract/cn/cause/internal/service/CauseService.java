@@ -446,7 +446,10 @@ public class CauseService {
 //    }
 
     private void setRatingsAndAverage(CauseEntity causeEntity, Cause cause) {
-        List<CauseRating> causeRatings = this.ratingRepository.findAllByCause(causeEntity).map(RatingMapper::map).collect(Collectors.toList());
+//        List<CauseRating> causeRatings = this.ratingRepository.findAllByCause(causeEntity).map(RatingMapper::map).collect(Collectors.toList());
+
+        List<CauseRating> causeRatings = this.fetchRatingsAndCommentsByCause(causeEntity.getIdentifier()).collect(Collectors.toList());
+
         cause.setCauseRatings(causeRatings);
         cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
     }
