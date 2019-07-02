@@ -98,7 +98,7 @@ public class CustomerRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.SADMIN)
     @RequestMapping(
-            value = "/countries",
+            value = "/retrieveBankList",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
