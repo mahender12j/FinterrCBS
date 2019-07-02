@@ -40,6 +40,15 @@ public class CauseComment {
     public CauseComment() {
     }
 
+    public CauseComment(Long id, String comment, boolean active, Long ref, String createdBy, String createdOn) {
+        this.id = id;
+        this.comment = comment;
+        this.active = active;
+        this.ref = ref;
+        this.createdBy = createdBy;
+        this.createdOn = createdOn;
+    }
+
     public Long getId() {
         return id;
     }

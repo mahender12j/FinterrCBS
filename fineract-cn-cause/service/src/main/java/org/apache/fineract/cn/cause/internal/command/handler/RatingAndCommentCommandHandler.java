@@ -59,16 +59,22 @@ public class RatingAndCommentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_COMMENTS)
-    public String createComment(final CreateCommentCommand commentCommand) {
+    public CauseComment createComment(final CreateCommentCommand commentCommand) {
         CauseComment causeComment = commentCommand.getCauseComment();
 
         findCauseEntityOrThrow(commentCommand.getCauseIdentifier());
         RatingEntity entity = this.ratingRepository.findById(commentCommand.getRatingid()).orElseThrow(() -> ServiceException.notFound("Rating Not found {0}", commentCommand.getRatingid()));
 
-        CommentEntity commentEntity = CommentMapper.map(causeComment, entity);
-        this.commentRepository.save(commentEntity);
-        return causeComment.toString();
+        CommentEntity commentEntity = this.commentRepository.save(CommentMapper.map(causeComment, entity));
+        return new CauseComment(commentEntity.getId(),
+                commentEntity.getComment(),
+                commentEntity.getActive(),
+                commentEntity.getRef(),
+                commentEntity.getCreatedBy(),
+                commentEntity.getCreatedOn().toString());
     }
+
+
 
     private CauseEntity findCauseEntityOrThrow(String identifier) {
         return this.causeRepository.findByIdentifier(identifier).orElseThrow(() -> ServiceException.notFound("Cause ''{0}'' not found", identifier));

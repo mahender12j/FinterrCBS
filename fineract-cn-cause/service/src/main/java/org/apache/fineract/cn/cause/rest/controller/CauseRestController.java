@@ -426,23 +426,6 @@ public class CauseRestController {
         return ResponseEntity.accepted().build();
     }
 
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-//    @RequestMapping(
-//            value = "/causes/{identifier}/commands",
-//            method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.ALL_VALUE
-//    )
-//    public
-//    @ResponseBody
-//    ResponseEntity<List<Command>> fetchCauseCommands(@PathVariable("identifier") final String identifier) {
-//        if (this.causeService.causeExists(identifier)) {
-//            return ResponseEntity.ok(this.causeService.fetchCommandsByCause(identifier).collect(Collectors.toList()));
-//        } else {
-//            throw ServiceException.notFound("Cause {0} not found.", identifier);
-//        }
-//    }
-
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/{identifier}/ratings",
@@ -459,7 +442,6 @@ public class CauseRestController {
         try {
             CommandCallback<CauseRating> commandCallback = this.commandGateway.process(new CreateRatingCommand(identifier, UserContextHolder.checkedGetUser(), rating), CauseRating.class);
             return ResponseEntity.ok(commandCallback.get());
-//            return ResponseEntity.accepted().build();
         } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
             throw ServiceException.internalError("Something went wrong");
         }
@@ -476,16 +458,20 @@ public class CauseRestController {
 
     public
     @ResponseBody
-    ResponseEntity<Void> causeComment(@PathVariable("identifier") final String identifier,
-                                      @PathVariable("ratingid") final Long ratingid,
-                                      @Valid @RequestBody final CauseComment causeComment) {
+    ResponseEntity<CauseComment> causeComment(@PathVariable("identifier") final String identifier,
+                                              @PathVariable("ratingid") final Long ratingid,
+                                              @Valid @RequestBody final CauseComment causeComment) {
         throwIfCauseNotExists(identifier);
         throwIfRatingNotExists(ratingid);
         if (causeComment.getRef() != null)
             throwIfCommentNotExists(causeComment.getRef());
 
-        this.commandGateway.process(new CreateCommentCommand(identifier, ratingid, causeComment));
-        return ResponseEntity.accepted().build();
+        try {
+            CommandCallback<CauseComment> commandCallback = this.commandGateway.process(new CreateCommentCommand(identifier, ratingid, causeComment), CauseComment.class);
+            return ResponseEntity.ok(commandCallback.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.badRequest("Sorry ! Something went wrong!!!");
+        }
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
