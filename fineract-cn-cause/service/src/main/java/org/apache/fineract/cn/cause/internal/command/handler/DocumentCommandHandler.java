@@ -81,7 +81,7 @@ public class DocumentCommandHandler {
 //                .map(causeEntity -> DocumentMapper.map(command.getCauseDocument(), causeEntity))
 //                .ifPresent(documentRepository::save);
 //
-//        return new DocumentEvent(command.getCauseIdentifier(), command.getCauseDocument().getIdentifier());
+//        return new DocumentEvent(command.getCauseIdentifier(), command.getCauseDocument().getRating());
 //    }
 
 

@@ -31,17 +31,10 @@ import java.util.Optional;
  */
 @Repository
 public interface DocumentEntryRepository extends JpaRepository<DocumentEntryEntity, Long> {
-
-
-    List<DocumentEntryEntity> findByDocument(final DocumentEntity documentEntity);
-
     List<DocumentEntryEntity> findByDocumentAndStatusNot(final DocumentEntity documentEntity, final String documentStatus);
-
-    List<DocumentEntryEntity> findByDocumentAndStatus(final DocumentEntity documentEntity, final String documentStatus);
-
-    Optional<DocumentEntryEntity> findById(final Long documentId);
-
 
     @Query("SELECT d FROM DocumentEntryEntity d WHERE d.document.customer.identifier = :customerIdentifier AND d.id = :documentId")
     Optional<DocumentEntryEntity> findByCustomerIdAndDocumentId(@Param("customerIdentifier") String customerIdentifier, @Param("documentId") Long documentId);
+
+    List<DocumentEntryEntity> findAllByTypeAndCreatedByAndStatusNot(final String docType, final String createdBy, final String status);
 }

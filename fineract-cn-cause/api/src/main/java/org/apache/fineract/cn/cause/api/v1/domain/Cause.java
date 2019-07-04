@@ -61,9 +61,9 @@ public class Cause {
     @NotNull
     private Double hardTarget;
 
-    private Boolean isTaxExemption;
-    private Boolean isResubmitted;
-    private Boolean isExtended;
+    private Boolean taxExemption;
+    private Boolean resubmitted;
+    private Boolean extended;
 
 
     //    todo comment out for unused value
@@ -89,7 +89,7 @@ public class Cause {
     private String lastModifiedBy;
     private String lastModifiedOn;
     @NotNull
-    private boolean isFeeRevisionRequired;
+    private boolean feeRevisionRequired;
 
 
     @Valid
@@ -98,7 +98,6 @@ public class Cause {
     private String websiteUrl;
     private String smediaLinks;
     private String videoUrls;
-    private String avgRating;
     private String causeTxHash;
     @NotNull
     private String accountNumber;
@@ -123,13 +122,14 @@ public class Cause {
     private String rejectedReason;
 
     private LocalDateTime publishDate;
-    private List<CauseRating> causeRatingList;
-    private List<CauseFiles> causeFiles;
 
     //    resubmit and extended
     private Long numberOfResubmit;
     private Long numberOfExtended;
 
+    private double avgRating;
+    private List<CauseRating> causeRatings;
+    private List<CauseFiles> causeFiles;
 
     public Cause() {
         super();
@@ -224,12 +224,12 @@ public class Cause {
         this.hardTarget = hardTarget;
     }
 
-    public Boolean getIsTaxExemption() {
-        return isTaxExemption;
+    public Boolean getTaxExemption() {
+        return taxExemption;
     }
 
-    public void setIsTaxExemption(Boolean isTaxExemption) {
-        this.isTaxExemption = isTaxExemption;
+    public void setTaxExemption(Boolean taxExemption) {
+        this.taxExemption = taxExemption;
     }
 
     public String getAcceptedDenominationAmounts() {
@@ -313,11 +313,11 @@ public class Cause {
     }
 
     public Boolean getTaxExamption() {
-        return isTaxExemption;
+        return taxExemption;
     }
 
     public void setTaxExamption(Boolean taxExamption) {
-        isTaxExemption = taxExamption;
+        taxExemption = taxExamption;
     }
 
     public CauseCategory getCauseCategories() {
@@ -360,12 +360,27 @@ public class Cause {
         this.videoUrls = videoUrls;
     }
 
-    public String getAvgRating() {
+    public double getAvgRating() {
         return avgRating;
     }
 
-    public void setAvgRating(String avgRating) {
+    public void setAvgRating(double avgRating) {
         this.avgRating = avgRating;
+    }
+    public Boolean getResubmitted() {
+        return resubmitted;
+    }
+
+    public void setResubmitted(Boolean resubmitted) {
+        this.resubmitted = resubmitted;
+    }
+
+    public List<CauseRating> getCauseRatings() {
+        return causeRatings;
+    }
+
+    public void setCauseRatings(List<CauseRating> causeRatings) {
+        this.causeRatings = causeRatings;
     }
 
     public String getCauseTxHash() {
@@ -408,28 +423,20 @@ public class Cause {
         this.causeDocument = causeDocument;
     }
 
-    public List<CauseRating> getCauseRatingList() {
-        return causeRatingList;
-    }
-
-    public void setCauseRatingList(List<CauseRating> causeRatingList) {
-        this.causeRatingList = causeRatingList;
-    }
-
     public Boolean getResubmited() {
-        return isResubmitted;
+        return resubmitted;
     }
 
     public void setResubmited(Boolean resubmited) {
-        isResubmitted = resubmited;
+        resubmitted = resubmited;
     }
 
     public Boolean getExtended() {
-        return isExtended;
+        return extended;
     }
 
     public void setExtended(Boolean extended) {
-        isExtended = extended;
+        this.extended = extended;
     }
 
     public String getRejectedReason() {
@@ -481,11 +488,11 @@ public class Cause {
     }
 
     public boolean isFeeRevisionRequired() {
-        return isFeeRevisionRequired;
+        return feeRevisionRequired;
     }
 
     public void setFeeRevisionRequired(boolean feeRevisionRequired) {
-        isFeeRevisionRequired = feeRevisionRequired;
+        this.feeRevisionRequired = feeRevisionRequired;
     }
 
     public int getTotalNumberOfUpdates() {
@@ -525,9 +532,9 @@ public class Cause {
                 ", currentState='" + currentState + '\'' +
                 ", softTarget=" + softTarget +
                 ", hardTarget=" + hardTarget +
-                ", isTaxExemption=" + isTaxExemption +
-                ", isResubmitted=" + isResubmitted +
-                ", isExtended=" + isExtended +
+                ", taxExemption=" + taxExemption +
+                ", resubmitted=" + resubmitted +
+                ", extended=" + extended +
                 ", acceptedDenominationAmounts='" + acceptedDenominationAmounts + '\'' +
                 ", successFees=" + successFees +
                 ", finCollLimit=" + finCollLimit +
@@ -538,13 +545,12 @@ public class Cause {
                 ", createdOn='" + createdOn + '\'' +
                 ", lastModifiedBy='" + lastModifiedBy + '\'' +
                 ", lastModifiedOn='" + lastModifiedOn + '\'' +
-                ", isFeeRevisionRequired=" + isFeeRevisionRequired +
+                ", isFeeRevisionRequired=" + feeRevisionRequired +
                 ", causeCategories=" + causeCategories +
                 ", taxExemptionPercentage='" + taxExemptionPercentage + '\'' +
                 ", websiteUrl='" + websiteUrl + '\'' +
                 ", smediaLinks='" + smediaLinks + '\'' +
                 ", videoUrls='" + videoUrls + '\'' +
-                ", avgRating='" + avgRating + '\'' +
                 ", causeTxHash='" + causeTxHash + '\'' +
                 ", accountNumber='" + accountNumber + '\'' +
                 ", ethAddress='" + ethAddress + '\'' +
@@ -557,7 +563,6 @@ public class Cause {
                 ", NumberOfDaysLeftForNextUpdate=" + NumberOfDaysLeftForNextUpdate +
                 ", rejectedReason='" + rejectedReason + '\'' +
                 ", publishDate=" + publishDate +
-                ", causeRatingList=" + causeRatingList +
                 ", causeFiles=" + causeFiles +
                 ", numberOfResubmit=" + numberOfResubmit +
                 ", numberOfExtended=" + numberOfExtended +

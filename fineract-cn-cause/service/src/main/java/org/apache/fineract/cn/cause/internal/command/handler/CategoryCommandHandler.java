@@ -55,7 +55,7 @@ public class CategoryCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_CATEGORY)
-    public CategoryEvent process(final CreateCategoryCommand command) throws IOException {
+    public CategoryEvent process(final CreateCategoryCommand command) {
         causeRepository.findByIdentifier(command.getCauseIdentifier())
                 .map(causeEntity -> CategoryMapper.map(command.getCauseCategory(), causeEntity))
                 .ifPresent(categoryRepository::save);
@@ -68,10 +68,10 @@ public class CategoryCommandHandler {
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.PUT_CATEGORY)
     public CategoryEvent process(final ChangeCategoryCommand command) throws IOException {
         final CategoryEntity existingCategory = categoryRepository.findByCauseIdAndCategoryIdentifier(
-                command.getCauseIdentifier(), command.getCauseCategory().getIdentifier())
+                command.getCauseIdentifier(), command.getCauseCategory().getRating())
                 .orElseThrow(() ->
                         ServiceException.notFound("Category ''{0}'' for cause ''{1}'' not found",
-                                command.getCauseCategory().getIdentifier(), command.getCauseIdentifier()));
+                                command.getCauseCategory().getRating(), command.getCauseIdentifier()));
 
         causeRepository.findByIdentifier(command.getCauseIdentifier())
                 .map(causeEntity -> CategoryMapper.map(command.getCauseCategory(), causeEntity))
@@ -80,7 +80,7 @@ public class CategoryCommandHandler {
                     categoryRepository.save(categoryEntity);
                 });
 
-        return new CategoryEvent(command.getCauseIdentifier(), command.getCauseCategory().getIdentifier());
+        return new CategoryEvent(command.getCauseIdentifier(), command.getCauseCategory().getRating());
     }
 
     @Transactional

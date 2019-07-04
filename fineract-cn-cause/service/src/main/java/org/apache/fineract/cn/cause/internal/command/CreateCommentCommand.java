@@ -16,59 +16,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.api.v1.events;
+package org.apache.fineract.cn.cause.internal.command;
 
-import java.util.Objects;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseComment;
 
 /**
- * @author Padma Raju Sattineni
+ * @author Md Robiul Hassan
  */
-public class RatingEvent {
+public class CreateCommentCommand {
+    private final String causeIdentifier;
+    private final CauseComment causeComment;
+    private final Long ratingid;
 
-    private String causeIdentifier;
-
-    private int rating;
-
-    public RatingEvent(String causeIdentifier, int rating) {
+    public CreateCommentCommand(final String causeIdentifier,
+                                final Long ratingid,
+                                final CauseComment causeComment) {
         this.causeIdentifier = causeIdentifier;
-        this.rating = rating;
+        this.causeComment = causeComment;
+        this.ratingid = ratingid;
     }
 
     public String getCauseIdentifier() {
         return causeIdentifier;
     }
 
-    public void setCauseIdentifier(String causeIdentifier) {
-        this.causeIdentifier = causeIdentifier;
+    public CauseComment getCauseComment() {
+        return causeComment;
     }
 
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RatingEvent that = (RatingEvent) o;
-        return Objects.equals(causeIdentifier, that.causeIdentifier) &&
-                Objects.equals(rating, that.rating);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(causeIdentifier, rating);
+    public Long getRatingid() {
+        return ratingid;
     }
 
     @Override
     public String toString() {
-        return "RatingEvent{" +
+        return "CreateCommentCommand{" +
                 "causeIdentifier='" + causeIdentifier + '\'' +
-                ", rating='" + rating + '\'' +
+                ", causeComment=" + causeComment +
                 '}';
     }
 }

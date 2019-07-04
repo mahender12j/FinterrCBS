@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.customer.internal.service;
 
+import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.internal.mapper.ContactDetailMapper;
 import org.apache.fineract.cn.customer.internal.mapper.CustomerMapper;
@@ -26,9 +27,7 @@ import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -85,8 +84,8 @@ public class DocumentService {
 
     public CustomerDocument findCustomerDocuments(final String customerIdentifier) {
         final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
-        List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findByisActive();
-        List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findByisActive();
+        List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findByActiveIsTrue();
+        List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findByActiveIsTrue();
         return cAdminService.findCustomerDocuments(customerEntity, documentTypeEntities, documentSubTypeEntities);
     }
 
@@ -192,15 +191,10 @@ public class DocumentService {
         });
     }
 
-//
-//    private String getDocumentTypeTitle(final String uuid) {
-//        Optional<DocumentTypeEntity> documentTypeEntity = this.documentTypeRepository.findByUuid(uuid);
-//        if (documentTypeEntity.isPresent()) {
-//            return documentTypeEntity.get().getTitle();
-//        } else {
-//            return "NOT-FOUND";
-//        }
-//    }
+
+    public String getDocumentTypeTitle(final String uuid) {
+        return this.documentTypeRepository.findByUuid(uuid).orElseThrow(() -> ServiceException.notFound("Document Type Not Found")).getTitle();
+    }
 //
 //    private String getDocumentSubTypeTitle(final String uuid) {
 //        Optional<DocumentSubTypeEntity> documentSubTypeEntity = this.documentSubTypeRepository.findByUuid(uuid);
@@ -239,10 +233,12 @@ public class DocumentService {
         List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findAll();
         return documentSubTypeEntities.stream().map(entity -> {
             DocumentsMasterSubtype subtype = DocumentMapper.map(entity);
-            documentTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getId().equals(subtype.getDocTypeId()))
-                    .findFirst().ifPresent(d -> {
-                subtype.setDocTypeUUID(d.getUuid());
-            });
+            documentTypeEntities.stream()
+                    .filter(documentTypeEntity -> documentTypeEntity.getId().equals(subtype.getDocTypeId()))
+                    .findFirst()
+                    .ifPresent(d -> {
+                        subtype.setDocTypeUUID(d.getUuid());
+                    });
             return subtype;
         }).collect(toList());
     }
@@ -252,8 +248,17 @@ public class DocumentService {
     }
 
 
-    public Optional<DocumentTypeEntity> findDocumentTypeEntityByUserTypeAndUuid(final String userType, final String uuid) {
-        return this.documentTypeRepository.findByUserTypeAndUuid(userType, uuid);
+    public List<DocumentSubTypeEntity> findByDocumentTypeAndActiveIsTrue(final DocumentTypeEntity documentType) {
+        return this.documentSubTypeRepository.findByDocumentTypeAndActiveIsTrue(documentType);
+    }
+
+
+//    public Optional<DocumentTypeEntity> findDocumentTypeEntityByUserTypeAndUuid(final String userType, final String uuid) {
+//        return this.documentTypeRepository.findByUserTypeAndUuid(userType, uuid);
+//    }
+
+    public Optional<DocumentTypeEntity> findByUserTypeAndUuidAndActiveTrue(final String userType, final String uuid) {
+        return this.documentTypeRepository.findByUserTypeAndUuidAndActiveIsTrue(userType, uuid);
     }
 
 
@@ -276,6 +281,10 @@ public class DocumentService {
                                        final Long documentIdentifier) {
         final Optional<DocumentEntryEntity> documentEntityOptional = documentEntryRepository.findByCustomerIdAndDocumentId(customerIdentifier, documentIdentifier);
         return documentEntityOptional.map(DocumentEntryEntity::getStatus).get().equals(CustomerDocument.Status.APPROVED.name());
+    }
+
+    public List<DocumentEntryEntity> findAllByTypeAndStatusNot(String docType) {
+        return this.documentEntryRepository.findAllByTypeAndCreatedByAndStatusNot(docType, UserContextHolder.checkedGetUser(), CustomerDocument.Status.DELETED.name());
     }
 
 }

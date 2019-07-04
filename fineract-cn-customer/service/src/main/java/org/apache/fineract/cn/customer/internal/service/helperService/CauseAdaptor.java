@@ -19,9 +19,6 @@
 
 package org.apache.fineract.cn.customer.internal.service.helperService;
 
-import org.apache.fineract.cn.accounting.api.v1.client.AccountManager;
-import org.apache.fineract.cn.accounting.api.v1.domain.Account;
-import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
 import org.apache.fineract.cn.cause.api.v1.client.CAdminCauseManager;
 import org.apache.fineract.cn.cause.api.v1.domain.CaAdminCauseData;
 import org.apache.fineract.cn.customer.ServiceConstants;
@@ -29,8 +26,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CauseAdaptor {

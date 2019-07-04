@@ -42,27 +42,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/applications")
 public class ApplicationRestController {
 
-  private final CommandGateway commandGateway;
+    private final CommandGateway commandGateway;
 
-  @Autowired
-  public ApplicationRestController(final CommandGateway commandGateway) {
-    super();
-    this.commandGateway = commandGateway;
-  }
+    @Autowired
+    public ApplicationRestController(final CommandGateway commandGateway) {
+        super();
+        this.commandGateway = commandGateway;
+    }
 
-  @Permittable(value = AcceptedTokenType.SYSTEM)
-  @RequestMapping(
-          value = "/{applicationidentifier}",
-          method = RequestMethod.DELETE,
-          consumes = MediaType.ALL_VALUE,
-          produces = MediaType.ALL_VALUE
-  )
-  public
-  @ResponseBody
-  ResponseEntity<Void> deleteApplication(
-          @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
-          @PathVariable("applicationidentifier") final String applicationIdentifier) throws InterruptedException {
-    this.commandGateway.process(new DeleteApplicationCommand(tenantIdentifier, applicationIdentifier));
-    return ResponseEntity.accepted().build();
-  }
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(
+            value = "/{applicationidentifier}",
+            method = RequestMethod.DELETE,
+            consumes = MediaType.ALL_VALUE,
+            produces = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> deleteApplication(
+            @RequestHeader(TENANT_HEADER) final String tenantIdentifier,
+            @PathVariable("applicationidentifier") final String applicationIdentifier) throws InterruptedException {
+        this.commandGateway.process(new DeleteApplicationCommand(tenantIdentifier, applicationIdentifier));
+        return ResponseEntity.accepted().build();
+    }
 }

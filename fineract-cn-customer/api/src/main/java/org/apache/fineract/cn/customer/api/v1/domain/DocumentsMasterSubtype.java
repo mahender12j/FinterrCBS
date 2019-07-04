@@ -20,6 +20,7 @@ package org.apache.fineract.cn.customer.api.v1.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -29,12 +30,15 @@ public class DocumentsMasterSubtype {
 
     @JsonIgnore
     private Long id;
+    @NotNull
     private String title;
     private String uuid;
     @JsonIgnore
     private Long docTypeId;
+    @NotNull
     private String docTypeUUID;
-    private boolean isActive;
+    @NotNull
+    private boolean active;
 
     public DocumentsMasterSubtype() {
     }
@@ -72,11 +76,11 @@ public class DocumentsMasterSubtype {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     public String getDocTypeUUID() {

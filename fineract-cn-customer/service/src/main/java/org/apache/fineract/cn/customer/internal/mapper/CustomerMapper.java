@@ -66,8 +66,8 @@ public final class CustomerMapper {
         customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
         customerEntity.setEthAddress(customer.getEthAddress());
-        if (customer.getIsDeposited() != null) {
-            customerEntity.setIsDeposited(customer.getIsDeposited());
+        if (customer.getDeposited() != null) {
+            customerEntity.setIsDeposited(customer.getDeposited());
         } else {
             customerEntity.setIsDeposited(Boolean.FALSE);
         }
@@ -131,9 +131,9 @@ public final class CustomerMapper {
         customer.setEthAddress(customerEntity.getEthAddress());
 
         if (customerEntity.getIsDeposited() != null) {
-            customer.setIsDeposited(customerEntity.getIsDeposited());
+            customer.setDeposited(customerEntity.getIsDeposited());
         } else {
-            customer.setIsDeposited(false);
+            customer.setDeposited(false);
         }
         if (customerEntity.getDepositedOn() != null) {
             customer.setDepositedOn(DateConverter.toIsoString(customerEntity.getDepositedOn()));

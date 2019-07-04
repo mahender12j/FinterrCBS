@@ -18,30 +18,32 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
-import org.hibernate.validator.constraints.NotBlank;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
 public final class UserContactVerificationStatus {
 
 
     private String email;
-    private boolean isEmailVerified;
+    private boolean emailVerified;
     private String mobile;
-    private boolean isMobileVerified;
+    private boolean mobileVerified;
     private String username;
 
     public UserContactVerificationStatus() {
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
     public void setEmailVerified(boolean emailVerified) {
-        isEmailVerified = emailVerified;
+        this.emailVerified = emailVerified;
     }
 
     public String getMobile() {
@@ -53,19 +55,11 @@ public final class UserContactVerificationStatus {
     }
 
     public boolean isMobileVerified() {
-        return isMobileVerified;
+        return mobileVerified;
     }
 
     public void setMobileVerified(boolean mobileVerified) {
-        isMobileVerified = mobileVerified;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public boolean isEmailVerified() {
-        return isEmailVerified;
+        this.mobileVerified = mobileVerified;
     }
 
     public String getUsername() {
@@ -74,5 +68,16 @@ public final class UserContactVerificationStatus {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public String toString() {
+        return "UserContactVerificationStatus{" +
+                "email='" + email + '\'' +
+                ", emailVerified=" + emailVerified +
+                ", mobile='" + mobile + '\'' +
+                ", mobileVerified=" + mobileVerified +
+                ", username='" + username + '\'' +
+                '}';
     }
 }

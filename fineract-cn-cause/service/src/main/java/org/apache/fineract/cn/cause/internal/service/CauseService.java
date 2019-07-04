@@ -18,13 +18,11 @@
  */
 package org.apache.fineract.cn.cause.internal.service;
 
-import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.cause.internal.mapper.*;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAdaptor;
-import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -45,12 +43,12 @@ public class CauseService {
     private final PortraitRepository portraitRepository;
     private final CategoryRepository categoryRepository;
     private final RatingRepository ratingRepository;
-    private final CommandRepository commandRepository;
     private final TaskDefinitionRepository taskDefinitionRepository;
     private final TaskInstanceRepository taskInstanceRepository;
     private final AccountingAdaptor accountingAdaptor;
     private final CauseStateRepository causeStateRepository;
     private final CauseUpdateRepository causeUpdateRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
     public CauseService(final CauseRepository causeRepository,
@@ -60,18 +58,18 @@ public class CauseService {
                         final DocumentPageRepository documentPageRepository,
                         final RatingRepository ratingRepository,
                         final DocumentRepository documentRepository,
-                        final CommandRepository commandRepository,
                         final AccountingAdaptor accountingAdaptor,
                         final TaskDefinitionRepository taskDefinitionRepository,
                         final TaskInstanceRepository taskInstanceRepository,
                         final CauseStateRepository causeStateRepository,
-                        final CauseUpdateRepository causeUpdateRepository) {
+                        final CauseUpdateRepository causeUpdateRepository,
+                        final CommentRepository commentRepository) {
         super();
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
         this.categoryRepository = categoryRepository;
         this.ratingRepository = ratingRepository;
-        this.commandRepository = commandRepository;
+        this.commentRepository = commentRepository;
         this.addressRepository = addressRepository;
         this.documentPageRepository = documentPageRepository;
         this.taskDefinitionRepository = taskDefinitionRepository;
@@ -87,35 +85,18 @@ public class CauseService {
     }
 
 
-    public Optional<CauseEntity> findCauseByIdentifier(final String identifier) {
-        return this.causeRepository.findByIdentifier(identifier);
+    public Boolean ratingExists(final Long id) {
+        return this.ratingRepository.existsByid(id);
     }
 
-    public Optional<Cause> findCause(final String identifier) {
-        return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
-            List<CauseUpdateEntity> entities = this.causeUpdateRepository.findByCauseEntity(causeEntity);
-            final Cause cause = CauseMapper.map(causeEntity);
-//            final int numberOfUpdateRequired = (causeEntity.getCauseImplementationDuration() * 4) / causeEntity.getFrequencyCauseImplementationUpdates();
-//            cause.setTotalNumberOfUpdates(numberOfUpdateRequired);
-            cause.setNumberOfUpdateProvided(entities.size());
 
-//            LocalDateTime dateTime = causeEntity.getEndDate().plusWeeks()
-//            cause.setNumberOfDaysLeftForNextUpdate(numberOfUpdateRequired - entities.size());
-//            cause.setCa
-            setCauseDocuments(causeEntity, cause);
-            AddressEntity addressEntity = this.addressRepository.findByCause(causeEntity);
-            cause.setAddress(AddressMapper.map(addressEntity));
-            cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
-            setCauseExtendedAndResubmitValue(causeEntity, cause);
-            if (cause.getAccountNumber() != null) {
-                final List<JournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
-            }
-            cause.setCauseRatingList(RatingMapper.map(ratingRepository.findByCause(causeEntity)));
-            final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(identifier);
-            cause.setAvgRating(avgRatingValue != null ? avgRatingValue.toString() : "0");
-            return cause;
-        });
+    public Boolean commentExists(final Long id) {
+        return this.commentRepository.existsByid(id);
+    }
+
+
+    public Optional<CauseEntity> findCauseByIdentifier(final String identifier) {
+        return this.causeRepository.findByIdentifier(identifier);
     }
 
     private void setCauseDocuments(CauseEntity causeEntity, Cause cause) {
@@ -125,17 +106,6 @@ public class CauseService {
         causeDocument.setCauseDocumentPages(DocumentMapper.map(pageEntity));
         cause.setCauseDocument(causeDocument);
         cause.setCauseFiles(DocumentMapper.mapFile(pageEntity));
-    }
-
-
-    public List<CauseDocumentPage> causeDocumentPages(final String identifier) {
-        Optional<CauseEntity> causeEntity = causeRepository.findByIdentifier(identifier);
-        if (causeEntity.isPresent()) {
-            DocumentEntity entity = documentRepository.findByCauseAndCreatedBy(causeEntity.get(), UserContextHolder.checkedGetUser());
-            return documentPageRepository.findByDocument(entity).stream().map(DocumentMapper::map).collect(Collectors.toList());
-        } else {
-            throw ServiceException.notFound("Cause not found");
-        }
     }
 
 
@@ -154,10 +124,8 @@ public class CauseService {
         if (param == null) {
             CausePage causePage = new CausePage();
             final List<CauseEntity> causeEntities;
-//            System.out.println("sort by " + sortBy);
             switch (sortBy) {
                 case 1:
-//                    System.out.println("sort bt createdOn");
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()))
                             .stream()
                             .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.reverseOrder()))
@@ -169,7 +137,6 @@ public class CauseService {
                     causePage.setCauses(causeArrayList(page.getContent()));
                     break;
                 case 2:
-//                    System.out.println("sort bt getTotalRaised");
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> topFundedcauses = causeArrayList(causeEntities)
                             .stream()
@@ -182,7 +149,6 @@ public class CauseService {
                     causePage.setCauses(topFundedcauses);
                     break;
                 case 3:
-//                    System.out.println("sort bt getAvgRating");
                     causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                     List<Cause> popularCauses = causeArrayList(causeEntities)
                             .stream()
@@ -195,7 +161,6 @@ public class CauseService {
                     causePage.setCauses(popularCauses);
                     break;
                 default:
-//                    System.out.println("sort by default");
                     final Page<CauseEntity> allPage = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
                     causePage.setTotalPages(allPage.getTotalPages());
                     causePage.setTotalElements(allPage.getTotalElements());
@@ -377,30 +342,43 @@ public class CauseService {
         final ArrayList<Cause> causes = new ArrayList<>(causeEntities.size());
         for (CauseEntity causeEntity : causeEntities) {
             final Cause cause = CauseMapper.map(causeEntity);
+
             if (cause.getAccountNumber() != null) {
-                final List<JournalEntry> journalEntry = this.accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                final List<CauseJournalEntry> journalEntry = this.accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
                 cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
             }
 
             cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
-
             setCauseExtendedAndResubmitValue(causeEntity, cause);
-
             setCauseDocuments(causeEntity, cause);
-            final Double avgRatingValue = this.ratingRepository.findAvgRatingByCauseId(cause.getIdentifier());
-
-            if (avgRatingValue != null) {
-                cause.setAvgRating(avgRatingValue.toString());
-            } else {
-                cause.setAvgRating("0");
-            }
-
+            setRatingsAndAverage(causeEntity, cause);
             causes.add(cause);
         }
 
         return causes;
     }
+
+    public Optional<Cause> findCause(final String identifier) {
+        return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
+            List<CauseUpdateEntity> entities = this.causeUpdateRepository.findByCauseEntity(causeEntity);
+            final Cause cause = CauseMapper.map(causeEntity);
+            Address address = AddressMapper.map(this.addressRepository.findByCause(causeEntity));
+            cause.setAddress(address);
+            cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
+            cause.setNumberOfUpdateProvided(entities.size());
+            if (cause.getAccountNumber() != null) {
+                final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+            }
+            setCauseDocuments(causeEntity, cause);
+            setCauseExtendedAndResubmitValue(causeEntity, cause);
+            setRatingsAndAverage(causeEntity, cause);
+
+            return cause;
+        });
+    }
+
 
     private void setCauseExtendedAndResubmitValue(CauseEntity causeEntity, Cause cause) {
         cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name()))));
@@ -411,9 +389,6 @@ public class CauseService {
     public CaAdminCauseData findAllCauseData() {
         CaAdminCauseData caAdminCauseData = new CaAdminCauseData();
         List<CauseEntity> causeEntities = this.causeRepository.findAll();
-
-//        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
-//        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
         final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).minusDays(7);
         caAdminCauseData.setNoOfCause((long) causeEntities.size());
         caAdminCauseData.setActiveCause(causeEntities.stream().filter(causeEntity -> causeEntity.getCurrentState().equals(Cause.State.ACTIVE.name())).count());
@@ -439,7 +414,7 @@ public class CauseService {
     }
 
     public NGOProfileStatistics findCausebyCreatedByForNgoProfile(final String identifier) {
-        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(identifier, Cause.State.DELETED.name());
+        final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentState(identifier, Cause.State.ACTIVE.name());
         ArrayList<CauseStatistics> causeStatistics = causeEntities
                 .stream()
                 .filter(causeEntity -> causeEntity.getAccountNumber() != null)
@@ -451,41 +426,71 @@ public class CauseService {
         ngoStatistics.setTotalRaisedAmount(causeStatistics.stream().mapToDouble(CauseStatistics::getTotalRaised).sum());
         ngoStatistics.setTotalSupporter(causeStatistics.stream().mapToInt(CauseStatistics::getTotalSupporter).sum());
         ngoStatistics.setTotalCause(causeEntities.size());
-//set value
+
         NGOProfileStatistics statistics = new NGOProfileStatistics();
         statistics.setNgoStatistics(ngoStatistics);
         statistics.setCauseList(this.causeArrayList(causeEntities));
 
+        List<CauseJournalEntry> causeJournalEntries = causeStatistics.stream()
+                .flatMap(entry -> entry.getJournalEntry().stream()).collect(Collectors.toList());
+        statistics.setCauseJournalEntries(causeJournalEntries);
         return statistics;
     }
 
 
-    public final Stream<CauseRating> fetchActiveRatingsByCause(final String identifier, final Boolean active) {
-        return causeRepository.findByIdentifier(identifier)
-                .map(causeEntity -> this.ratingRepository.findByCauseAndActive(causeEntity, active))
-                .orElse(Stream.empty())
-                .map(RatingMapper::map);
+//    public final Stream<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
+//        return causeRepository.findByIdentifier(identifier)
+//                .map(this.ratingRepository::findAllByCause)
+//                .orElse(Stream.empty())
+//                .map(RatingMapper::map);
+//    }
+
+    private void setRatingsAndAverage(CauseEntity causeEntity, Cause cause) {
+        List<CauseRating> causeRatings = this.ratingRepository.findAllByCause(causeEntity).map(ratingEntity -> {
+            CauseRating rating = RatingMapper.map(ratingEntity);
+            List<CommentEntity> commentEntities = this.commentRepository.findByRating(ratingEntity).collect(Collectors.toList());
+            rating.setCauseComments(this.fetchNastedComments(commentEntities, null));
+            return rating;
+        }).collect(Collectors.toList());
+
+        cause.setCauseRatings(causeRatings);
+        cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
     }
 
-    public final Stream<Command> fetchCommandsByCause(final String identifier) {
+
+    public final Stream<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
-                .map(commandRepository::findByCause)
+                .map(this.ratingRepository::findAllByCause)
                 .orElse(Stream.empty())
-                .map(CommandMapper::map);
+                .map(ratingEntity -> {
+                    CauseRating rating = RatingMapper.map(ratingEntity);
+                    List<CommentEntity> commentEntities = this.commentRepository.findByRating(ratingEntity).collect(Collectors.toList());
+                    rating.setCauseComments(this.fetchNastedComments(commentEntities, null));
+                    return rating;
+                });
+    }
+
+
+    private List<CauseComment> fetchNastedComments(List<CommentEntity> commentEntities, final Long ref) {
+        return commentEntities
+                .stream()
+                .filter(ent -> ent.getRef() == ref)  //equal equal is used cause ref value can be null value which can cause null pointer issue
+                .map(entity -> {
+                    CauseComment causeComment = CommentMapper.map(entity);
+                    Stream<CommentEntity> childComment = commentEntities
+                            .stream()
+                            .filter(cdata -> cdata.getRef() == entity.getId()); //equal equal is used cause ref value can be null value which can cause null pointer issue
+                    if (childComment.findAny().isPresent()) {
+                        causeComment.setChildComments(fetchNastedComments(commentEntities, entity.getId()));
+                    }
+                    return causeComment;
+                })
+                .collect(Collectors.toList());
     }
 
     public final Optional<PortraitEntity> findPortrait(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
                 .map(portraitRepository::findByCause);
-    }
-
-    public static boolean isRemovableState(String val) {
-        for (Cause.RemovableCauseState c : Cause.RemovableCauseState.values()) {
-            if (c.name().equals(val)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public List<ProcessStep> getProcessSteps(final String causeIdentifier) {

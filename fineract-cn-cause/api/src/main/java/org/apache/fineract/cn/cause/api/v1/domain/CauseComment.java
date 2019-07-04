@@ -18,34 +18,33 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Md Robiul Hassan
  */
-public class CauseRating {
+public class CauseComment {
+
     private Long id;
-    @Max(value = 5, message = "rating range must be between 0-5")
-    @Min(value = 0, message = "rating range must be between 0-5")
     @NotNull
-    private int rating;
     private String comment;
-    private boolean active = true;
+    private boolean active;
+    private Long ref;
     private String createdBy;
     private String createdOn;
-    private List<CauseComment> causeComments;
+    //    ignore to post
+    private List<CauseComment> childComments;
 
-    public CauseRating() {
+    public CauseComment() {
     }
 
-    public CauseRating(Long id, int rating, String comment, boolean active, String createdBy, String createdOn) {
+    public CauseComment(Long id, String comment, boolean active, Long ref, String createdBy, String createdOn) {
         this.id = id;
-        this.rating = rating;
         this.comment = comment;
         this.active = active;
+        this.ref = ref;
         this.createdBy = createdBy;
         this.createdOn = createdOn;
     }
@@ -58,12 +57,12 @@ public class CauseRating {
         this.id = id;
     }
 
-    public int getRating() {
-        return rating;
+    public String getComment() {
+        return comment;
     }
 
-    public void setRating(int rating) {
-        this.rating = rating;
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public boolean isActive() {
@@ -90,26 +89,40 @@ public class CauseRating {
         this.createdOn = createdOn;
     }
 
-    public List<CauseComment> getCauseComments() {
-        return causeComments;
+    public Long getRef() {
+        return ref;
     }
 
-    public void setCauseComments(List<CauseComment> causeComments) {
-        this.causeComments = causeComments;
+    public void setRef(Long ref) {
+        this.ref = ref;
     }
 
-    public String getComment() {
-        return comment;
+    public List<CauseComment> getChildComments() {
+        return childComments;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setChildComments(List<CauseComment> childComments) {
+        this.childComments = childComments;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CauseComment that = (CauseComment) o;
+        return active == that.active &&
+                Objects.equals(comment, that.comment);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(comment, active);
     }
 
     @Override
     public String toString() {
         return "CauseRating{" +
-                "rating='" + rating + '\'' +
+                ", comment='" + comment + '\'' +
                 ", active=" + active +
                 ", createdBy='" + createdBy + '\'' +
                 ", createdOn='" + createdOn + '\'' +

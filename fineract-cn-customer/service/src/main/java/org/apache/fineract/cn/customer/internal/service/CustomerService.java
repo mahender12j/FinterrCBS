@@ -30,12 +30,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.net.ssl.*;
+import java.io.*;
+import java.net.*;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -79,6 +81,98 @@ public class CustomerService {
         this.documentTypeRepository = documentTypeRepository;
         this.documentSubTypeRepository = documentSubTypeRepository;
     }
+
+
+    public HashMap<String, String> fetchBankList(PaynetDetails paynetDetails) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+        HashMap<String, String> respMap = new HashMap<>();
+//        default value
+//        String final_checkSum = "566DACEE09ADFA8D65733CC05E7599964556E8FE1E7396A84717CAEA79DEC96022C226593B35B1E4EF441A8052C636861E1DC298CB3BA3C5FA1F6F7D409AE01DB0A9BBD26EA27F6DC98BFFE1758C1746922C6A9A8BA18120C15B4B8C05F994767A715C834C09B313895AEDB25E8CBA36B5CB7A82CB5496BA1857F4AB0BAEDD3E5239B5B5441729A683199B90C7AD9B537AD9DBE9168EDA1D1E82ECC0F111BA33DD4A6FB097FDA38DB80CFBF9FB8B7773E062C11545F6C7B94FBAC3707AF72297D11DF4A21C5E70C07F242ADA8F597F0C3BC16C14D840A0010B46BE96F8B5BA6CDAF21B9514B71D332B3543B19DBDDF6DCAF8A4EBE31A0445F9AD4A0C5C9BDC60";
+//        String fpx_msgType = "BE";
+//        String fpx_msgToken = "01";
+//        String fpx_sellerExId = "EX00009694";
+//        String fpx_version = "7.0";
+
+        StringBuilder postDataStrBuilder = new StringBuilder();
+        postDataStrBuilder.append("fpx_msgType=").append(URLEncoder.encode(paynetDetails.getFpx_msgType(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_msgToken=").append(URLEncoder.encode(paynetDetails.getFpx_msgToken(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_sellerExId=").append(URLEncoder.encode(paynetDetails.getFpx_sellerExId(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_version=").append(URLEncoder.encode(paynetDetails.getFpx_version(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_checkSum=").append(URLEncoder.encode(paynetDetails.getFinal_checkSum(), "UTF-8"));
+
+//Create a trust manager that does not validate certificate chains only for testing environment
+        TrustManager[] trustAllCerts = new TrustManager[]
+                {
+                        new X509TrustManager() {
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                return null;
+                            }
+
+                            public void checkClientTrusted(
+                                    java.security.cert.X509Certificate[] certs, String authType) {
+                            }
+
+                            public void checkServerTrusted(
+                                    java.security.cert.X509Certificate[] certs, String authType) {
+                            }
+
+                            public boolean isServerTrusted(java.security.cert.X509Certificate[] chain) {
+                                return true;
+                            }
+
+                            public boolean isClientTrusted(java.security.cert.X509Certificate[] chain) {
+                                return true;
+                            }
+                        }
+                };
+
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+
+            public boolean verify(String hostname, String session) {
+                return true;
+            }
+        });
+
+        URLConnection conn = (HttpsURLConnection) new URL("https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList").openConnection();
+
+        conn.setDoOutput(true);
+        BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+        outputWriter.write(postDataStrBuilder.toString(), 0, postDataStrBuilder.toString().length());
+
+        outputWriter.flush();
+        outputWriter.close();
+        BufferedReader inputReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String strResponse = inputReader.readLine();
+        inputReader.close();
+        strResponse = strResponse.trim();
+        if (strResponse.equals("ERROR")) {
+            System.out.println("An error occured!..Response[" + strResponse + "]");
+            return respMap;
+        } else {
+            StringTokenizer strToknzr = new StringTokenizer(strResponse, "&");
+            while (strToknzr.hasMoreElements()) {
+                String temp = strToknzr.nextToken();
+                if (temp.contains("=")) {
+                    String nvp[] = temp.split("=");
+                    String name = nvp[0];
+                    String value = "";
+                    if (nvp.length == 2)
+                        value = URLDecoder.decode(nvp[1], "UTF-8");
+                    respMap.put(name, value);
+                } else {
+                    System.out.println("Parsing Error!" + temp);
+                }
+            }
+            return respMap;
+        }
+
+    }
+
 
     public Boolean customerExists(final String identifier) {
         return this.customerRepository.existsByIdentifier(identifier);
@@ -292,10 +386,7 @@ public class CustomerService {
     }
 
     public final Optional<PortraitEntity> findPortrait(final String identifier) {
-        Optional<CustomerEntity> customerEntity = customerRepository.findByIdentifier(identifier);
-        if (!customerEntity.isPresent()) {
-            throw ServiceException.notFound("Customer {0} not found.", identifier);
-        } else return customerEntity.map(portraitRepository::findByCustomer);
+        return this.customerRepository.findByIdentifier(identifier).map(this.portraitRepository::findByCustomer);
 
     }
 

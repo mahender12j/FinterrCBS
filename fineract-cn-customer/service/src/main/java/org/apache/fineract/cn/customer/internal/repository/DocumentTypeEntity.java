@@ -42,8 +42,12 @@ public class DocumentTypeEntity {
     @Column(name = "user_type", nullable = false)
     private String userType;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
+    @Column(name = "max_upload", nullable = false)
+    private int maxUpload;
+
 
     public DocumentTypeEntity() {
         this.uuid = UUID.randomUUID().toString();
@@ -82,11 +86,19 @@ public class DocumentTypeEntity {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
+    }
+
+    public int getMaxUpload() {
+        return maxUpload;
+    }
+
+    public void setMaxUpload(int maxUpload) {
+        this.maxUpload = maxUpload;
     }
 
     @Override

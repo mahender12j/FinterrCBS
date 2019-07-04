@@ -32,7 +32,8 @@ public class DocumentsMaster {
     private String title;
     private String uuid;
     private String userType;
-    private boolean isActive;
+    private boolean active;
+    private int maxUpload;
     private List<DocumentsMasterSubtype> documentsMasterSubtypes;
 
     public DocumentsMaster() {
@@ -71,11 +72,11 @@ public class DocumentsMaster {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     public Long getId() {
@@ -84,6 +85,14 @@ public class DocumentsMaster {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public int getMaxUpload() {
+        return maxUpload;
+    }
+
+    public void setMaxUpload(int maxUpload) {
+        this.maxUpload = maxUpload;
     }
 
     @Override

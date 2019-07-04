@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * @author Padma Raju Sattineni
+ * @author Md Robiul Hassan
  */
 @Entity
 @Table(name = "cass_rating")
@@ -36,18 +36,17 @@ public class RatingEntity {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cause_id")
     private CauseEntity cause;
 
-    @Column(name = "identifier", nullable = false)
-    private String identifier;
+    @Column(name = "rating", nullable = false)
+    private int rating;
 
-    @SuppressWarnings("DefaultAnnotationParam")
-    @Column(name = "description", nullable = true)
-    private String description;
+    @Column(name = "comment")
+    private String comment;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "active", nullable = false)
     private Boolean active;
 
     @Column(name = "created_by")
@@ -58,6 +57,7 @@ public class RatingEntity {
     private LocalDateTime createdOn;
 
     public RatingEntity() {
+        this.createdOn = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -76,20 +76,12 @@ public class RatingEntity {
         this.cause = cause;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public int getRating() {
+        return rating;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     public Boolean getActive() {
@@ -102,6 +94,14 @@ public class RatingEntity {
 
     public String getCreatedBy() {
         return createdBy;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public void setCreatedBy(String createdBy) {
@@ -122,12 +122,12 @@ public class RatingEntity {
         if (o == null || getClass() != o.getClass()) return false;
         RatingEntity that = (RatingEntity) o;
         return Objects.equals(cause, that.cause) &&
-                Objects.equals(identifier, that.identifier);
+                Objects.equals(rating, that.rating);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cause, identifier);
+        return Objects.hash(cause, rating);
     }
 }
 

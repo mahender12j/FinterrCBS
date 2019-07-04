@@ -22,6 +22,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
 import org.apache.fineract.cn.rhythm.api.v1.domain.ClockOffset;
 import org.apache.fineract.cn.rhythm.service.ServiceConstants;
 import org.apache.fineract.cn.rhythm.service.internal.mapper.BeatMapper;
@@ -41,126 +42,121 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 public class Drummer {
-  private final IdentityPermittableGroupService identityPermittableGroupService;
-  private final BeatPublisherService beatPublisherService;
-  private final BeatRepository beatRepository;
-  private final ClockOffsetService clockOffsetService;
-  private final Logger logger;
+    private final IdentityPermittableGroupService identityPermittableGroupService;
+    private final BeatPublisherService beatPublisherService;
+    private final BeatRepository beatRepository;
+    private final ClockOffsetService clockOffsetService;
+    private final Logger logger;
 
-  @Autowired
-  public Drummer(
-      final IdentityPermittableGroupService identityPermittableGroupService,
-      final BeatPublisherService beatPublisherService,
-      final BeatRepository beatRepository,
-      final ClockOffsetService clockOffsetService,
-      @Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger) {
-    this.identityPermittableGroupService = identityPermittableGroupService;
-    this.beatPublisherService = beatPublisherService;
-    this.beatRepository = beatRepository;
-    this.clockOffsetService = clockOffsetService;
-    this.logger = logger;
-  }
+    @Autowired
+    public Drummer(
+            final IdentityPermittableGroupService identityPermittableGroupService,
+            final BeatPublisherService beatPublisherService,
+            final BeatRepository beatRepository,
+            final ClockOffsetService clockOffsetService,
+            @Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger) {
+        this.identityPermittableGroupService = identityPermittableGroupService;
+        this.beatPublisherService = beatPublisherService;
+        this.beatRepository = beatRepository;
+        this.clockOffsetService = clockOffsetService;
+        this.logger = logger;
+    }
 
-  @Scheduled(initialDelayString = "${rhythm.beatCheckRate}", fixedRateString = "${rhythm.beatCheckRate}")
-  @Transactional
-  public synchronized void checkForBeatsNeeded() {
-    logger.info("checkForBeatsNeeded begin.");
-    //In it's current form this function cannot be run in multiple instances of the same service.  We need to get
-    //locking on selected entries corrected here, before this will work.
-    try {
-      final LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
-      //Get beats from the last two hours in case restart/start happens close to hour begin.
-      final Stream<BeatEntity> beats = beatRepository.findByNextBeatBefore(now);
-      beats.forEach((beat) -> {
-        final boolean applicationHasRequestForAccessPermission
-                = identityPermittableGroupService.checkThatApplicationHasRequestForAccessPermission(
-                beat.getTenantIdentifier(), beat.getApplicationIdentifier());
-        if (!applicationHasRequestForAccessPermission) {
-          logger.info("Not checking if beat {} needs publishing, because application access needed to publish is not available.", beat);
+    @Scheduled(initialDelayString = "${rhythm.beatCheckRate}", fixedRateString = "${rhythm.beatCheckRate}")
+    @Transactional
+    public synchronized void checkForBeatsNeeded() {
+        logger.info("checkForBeatsNeeded begin.");
+        //In it's current form this function cannot be run in multiple instances of the same service.  We need to get
+        //locking on selected entries corrected here, before this will work.
+        System.out.println("statring the bits");
+        try {
+            final LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
+            //Get beats from the last two hours in case restart/start happens close to hour begin.
+            final Stream<BeatEntity> beats = beatRepository.findByNextBeatBefore(now);
+            beats.forEach((beat) -> {
+                final boolean applicationHasRequestForAccessPermission = identityPermittableGroupService.checkThatApplicationHasRequestForAccessPermission(
+                        beat.getTenantIdentifier(), beat.getApplicationIdentifier());
+                if (!applicationHasRequestForAccessPermission) {
+                    logger.info("Not checking if beat {} needs publishing, because application access needed to publish is not available.", beat);
+                } else {
+                    logger.info("Checking if beat {} needs publishing.", beat);
+                    final LocalDateTime nextBeat = checkBeatForPublish(
+                            now,
+                            beat.getBeatIdentifier(),
+                            beat.getTenantIdentifier(),
+                            beat.getApplicationIdentifier(),
+                            beat.getAlignmentHour(),
+                            beat.getNextBeat());
+                    if (!nextBeat.equals(beat.getNextBeat())) {
+                        beat.setNextBeat(nextBeat);
+                        beatRepository.save(beat);
+                    }
+                    logger.info("Beat updated to {}.", beat);
+                }
+            });
+
+        } catch (final InvalidDataAccessResourceUsageException e) {
+            logger.info("InvalidDataAccessResourceUsageException in check for scheduled beats, probably " +
+                    "because initialize hasn't been called yet. {}", e);
         }
-        else {
-          logger.info("Checking if beat {} needs publishing.", beat);
-          final LocalDateTime nextBeat = checkBeatForPublish(
-                  now,
-                  beat.getBeatIdentifier(),
-                  beat.getTenantIdentifier(),
-                  beat.getApplicationIdentifier(),
-                  beat.getAlignmentHour(),
-                  beat.getNextBeat());
-          if (!nextBeat.equals(beat.getNextBeat())) {
-            beat.setNextBeat(nextBeat);
-            beatRepository.save(beat);
-          }
-          logger.info("Beat updated to {}.", beat);
+        logger.info("checkForBeatsNeeded end.");
+    }
+
+    @Transactional
+    public synchronized void realignAllBeatsForTenant(
+            final String tenantIdentifier,
+            final ClockOffsetEntity oldClockOffset,
+            final ClockOffsetEntity newClockOffset) {
+        final Stream<BeatEntity> beatsToAdjust = beatRepository.findByTenantIdentifier(tenantIdentifier);
+        beatsToAdjust.forEach(x -> {
+            //Need to subtract old clock offset, because for large clock offsets and large alignments,
+            //time can "skip" into the next day through realignment.
+            final LocalDateTime oldBeatNextBeat = x.getNextBeat()
+                    .minusHours(oldClockOffset.getHours())
+                    .minusMinutes(oldClockOffset.getMinutes())
+                    .minusSeconds(oldClockOffset.getSeconds());
+            x.setNextBeat(BeatMapper.alignDateTime(
+                    oldBeatNextBeat,
+                    x.getAlignmentHour(),
+                    newClockOffset));
+            beatRepository.save(x);
+        });
+    }
+
+    private LocalDateTime checkBeatForPublish(
+            final LocalDateTime now,
+            final String beatIdentifier,
+            final String tenantIdentifier,
+            final String applicationIdentifier,
+            final Integer alignmentHour,
+            final LocalDateTime nextBeat) {
+        final ClockOffset clockOffset = clockOffsetService.findByTenantIdentifier(tenantIdentifier);
+        return checkBeatForPublishHelper(now, alignmentHour, nextBeat, clockOffset,
+                x -> beatPublisherService.publishBeat(beatIdentifier, tenantIdentifier, applicationIdentifier, x));
+    }
+
+    //Helper is separated from original function so that it can be unit-tested separately from publishBeat.
+    static LocalDateTime checkBeatForPublishHelper(
+            final LocalDateTime now,
+            final Integer alignmentHour,
+            final LocalDateTime nextBeat,
+            final ClockOffset clockOffset,
+            final Predicate<LocalDateTime> publishSucceeded) {
+        LocalDateTime beatToPublish = nextBeat;
+        for (;
+             !beatToPublish.isAfter(now);
+             beatToPublish = incrementToAlignment(beatToPublish, alignmentHour, clockOffset)) {
+            if (!publishSucceeded.test(beatToPublish))
+                break;
         }
-      });
 
-    }
-    catch (final InvalidDataAccessResourceUsageException e) {
-      logger.info("InvalidDataAccessResourceUsageException in check for scheduled beats, probably " +
-              "because initialize hasn't been called yet. {}", e);
-    }
-    logger.info("checkForBeatsNeeded end.");
-  }
-
-  @Transactional
-  public synchronized void realignAllBeatsForTenant(
-      final String tenantIdentifier,
-      final ClockOffsetEntity oldClockOffset,
-      final ClockOffsetEntity newClockOffset)
-  {
-    final Stream<BeatEntity> beatsToAdjust = beatRepository.findByTenantIdentifier(tenantIdentifier);
-    beatsToAdjust.forEach(x -> {
-      //Need to subtract old clock offset, because for large clock offsets and large alignments,
-      //time can "skip" into the next day through realignment.
-      final LocalDateTime oldBeatNextBeat = x.getNextBeat()
-          .minusHours(oldClockOffset.getHours())
-          .minusMinutes(oldClockOffset.getMinutes())
-          .minusSeconds(oldClockOffset.getSeconds());
-      x.setNextBeat(BeatMapper.alignDateTime(
-          oldBeatNextBeat,
-          x.getAlignmentHour(),
-          newClockOffset));
-      beatRepository.save(x);
-    });
-  }
-
-  private LocalDateTime checkBeatForPublish(
-      final LocalDateTime now,
-      final String beatIdentifier,
-      final String tenantIdentifier,
-      final String applicationIdentifier,
-      final Integer alignmentHour,
-      final LocalDateTime nextBeat) {
-    final ClockOffset clockOffset = clockOffsetService.findByTenantIdentifier(tenantIdentifier);
-    return checkBeatForPublishHelper(now, alignmentHour, nextBeat, clockOffset,
-            x -> beatPublisherService.publishBeat(beatIdentifier, tenantIdentifier, applicationIdentifier, x));
-  }
-
-  //Helper is separated from original function so that it can be unit-tested separately from publishBeat.
-  static LocalDateTime checkBeatForPublishHelper(
-          final LocalDateTime now,
-          final Integer alignmentHour,
-          final LocalDateTime nextBeat,
-          final ClockOffset clockOffset,
-          final Predicate<LocalDateTime> publishSucceeded) {
-    LocalDateTime beatToPublish = nextBeat;
-    for (;
-         !beatToPublish.isAfter(now);
-         beatToPublish = incrementToAlignment(beatToPublish, alignmentHour, clockOffset))
-    {
-      if (!publishSucceeded.test(beatToPublish))
-        break;
+        return beatToPublish;
     }
 
-    return beatToPublish;
-  }
-
-  static LocalDateTime incrementToAlignment(
-      final LocalDateTime toIncrement,
-      final Integer alignmentHour,
-      final ClockOffset clockOffset)
-  {
-    return BeatMapper.alignDateTime(toIncrement.plusDays(1), alignmentHour, clockOffset);
-  }
+    static LocalDateTime incrementToAlignment(
+            final LocalDateTime toIncrement,
+            final Integer alignmentHour,
+            final ClockOffset clockOffset) {
+        return BeatMapper.alignDateTime(toIncrement.plusDays(1), alignmentHour, clockOffset);
+    }
 }

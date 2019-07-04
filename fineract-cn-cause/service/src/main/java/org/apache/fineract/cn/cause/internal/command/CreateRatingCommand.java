@@ -25,12 +25,12 @@ import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
  */
 public class CreateRatingCommand {
     private final String causeIdentifier;
+    private final String userIdentifier;
     private final CauseRating rating;
 
-    public CreateRatingCommand(
-            final String causeIdentifier,
-            final CauseRating rating) {
+    public CreateRatingCommand(final String causeIdentifier, final String userIdentifier, final CauseRating rating) {
         this.causeIdentifier = causeIdentifier;
+        this.userIdentifier = userIdentifier;
         this.rating = rating;
     }
 
@@ -38,7 +38,11 @@ public class CreateRatingCommand {
         return causeIdentifier;
     }
 
-    public CauseRating getCauseRating() {
+    public String getUserIdentifier() {
+        return userIdentifier;
+    }
+
+    public CauseRating getRating() {
         return rating;
     }
 
@@ -46,7 +50,7 @@ public class CreateRatingCommand {
     public String toString() {
         return "CreateRatingCommand{" +
                 "causeIdentifier ='" + causeIdentifier + '\'' +
-                ", CauseRating =" + rating.getIdentifier() +
+                ", CauseRating =" + rating.getRating() +
                 '}';
     }
 }

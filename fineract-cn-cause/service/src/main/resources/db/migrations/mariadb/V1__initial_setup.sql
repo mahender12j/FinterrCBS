@@ -30,10 +30,10 @@ CREATE TABLE cass_addresses (
 
 CREATE TABLE cass_causes (
   id BIGINT NOT NULL AUTO_INCREMENT,
-  identifier VARCHAR(32) NOT NULL,
+  rating VARCHAR(32) NOT NULL,
   a_type VARCHAR(32) NOT NULL,
   title VARCHAR(256) NOT NULL,
-  description TEXT NOT NULL,
+  comment TEXT NOT NULL,
   t_n_c TEXT NOT NULL,
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE cass_causes (
   last_modified_by VARCHAR(32) NULL,
   last_modified_on TIMESTAMP(3) NULL,
   CONSTRAINT cass_causes_pk PRIMARY KEY (id),
-  CONSTRAINT cass_cause_identifier_uq UNIQUE (identifier),
+  CONSTRAINT cass_cause_identifier_uq UNIQUE (rating),
   CONSTRAINT cass_causes_addresses_fk FOREIGN KEY (address_id) REFERENCES cass_addresses (id)
 );
 
@@ -83,15 +83,15 @@ CREATE TABLE cass_commands (
 
 CREATE TABLE cass_task_definitions (
   id BIGINT NOT NULL AUTO_INCREMENT,
-  identifier VARCHAR(32) NOT NULL,
+  rating VARCHAR(32) NOT NULL,
   a_type VARCHAR(32) NOT NULL,
   a_name VARCHAR(256) NOT NULL,
-  description VARCHAR(4096) NULL,
+  comment VARCHAR(4096) NULL,
   assigned_commands VARCHAR(512) NOT NULL,
   mandatory BOOLEAN NULL,
   predefined BOOLEAN NULL,
   CONSTRAINT cass_task_definitions_pk PRIMARY KEY (id),
-  CONSTRAINT cass_task_def_identifier_uq UNIQUE (identifier)
+  CONSTRAINT cass_task_def_identifier_uq UNIQUE (rating)
 );
 
 CREATE TABLE cass_task_instances (

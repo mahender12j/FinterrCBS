@@ -18,18 +18,17 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
-import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 
 import java.util.List;
 
 /**
- * @author Padma Raju Sattineni
+ * @author Md Robiul Hassan
  */
 public class CauseStatistics {
 
     private Double totalRaised;
     private int totalSupporter;
-    private List<JournalEntry> journalEntry;
+    private List<CauseJournalEntry> journalEntry;
 
     public CauseStatistics() {
         super();
@@ -51,11 +50,11 @@ public class CauseStatistics {
         this.totalSupporter = totalSupporter;
     }
 
-    public List<JournalEntry> getJournalEntry() {
+    public List<CauseJournalEntry> getJournalEntry() {
         return journalEntry;
     }
 
-    public void setJournalEntry(List<JournalEntry> journalEntry) {
+    public void setJournalEntry(List<CauseJournalEntry> journalEntry) {
         this.journalEntry = journalEntry;
     }
 

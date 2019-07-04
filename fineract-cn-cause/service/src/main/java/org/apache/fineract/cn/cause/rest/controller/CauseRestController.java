@@ -157,10 +157,11 @@ public class CauseRestController {
     @ResponseBody
     ResponseEntity<Void> deleteCause(@PathVariable("identifier") final String identifier) {
         throwIfCauseNotExists(identifier);
-
-        this.causeService.findCause(identifier).ifPresent(cause -> {
-            if (!CauseService.isRemovableState(cause.getCurrentState())) {
+        this.causeService.findCauseEntity(identifier).map(causeEntity -> {
+            if (Arrays.stream(Cause.RemovableCauseState.values()).anyMatch(c -> c.name().equals(causeEntity.getCurrentState()))) {
                 throw ServiceException.conflict("Unable to delete this cause!");
+            } else {
+                return causeEntity;
             }
         });
 
@@ -427,23 +428,6 @@ public class CauseRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/{identifier}/commands",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<List<Command>> fetchCauseCommands(@PathVariable("identifier") final String identifier) {
-        if (this.causeService.causeExists(identifier)) {
-            return ResponseEntity.ok(this.causeService.fetchCommandsByCause(identifier).collect(Collectors.toList()));
-        } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
-        }
-    }
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
             value = "/causes/{identifier}/ratings",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -452,14 +436,41 @@ public class CauseRestController {
 
     public
     @ResponseBody
-    ResponseEntity<Void> causeRating(@PathVariable("identifier") final String identifier,
-                                     @RequestBody final CauseRating rating) {
+    ResponseEntity<CauseRating> causeRating(@PathVariable("identifier") final String identifier,
+                                            @Valid @RequestBody final CauseRating rating) {
+        this.throwIfCauseNotExists(identifier);
+        try {
+            CommandCallback<CauseRating> commandCallback = this.commandGateway.process(new CreateRatingCommand(identifier, UserContextHolder.checkedGetUser(), rating), CauseRating.class);
+            return ResponseEntity.ok(commandCallback.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Something went wrong");
+        }
+    }
 
-        if (this.causeService.causeExists(identifier)) {
-            this.commandGateway.process(new CreateRatingCommand(identifier, rating));
-            return ResponseEntity.accepted().build();
-        } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/comments/{ratingid}",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+
+    public
+    @ResponseBody
+    ResponseEntity<CauseComment> causeComment(@PathVariable("identifier") final String identifier,
+                                              @PathVariable("ratingid") final Long ratingid,
+                                              @Valid @RequestBody final CauseComment causeComment) {
+        throwIfCauseNotExists(identifier);
+        throwIfRatingNotExists(ratingid);
+        if (causeComment.getRef() != null)
+            throwIfCommentNotExists(causeComment.getRef());
+
+        try {
+            CommandCallback<CauseComment> commandCallback = this.commandGateway.process(new CreateCommentCommand(identifier, ratingid, causeComment), CauseComment.class);
+            return ResponseEntity.ok(commandCallback.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.badRequest("Sorry ! Something went wrong!!!");
         }
     }
 
@@ -474,11 +485,8 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<List<CauseRating>> fetchCauseRatings(@PathVariable("identifier") final String identifier) {
-        if (this.causeService.causeExists(identifier)) {
-            return ResponseEntity.ok(this.causeService.fetchActiveRatingsByCause(identifier, Boolean.TRUE).collect(Collectors.toList()));
-        } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
-        }
+        throwIfCauseNotExists(identifier);
+        return ResponseEntity.ok(this.causeService.fetchRatingsAndCommentsByCause(identifier).collect(Collectors.toList()));
     }
 
 
@@ -782,6 +790,18 @@ public class CauseRestController {
         }
     }
 
+
+    private void throwIfRatingNotExists(Long ratingid) {
+        if (!this.causeService.ratingExists(ratingid)) {
+            throw ServiceException.notFound("Rating {0} not found.", ratingid);
+        }
+    }
+
+    private void throwIfCommentNotExists(Long ref) {
+        if (!this.causeService.commentExists(ref)) {
+            throw ServiceException.notFound("Comment for ref {0} not found.", ref);
+        }
+    }
 
     private void throwIfDocumentNotValid(Cause cause) {
         if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("terms"))) {

@@ -16,38 +16,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.api.v1.domain;
+package org.apache.fineract.cn.cause.internal.repository;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import java.util.List;
+import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 /**
  * @author Md Robiul Hassan
  */
-public class CauseRating {
+@Entity
+@Table(name = "cass_comments")
+public class CommentEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @Max(value = 5, message = "rating range must be between 0-5")
-    @Min(value = 0, message = "rating range must be between 0-5")
-    @NotNull
-    private int rating;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rating_id")
+    private RatingEntity rating;
+
+    @Column(name = "comment")
     private String comment;
-    private boolean active = true;
+
+    @Column(name = "ref")
+    private Long ref;
+
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
+
+    @Column(name = "created_by")
     private String createdBy;
-    private String createdOn;
-    private List<CauseComment> causeComments;
 
-    public CauseRating() {
-    }
+    @Column(name = "created_on")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime createdOn;
 
-    public CauseRating(Long id, int rating, String comment, boolean active, String createdBy, String createdOn) {
-        this.id = id;
-        this.rating = rating;
-        this.comment = comment;
-        this.active = active;
-        this.createdBy = createdBy;
-        this.createdOn = createdOn;
+    public CommentEntity() {
+        this.createdOn = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -58,19 +67,27 @@ public class CauseRating {
         this.id = id;
     }
 
-    public int getRating() {
+    public RatingEntity getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(RatingEntity rating) {
         this.rating = rating;
     }
 
-    public boolean isActive() {
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Boolean getActive() {
         return active;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 
@@ -82,37 +99,32 @@ public class CauseRating {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedOn() {
+    public LocalDateTime getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(String createdOn) {
+    public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
     }
 
-    public List<CauseComment> getCauseComments() {
-        return causeComments;
+    public Long getRef() {
+        return ref;
     }
 
-    public void setCauseComments(List<CauseComment> causeComments) {
-        this.causeComments = causeComments;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setRef(Long ref) {
+        this.ref = ref;
     }
 
     @Override
     public String toString() {
-        return "CauseRating{" +
-                "rating='" + rating + '\'' +
+        return "CommentEntity{" +
+                "id=" + id +
+                ", rating=" + rating +
+                ", comment='" + comment + '\'' +
                 ", active=" + active +
+                ", ref=" + ref +
                 ", createdBy='" + createdBy + '\'' +
-                ", createdOn='" + createdOn + '\'' +
+                ", createdOn=" + createdOn +
                 '}';
     }
 }

@@ -42,7 +42,7 @@ public class NgoProfile {
     private String twitterUrl;
     private String instagramUrl;
     private String linkedinUrl;
-    private String printrestUrl;
+    private String pinterestUrl;
     private String createdOn;
     @Valid
     @NotNull
@@ -112,12 +112,12 @@ public class NgoProfile {
         this.linkedinUrl = linkedinUrl;
     }
 
-    public String getPrintrestUrl() {
-        return printrestUrl;
+    public String getPinterestUrl() {
+        return pinterestUrl;
     }
 
-    public void setPrintrestUrl(String printrestUrl) {
-        this.printrestUrl = printrestUrl;
+    public void setPinterestUrl(String pinterestUrl) {
+        this.pinterestUrl = pinterestUrl;
     }
 
     public String getCreatedOn() {
@@ -170,7 +170,7 @@ public class NgoProfile {
                 ", twitterUrl=" + twitterUrl +
                 ", instagramUrl=" + instagramUrl +
                 ", linkedinUrl=" + linkedinUrl +
-                ", printrestUrl=" + printrestUrl +
+                ", pinterestUrl=" + pinterestUrl +
                 ", createdOn=" + createdOn +
                 '}';
     }

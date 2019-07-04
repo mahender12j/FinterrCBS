@@ -26,6 +26,8 @@ import org.apache.fineract.cn.customer.api.v1.domain.CAdminPage;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
 import org.apache.fineract.cn.customer.api.v1.domain.NgoProfile;
 import org.apache.fineract.cn.customer.internal.command.CreateNGOCommand;
+import org.apache.fineract.cn.customer.internal.command.UndoDocumentStatusCommand;
+import org.apache.fineract.cn.customer.internal.command.UpdateNGOCommand;
 import org.apache.fineract.cn.customer.internal.service.CAdminService;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.NGOService;
@@ -81,7 +83,7 @@ public class NgoRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> createCustomer(
+    ResponseEntity<Void> createNgoProfile(
             @PathVariable("identifier") final String identifier,
             @RequestBody @Valid final NgoProfile ngoProfile) {
 
@@ -92,6 +94,25 @@ public class NgoRestController {
         this.commandGateway.process(new CreateNGOCommand(ngoProfile, identifier));
         return ResponseEntity.accepted().build();
     }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.NGO)
+    @RequestMapping(value = "/ngo/{identifier}/profile",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Void> updateNgoProfile(
+            @PathVariable("identifier") final String identifier,
+            @RequestBody @Valid final NgoProfile ngoProfile) {
+
+        throwIfIdentifierNotMatch(identifier, ngoProfile.getNgoIdentifier());
+        throwIfNGONotExists(identifier);
+        commandGateway.process(new UpdateNGOCommand(ngoProfile, identifier));
+        return ResponseEntity.accepted().build();
+    }
+
 
     private void throwIfIdentifierNotMatch(String identifier, String ngoIdentifier) {
         if (!identifier.equals(ngoIdentifier)) {

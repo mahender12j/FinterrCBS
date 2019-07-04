@@ -19,14 +19,16 @@
 package org.apache.fineract.cn.cause.internal.service.helper.service;
 
 import org.apache.fineract.cn.accounting.api.v1.client.JournalManager;
-import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 import org.apache.fineract.cn.cause.ServiceConstants;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseJournalEntry;
+import org.apache.fineract.cn.cause.internal.mapper.CauseJournalEntryMapper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountingAdaptor {
@@ -42,8 +44,11 @@ public class AccountingAdaptor {
         this.journalManager = journalManager;
     }
 
-    public List<JournalEntry> fetchJournalEntriesJournalEntries(final String creditorsAccountNumber) {
-        return this.journalManager.fetchJournalEntriesForStatistics(creditorsAccountNumber);
+    public List<CauseJournalEntry> fetchJournalEntriesJournalEntries(final String creditorsAccountNumber) {
+        return this.journalManager.fetchJournalEntriesForStatistics(creditorsAccountNumber)
+                .stream()
+                .map(CauseJournalEntryMapper::map)
+                .collect(Collectors.toList());
     }
 }
 

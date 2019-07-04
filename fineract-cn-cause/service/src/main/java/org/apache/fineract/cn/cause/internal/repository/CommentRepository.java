@@ -16,31 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.customer.internal.repository;
+package org.apache.fineract.cn.cause.internal.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Stream;
 
+/**
+ * @author Md Robiul Hassan
+ */
 @Repository
-public interface NgoProfileRepository extends JpaRepository<NgoProfileEntity, Long> {
+public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM NgoProfileEntity c WHERE c.id = :id")
-    Boolean existsByIdentifier(@Param("id") final Long id);
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CommentEntity c WHERE c.id = :id")
+    Boolean existsByid(@Param("id") final Long id);
 
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM NgoProfileEntity c WHERE c.customer.identifier = :identifier")
-    Boolean existsByCustomerIdentifier(@Param("identifier") final String identifier);
-
-    @Query("SELECT c FROM NgoProfileEntity c WHERE c.customer.id = :id")
-    Optional<NgoProfileEntity> findByCustomerId(@Param("id") final Long id);
-
-    Optional<NgoProfileEntity> findByCustomer(CustomerEntity entity);
-
+    Stream<CommentEntity> findByRating(final RatingEntity ratingEntity);
 }
+

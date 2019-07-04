@@ -19,16 +19,17 @@
 package org.apache.fineract.cn.cause.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
+import org.apache.fineract.cn.cause.api.v1.domain.CauseComment;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
 import org.apache.fineract.cn.cause.internal.repository.RatingEntity;
 import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 
-import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -41,41 +42,41 @@ public class RatingMapper {
 
     public static CauseRating map(final RatingEntity ratingEntity) {
         final CauseRating ret = new CauseRating();
+        ret.setId(ratingEntity.getId());
         ret.setActive(ratingEntity.getActive());
         ret.setCreatedBy(ratingEntity.getCreatedBy());
         ret.setCreatedOn(DateConverter.toIsoString(ratingEntity.getCreatedOn()));
-        ret.setIdentifier(ratingEntity.getIdentifier());
-        ret.setDescription(ratingEntity.getDescription());
+        ret.setRating(ratingEntity.getRating());
+        ret.setComment(ratingEntity.getComment());
         return ret;
     }
 
     public static RatingEntity map(final CauseRating rating) {
         final RatingEntity ret = new RatingEntity();
-        ret.setActive(true);
+        ret.setActive(rating.isActive());
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-        ret.setIdentifier(rating.getIdentifier());
-        ret.setDescription(rating.getDescription());
+        ret.setRating(rating.getRating());
+        ret.setComment(rating.getComment());
         return ret;
     }
 
     public static RatingEntity map(final CauseRating rating, final CauseEntity causeEntity) {
         final RatingEntity ret = new RatingEntity();
         ret.setCause(causeEntity);
-        ret.setActive(true);
+        ret.setActive(rating.isActive());
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-        ret.setIdentifier(rating.getIdentifier());
-        ret.setDescription(rating.getDescription());
+        ret.setRating(rating.getRating());
+        ret.setComment(rating.getComment());
         return ret;
     }
 
+
+//    public static CauseComment
+
     public static List<CauseRating> map(Stream<RatingEntity> byCause) {
-        List<CauseRating> causeRatings = new ArrayList<>();
-        byCause.forEach(d -> {
-            causeRatings.add(map(d));
-        });
-        return causeRatings;
+        return byCause.map(RatingMapper::map).collect(Collectors.toList());
     }
 }
 

@@ -17,4 +17,4 @@
 -- under the License.
 --
 
-ALTER TABLE cass_documents ADD description VARCHAR(4096) NULL;
+ALTER TABLE cass_documents ADD comment VARCHAR(4096) NULL;

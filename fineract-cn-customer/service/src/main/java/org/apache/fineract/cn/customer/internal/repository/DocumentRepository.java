@@ -44,7 +44,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
     @Query("SELECT CASE WHEN COUNT(d) > 0 THEN 'true' ELSE 'false' END FROM DocumentEntity d WHERE d.customer.identifier = :customerIdentifier")
     Boolean findByIdentifierAndCustomer(@Param("customerIdentifier") String customerIdentifier);
 
-    DocumentEntity findByCustomer(CustomerEntity entity);
+    Optional<DocumentEntity> findByCustomer(CustomerEntity entity);
 
     Page<DocumentEntity> findAll(final Pageable pageable);
 }

@@ -24,6 +24,7 @@ public interface PermittableGroupIds {
     String CUSTOMER = "customer__v1__customer";
     String PORTRAIT = "customer__v1__portrait";
     String CADMIN = "cadmin__v1__cadmin";
+    String SADMIN = "sadmin__v1__sadmin";
     String NGO = "ngo__v1__ngo";
     String IDENTIFICATIONS = "customer__v1__identifications";
     String TASK = "customer__v1__task";

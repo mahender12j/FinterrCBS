@@ -16,13 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.repository;
+package org.apache.fineract.cn.customer.internal.command;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.apache.fineract.cn.customer.api.v1.domain.NgoProfile;
 
-import java.util.stream.Stream;
+public class UpdateNGOCommand {
 
-public interface CommandRepository extends JpaRepository<CommentEntity, Long> {
+    private final NgoProfile ngoProfile;
+    private final String identifier;
 
-    Stream<CommentEntity> findByRating(final RatingEntity ratingEntity);
+    public UpdateNGOCommand(final NgoProfile ngoProfile,
+                            final String identifier) {
+        super();
+        this.ngoProfile = ngoProfile;
+        this.identifier = identifier;
+    }
+
+    public NgoProfile getNgoProfile() {
+        return ngoProfile;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
 }
