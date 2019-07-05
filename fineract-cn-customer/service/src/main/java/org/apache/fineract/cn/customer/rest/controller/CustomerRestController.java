@@ -96,6 +96,20 @@ public class CustomerRestController {
         return ResponseEntity.accepted().build();
     }
 
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.SADMIN)
+    @RequestMapping(
+            value = "/aerequest",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<HashMap<String, String>> aerequest(
+            @RequestBody @Valid AERequest aeRequest) throws NoSuchAlgorithmException, IOException, KeyManagementException {
+        return ResponseEntity.ok(this.customerService.aerequest(aeRequest));
+    }
+
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.SADMIN)
     @RequestMapping(
             value = "/retrieveBankList",

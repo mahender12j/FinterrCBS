@@ -32,7 +32,10 @@ import org.springframework.stereotype.Service;
 
 import javax.net.ssl.*;
 import java.io.*;
-import java.net.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -82,8 +85,131 @@ public class CustomerService {
         this.documentSubTypeRepository = documentSubTypeRepository;
     }
 
+    public HashMap<String, String> aerequest(AERequest aeRequest) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+        HashMap<String, String> respMap = new HashMap<String, String>();
+        try {
+            StringBuilder postDataStrBuilder = new StringBuilder();
+            postDataStrBuilder.append("fpx_msgType=").append(URLEncoder.encode(aeRequest.getFpx_msgType(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_msgToken=").append(URLEncoder.encode(aeRequest.getFpx_msgToken(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerExId=").append(URLEncoder.encode(aeRequest.getFpx_sellerExId(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerExOrderNo=").append(URLEncoder.encode(aeRequest.getFpx_sellerExOrderNo(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerTxnTime=").append(URLEncoder.encode(aeRequest.getFpx_sellerTxnTime(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerOrderNo=").append(URLEncoder.encode(aeRequest.getFpx_sellerOrderNo(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerId=").append(URLEncoder.encode(aeRequest.getFpx_sellerId(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerBankCode=").append(URLEncoder.encode(aeRequest.getFpx_sellerBankCode(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_txnCurrency=").append(URLEncoder.encode(aeRequest.getFpx_txnCurrency(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_txnAmount=").append(URLEncoder.encode(aeRequest.getFpx_txnAmount(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerEmail=").append(URLEncoder.encode(aeRequest.getFpx_buyerEmail(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerName=").append(URLEncoder.encode(aeRequest.getFpx_buyerName(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerBankId=").append(URLEncoder.encode(aeRequest.getFpx_buyerBankId(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerBankBranch=").append(URLEncoder.encode(aeRequest.getFpx_buyerBankBranch(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerAccNo=").append(URLEncoder.encode(aeRequest.getFpx_buyerAccNo(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerId=").append(URLEncoder.encode(aeRequest.getFpx_buyerId(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_makerName=").append(URLEncoder.encode(aeRequest.getFpx_makerName(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerIban=").append(URLEncoder.encode(aeRequest.getFpx_buyerIban(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_productDesc=").append(URLEncoder.encode(aeRequest.getFpx_productDesc(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_version=").append(URLEncoder.encode(aeRequest.getFpx_version(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_checkSum=").append(URLEncoder.encode(aeRequest.getFpx_checkSum(), "UTF-8"));
 
-    public HashMap<String, String> fetchBankList(PaynetDetails paynetDetails) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+
+// Create a trust manager that does not validate certificate chains only for testing environment
+            TrustManager[] trustAllCerts = new TrustManager[]
+                    {
+                            new X509TrustManager() {
+                                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                    return null;
+                                }
+
+                                public void checkClientTrusted(
+                                        java.security.cert.X509Certificate[] certs, String authType) {
+                                }
+
+                                public void checkServerTrusted(
+                                        java.security.cert.X509Certificate[] certs, String authType) {
+                                }
+
+                                public boolean isServerTrusted(java.security.cert.X509Certificate[] chain) {
+                                    return true;
+                                }
+
+                                public boolean isClientTrusted(java.security.cert.X509Certificate[] chain) {
+                                    return true;
+                                }
+                            }
+                    };
+
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+
+                public boolean verify(String hostname, String session) {
+                    return true;
+                }
+            });
+
+            URLConnection conn = (HttpsURLConnection) new URL("https://uat.mepsfpx.com.my/FPXMain/sellerNVPTxnStatus.jsp").openConnection();
+
+            conn.setDoOutput(true);
+            BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+            outputWriter.write(postDataStrBuilder.toString(), 0, postDataStrBuilder.toString().length());
+            outputWriter.flush();
+            outputWriter.close();
+            BufferedReader inputReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String strResponse = null;
+            while ((strResponse = inputReader.readLine()) != null) {
+//                System.out.println("Response is .." + strResponse);
+                if (strResponse.length() > 0)
+                    break;
+            }
+
+//            System.out.println("strResponse:[" + strResponse + "] result:[" + Objects.requireNonNull(strResponse).trim() + "] " + (strResponse.trim()).equals("PROSESSING ERROR"));
+            inputReader.close();
+            if (strResponse.trim().equals("msgfromfpx= PROSESSING ERROR")) {
+                System.out.println("An error occurred!..Response[" + strResponse + "]");
+                throw ServiceException.internalError("An error occurred!..Response {0}", strResponse);
+            } else {
+                StringTokenizer strToknzr = new StringTokenizer(strResponse, "&");
+                while (strToknzr.hasMoreElements()) {
+                    String temp = strToknzr.nextToken();
+                    if (temp.contains("=")) {
+                        String[] nvp = temp.split("=");
+                        String name = nvp[0];
+                        String value = "";
+                        if (nvp.length == 2)
+                            value = URLDecoder.decode(nvp[1], "UTF-8");
+                        respMap.put(name, value);
+                    } else {
+                        System.out.println("Parsing Error!" + temp);
+                        throw ServiceException.internalError("Parsing Error! {0}", temp);
+                    }
+                }
+//                System.out.println("response Map[" + respMap + "]");
+//                throw ServiceException.internalError("response Map {0}", respMap);
+            }
+
+//            String fpx_checkSumString = respMap.get("fpx_buyerBankBranch") + "|" + respMap.get("fpx_buyerBankId") + "|" + respMap.get("fpx_buyerIban") + "|" + respMap.get("fpx_buyerId") + "|" + respMap.get("fpx_buyerName") + "|" + respMap.get("fpx_creditAuthCode");
+//            fpx_checkSumString += "|" + respMap.get("fpx_creditAuthNo") + "|" + respMap.get("fpx_debitAuthCode") + "|" + respMap.get("fpx_debitAuthNo") + "|" + respMap.get("fpx_fpxTxnId") + "|" + respMap.get("fpx_fpxTxnTime") + "|" + respMap.get("fpx_makerName");
+//            fpx_checkSumString += "|" + respMap.get("fpx_msgToken") + "|" + respMap.get("fpx_msgType") + "|" + respMap.get("fpx_sellerExId") + "|" + respMap.get("fpx_sellerExOrderNo") + "|" + respMap.get("fpx_sellerId") + "|" + respMap.get("fpx_sellerOrderNo") + "|" + respMap.get("fpx_sellerTxnTime") + "|" + respMap.get("fpx_txnAmount") + "|" + respMap.get("fpx_txnCurrency");
+//            System.out.println("fpx_checkSumString:" + fpx_checkSumString);
+//            System.out.println("fpx_checkSum:" + respMap.get("fpx_checkSum"));
+
+
+        } catch (Exception e) {
+            System.out.println("<HR><H3>Error :" + e);
+            throw ServiceException.internalError("Something went wrong !");
+        }
+
+        return respMap;
+
+    }
+
+
+    public HashMap<String, String> fetchBankList(PaynetDetails paynetDetails) throws
+            IOException, NoSuchAlgorithmException, KeyManagementException {
         HashMap<String, String> respMap = new HashMap<>();
 //        default value
 //        String final_checkSum = "566DACEE09ADFA8D65733CC05E7599964556E8FE1E7396A84717CAEA79DEC96022C226593B35B1E4EF441A8052C636861E1DC298CB3BA3C5FA1F6F7D409AE01DB0A9BBD26EA27F6DC98BFFE1758C1746922C6A9A8BA18120C15B4B8C05F994767A715C834C09B313895AEDB25E8CBA36B5CB7A82CB5496BA1857F4AB0BAEDD3E5239B5B5441729A683199B90C7AD9B537AD9DBE9168EDA1D1E82ECC0F111BA33DD4A6FB097FDA38DB80CFBF9FB8B7773E062C11545F6C7B94FBAC3707AF72297D11DF4A21C5E70C07F242ADA8F597F0C3BC16C14D840A0010B46BE96F8B5BA6CDAF21B9514B71D332B3543B19DBDDF6DCAF8A4EBE31A0445F9AD4A0C5C9BDC60";
@@ -267,7 +393,8 @@ public class CustomerService {
         return customerPage;
     }
 
-    public CustomerRefPage fetchCustomerReferrals(final String refferalcode, final String searchKey, final Pageable pageable) {
+    public CustomerRefPage fetchCustomerReferrals(final String refferalcode, final String searchKey,
+                                                  final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
         CustomerEntity customerEntity = customerRepository.findByRefferalCodeIdentifier(refferalcode).orElseThrow(() -> ServiceException.notFound("Customer with refferal code {0} not found", refferalcode));
 
@@ -411,12 +538,14 @@ public class CustomerService {
                 .orElseGet(Collections::emptyList);
     }
 
-    private Optional<IdentificationCardScanEntity> findIdentificationCardEntity(final String number, final String identifier) {
+    private Optional<IdentificationCardScanEntity> findIdentificationCardEntity(final String number,
+                                                                                final String identifier) {
         final Optional<IdentificationCardEntity> cardEntity = this.identificationCardRepository.findByNumber(number);
         return cardEntity.flatMap(card -> this.identificationCardScanRepository.findByIdentifierAndIdentificationCard(identifier, card));
     }
 
-    public Optional<IdentificationCardScan> findIdentificationCardScan(final String number, final String identifier) {
+    public Optional<IdentificationCardScan> findIdentificationCardScan(final String number,
+                                                                       final String identifier) {
         return this.findIdentificationCardEntity(number, identifier).map(IdentificationCardScanMapper::map);
     }
 
