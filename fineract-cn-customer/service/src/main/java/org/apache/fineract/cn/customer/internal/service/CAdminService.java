@@ -167,6 +167,7 @@ public class CAdminService {
                 DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
                 type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
                 type.setDocumentsSubType(documentsSubTypeList);
+                type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
                 documentsType.add(type);
             });
             customerDocument.setDocumentsTypes(documentsType);
