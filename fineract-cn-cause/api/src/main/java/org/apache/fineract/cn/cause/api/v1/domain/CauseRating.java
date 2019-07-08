@@ -29,7 +29,7 @@ import java.util.List;
 public class CauseRating {
     private Long id;
     @Max(value = 5, message = "rating range must be between 0-5")
-    @Min(value = 0, message = "rating range must be between 0-5")
+    @Min(value = -1, message = "rating range must be between 0-5")
     @NotNull
     private int rating;
     private String comment;
