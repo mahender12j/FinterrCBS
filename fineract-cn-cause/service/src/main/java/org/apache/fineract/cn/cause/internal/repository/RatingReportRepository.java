@@ -23,27 +23,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 /**
  * @author Md Robiul hassan
  */
 @Repository
-public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
+public interface RatingReportRepository extends JpaRepository<RatingReportEntity, Long> {
 
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM RatingEntity c WHERE c.id = :id")
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM RatingReportEntity c WHERE c.id = :id")
     Boolean existsByid(@Param("id") final Long id);
 
-    Optional<RatingEntity> findById(final Long id);
-
-    Optional<RatingEntity> findByCauseAndCreatedBy(final CauseEntity causeEntity, final String createdBy);
-
-    Optional<RatingEntity> findByIdAndCreatedBy(final Long id, final String createdBy);
-
-    Optional<RatingEntity> findByIdAndCause(final Long id, final CauseEntity causeEntity);
-
-    Stream<RatingEntity> findAllByCause(final CauseEntity causeEntity);
 }
 

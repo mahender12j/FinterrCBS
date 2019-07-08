@@ -23,6 +23,7 @@ import org.apache.fineract.cn.cause.api.v1.domain.CauseComment;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
 import org.apache.fineract.cn.cause.internal.command.CreateCommentCommand;
 import org.apache.fineract.cn.cause.internal.command.CreateRatingCommand;
+import org.apache.fineract.cn.cause.internal.command.DeleteCauseRatingCommand;
 import org.apache.fineract.cn.cause.internal.mapper.RatingMapper;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.command.annotation.Aggregate;
@@ -70,6 +71,18 @@ public class RatingAndCommentCommandHandler {
                 entity.getActive(),
                 entity.getCreatedBy(),
                 entity.getCreatedOn().toString());
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_RATING)
+    public String deleteRating(final DeleteCauseRatingCommand deleteCauseRatingCommand) {
+        final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseRatingCommand.getCauseIdentifier());
+        final RatingEntity ratingEntity = this.ratingRepository.findByIdAndCause(deleteCauseRatingCommand.getRatingId(), causeEntity).orElseThrow(() -> ServiceException.notFound("Rating Not Found with ID {0} and cause ID {1}", deleteCauseRatingCommand.getRatingId(), deleteCauseRatingCommand.getCauseIdentifier()));
+        ratingEntity.setActive(false);
+        this.ratingRepository.save(ratingEntity);
+        return ratingEntity.toString();
     }
 
 

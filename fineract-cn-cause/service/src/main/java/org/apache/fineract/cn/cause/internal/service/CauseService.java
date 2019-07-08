@@ -86,6 +86,11 @@ public class CauseService {
         return this.ratingRepository.existsByid(id);
     }
 
+
+    public Optional<RatingEntity> ratingExistsByCreatedBy(final Long id) {
+        return this.ratingRepository.findByIdAndCreatedBy(id, UserContextHolder.checkedGetUser());
+    }
+
     public Optional<CauseEntity> findCauseByIdentifier(final String identifier) {
         return this.causeRepository.findByIdentifier(identifier);
     }

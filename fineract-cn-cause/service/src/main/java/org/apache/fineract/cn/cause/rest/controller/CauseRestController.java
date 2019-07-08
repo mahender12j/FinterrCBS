@@ -455,7 +455,6 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-
     public
     @ResponseBody
     ResponseEntity<List<CauseRating>> fetchCauseRatings(@PathVariable("identifier") final String identifier) {
@@ -463,6 +462,26 @@ public class CauseRestController {
         return ResponseEntity.ok(this.causeService.fetchRatingsAndCommentsByCause(identifier));
     }
 
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTIFICATIONS)
+    @RequestMapping(
+            value = "/causes/{identifier}/ratings/{id}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> deleteCauseRating(@PathVariable("identifier") final String identifier,
+                                           @PathVariable("ratingId") final Long ratingId) {
+        this.throwIfCauseExists(identifier);
+        this.throwIfRatingNotExists(ratingId);
+//        todo has implementation inside the method
+        this.throwIfRatingOwnerIsNotOwnByCurrentUserOrCA(ratingId);
+
+        this.commandGateway.process(new DeleteCauseRatingCommand(identifier, ratingId));
+        return ResponseEntity.accepted().build();
+    }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
@@ -770,6 +789,14 @@ public class CauseRestController {
             throw ServiceException.notFound("Rating {0} not found.", ratingid);
         }
     }
+
+    private void throwIfRatingOwnerIsNotOwnByCurrentUserOrCA(Long ratingId) {
+        // todo need to make sure ca is able to access this api, need to call customer api for this to know the current user role
+        if (!this.causeService.ratingExistsByCreatedBy(ratingId).isPresent()) {
+            throw ServiceException.badRequest("Rating {0} not owned by the current user", ratingId);
+        }
+    }
+
 
     private void throwIfDocumentNotValid(Cause cause) {
         if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("terms"))) {
