@@ -58,7 +58,7 @@ public class NGOService {
     }
 
     public NgoProfile getNgoProfile(final String identifier) {
-        Customer customer = this.customerService.findCustomer(identifier).orElseThrow(() -> ServiceException.notFound("NGO NOT FOUND"));
+        Customer customer = this.customerService.findCustomer(identifier);
         NgoProfileEntity profileEntity = this.profileRepository.findByCustomerId(customer.getId()).orElseThrow(() -> ServiceException.notFound("This NGO details are not yet updated"));
         NgoProfile profile = NgoProfileMapper.map(profileEntity);
         profile.setNgoDetails(customer);

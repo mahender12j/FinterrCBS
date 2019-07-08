@@ -58,6 +58,7 @@ public class CustomerService {
     private final TaskInstanceRepository taskInstanceRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final DocumentSubTypeRepository documentSubTypeRepository;
+    private final NgoProfileRepository ngoProfileRepository;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -70,7 +71,8 @@ public class CustomerService {
                            final TaskDefinitionRepository taskDefinitionRepository,
                            final TaskInstanceRepository taskInstanceRepository,
                            final DocumentTypeRepository documentTypeRepository,
-                           final DocumentSubTypeRepository documentSubTypeRepository) {
+                           final DocumentSubTypeRepository documentSubTypeRepository,
+                           final NgoProfileRepository ngoProfileRepository) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -83,10 +85,11 @@ public class CustomerService {
         this.taskInstanceRepository = taskInstanceRepository;
         this.documentTypeRepository = documentTypeRepository;
         this.documentSubTypeRepository = documentSubTypeRepository;
+        this.ngoProfileRepository = ngoProfileRepository;
     }
 
     public HashMap<String, String> aerequest(AERequest aeRequest) throws IOException, NoSuchAlgorithmException, KeyManagementException {
-        HashMap<String, String> respMap = new HashMap<String, String>();
+        HashMap<String, String> respMap = new HashMap<>();
         try {
             StringBuilder postDataStrBuilder = new StringBuilder();
             postDataStrBuilder.append("fpx_msgType=").append(URLEncoder.encode(aeRequest.getFpx_msgType(), "UTF-8"));
@@ -113,43 +116,7 @@ public class CustomerService {
 
 
 // Create a trust manager that does not validate certificate chains only for testing environment
-            TrustManager[] trustAllCerts = new TrustManager[]
-                    {
-                            new X509TrustManager() {
-                                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                                    return null;
-                                }
-
-                                public void checkClientTrusted(
-                                        java.security.cert.X509Certificate[] certs, String authType) {
-                                }
-
-                                public void checkServerTrusted(
-                                        java.security.cert.X509Certificate[] certs, String authType) {
-                                }
-
-                                public boolean isServerTrusted(java.security.cert.X509Certificate[] chain) {
-                                    return true;
-                                }
-
-                                public boolean isClientTrusted(java.security.cert.X509Certificate[] chain) {
-                                    return true;
-                                }
-                            }
-                    };
-
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-
-                public boolean verify(String hostname, String session) {
-                    return true;
-                }
-            });
+            createTrustManager();
 
             URLConnection conn = (HttpsURLConnection) new URL("https://uat.mepsfpx.com.my/FPXMain/sellerNVPTxnStatus.jsp").openConnection();
 
@@ -187,16 +154,7 @@ public class CustomerService {
                         throw ServiceException.internalError("Parsing Error! {0}", temp);
                     }
                 }
-//                System.out.println("response Map[" + respMap + "]");
-//                throw ServiceException.internalError("response Map {0}", respMap);
             }
-
-//            String fpx_checkSumString = respMap.get("fpx_buyerBankBranch") + "|" + respMap.get("fpx_buyerBankId") + "|" + respMap.get("fpx_buyerIban") + "|" + respMap.get("fpx_buyerId") + "|" + respMap.get("fpx_buyerName") + "|" + respMap.get("fpx_creditAuthCode");
-//            fpx_checkSumString += "|" + respMap.get("fpx_creditAuthNo") + "|" + respMap.get("fpx_debitAuthCode") + "|" + respMap.get("fpx_debitAuthNo") + "|" + respMap.get("fpx_fpxTxnId") + "|" + respMap.get("fpx_fpxTxnTime") + "|" + respMap.get("fpx_makerName");
-//            fpx_checkSumString += "|" + respMap.get("fpx_msgToken") + "|" + respMap.get("fpx_msgType") + "|" + respMap.get("fpx_sellerExId") + "|" + respMap.get("fpx_sellerExOrderNo") + "|" + respMap.get("fpx_sellerId") + "|" + respMap.get("fpx_sellerOrderNo") + "|" + respMap.get("fpx_sellerTxnTime") + "|" + respMap.get("fpx_txnAmount") + "|" + respMap.get("fpx_txnCurrency");
-//            System.out.println("fpx_checkSumString:" + fpx_checkSumString);
-//            System.out.println("fpx_checkSum:" + respMap.get("fpx_checkSum"));
-
 
         } catch (Exception e) {
             System.out.println("<HR><H3>Error :" + e);
@@ -207,25 +165,7 @@ public class CustomerService {
 
     }
 
-
-    public HashMap<String, String> fetchBankList(PaynetDetails paynetDetails) throws
-            IOException, NoSuchAlgorithmException, KeyManagementException {
-        HashMap<String, String> respMap = new HashMap<>();
-//        default value
-//        String final_checkSum = "566DACEE09ADFA8D65733CC05E7599964556E8FE1E7396A84717CAEA79DEC96022C226593B35B1E4EF441A8052C636861E1DC298CB3BA3C5FA1F6F7D409AE01DB0A9BBD26EA27F6DC98BFFE1758C1746922C6A9A8BA18120C15B4B8C05F994767A715C834C09B313895AEDB25E8CBA36B5CB7A82CB5496BA1857F4AB0BAEDD3E5239B5B5441729A683199B90C7AD9B537AD9DBE9168EDA1D1E82ECC0F111BA33DD4A6FB097FDA38DB80CFBF9FB8B7773E062C11545F6C7B94FBAC3707AF72297D11DF4A21C5E70C07F242ADA8F597F0C3BC16C14D840A0010B46BE96F8B5BA6CDAF21B9514B71D332B3543B19DBDDF6DCAF8A4EBE31A0445F9AD4A0C5C9BDC60";
-//        String fpx_msgType = "BE";
-//        String fpx_msgToken = "01";
-//        String fpx_sellerExId = "EX00009694";
-//        String fpx_version = "7.0";
-
-        StringBuilder postDataStrBuilder = new StringBuilder();
-        postDataStrBuilder.append("fpx_msgType=").append(URLEncoder.encode(paynetDetails.getFpx_msgType(), "UTF-8"));
-        postDataStrBuilder.append("&fpx_msgToken=").append(URLEncoder.encode(paynetDetails.getFpx_msgToken(), "UTF-8"));
-        postDataStrBuilder.append("&fpx_sellerExId=").append(URLEncoder.encode(paynetDetails.getFpx_sellerExId(), "UTF-8"));
-        postDataStrBuilder.append("&fpx_version=").append(URLEncoder.encode(paynetDetails.getFpx_version(), "UTF-8"));
-        postDataStrBuilder.append("&fpx_checkSum=").append(URLEncoder.encode(paynetDetails.getFinal_checkSum(), "UTF-8"));
-
-//Create a trust manager that does not validate certificate chains only for testing environment
+    private void createTrustManager() throws NoSuchAlgorithmException, KeyManagementException {
         TrustManager[] trustAllCerts = new TrustManager[]
                 {
                         new X509TrustManager() {
@@ -263,6 +203,21 @@ public class CustomerService {
                 return true;
             }
         });
+    }
+
+
+    public HashMap<String, String> fetchBankList(PaynetDetails paynetDetails) throws
+            IOException, NoSuchAlgorithmException, KeyManagementException {
+        HashMap<String, String> respMap = new HashMap<>();
+        StringBuilder postDataStrBuilder = new StringBuilder();
+        postDataStrBuilder.append("fpx_msgType=").append(URLEncoder.encode(paynetDetails.getFpx_msgType(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_msgToken=").append(URLEncoder.encode(paynetDetails.getFpx_msgToken(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_sellerExId=").append(URLEncoder.encode(paynetDetails.getFpx_sellerExId(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_version=").append(URLEncoder.encode(paynetDetails.getFpx_version(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_checkSum=").append(URLEncoder.encode(paynetDetails.getFinal_checkSum(), "UTF-8"));
+
+//Create a trust manager that does not validate certificate chains only for testing environment
+        createTrustManager();
 
         URLConnection conn = (HttpsURLConnection) new URL("https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList").openConnection();
 
@@ -332,15 +287,21 @@ public class CustomerService {
 
     }
 
-    public Optional<Customer> findCustomer(final String identifier) {
+    public Customer findCustomer(final String identifier) {
         CustomerEntity customerEntity = customerRepository.findByIdentifier(identifier).orElseThrow(() -> ServiceException.notFound("Customer with identifier {0} not found in this system", identifier));
-
         Customer customer = CustomerMapper.map(customerEntity);
         customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
+        setCustomerContactDetails(customerEntity, customer);
+
+        if (this.ngoProfileRepository.existsByCustomerIdentifier(identifier)) {
+            customer.setNgoProfileExist(true);
+        } else {
+            customer.setNgoProfileExist(false);
+        }
 
         if (customerEntity.getReferenceCustomer() != null) {
-            Optional<CustomerEntity> reffCustomer = this.customerRepository.findByRefferalCodeIdentifier(customerEntity.getReferenceCustomer());
-            reffCustomer.ifPresent(reff -> customer.setRefferalUserIdentifier(reff.getIdentifier()));
+            this.customerRepository.findByRefferalCodeIdentifier(customerEntity.getReferenceCustomer())
+                    .ifPresent(reff -> customer.setRefferalUserIdentifier(reff.getIdentifier()));
         }
 
         customer.setSocialMatrix(getSocialMatrix(customerEntity));
@@ -349,10 +310,7 @@ public class CustomerService {
             customer.setRefferalBalance(account.getBalance());
         }
 
-
-        setCustomerContactDetails(customerEntity, customer);
-        return Optional.of(customer);
-
+        return customer;
     }
 
     private void setCustomerContactDetails(CustomerEntity customerEntity, Customer customer) {

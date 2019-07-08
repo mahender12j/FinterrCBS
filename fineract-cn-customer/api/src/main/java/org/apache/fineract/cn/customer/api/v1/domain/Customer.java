@@ -75,6 +75,7 @@ public final class Customer {
     private String gender;
     private DateOfBirth dateOfBirth;
     private Boolean member;
+    private Boolean ngoProfileExist;
     private String accountBeneficiary;
     private String referenceCustomer;
     private String assignedOffice;
@@ -438,6 +439,15 @@ public final class Customer {
     public void setKycStatus(KycStatus kycStatus) {
         this.kycStatus = kycStatus;
     }
+
+    public Boolean getNgoProfileExist() {
+        return ngoProfileExist;
+    }
+
+    public void setNgoProfileExist(Boolean ngoProfileExist) {
+        this.ngoProfileExist = ngoProfileExist;
+    }
+
 
     @Override
     public String toString() {
