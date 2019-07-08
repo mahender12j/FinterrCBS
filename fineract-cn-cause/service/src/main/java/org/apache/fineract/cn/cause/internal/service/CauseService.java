@@ -48,7 +48,6 @@ public class CauseService {
     private final AccountingAdaptor accountingAdaptor;
     private final CauseStateRepository causeStateRepository;
     private final CauseUpdateRepository causeUpdateRepository;
-    private final CommentRepository commentRepository;
 
     @Autowired
     public CauseService(final CauseRepository causeRepository,
@@ -62,14 +61,12 @@ public class CauseService {
                         final TaskDefinitionRepository taskDefinitionRepository,
                         final TaskInstanceRepository taskInstanceRepository,
                         final CauseStateRepository causeStateRepository,
-                        final CauseUpdateRepository causeUpdateRepository,
-                        final CommentRepository commentRepository) {
+                        final CauseUpdateRepository causeUpdateRepository) {
         super();
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
         this.categoryRepository = categoryRepository;
         this.ratingRepository = ratingRepository;
-        this.commentRepository = commentRepository;
         this.addressRepository = addressRepository;
         this.documentPageRepository = documentPageRepository;
         this.taskDefinitionRepository = taskDefinitionRepository;
@@ -88,12 +85,6 @@ public class CauseService {
     public Boolean ratingExists(final Long id) {
         return this.ratingRepository.existsByid(id);
     }
-
-
-    public Boolean commentExists(final Long id) {
-        return this.commentRepository.existsByid(id);
-    }
-
 
     public Optional<CauseEntity> findCauseByIdentifier(final String identifier) {
         return this.causeRepository.findByIdentifier(identifier);
@@ -448,8 +439,8 @@ public class CauseService {
     private void setRatingsAndAverage(CauseEntity causeEntity, Cause cause) {
         List<CauseRating> causeRatings = this.ratingRepository.findAllByCause(causeEntity).map(ratingEntity -> {
             CauseRating rating = RatingMapper.map(ratingEntity);
-            List<CommentEntity> commentEntities = this.commentRepository.findByRating(ratingEntity).collect(Collectors.toList());
-            rating.setCauseComments(this.fetchNastedComments(commentEntities, null));
+//            List<CommentEntity> commentEntities = this.commentRepository.findByRating(ratingEntity).collect(Collectors.toList());
+//            rating.setCauseComments(this.fetchNastedComments(commentEntities, null));
             return rating;
         }).collect(Collectors.toList());
 
@@ -458,35 +449,49 @@ public class CauseService {
     }
 
 
-    public final Stream<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
+    public final List<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
                 .map(this.ratingRepository::findAllByCause)
+                .map(ratingEntity -> this.fetchNestedComments(ratingEntity.collect(Collectors.toList()), (long) -1))
                 .orElse(Stream.empty())
-                .map(ratingEntity -> {
-                    CauseRating rating = RatingMapper.map(ratingEntity);
-                    List<CommentEntity> commentEntities = this.commentRepository.findByRating(ratingEntity).collect(Collectors.toList());
-                    rating.setCauseComments(this.fetchNastedComments(commentEntities, null));
-                    return rating;
+                .collect(Collectors.toList());
+
+    }
+
+
+    private Stream<CauseRating> fetchNestedComments(List<RatingEntity> ratingEntities, final Long ref) {
+        return ratingEntities
+                .stream()
+                .filter(ent -> ent.getRef() == ref)  //equal equal is used cause ref value can be null value which can cause null pointer issue
+                .map(entity -> {
+                    CauseRating causeRating = RatingMapper.map(entity);
+                    Stream<RatingEntity> ratingEntityStream = ratingEntities
+                            .stream()
+                            .filter(cdata -> cdata.getRef() == entity.getId()); //equal equal is used cause ref value can be null value which can cause null pointer issue
+                    if (ratingEntityStream.findAny().isPresent()) {
+                        causeRating.setCauseRatings(fetchNestedComments(ratingEntities, entity.getId()).collect(Collectors.toList()));
+                    }
+                    return causeRating;
                 });
     }
 
 
-    private List<CauseComment> fetchNastedComments(List<CommentEntity> commentEntities, final Long ref) {
-        return commentEntities
-                .stream()
-                .filter(ent -> ent.getRef() == ref)  //equal equal is used cause ref value can be null value which can cause null pointer issue
-                .map(entity -> {
-                    CauseComment causeComment = CommentMapper.map(entity);
-                    Stream<CommentEntity> childComment = commentEntities
-                            .stream()
-                            .filter(cdata -> cdata.getRef() == entity.getId()); //equal equal is used cause ref value can be null value which can cause null pointer issue
-                    if (childComment.findAny().isPresent()) {
-                        causeComment.setChildComments(fetchNastedComments(commentEntities, entity.getId()));
-                    }
-                    return causeComment;
-                })
-                .collect(Collectors.toList());
-    }
+//    private List<CauseComment> fetchNastedComments(List<CommentEntity> commentEntities, final Long ref) {
+//        return commentEntities
+//                .stream()
+//                .filter(ent -> ent.getRef() == ref)  //equal equal is used cause ref value can be null value which can cause null pointer issue
+//                .map(entity -> {
+//                    CauseComment causeComment = CommentMapper.map(entity);
+//                    Stream<CommentEntity> childComment = commentEntities
+//                            .stream()
+//                            .filter(cdata -> cdata.getRef() == entity.getId()); //equal equal is used cause ref value can be null value which can cause null pointer issue
+//                    if (childComment.findAny().isPresent()) {
+//                        causeComment.setChildComments(fetchNastedComments(commentEntities, entity.getId()));
+//                    }
+//                    return causeComment;
+//                })
+//                .collect(Collectors.toList());
+//    }
 
     public final Optional<PortraitEntity> findPortrait(final String identifier) {
         return causeRepository.findByIdentifier(identifier)

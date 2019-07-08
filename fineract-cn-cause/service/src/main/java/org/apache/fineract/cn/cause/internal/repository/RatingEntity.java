@@ -49,6 +49,9 @@ public class RatingEntity {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
+    @Column(name = "ref", nullable = false)
+    private Long ref;
+
     @Column(name = "created_by")
     private String createdBy;
 
@@ -114,6 +117,14 @@ public class RatingEntity {
 
     public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public Long getRef() {
+        return ref;
+    }
+
+    public void setRef(Long ref) {
+        this.ref = ref;
     }
 
     @Override

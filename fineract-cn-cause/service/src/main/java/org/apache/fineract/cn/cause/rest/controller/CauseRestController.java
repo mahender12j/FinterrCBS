@@ -87,7 +87,7 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Void>
-    initialize() throws InterruptedException {
+    initialize() {
         this.commandGateway.process(new InitializeServiceCommand());
         return ResponseEntity.accepted().build();
     }
@@ -450,32 +450,6 @@ public class CauseRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/{identifier}/comments/{ratingid}",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-
-    public
-    @ResponseBody
-    ResponseEntity<CauseComment> causeComment(@PathVariable("identifier") final String identifier,
-                                              @PathVariable("ratingid") final Long ratingid,
-                                              @Valid @RequestBody final CauseComment causeComment) {
-        throwIfCauseNotExists(identifier);
-        throwIfRatingNotExists(ratingid);
-        if (causeComment.getRef() != null)
-            throwIfCommentNotExists(causeComment.getRef());
-
-        try {
-            CommandCallback<CauseComment> commandCallback = this.commandGateway.process(new CreateCommentCommand(identifier, ratingid, causeComment), CauseComment.class);
-            return ResponseEntity.ok(commandCallback.get());
-        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
-            throw ServiceException.badRequest("Sorry ! Something went wrong!!!");
-        }
-    }
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
             value = "/causes/{identifier}/ratings",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -486,7 +460,7 @@ public class CauseRestController {
     @ResponseBody
     ResponseEntity<List<CauseRating>> fetchCauseRatings(@PathVariable("identifier") final String identifier) {
         throwIfCauseNotExists(identifier);
-        return ResponseEntity.ok(this.causeService.fetchRatingsAndCommentsByCause(identifier).collect(Collectors.toList()));
+        return ResponseEntity.ok(this.causeService.fetchRatingsAndCommentsByCause(identifier));
     }
 
 
@@ -794,12 +768,6 @@ public class CauseRestController {
     private void throwIfRatingNotExists(Long ratingid) {
         if (!this.causeService.ratingExists(ratingid)) {
             throw ServiceException.notFound("Rating {0} not found.", ratingid);
-        }
-    }
-
-    private void throwIfCommentNotExists(Long ref) {
-        if (!this.causeService.commentExists(ref)) {
-            throw ServiceException.notFound("Comment for ref {0} not found.", ref);
         }
     }
 

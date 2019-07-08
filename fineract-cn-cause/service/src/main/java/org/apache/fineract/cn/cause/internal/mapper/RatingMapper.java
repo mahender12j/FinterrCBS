@@ -47,19 +47,11 @@ public class RatingMapper {
         ret.setCreatedBy(ratingEntity.getCreatedBy());
         ret.setCreatedOn(DateConverter.toIsoString(ratingEntity.getCreatedOn()));
         ret.setRating(ratingEntity.getRating());
+        ret.setRef(ratingEntity.getRef());
         ret.setComment(ratingEntity.getComment());
         return ret;
     }
 
-    public static RatingEntity map(final CauseRating rating) {
-        final RatingEntity ret = new RatingEntity();
-        ret.setActive(rating.isActive());
-        ret.setCreatedBy(UserContextHolder.checkedGetUser());
-        ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-        ret.setRating(rating.getRating());
-        ret.setComment(rating.getComment());
-        return ret;
-    }
 
     public static RatingEntity map(final CauseRating rating, final CauseEntity causeEntity) {
         final RatingEntity ret = new RatingEntity();
@@ -69,11 +61,9 @@ public class RatingMapper {
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setRating(rating.getRating());
         ret.setComment(rating.getComment());
+        ret.setRef(rating.getRef());
         return ret;
     }
-
-
-//    public static CauseComment
 
     public static List<CauseRating> map(Stream<RatingEntity> byCause) {
         return byCause.map(RatingMapper::map).collect(Collectors.toList());
