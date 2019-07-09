@@ -181,9 +181,6 @@ public class CustomerAggregate {
         if (customer.getSurname() != null) {
             customerEntity.setSurname(customer.getSurname());
         }
-        if (customer.getAccountBeneficiary() != null) {
-            customerEntity.setAccountBeneficiary(customer.getAccountBeneficiary());
-        }
         if (customer.getReferenceCustomer() != null) {
             customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
         }

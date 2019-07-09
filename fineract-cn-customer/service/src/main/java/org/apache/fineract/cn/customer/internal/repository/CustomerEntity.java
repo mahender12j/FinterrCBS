@@ -62,14 +62,8 @@ public class CustomerEntity {
     private Date dateOfBirth;
     @Column(name = "is_member", nullable = false)
     private Boolean member;
-    @Column(name = "account_beneficiary")
-    private String accountBeneficiary;
     @Column(name = "reference_customer")
     private String referenceCustomer;
-    @Column(name = "assigned_office")
-    private String assignedOffice;
-    @Column(name = "assigned_employee")
-    private String assignedEmployee;
     @Column(name = "current_state")
     private String currentState;
     @Column(name = "application_date")
@@ -192,36 +186,12 @@ public class CustomerEntity {
         this.member = member;
     }
 
-    public String getAccountBeneficiary() {
-        return this.accountBeneficiary;
-    }
-
-    public void setAccountBeneficiary(final String accountBeneficiary) {
-        this.accountBeneficiary = accountBeneficiary;
-    }
-
-    public String getAssignedOffice() {
-        return this.assignedOffice;
-    }
-
-    public void setAssignedOffice(final String assignedOffice) {
-        this.assignedOffice = assignedOffice;
-    }
-
     public String getReferenceCustomer() {
         return this.referenceCustomer;
     }
 
     public void setReferenceCustomer(final String referenceCustomer) {
         this.referenceCustomer = referenceCustomer;
-    }
-
-    public String getAssignedEmployee() {
-        return this.assignedEmployee;
-    }
-
-    public void setAssignedEmployee(final String assignedEmployee) {
-        this.assignedEmployee = assignedEmployee;
     }
 
     public String getCurrentState() {

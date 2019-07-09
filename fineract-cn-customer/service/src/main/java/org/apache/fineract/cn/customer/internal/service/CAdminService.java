@@ -71,15 +71,13 @@ public class CAdminService {
         List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findAll();
 
         CaAdminCauseData caAdminCauseData = this.causeAdaptor.fetchCauseData();
-
-//        System.out.println("object: " + caAdminCauseData.toString());
-
-//        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
-//        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
         final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).minusDays(7);
 
-//        System.out.println("Start Date Of This Week" + startDateOfThisWeek);
 
+//        todo next release we need to complete for release of the fund
+//        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
+//        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+//        System.out.println("Start Date Of This Week" + startDateOfThisWeek);
 
         cAdminPage.setActiveMember(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.Type.PERSON.name())).count());
         cAdminPage.setNoOfMember(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.PERSON.name())).count());
@@ -102,9 +100,6 @@ public class CAdminService {
         cAdminPage.setKycRejected(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.REJECTED.name())).count());
         cAdminPage.setKycApproved(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.APPROVED.name())).count());
         cAdminPage.setKycNotUploaded(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.NOTUPLOADED.name())).count());
-
-//        System.out.println("No of Cause: " + caAdminCauseData.getNoOfCause());
-//        System.out.println("No of active Cause: " + caAdminCauseData.getActiveCause());
 
         cAdminPage.setNoOfCause(caAdminCauseData.getNoOfCause());
         cAdminPage.setNoOfCauseThisWeek(caAdminCauseData.getNoOfCauseThisWeek());
