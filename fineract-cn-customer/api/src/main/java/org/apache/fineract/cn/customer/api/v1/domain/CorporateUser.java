@@ -30,28 +30,61 @@ public final class CorporateUser {
     private Long id;
     @NotBlank
     private String identifier;
-    @NotNull
     private Customer.UserType type;
+
     @NotNull
-    private Customer.RegistrationType registrationType;
+    private String companyName;
     @NotBlank
     private String givenName;
     @NotBlank
     private String surname;
     private String middleName;
-    @NotNull
-    private String companyName;
-    @NotNull
-    private String companyRepresentativeName;
-    @Valid
-    private Address address;
+
     @Valid
     private List<ContactDetail> contactDetails;
+
     @NotNull
     private String designation;
 
+    @Valid
+    private Address address;
+
+    @NotNull
+    private String ercTokenAddress;
+    private String typeOfCompany;
+    private int numberOfEmployees;
+
+    @NotNull
+    private String refferalCodeIdentifier;
+    private String refferalUserIdentifier;
+
+    private SocialMatrix socialMatrix;
+    private CustomerDocument corporateDocument;
+    @NotNull
+    private String refAccountNumber;
+    private Boolean deposited;
+    private Customer.KycStatus kycStatus;
+    @NotNull
+    private String accountNumbers;
+    private String principalBusinessActivities;
+
+
+    @NotNull
+    private Customer.RegistrationType registrationType;
+
+
     public CorporateUser() {
         super();
+    }
+
+    public CorporateUser(Long id, String identifier, Customer.UserType type, String givenName, String surname, String designation) {
+        this.id = id;
+        this.identifier = identifier;
+        this.type = type;
+        this.givenName = givenName;
+        this.surname = surname;
+        this.companyName = companyName;
+        this.designation = designation;
     }
 
     public Long getId() {
@@ -70,20 +103,16 @@ public final class CorporateUser {
         this.identifier = identifier;
     }
 
-    public Customer.UserType getType() {
-        return type;
+    public String getType() {
+        return type.name();
     }
 
-    public void setType(Customer.UserType type) {
-        this.type = type;
+    public String getRegistrationType() {
+        return registrationType.name();
     }
 
-    public Customer.RegistrationType getRegistrationType() {
-        return registrationType;
-    }
-
-    public void setRegistrationType(Customer.RegistrationType registrationType) {
-        this.registrationType = registrationType;
+    public void setRegistrationType(String registrationType) {
+        this.registrationType = Customer.RegistrationType.valueOf(registrationType);
     }
 
     public String getGivenName() {
@@ -118,14 +147,6 @@ public final class CorporateUser {
         this.companyName = companyName;
     }
 
-    public String getCompanyRepresentativeName() {
-        return companyRepresentativeName;
-    }
-
-    public void setCompanyRepresentativeName(String companyRepresentativeName) {
-        this.companyRepresentativeName = companyRepresentativeName;
-    }
-
     public Address getAddress() {
         return address;
     }
@@ -150,6 +171,102 @@ public final class CorporateUser {
         this.designation = designation;
     }
 
+    public String getErcTokenAddress() {
+        return ercTokenAddress;
+    }
+
+    public void setErcTokenAddress(String ercTokenAddress) {
+        this.ercTokenAddress = ercTokenAddress;
+    }
+
+    public String getTypeOfCompany() {
+        return typeOfCompany;
+    }
+
+    public void setTypeOfCompany(String typeOfCompany) {
+        this.typeOfCompany = typeOfCompany;
+    }
+
+    public int getNumberOfEmployees() {
+        return numberOfEmployees;
+    }
+
+    public void setNumberOfEmployees(int numberOfEmployees) {
+        this.numberOfEmployees = numberOfEmployees;
+    }
+
+    public String getRefferalCodeIdentifier() {
+        return refferalCodeIdentifier;
+    }
+
+    public void setRefferalCodeIdentifier(String refferalCodeIdentifier) {
+        this.refferalCodeIdentifier = refferalCodeIdentifier;
+    }
+
+    public String getRefferalUserIdentifier() {
+        return refferalUserIdentifier;
+    }
+
+    public void setRefferalUserIdentifier(String refferalUserIdentifier) {
+        this.refferalUserIdentifier = refferalUserIdentifier;
+    }
+
+    public SocialMatrix getSocialMatrix() {
+        return socialMatrix;
+    }
+
+    public void setSocialMatrix(SocialMatrix socialMatrix) {
+        this.socialMatrix = socialMatrix;
+    }
+
+    public CustomerDocument getCorporateDocument() {
+        return corporateDocument;
+    }
+
+    public void setCorporateDocument(CustomerDocument corporateDocument) {
+        this.corporateDocument = corporateDocument;
+    }
+
+    public Boolean getDeposited() {
+        return deposited;
+    }
+
+    public void setDeposited(Boolean deposited) {
+        this.deposited = deposited;
+    }
+
+    public String getKycStatus() {
+        return kycStatus.name();
+    }
+
+    public void setKycStatus(String kycStatus) {
+        this.kycStatus = Customer.KycStatus.valueOf(kycStatus);
+    }
+
+    public String getAccountNumbers() {
+        return accountNumbers;
+    }
+
+    public void setAccountNumbers(String accountNumbers) {
+        this.accountNumbers = accountNumbers;
+    }
+
+    public String getPrincipalBusinessActivities() {
+        return principalBusinessActivities;
+    }
+
+    public void setPrincipalBusinessActivities(String principalBusinessActivities) {
+        this.principalBusinessActivities = principalBusinessActivities;
+    }
+
+    public String getRefAccountNumber() {
+        return refAccountNumber;
+    }
+
+    public void setRefAccountNumber(String refAccountNumber) {
+        this.refAccountNumber = refAccountNumber;
+    }
+
     @Override
     public String toString() {
         return "CorporateUser{" +
@@ -161,7 +278,6 @@ public final class CorporateUser {
                 ", surname='" + surname + '\'' +
                 ", middleName='" + middleName + '\'' +
                 ", companyName='" + companyName + '\'' +
-                ", companyRepresentativeName='" + companyRepresentativeName + '\'' +
                 ", address=" + address +
                 ", contactDetails=" + contactDetails +
                 ", designation='" + designation + '\'' +

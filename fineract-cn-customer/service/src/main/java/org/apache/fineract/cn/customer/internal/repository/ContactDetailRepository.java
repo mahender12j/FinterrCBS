@@ -38,7 +38,8 @@ public interface ContactDetailRepository extends JpaRepository<ContactDetailEnti
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true  ELSE  false END FROM ContactDetailEntity c WHERE c.type = :type and c.value = :identifier and c.valid = true ")
     Boolean existsByIdentifierAndTypeAndValid(@Param("identifier") final String identifier, @Param("type") final String type);
 
-
     List<ContactDetailEntity> findAllByValueAndTypeAndValid(final String identifier, final String type, final boolean valid);
+
+    List<ContactDetailEntity> findAllByTypeAndValueAndValidIsTrue(final String type, final String value);
 
 }

@@ -16,18 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.customer;
+package org.apache.fineract.cn.customer.internal.command;
 
-public interface PermittableGroupIds {
+import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
 
-    String DOCUMENTS = "customer__v1__documents";
-    String CUSTOMER = "customer__v1__customer";
-    String PORTRAIT = "customer__v1__portrait";
-    String CADMIN = "cadmin__v1__cadmin";
-    String CORPORATE = "corporate__v1__corporate";
-    String SADMIN = "sadmin__v1__sadmin";
-    String NGO = "ngo__v1__ngo";
-    String IDENTIFICATIONS = "customer__v1__identifications";
-    String TASK = "customer__v1__task";
-    String CATALOG = "catalog__v1__catalog";
+public class CreateCorporateCommand {
+
+    private final CorporateUser corporateUser;
+
+    public CreateCorporateCommand(final CorporateUser corporateUser) {
+        super();
+        this.corporateUser = corporateUser;
+    }
+
+
+    public CorporateUser getCorporateUser() {
+        return corporateUser;
+    }
 }

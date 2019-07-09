@@ -20,6 +20,7 @@ package org.apache.fineract.cn.customer.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.BusinessCustomer;
+import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.lang.DateConverter;
@@ -144,6 +145,31 @@ public final class CustomerMapper {
         }
         customer.setRefAccountNumber(customerEntity.getRefAccountNumber());
         return customer;
+    }
+
+
+    public static CustomerEntity map(final CorporateUser customer) {
+        final CustomerEntity customerEntity = new CustomerEntity();
+        customerEntity.setIdentifier(customer.getIdentifier());
+        customerEntity.setType(Customer.UserType.CORPORATE.name());
+        customerEntity.setRegistrationType(customer.getRegistrationType());
+        customerEntity.setGivenName(customer.getGivenName());
+        customerEntity.setMiddleName(customer.getMiddleName());
+        customerEntity.setSurname(customer.getSurname());
+        customerEntity.setCurrentState(Customer.UserState.NOT_REQUIRED.name());
+        customerEntity.setCreatedBy(UserContextHolder.checkedGetUser());
+        customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
+        customerEntity.setEthAddress(customer.getErcTokenAddress());
+        customerEntity.setIsDeposited(customer.getDeposited());
+        customerEntity.setAccountNumbers(customer.getAccountNumbers());
+        customerEntity.setDesignation(customer.getDesignation());
+        customerEntity.setRefAccountNumber(customer.getAccountNumbers());
+        customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
+        customerEntity.setLastModifiedOn(LocalDateTime.now());
+        customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
+        customerEntity.setAccountNumbers(customer.getAccountNumbers());
+        return customerEntity;
     }
 
 

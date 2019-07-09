@@ -49,7 +49,8 @@ public final class Customer {
         ACTIVE,
         LOCKED,
         REJECTED,
-        CLOSED
+        CLOSED,
+        NOT_REQUIRED
     }
 
     public enum KycStatus {
