@@ -28,7 +28,7 @@ import java.util.List;
 
 public final class Customer {
 
-    public enum Type {
+    public enum UserType {
         PERSON,
         BUSINESS,
         CADMIN,
@@ -44,7 +44,7 @@ public final class Customer {
         EMAIL
     }
 
-    public enum State {
+    public enum UserState {
         PENDING,
         ACTIVE,
         LOCKED,
@@ -64,7 +64,7 @@ public final class Customer {
     @NotBlank
     private String identifier;
     @NotNull
-    private Type type;
+    private UserType userType;
     @NotNull
     private RegistrationType registrationType;
     @NotBlank
@@ -79,7 +79,7 @@ public final class Customer {
     private Address address;
     @Valid
     private List<ContactDetail> contactDetails;
-    private State currentState;
+    private UserState currentUserState;
     private String applicationDate;
     private List<Value> customValues;
     private String createdBy;
@@ -115,12 +115,12 @@ public final class Customer {
         this.identifier = identifier;
     }
 
-    public String getType() {
-        return this.type.name();
+    public String getUserType() {
+        return this.userType.name();
     }
 
-    public void setType(final String type) {
-        this.type = Type.valueOf(type);
+    public void setUserType(final String userType) {
+        this.userType = UserType.valueOf(userType);
     }
 
     public String getRegistrationType() {
@@ -187,12 +187,12 @@ public final class Customer {
         this.contactDetails = contactDetails;
     }
 
-    public String getCurrentState() {
-        return this.currentState != null ? this.currentState.name() : null;
+    public String getCurrentUserState() {
+        return this.currentUserState != null ? this.currentUserState.name() : null;
     }
 
-    public void setCurrentState(final String currentState) {
-        this.currentState = State.valueOf(currentState);
+    public void setCurrentUserState(final String currentUserState) {
+        this.currentUserState = UserState.valueOf(currentUserState);
     }
 
     public String getCreatedBy() {
@@ -355,16 +355,16 @@ public final class Customer {
         this.id = id;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setType(UserType userType) {
+        this.userType = userType;
     }
 
     public void setRegistrationType(RegistrationType registrationType) {
         this.registrationType = registrationType;
     }
 
-    public void setCurrentState(State currentState) {
-        this.currentState = currentState;
+    public void setCurrentState(UserState currentUserState) {
+        this.currentUserState = currentUserState;
     }
 
     public Boolean getDeposited() {
@@ -408,7 +408,7 @@ public final class Customer {
         return "Customer{" +
                 "id=" + id +
                 ", identifier='" + identifier + '\'' +
-                ", type=" + type +
+                ", userType=" + userType +
                 ", registrationType=" + registrationType +
                 ", givenName='" + givenName + '\'' +
                 ", surname='" + surname + '\'' +
@@ -419,7 +419,7 @@ public final class Customer {
                 ", referenceCustomer='" + referenceCustomer + '\'' +
                 ", address=" + address +
                 ", contactDetails=" + contactDetails +
-                ", currentState=" + currentState +
+                ", currentUserState=" + currentUserState +
                 ", createdBy='" + createdBy + '\'' +
                 ", createdOn='" + createdOn + '\'' +
                 ", lastModifiedBy='" + lastModifiedBy + '\'' +

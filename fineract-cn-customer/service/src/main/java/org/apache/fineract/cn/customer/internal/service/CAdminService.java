@@ -29,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
-import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,20 +77,20 @@ public class CAdminService {
 //        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
 //        System.out.println("Start Date Of This Week" + startDateOfThisWeek);
 
-        cAdminPage.setActiveMember(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.Type.PERSON.name())).count());
-        cAdminPage.setNoOfMember(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.PERSON.name())).count());
-        cAdminPage.setNoOfMemberThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.PERSON.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
-        cAdminPage.setMemberPerMonth(CadminMapper.map(customerEntities, Customer.Type.PERSON));
-        cAdminPage.setActiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.PERSON, true));
-        cAdminPage.setInactiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.PERSON, false));
+        cAdminPage.setActiveMember(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.PERSON.name())).count());
+        cAdminPage.setNoOfMember(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.PERSON.name())).count());
+        cAdminPage.setNoOfMemberThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.PERSON.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setMemberPerMonth(CadminMapper.map(customerEntities, Customer.UserType.PERSON));
+        cAdminPage.setActiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.PERSON, true));
+        cAdminPage.setInactiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.PERSON, false));
 
 
-        cAdminPage.setActiveNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.Type.BUSINESS.name())).count());
-        cAdminPage.setNoOfNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.BUSINESS.name())).count());
-        cAdminPage.setNoOfNGOThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.BUSINESS.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
-        cAdminPage.setNgoPerMonth(CadminMapper.map(customerEntities, Customer.Type.BUSINESS));
-        cAdminPage.setActiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.BUSINESS, true));
-        cAdminPage.setInactiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.BUSINESS, false));
+        cAdminPage.setActiveNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.BUSINESS.name())).count());
+        cAdminPage.setNoOfNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.BUSINESS.name())).count());
+        cAdminPage.setNoOfNGOThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.BUSINESS.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setNgoPerMonth(CadminMapper.map(customerEntities, Customer.UserType.BUSINESS));
+        cAdminPage.setActiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, true));
+        cAdminPage.setInactiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, false));
 
         List<CustomerDocument> customerDocuments = customerEntities.stream().map(customerEntity -> this.findCustomerDocuments(customerEntity, documentTypeEntities, documentSubTypeEntities)).collect(Collectors.toList());
 

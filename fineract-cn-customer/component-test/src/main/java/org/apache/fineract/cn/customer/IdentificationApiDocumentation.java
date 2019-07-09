@@ -196,7 +196,7 @@ public class IdentificationApiDocumentation extends AbstractCustomerTest {
             .andExpect(status().isAccepted())
             .andDo(document("document-create-id-card", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                     requestFields(
-                            fieldWithPath("type").description("Type of identity card"),
+                            fieldWithPath("type").description("UserType of identity card"),
                             fieldWithPath("number").description("Identity card number"),
                             fieldWithPath("expirationDate").type("ExpirationDate").description("expiry date of card +\n" +
                                     " +\n" +
@@ -237,7 +237,7 @@ public class IdentificationApiDocumentation extends AbstractCustomerTest {
             .andExpect(status().isAccepted())
             .andDo(document("document-update-id-card", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                     requestFields(
-                            fieldWithPath("type").description("Type of Identity card"),
+                            fieldWithPath("type").description("UserType of Identity card"),
                             fieldWithPath("number").description("Identity card number"),
                             fieldWithPath("expirationDate").type("ExpirationDate").description("expiry date of card +\n" +
                                     " +\n" +

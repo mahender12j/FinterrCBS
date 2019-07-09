@@ -140,7 +140,7 @@ public class CustomerAggregate {
         final Customer customer = createCustomerCommand.customer();
         final AddressEntity savedAddress = this.addressRepository.save(AddressMapper.map(customer.getAddress()));
         final CustomerEntity customerEntity = CustomerMapper.map(customer);
-        customerEntity.setCurrentState(Customer.State.PENDING.name());
+        customerEntity.setCurrentState(Customer.UserState.PENDING.name());
         customerEntity.setAddress(savedAddress);
         final CustomerEntity savedCustomerEntity = this.customerRepository.save(customerEntity);
         if (customer.getContactDetails() != null) {
@@ -265,7 +265,7 @@ public class CustomerAggregate {
             throw ServiceException.conflict("Open Tasks for customer {0} exists.", activateCustomerCommand.identifier());
         }
 
-        customerEntity.setCurrentState(Customer.State.ACTIVE.name());
+        customerEntity.setCurrentState(Customer.UserState.ACTIVE.name());
         if (customerEntity.getApplicationDate() == null) {
             customerEntity.setApplicationDate(LocalDate.now(Clock.systemUTC()));
         }
@@ -287,7 +287,7 @@ public class CustomerAggregate {
     public String lockCustomer(final LockCustomerCommand lockCustomerCommand) {
         final CustomerEntity customerEntity = findCustomerEntityOrThrow(lockCustomerCommand.identifier());
 
-        customerEntity.setCurrentState(Customer.State.LOCKED.name());
+        customerEntity.setCurrentState(Customer.UserState.LOCKED.name());
         customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
 
@@ -312,7 +312,7 @@ public class CustomerAggregate {
             throw ServiceException.conflict("Open Tasks for customer {0} exists.", unlockCustomerCommand.identifier());
         }
 
-        customerEntity.setCurrentState(Customer.State.ACTIVE.name());
+        customerEntity.setCurrentState(Customer.UserState.ACTIVE.name());
         customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
 
@@ -331,7 +331,7 @@ public class CustomerAggregate {
     public String closeCustomer(final CloseCustomerCommand closeCustomerCommand) {
         final CustomerEntity customerEntity = findCustomerEntityOrThrow(closeCustomerCommand.identifier());
 
-        customerEntity.setCurrentState(Customer.State.CLOSED.name());
+        customerEntity.setCurrentState(Customer.UserState.CLOSED.name());
         customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
 
@@ -356,7 +356,7 @@ public class CustomerAggregate {
             throw ServiceException.conflict("Open Tasks for customer {0} exists.", reopenCustomerCommand.identifier());
         }
 
-        customerEntity.setCurrentState(Customer.State.ACTIVE.name());
+        customerEntity.setCurrentState(Customer.UserState.ACTIVE.name());
         customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
 

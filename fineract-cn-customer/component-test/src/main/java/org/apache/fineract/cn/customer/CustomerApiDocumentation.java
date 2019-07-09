@@ -111,14 +111,14 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(contactDetailTwo);
 
         customer.setIdentifier("idOne");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Kima");
         customer.setMiddleName("Bessem");
         customer.setSurname("Ray");
         customer.setDateOfBirth(dateOfBirth);
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("mate");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 200).toString());
         customer.setLastModifiedBy("Nakuve");
@@ -174,7 +174,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
                                         "   } group, +\n" +
                                         "   *String* value +\n" +
                                         " } +"),
-                                fieldWithPath("currentState").type("State").description("The customer's current state +\n" +
+                                fieldWithPath("currentState").type("UserState").description("The customer's current state +\n" +
                                         " +\n" +
                                         "*enum* _State_ { +\n" +
                                         "     PENDING, +\n" +
@@ -218,7 +218,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(contactDetailOne);
 
         customer.setIdentifier("eniruth");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Eni");
         customer.setMiddleName("Ruth");
         customer.setSurname("Tah");
@@ -226,7 +226,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("friend");
         customer.setApplicationDate(LocalDate.ofYearDay(2018, 4).toString());
         customer.setLastModifiedBy("Asah Aaron");
@@ -287,7 +287,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
                                         "   } group, +\n" +
                                         "   *String* value +\n" +
                                         " } +"),
-                                fieldWithPath("currentState").type("State").description("The customer's current state +\n" +
+                                fieldWithPath("currentState").type("UserState").description("The customer's current state +\n" +
                                         " +\n" +
                                         "*enum* _State_ { +\n" +
                                         "     PENDING, +\n" +
@@ -335,7 +335,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetailsOne.add(contactDetailOne);
 
         customerOne.setIdentifier("meni");
-        customerOne.setType(Customer.Type.PERSON.name());
+        customerOne.setUserType(Customer.UserType.PERSON.name());
         customerOne.setGivenName("Meni");
         customerOne.setMiddleName("Richmond");
         customerOne.setSurname("Akom");
@@ -343,7 +343,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
        
         customerOne.setAddress(addressOne);
         customerOne.setContactDetails(contactDetailsOne);
-        customerOne.setCurrentState(Customer.State.PENDING.name());
+        customerOne.setCurrentUserState(Customer.UserState.PENDING.name());
         customerOne.setReferenceCustomer("friend");
         customerOne.setApplicationDate(LocalDate.ofYearDay(2018, 49).toString());
 
@@ -379,14 +379,14 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetailsTwo.add(contactDetailThree);
 
         customerTwo.setIdentifier("bencho");
-        customerTwo.setType(Customer.Type.PERSON.name());
+        customerTwo.setUserType(Customer.UserType.PERSON.name());
         customerTwo.setGivenName("Bencho");
         customerTwo.setMiddleName("Etah");
         customerTwo.setSurname("Obi");
         customerTwo.setDateOfBirth(dateOfBirthTwo);
         customerTwo.setAddress(addressTwo);
         customerTwo.setContactDetails(contactDetailsTwo);
-        customerTwo.setCurrentState(Customer.State.PENDING.name());
+        customerTwo.setCurrentUserState(Customer.UserState.PENDING.name());
         customerTwo.setReferenceCustomer("mate");
         customerTwo.setApplicationDate(LocalDate.ofYearDay(2017, 100).toString());
         customerTwo.setLastModifiedBy("Nalowa");
@@ -416,7 +416,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
                                 fieldWithPath("totalPages").type("Integer").description("Number of pages"),
                                 fieldWithPath("totalElements").type("Long").description("Number of customers in page"),
                                 fieldWithPath("customers[].identifier").type("String").description("First customer's identifier"),
-                                fieldWithPath("customers[].type").type("Type").description("The type of first customer +\n" +
+                                fieldWithPath("customers[].type").type("UserType").description("The type of first customer +\n" +
                                         " +\n" +
                                         "*enum* _Type_ { +\n" +
                                         "    PERSON, +\n" +
@@ -458,7 +458,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
                                         "   } group, +\n" +
                                         "   *String* value +\n" +
                                         " } +"),
-                                fieldWithPath("customers[].currentState").type("State").description("first customer's current state +\n" +
+                                fieldWithPath("customers[].currentState").type("UserState").description("first customer's current state +\n" +
                                         " +\n" +
                                         "*enum* _State_ { +\n" +
                                         "     PENDING, +\n" +
@@ -475,7 +475,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
                                 fieldWithPath("customers[].lastModifiedBy").type("String").description("Employee who last modified first customer's account"),
                                 fieldWithPath("customers[].lastModifiedOn").type("String").description("Date and time first customer's account was last modified"),
                                 fieldWithPath("customers[1].identifier").description("Second customer's identifier"),
-                                fieldWithPath("customers[1].type").type("Type").description("The type of the second customer +\n" +
+                                fieldWithPath("customers[1].type").type("UserType").description("The type of the second customer +\n" +
                                         " +\n" +
                                         "*enum* _Type_ { +\n" +
                                         "    PERSON, +\n" +
@@ -517,7 +517,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
                                         "   } group, +\n" +
                                         "   *String* value +\n" +
                                         " } +"),
-                                fieldWithPath("customers[1].currentState").type("State").description("The second customer's current state +\n" +
+                                fieldWithPath("customers[1].currentState").type("UserState").description("The second customer's current state +\n" +
                                         " +\n" +
                                         "*enum* _State_ { +\n" +
                                         "     PENDING, +\n" +
@@ -563,14 +563,14 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(contactDetailOne);
 
         originalCustomer.setIdentifier("tifuh");
-        originalCustomer.setType(Customer.Type.PERSON.name());
+        originalCustomer.setUserType(Customer.UserType.PERSON.name());
         originalCustomer.setGivenName("Tifuh");
         originalCustomer.setMiddleName("Ndah");
         originalCustomer.setSurname("Tah");
         originalCustomer.setDateOfBirth(dateOfBirth);
         originalCustomer.setAddress(address);
         originalCustomer.setContactDetails(contactDetails);
-        originalCustomer.setCurrentState(Customer.State.PENDING.name());
+        originalCustomer.setCurrentUserState(Customer.UserState.PENDING.name());
         originalCustomer.setReferenceCustomer("sister");
         originalCustomer.setApplicationDate(LocalDate.ofYearDay(2017, 249).toString());
         originalCustomer.setLastModifiedBy("Nah Toh");
@@ -637,7 +637,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
                                         "   } group, +\n" +
                                         "   *String* value +\n" +
                                         " } +"),
-                                fieldWithPath("currentState").type("State").description("The customer's current state +\n" +
+                                fieldWithPath("currentState").type("UserState").description("The customer's current state +\n" +
                                         " +\n" +
                                         "*enum* _State_ { +\n" +
                                         "     PENDING, +\n" +
@@ -683,7 +683,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(contactDetailOne);
 
         customer.setIdentifier("bihade");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Bih");
         customer.setMiddleName("Ade");
         customer.setSurname("Njang");
@@ -691,7 +691,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("Sister");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 269).toString());
         customer.setLastModifiedBy("Cho Sa'ah");
@@ -758,7 +758,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(nextellContact);
 
         customer.setIdentifier("bahtende");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Bah");
         customer.setMiddleName("Tende");
         customer.setSurname("Njuh");
@@ -766,7 +766,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("bihade");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 14).toString());
         customer.setLastModifiedBy("Cho Sa'ah");
@@ -837,7 +837,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(nextellContact);
 
         customer.setIdentifier("pobum");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Pobum");
         customer.setMiddleName("Rebe");
         customer.setSurname("Dob");
@@ -845,7 +845,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("bahtende");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 90).toString());
         customer.setLastModifiedBy("Awa Sum");
@@ -920,7 +920,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(nextellContact);
 
         customer.setIdentifier("epolle");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Epolle");
         customer.setMiddleName("E.");
         customer.setSurname("Makoge");
@@ -928,7 +928,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("pobum");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 32).toString());
         customer.setLastModifiedBy("Epie N.");
@@ -995,7 +995,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(nextellContact);
 
         customer.setIdentifier("eyolle");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Eyolle");
         customer.setMiddleName("E.");
         customer.setSurname("Mola");
@@ -1003,7 +1003,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("epolle");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 3).toString());
         customer.setLastModifiedBy("Epie N.");
@@ -1074,7 +1074,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(nextellContact);
 
         customer.setIdentifier("kumba");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Kumba");
         customer.setMiddleName("Ebere");
         customer.setSurname("Besong");
@@ -1082,7 +1082,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("eyolle");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 23).toString());
         customer.setLastModifiedBy("Epie Ngome");
@@ -1145,14 +1145,14 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(nextellContact);
 
         originalCustomer.setIdentifier("likumba");
-        originalCustomer.setType(Customer.Type.PERSON.name());
+        originalCustomer.setUserType(Customer.UserType.PERSON.name());
         originalCustomer.setGivenName("Ikome");
         originalCustomer.setMiddleName("Esong");
         originalCustomer.setSurname("Ikome");
         originalCustomer.setDateOfBirth(dateOfBirth);
         originalCustomer.setAddress(address);
         originalCustomer.setContactDetails(contactDetails);
-        originalCustomer.setCurrentState(Customer.State.PENDING.name());
+        originalCustomer.setCurrentUserState(Customer.UserState.PENDING.name());
         originalCustomer.setReferenceCustomer("likumba");
         originalCustomer.setApplicationDate(LocalDate.ofYearDay(2017, 239).toString());
         originalCustomer.setLastModifiedBy("Malafa Ikome");
@@ -1221,7 +1221,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(orangeContact);
 
         customer.setIdentifier("kome");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Kome");
         customer.setMiddleName("Ngome");
         customer.setSurname("B.");
@@ -1229,7 +1229,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("likumba");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 230).toString());
         customer.setLastModifiedBy("Malafa E.");
@@ -1260,7 +1260,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
                 .andExpect(status().isAccepted())
                 .andDo(document("document-update-customer-details", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("[].type").type("Type").description("The type of the first contact +\n" +
+                                fieldWithPath("[].type").type("UserType").description("The type of the first contact +\n" +
                                         " +\n" +
                                         "*enum* _Type_ { +\n" +
                                         "    PERSON, +\n" +
@@ -1275,7 +1275,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
                                 fieldWithPath("[].value").description("first contact's value"),
                                 fieldWithPath("[].preferenceLevel").description("Preference Level"),
                                 fieldWithPath("[].validated").description("Is first contact validated ?"),
-                                fieldWithPath("[1].type").type("Type").description("The type of the second contact +\n" +
+                                fieldWithPath("[1].type").type("UserType").description("The type of the second contact +\n" +
                                         " +\n" +
                                         "*enum* _Type_ { +\n" +
                                         "    PERSON, +\n" +
@@ -1320,7 +1320,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(orangeContact);
 
         customer.setIdentifier("ojong");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Ojong");
         customer.setMiddleName("Arrey");
         customer.setSurname("Bessong");
@@ -1328,7 +1328,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("kumba");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 301).toString());
         customer.setLastModifiedBy("Egbe E.");
@@ -1373,7 +1373,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(orangeContact);
 
         customer.setIdentifier("osong");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Osong");
         customer.setMiddleName("Arrey");
         customer.setSurname("Besong");
@@ -1381,7 +1381,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("mianda");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 290).toString());
         customer.setLastModifiedBy("Ashu Arrey");
@@ -1440,7 +1440,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetails.add(orangeContact);
 
         customer.setIdentifier("shey");
-        customer.setType(Customer.Type.PERSON.name());
+        customer.setUserType(Customer.UserType.PERSON.name());
         customer.setGivenName("Shey");
         customer.setMiddleName("Sembe");
         customer.setSurname("Waba.");
@@ -1448,7 +1448,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
 
         customer.setAddress(address);
         customer.setContactDetails(contactDetails);
-        customer.setCurrentState(Customer.State.PENDING.name());
+        customer.setCurrentUserState(Customer.UserState.PENDING.name());
         customer.setReferenceCustomer("wirba");
         customer.setApplicationDate(LocalDate.ofYearDay(2017, 98).toString());
         customer.setLastModifiedBy("Waba Mala");

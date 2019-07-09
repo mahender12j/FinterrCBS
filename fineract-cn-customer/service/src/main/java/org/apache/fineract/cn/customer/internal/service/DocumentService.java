@@ -91,7 +91,7 @@ public class DocumentService {
 
 
     public List<Customer> findCustomersByKYCStatus(final String status) {
-        List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.Type.PERSON.name(), Customer.Type.BUSINESS.name())));
+        List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.UserType.PERSON.name(), Customer.UserType.BUSINESS.name())));
         return customerEntities.stream().map(entity -> {
             Customer customer = CustomerMapper.map(entity);
             final List<ContactDetailEntity> contactDetailEntities = contactDetailRepository.findByCustomer(entity);
@@ -193,7 +193,7 @@ public class DocumentService {
 
 
     public String getDocumentTypeTitle(final String uuid) {
-        return this.documentTypeRepository.findByUuid(uuid).orElseThrow(() -> ServiceException.notFound("Document Type Not Found")).getTitle();
+        return this.documentTypeRepository.findByUuid(uuid).orElseThrow(() -> ServiceException.notFound("Document UserType Not Found")).getTitle();
     }
 //
 //    private String getDocumentSubTypeTitle(final String uuid) {

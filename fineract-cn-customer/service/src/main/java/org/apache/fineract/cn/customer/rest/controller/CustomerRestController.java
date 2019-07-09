@@ -312,32 +312,32 @@ public class CustomerRestController {
         final Customer customer = this.customerService.findCustomer(identifier);
 
         final Command.Action action = Command.Action.valueOf(command.getAction());
-        final String currentState = customer.getCurrentState();
+        final String currentState = customer.getCurrentUserState();
         switch (action) {
             case ACTIVATE:
-                if (Customer.State.PENDING.name().equals(currentState)) {
+                if (Customer.UserState.PENDING.name().equals(currentState)) {
                     this.commandGateway.process(new ActivateCustomerCommand(identifier, command.getComment()));
                 }
                 break;
             case LOCK:
-                if (Customer.State.ACTIVE.name().equals(currentState)) {
+                if (Customer.UserState.ACTIVE.name().equals(currentState)) {
                     this.commandGateway.process(new LockCustomerCommand(identifier, command.getComment()));
                 }
                 break;
             case UNLOCK:
-                if (Customer.State.LOCKED.name().equals(currentState)) {
+                if (Customer.UserState.LOCKED.name().equals(currentState)) {
                     this.commandGateway.process(new UnlockCustomerCommand(identifier, command.getComment()));
                 }
                 break;
             case CLOSE:
-                if (Customer.State.ACTIVE.name().equals(currentState)
-                        || Customer.State.LOCKED.name().equals(currentState)
-                        || Customer.State.PENDING.name().equals(currentState)) {
+                if (Customer.UserState.ACTIVE.name().equals(currentState)
+                        || Customer.UserState.LOCKED.name().equals(currentState)
+                        || Customer.UserState.PENDING.name().equals(currentState)) {
                     this.commandGateway.process(new CloseCustomerCommand(identifier, command.getComment()));
                 }
                 break;
             case REOPEN:
-                if (Customer.State.CLOSED.name().equals(currentState)) {
+                if (Customer.UserState.CLOSED.name().equals(currentState)) {
                     this.commandGateway.process(new ReopenCustomerCommand(identifier, command.getComment()));
                 }
                 break;

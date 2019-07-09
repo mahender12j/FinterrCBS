@@ -333,9 +333,9 @@ public class CustomerService {
             if (term != null) {
                 customerEntities =
                         this.customerRepository.findByCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
-                                Customer.State.CLOSED.name(), term, term, term, pageable);
+                                Customer.UserState.CLOSED.name(), term, term, term, pageable);
             } else {
-                customerEntities = this.customerRepository.findByCurrentStateNot(Customer.State.CLOSED.name(), pageable);
+                customerEntities = this.customerRepository.findByCurrentStateNot(Customer.UserState.CLOSED.name(), pageable);
             }
         }
 
@@ -357,9 +357,9 @@ public class CustomerService {
         CustomerEntity customerEntity = customerRepository.findByRefferalCodeIdentifier(refferalcode).orElseThrow(() -> ServiceException.notFound("Customer with refferal code {0} not found", refferalcode));
 
         if (searchKey != null) {
-            customerEntities = this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, Customer.State.CLOSED.name(), searchKey, searchKey, searchKey, pageable);
+            customerEntities = this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, Customer.UserState.CLOSED.name(), searchKey, searchKey, searchKey, pageable);
         } else {
-            customerEntities = this.customerRepository.findByReferenceCustomerAndIsDepositedAndCurrentStateNot(refferalcode, true, Customer.State.CLOSED.name(), pageable);
+            customerEntities = this.customerRepository.findByReferenceCustomerAndIsDepositedAndCurrentStateNot(refferalcode, true, Customer.UserState.CLOSED.name(), pageable);
         }
 
 
@@ -516,8 +516,8 @@ public class CustomerService {
                 .map(customerEntity -> {
                     final List<ProcessStep> processSteps = new ArrayList<>();
 
-                    final Customer.State state = Customer.State.valueOf(customerEntity.getCurrentState());
-                    switch (state) {
+                    final Customer.UserState userState = Customer.UserState.valueOf(customerEntity.getCurrentState());
+                    switch (userState) {
                         case PENDING:
                             processSteps.add(this.buildProcessStep(customerEntity, Command.Action.ACTIVATE));
                             processSteps.add(this.buildProcessStep(customerEntity, Command.Action.CLOSE));
