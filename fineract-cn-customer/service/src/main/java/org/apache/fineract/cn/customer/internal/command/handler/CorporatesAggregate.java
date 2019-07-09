@@ -24,17 +24,18 @@ import org.apache.fineract.cn.command.annotation.EventEmitter;
 import org.apache.fineract.cn.customer.api.v1.CustomerEventConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
-import org.apache.fineract.cn.customer.catalog.internal.repository.CatalogRepository;
-import org.apache.fineract.cn.customer.catalog.internal.repository.FieldRepository;
-import org.apache.fineract.cn.customer.catalog.internal.repository.FieldValueRepository;
+import org.apache.fineract.cn.customer.catalog.internal.repository.*;
 import org.apache.fineract.cn.customer.internal.command.CreateCorporateCommand;
 import org.apache.fineract.cn.customer.internal.mapper.AddressMapper;
 import org.apache.fineract.cn.customer.internal.mapper.ContactDetailMapper;
 import org.apache.fineract.cn.customer.internal.mapper.CustomerMapper;
+import org.apache.fineract.cn.customer.internal.mapper.FieldValueMapper;
 import org.apache.fineract.cn.customer.internal.repository.*;
+import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
@@ -44,6 +45,9 @@ public class CorporatesAggregate {
     private final CustomerRepository customerRepository;
     private final ContactDetailRepository contactDetailRepository;
     private final CommandRepository commandRepository;
+    private final FieldValueRepository fieldValueRepository;
+    private final CatalogRepository catalogRepository;
+    private final FieldRepository fieldRepository;
 
     @Autowired
     public CorporatesAggregate(final AddressRepository addressRepository,
@@ -57,12 +61,16 @@ public class CorporatesAggregate {
                                final FieldRepository fieldRepository,
                                final CommandRepository commandRepository,
                                final AmlDetailRepository amlDetailRepository,
-                               final TaskAggregate taskAggregate) {
+                               final TaskAggregate taskAggregate,
+                               final FieldRepository fieldRepository1) {
         super();
         this.addressRepository = addressRepository;
         this.customerRepository = customerRepository;
         this.contactDetailRepository = contactDetailRepository;
         this.commandRepository = commandRepository;
+        this.fieldValueRepository = fieldValueRepository;
+        this.catalogRepository = catalogRepository;
+        this.fieldRepository = fieldRepository1;
     }
 
     @Transactional
@@ -90,6 +98,11 @@ public class CorporatesAggregate {
             );
         }
 
+
+        if (corporateUser.getCustomValues() != null) {
+            this.setCustomValues(corporateUser, savedCustomerEntity);
+        }
+
         return new CorporateUser(customerEntity.getId(),
                 customerEntity.getIdentifier(),
                 customerEntity.getType(),
@@ -98,5 +111,20 @@ public class CorporatesAggregate {
                 customerEntity.getDesignation());
     }
 
+
+    private void setCustomValues(final CorporateUser corporateUser, final CustomerEntity savedCustomerEntity) {
+        this.fieldValueRepository.save(
+                corporateUser.getCustomValues()
+                        .stream()
+                        .map(value -> {
+                            final Optional<CatalogEntity> catalog = this.catalogRepository.findByIdentifier(value.getCatalogIdentifier());
+                            final Optional<FieldEntity> field = this.fieldRepository.findByCatalogAndIdentifier(catalog.orElseThrow(() -> ServiceException.notFound("Catalog {0} not found.", value.getCatalogIdentifier())), value.getFieldIdentifier());
+                            final FieldValueEntity fieldValueEntity = FieldValueMapper.map(value);
+                            fieldValueEntity.setCustomer(savedCustomerEntity);
+                            fieldValueEntity.setField(field.orElseThrow(() -> ServiceException.notFound("Field {0} not found.", value.getFieldIdentifier())));
+                            return fieldValueEntity;
+                        }).collect(Collectors.toList())
+        );
+    }
 
 }

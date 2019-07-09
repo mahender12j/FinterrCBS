@@ -26,6 +26,7 @@ import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
 import org.apache.fineract.cn.customer.api.v1.domain.ContactDetail;
 import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
+import org.apache.fineract.cn.customer.catalog.internal.service.FieldValueValidator;
 import org.apache.fineract.cn.customer.internal.command.CreateCorporateCommand;
 import org.apache.fineract.cn.customer.internal.service.CorporateService;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
@@ -46,15 +47,18 @@ public class CorporateRestController {
     private final CustomerService customerService;
     private final CorporateService corporateService;
     private final CommandGateway commandGateway;
+    private final FieldValueValidator fieldValueValidator;
 
     @Autowired
     public CorporateRestController(final CustomerService customerService,
                                    final CorporateService corporateService,
-                                   final CommandGateway commandGateway) {
+                                   final CommandGateway commandGateway,
+                                   final FieldValueValidator fieldValueValidator) {
         super();
         this.customerService = customerService;
         this.corporateService = corporateService;
         this.commandGateway = commandGateway;
+        this.fieldValueValidator = fieldValueValidator;
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CORPORATE)
@@ -69,6 +73,11 @@ public class CorporateRestController {
     ResponseEntity<CorporateUser> createCustomer(@RequestBody @Valid final CorporateUser corporateUser) {
         throwIfUserAlreadyExist(corporateUser.getIdentifier());
         throwIfUserContactDetailsIsAlreadyVerified(corporateUser.getContactDetails());
+
+        if (corporateUser.getCustomValues() != null) {
+            this.fieldValueValidator.validateValues(corporateUser.getCustomValues());
+        }
+
         try {
             CommandCallback<CorporateUser> res = this.commandGateway.process(new CreateCorporateCommand(corporateUser), CorporateUser.class);
             return ResponseEntity.ok(res.get());

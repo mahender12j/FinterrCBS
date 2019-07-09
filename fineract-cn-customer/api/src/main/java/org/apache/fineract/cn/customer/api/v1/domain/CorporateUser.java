@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
+import org.apache.fineract.cn.customer.catalog.api.v1.domain.Value;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.Valid;
@@ -51,7 +52,6 @@ public final class CorporateUser {
 
     @NotNull
     private String ercTokenAddress;
-    private String typeOfCompany;
     private int numberOfEmployees;
 
     @NotNull
@@ -66,7 +66,8 @@ public final class CorporateUser {
 
     @NotNull
     private String accountNumbers;
-    private String principalBusinessActivities;
+    @Valid
+    private List<Value> customValues;
 
 
     private Customer.KycStatus kycStatus;
@@ -179,14 +180,6 @@ public final class CorporateUser {
         this.ercTokenAddress = ercTokenAddress;
     }
 
-    public String getTypeOfCompany() {
-        return typeOfCompany;
-    }
-
-    public void setTypeOfCompany(String typeOfCompany) {
-        this.typeOfCompany = typeOfCompany;
-    }
-
     public int getNumberOfEmployees() {
         return numberOfEmployees;
     }
@@ -251,20 +244,20 @@ public final class CorporateUser {
         this.accountNumbers = accountNumbers;
     }
 
-    public String getPrincipalBusinessActivities() {
-        return principalBusinessActivities;
-    }
-
-    public void setPrincipalBusinessActivities(String principalBusinessActivities) {
-        this.principalBusinessActivities = principalBusinessActivities;
-    }
-
     public String getRefAccountNumber() {
         return refAccountNumber;
     }
 
     public void setRefAccountNumber(String refAccountNumber) {
         this.refAccountNumber = refAccountNumber;
+    }
+
+    public List<Value> getCustomValues() {
+        return customValues;
+    }
+
+    public void setCustomValues(List<Value> customValues) {
+        this.customValues = customValues;
     }
 
     @Override
