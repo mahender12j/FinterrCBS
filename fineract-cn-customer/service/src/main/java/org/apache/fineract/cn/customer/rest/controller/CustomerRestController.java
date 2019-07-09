@@ -161,8 +161,7 @@ public class CustomerRestController {
                                                 @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                                 @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
         return ResponseEntity.ok(this.customerService.fetchCustomer(
-                term, (includeClosed != null ? includeClosed : Boolean.FALSE),
-                this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+                term, (includeClosed != null ? includeClosed : Boolean.FALSE), this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
     //    get via kyc status

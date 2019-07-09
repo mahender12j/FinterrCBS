@@ -21,6 +21,10 @@ package org.apache.fineract.cn.customer.internal.service;
 import org.apache.fineract.cn.accounting.api.v1.domain.Account;
 import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
+import org.apache.fineract.cn.customer.catalog.api.v1.domain.Value;
+import org.apache.fineract.cn.customer.catalog.internal.repository.FieldEntity;
+import org.apache.fineract.cn.customer.catalog.internal.repository.FieldValueEntity;
+import org.apache.fineract.cn.customer.catalog.internal.repository.FieldValueRepository;
 import org.apache.fineract.cn.customer.internal.mapper.*;
 import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.customer.internal.service.helperService.AccountingAdaptor;
@@ -59,6 +63,7 @@ public class CustomerService {
     private final DocumentTypeRepository documentTypeRepository;
     private final DocumentSubTypeRepository documentSubTypeRepository;
     private final NgoProfileRepository ngoProfileRepository;
+    private final FieldValueRepository fieldValueRepository;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -72,7 +77,8 @@ public class CustomerService {
                            final TaskInstanceRepository taskInstanceRepository,
                            final DocumentTypeRepository documentTypeRepository,
                            final DocumentSubTypeRepository documentSubTypeRepository,
-                           final NgoProfileRepository ngoProfileRepository) {
+                           final NgoProfileRepository ngoProfileRepository,
+                           final FieldValueRepository fieldValueRepository) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -86,6 +92,7 @@ public class CustomerService {
         this.documentTypeRepository = documentTypeRepository;
         this.documentSubTypeRepository = documentSubTypeRepository;
         this.ngoProfileRepository = ngoProfileRepository;
+        this.fieldValueRepository = fieldValueRepository;
     }
 
     public HashMap<String, String> aerequest(AERequest aeRequest) throws IOException, NoSuchAlgorithmException, KeyManagementException {
@@ -308,6 +315,22 @@ public class CustomerService {
         if (customer.getRefAccountNumber() != null) {
             Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
             customer.setRefferalBalance(account.getBalance());
+        }
+
+        final List<FieldValueEntity> fieldValueEntities = this.fieldValueRepository.findByCustomer(customerEntity);
+        if (fieldValueEntities != null) {
+            customer.setCustomValues(
+                    fieldValueEntities
+                            .stream()
+                            .map(fieldValueEntity -> {
+                                final Value value = new Value();
+                                value.setValue(fieldValueEntity.getValue());
+                                final FieldEntity fieldEntity = fieldValueEntity.getField();
+                                value.setCatalogIdentifier(fieldEntity.getCatalog().getIdentifier());
+                                value.setFieldIdentifier(fieldEntity.getIdentifier());
+                                return value;
+                            }).collect(Collectors.toList())
+            );
         }
 
         return customer;
