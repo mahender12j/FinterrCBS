@@ -47,7 +47,6 @@ public final class CustomerMapper {
         if (customer.getDateOfBirth() != null) {
             customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
         }
-        customerEntity.setMember(customer.getMember());
         customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
         customerEntity.setCurrentState(customer.getCurrentState());
         if (customer.getApplicationDate() != null) {
@@ -67,9 +66,6 @@ public final class CustomerMapper {
             customerEntity.setIsDeposited(customer.getDeposited());
         } else {
             customerEntity.setIsDeposited(Boolean.FALSE);
-        }
-        if (customer.getDepositedOn() != null) {
-            customerEntity.setDepositedOn(LocalDateTime.parse(customer.getDepositedOn()));
         }
         if (customer.getKycStatus() != null) {
             customerEntity.setKycStatus(customer.getKycStatus());
@@ -106,7 +102,6 @@ public final class CustomerMapper {
         if (customerEntity.getDateOfBirth() != null) {
             customer.setDateOfBirth(DateOfBirth.fromLocalDate(customerEntity.getDateOfBirth().toLocalDate()));
         }
-        customer.setMember(customerEntity.getMember());
         customer.setReferenceCustomer(customerEntity.getReferenceCustomer());
         customer.setCurrentState(customerEntity.getCurrentState());
         if (customerEntity.getApplicationDate() != null) {
@@ -129,10 +124,6 @@ public final class CustomerMapper {
         } else {
             customer.setDeposited(false);
         }
-        if (customerEntity.getDepositedOn() != null) {
-            customer.setDepositedOn(DateConverter.toIsoString(customerEntity.getDepositedOn()));
-        }
-
         if (customerEntity.getKycStatus() != null) {
             customer.setKycStatus(customerEntity.getKycStatus());
         } else {

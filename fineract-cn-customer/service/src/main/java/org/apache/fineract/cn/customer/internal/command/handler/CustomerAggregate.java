@@ -224,10 +224,6 @@ public class CustomerAggregate {
             customerEntity.setIsDeposited(customer.getDeposited());
         }
 
-        if (customer.getDepositedOn() != null) {
-            customerEntity.setDepositedOn(LocalDateTime.parse(customer.getDepositedOn()));
-        }
-
         if (customer.getKycStatus() != null) {
             customerEntity.setKycStatus(customer.getKycStatus());
         }

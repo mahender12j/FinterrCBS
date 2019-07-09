@@ -104,7 +104,6 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertNotNull(foundCustomer.getAddress());
     Assert.assertNotNull(foundCustomer.getContactDetails());
     Assert.assertEquals(2, foundCustomer.getContactDetails().size());
-    Assert.assertEquals(customer.getMember(), foundCustomer.getMember());
 
   }
 

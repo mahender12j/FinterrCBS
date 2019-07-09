@@ -60,8 +60,6 @@ public class CustomerEntity {
     private String gender;
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
-    @Column(name = "is_member", nullable = false)
-    private Boolean member;
     @Column(name = "reference_customer")
     private String referenceCustomer;
     @Column(name = "current_state")
@@ -88,9 +86,6 @@ public class CustomerEntity {
     private String ethAddress;
     @Column(name = "is_deposited")
     private Boolean isDeposited;
-    @Column(name = "deposited_on")
-    @Convert(converter = LocalDateTimeConverter.class)
-    private LocalDateTime depositedOn;
     @Column(name = "kyc_status")
     private String kycStatus;
     @Column(name = "account_numbers")
@@ -176,14 +171,6 @@ public class CustomerEntity {
 
     public void setDateOfBirth(final Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
-    }
-
-    public Boolean getMember() {
-        return this.member;
-    }
-
-    public void setMember(final Boolean member) {
-        this.member = member;
     }
 
     public String getReferenceCustomer() {
@@ -272,14 +259,6 @@ public class CustomerEntity {
 
     public void setIsDeposited(final Boolean isDeposited) {
         this.isDeposited = isDeposited;
-    }
-
-    public LocalDateTime getDepositedOn() {
-        return this.depositedOn;
-    }
-
-    public void setDepositedOn(final LocalDateTime depositedOn) {
-        this.depositedOn = depositedOn;
     }
 
     public String getKycStatus() {

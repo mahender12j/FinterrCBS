@@ -39,9 +39,6 @@ public final class CustomerGenerator {
     customer.setMiddleName(RandomStringUtils.randomAlphanumeric(256));
     customer.setSurname(RandomStringUtils.randomAlphanumeric(256));
     customer.setDateOfBirth(DateOfBirth.fromLocalDate(LocalDate.now(Clock.systemUTC())));
-    customer.setMember(Boolean.TRUE);
-    customer.setAssignedOffice(RandomStringUtils.randomAlphanumeric(8));
-    customer.setAssignedEmployee(RandomStringUtils.randomAlphanumeric(8));
     customer.setCurrentState(Customer.State.PENDING.name());
     customer.setAddress(AddressGenerator.createRandomAddress());
     customer.setContactDetails(Arrays.asList(ContactDetailGenerator.createRandomContactDetail(),
