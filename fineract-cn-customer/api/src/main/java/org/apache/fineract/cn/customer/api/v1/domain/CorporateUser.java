@@ -63,12 +63,13 @@ public final class CorporateUser {
     @NotNull
     private String refAccountNumber;
     private Boolean deposited;
-    private Customer.KycStatus kycStatus;
+
     @NotNull
     private String accountNumbers;
     private String principalBusinessActivities;
 
 
+    private Customer.KycStatus kycStatus;
     @NotNull
     private Customer.RegistrationType registrationType;
 
@@ -77,13 +78,12 @@ public final class CorporateUser {
         super();
     }
 
-    public CorporateUser(Long id, String identifier, Customer.UserType type, String givenName, String surname, String designation) {
+    public CorporateUser(Long id, String identifier, String type, String givenName, String surname, String designation) {
         this.id = id;
         this.identifier = identifier;
-        this.type = type;
+        this.type = Customer.UserType.valueOf(type);
         this.givenName = givenName;
         this.surname = surname;
-        this.companyName = companyName;
         this.designation = designation;
     }
 
@@ -104,11 +104,11 @@ public final class CorporateUser {
     }
 
     public String getType() {
-        return type.name();
+        return type == null ? null : type.name();
     }
 
     public String getRegistrationType() {
-        return registrationType.name();
+        return registrationType == null ? null : registrationType.name();
     }
 
     public void setRegistrationType(String registrationType) {
@@ -236,7 +236,7 @@ public final class CorporateUser {
     }
 
     public String getKycStatus() {
-        return kycStatus.name();
+        return this.kycStatus != null ? this.kycStatus.name() : null;
     }
 
     public void setKycStatus(String kycStatus) {

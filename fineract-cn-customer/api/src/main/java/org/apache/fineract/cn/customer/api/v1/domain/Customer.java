@@ -58,7 +58,8 @@ public final class Customer {
         PENDING,
         APPROVED,
         REJECTED,
-        PROCESSING
+        PROCESSING,
+        NOT_REQUIRED
     }
 
     private Long id;

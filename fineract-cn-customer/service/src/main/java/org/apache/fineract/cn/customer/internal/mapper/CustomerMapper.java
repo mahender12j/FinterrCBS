@@ -169,6 +169,7 @@ public final class CustomerMapper {
         customerEntity.setLastModifiedOn(LocalDateTime.now());
         customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
         customerEntity.setAccountNumbers(customer.getAccountNumbers());
+        customerEntity.setKycStatus(Customer.KycStatus.NOT_REQUIRED.name());
         return customerEntity;
     }
 

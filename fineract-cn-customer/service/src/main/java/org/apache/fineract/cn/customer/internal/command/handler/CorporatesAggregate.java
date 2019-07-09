@@ -92,7 +92,7 @@ public class CorporatesAggregate {
 
         return new CorporateUser(customerEntity.getId(),
                 customerEntity.getIdentifier(),
-                Customer.UserType.valueOf(customerEntity.getType()),
+                customerEntity.getType(),
                 customerEntity.getGivenName(),
                 customerEntity.getSurname(),
                 customerEntity.getDesignation());
