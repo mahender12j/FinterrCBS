@@ -65,7 +65,7 @@ public class TestTaskInstance extends AbstractCustomerTest {
 
     // assert client is still in pending
     final Customer stillPendingCustomer = this.customerManager.findCustomer(randomCustomer.getIdentifier());
-    Assert.assertEquals(Customer.UserState.PENDING.name(), stillPendingCustomer.getCurrentUserState());
+    Assert.assertEquals(Customer.UserState.PENDING.name(), stillPendingCustomer.getCurrentState());
 
     try {
       // try to close the task
@@ -90,7 +90,7 @@ public class TestTaskInstance extends AbstractCustomerTest {
 
     // assert customer is now active
     final Customer activatedCustomer = this.customerManager.findCustomer(randomCustomer.getIdentifier());
-    Assert.assertEquals(Customer.UserState.ACTIVE.name(), activatedCustomer.getCurrentUserState());
+    Assert.assertEquals(Customer.UserState.ACTIVE.name(), activatedCustomer.getCurrentState());
 
     // set predefined to false so it does not have a side effect on other tests
     taskDefinition.setPredefined(false);
@@ -196,7 +196,7 @@ public class TestTaskInstance extends AbstractCustomerTest {
     Assert.assertTrue(this.eventRecorder.wait(CustomerEventConstants.UNLOCK_CUSTOMER, randomCustomer.getIdentifier()));
 
     final Customer customer = this.customerManager.findCustomer(randomCustomer.getIdentifier());
-    Assert.assertEquals(Customer.UserState.ACTIVE.name(), customer.getCurrentUserState());
+    Assert.assertEquals(Customer.UserState.ACTIVE.name(), customer.getCurrentState());
 
     // set predefined to false so it does not have a side effect on other tests
     customTask1.setPredefined(false);

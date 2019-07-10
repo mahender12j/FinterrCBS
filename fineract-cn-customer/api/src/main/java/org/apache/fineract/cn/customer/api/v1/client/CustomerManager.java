@@ -92,7 +92,7 @@ public interface CustomerManager {
         } catch (CustomerNotFoundException e) {
             return false;
         }
-        final Customer.UserState userState = Customer.UserState.valueOf(customer.getCurrentUserState());
+        final Customer.UserState userState = Customer.UserState.valueOf(customer.getCurrentState());
         return (userState == Customer.UserState.ACTIVE);
     }
 

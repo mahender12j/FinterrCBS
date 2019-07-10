@@ -39,7 +39,7 @@ public final class CustomerMapper {
     public static CustomerEntity map(final Customer customer) {
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setIdentifier(customer.getIdentifier());
-        customerEntity.setType(customer.getUserType());
+        customerEntity.setType(customer.getType());
         customerEntity.setRegistrationType(customer.getRegistrationType());
         customerEntity.setGivenName(customer.getGivenName());
         customerEntity.setMiddleName(customer.getMiddleName());
@@ -49,7 +49,7 @@ public final class CustomerMapper {
             customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
         }
         customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
-        customerEntity.setCurrentState(customer.getCurrentUserState());
+        customerEntity.setCurrentState(customer.getCurrentState());
         if (customer.getApplicationDate() != null) {
             final String editedApplicationDate;
             if (!customer.getApplicationDate().endsWith("Z")) {
@@ -94,7 +94,7 @@ public final class CustomerMapper {
         final Customer customer = new Customer();
         customer.setId(customerEntity.getId());
         customer.setIdentifier(customerEntity.getIdentifier());
-        customer.setUserType(customerEntity.getType());
+        customer.setType(customerEntity.getType());
         customer.setRegistrationType(customerEntity.getRegistrationType());
         customer.setGivenName(customerEntity.getGivenName());
         customer.setMiddleName(customerEntity.getMiddleName());
@@ -104,7 +104,7 @@ public final class CustomerMapper {
             customer.setDateOfBirth(DateOfBirth.fromLocalDate(customerEntity.getDateOfBirth().toLocalDate()));
         }
         customer.setReferenceCustomer(customerEntity.getReferenceCustomer());
-        customer.setCurrentUserState(customerEntity.getCurrentState());
+        customer.setCurrentState(customerEntity.getCurrentState());
         if (customerEntity.getApplicationDate() != null) {
             final String editedApplicationDate =
                     DateConverter.toIsoString(customerEntity.getApplicationDate()).substring(0, 10);

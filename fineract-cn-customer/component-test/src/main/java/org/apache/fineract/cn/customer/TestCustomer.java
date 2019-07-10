@@ -191,7 +191,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertTrue(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer activatedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.UserState.ACTIVE.name(), activatedCustomer.getCurrentUserState());
+    Assert.assertEquals(Customer.UserState.ACTIVE.name(), activatedCustomer.getCurrentState());
     Assert.assertNotNull(activatedCustomer.getApplicationDate());
   }
 
@@ -213,7 +213,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertFalse(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer lockedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.UserState.LOCKED.name(), lockedCustomer.getCurrentUserState());
+    Assert.assertEquals(Customer.UserState.LOCKED.name(), lockedCustomer.getCurrentState());
   }
 
   @Test
@@ -242,7 +242,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertTrue(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer unlockedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.UserState.ACTIVE.name(), unlockedCustomer.getCurrentUserState());
+    Assert.assertEquals(Customer.UserState.ACTIVE.name(), unlockedCustomer.getCurrentState());
     Assert.assertEquals(applicationDate, unlockedCustomer.getApplicationDate());
   }
 
@@ -264,7 +264,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertFalse(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer closedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.UserState.CLOSED.name(), closedCustomer.getCurrentUserState());
+    Assert.assertEquals(Customer.UserState.CLOSED.name(), closedCustomer.getCurrentState());
   }
 
   @Test
@@ -290,7 +290,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertTrue(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer reopenedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.UserState.ACTIVE.name(), reopenedCustomer.getCurrentUserState());
+    Assert.assertEquals(Customer.UserState.ACTIVE.name(), reopenedCustomer.getCurrentState());
 
   }
 

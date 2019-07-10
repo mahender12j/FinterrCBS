@@ -34,12 +34,12 @@ public final class CustomerGenerator {
   public static Customer createRandomCustomer() {
     final Customer customer = new Customer();
     customer.setIdentifier(RandomStringUtils.randomAlphanumeric(8));
-    customer.setUserType(Customer.UserType.PERSON.name());
+    customer.setType(Customer.UserType.PERSON.name());
     customer.setGivenName(RandomStringUtils.randomAlphanumeric(256));
     customer.setMiddleName(RandomStringUtils.randomAlphanumeric(256));
     customer.setSurname(RandomStringUtils.randomAlphanumeric(256));
     customer.setDateOfBirth(DateOfBirth.fromLocalDate(LocalDate.now(Clock.systemUTC())));
-    customer.setCurrentUserState(Customer.UserState.PENDING.name());
+    customer.setCurrentState(Customer.UserState.PENDING.name());
     customer.setAddress(AddressGenerator.createRandomAddress());
     customer.setContactDetails(Arrays.asList(ContactDetailGenerator.createRandomContactDetail(),
         ContactDetailGenerator.createRandomContactDetail()));

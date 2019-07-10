@@ -311,7 +311,7 @@ public class CustomerRestController {
         final Customer customer = this.customerService.findCustomer(identifier);
 
         final Command.Action action = Command.Action.valueOf(command.getAction());
-        final String currentState = customer.getCurrentUserState();
+        final String currentState = customer.getCurrentState();
         switch (action) {
             case ACTIVATE:
                 if (Customer.UserState.PENDING.name().equals(currentState)) {

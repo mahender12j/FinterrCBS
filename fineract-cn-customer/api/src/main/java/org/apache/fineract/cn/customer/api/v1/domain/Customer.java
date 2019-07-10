@@ -66,7 +66,7 @@ public final class Customer {
     @NotBlank
     private String identifier;
     @NotNull
-    private UserType userType;
+    private UserType type;
     @NotNull
     private RegistrationType registrationType;
     @NotBlank
@@ -81,7 +81,7 @@ public final class Customer {
     private Address address;
     @Valid
     private List<ContactDetail> contactDetails;
-    private UserState currentUserState;
+    private UserState currentState;
     private String applicationDate;
     private List<Value> customValues;
     private String createdBy;
@@ -117,12 +117,12 @@ public final class Customer {
         this.identifier = identifier;
     }
 
-    public String getUserType() {
-        return this.userType.name();
+    public String getType() {
+        return this.type.name();
     }
 
-    public void setUserType(final String userType) {
-        this.userType = UserType.valueOf(userType);
+    public void setType(final String type) {
+        this.type = UserType.valueOf(type);
     }
 
     public String getRegistrationType() {
@@ -189,12 +189,12 @@ public final class Customer {
         this.contactDetails = contactDetails;
     }
 
-    public String getCurrentUserState() {
-        return this.currentUserState != null ? this.currentUserState.name() : null;
+    public String getCurrentState() {
+        return this.currentState != null ? this.currentState.name() : null;
     }
 
-    public void setCurrentUserState(final String currentUserState) {
-        this.currentUserState = UserState.valueOf(currentUserState);
+    public void setCurrentState(final String currentState) {
+        this.currentState = UserState.valueOf(currentState);
     }
 
     public String getCreatedBy() {
@@ -358,7 +358,7 @@ public final class Customer {
     }
 
     public void setType(UserType userType) {
-        this.userType = userType;
+        this.type = userType;
     }
 
     public void setRegistrationType(RegistrationType registrationType) {
@@ -366,7 +366,7 @@ public final class Customer {
     }
 
     public void setCurrentState(UserState currentUserState) {
-        this.currentUserState = currentUserState;
+        this.currentState = currentUserState;
     }
 
     public Boolean getDeposited() {
@@ -410,7 +410,7 @@ public final class Customer {
         return "Customer{" +
                 "id=" + id +
                 ", identifier='" + identifier + '\'' +
-                ", userType=" + userType +
+                ", type=" + type +
                 ", registrationType=" + registrationType +
                 ", givenName='" + givenName + '\'' +
                 ", surname='" + surname + '\'' +
@@ -421,7 +421,7 @@ public final class Customer {
                 ", referenceCustomer='" + referenceCustomer + '\'' +
                 ", address=" + address +
                 ", contactDetails=" + contactDetails +
-                ", currentUserState=" + currentUserState +
+                ", currentState=" + currentState +
                 ", createdBy='" + createdBy + '\'' +
                 ", createdOn='" + createdOn + '\'' +
                 ", lastModifiedBy='" + lastModifiedBy + '\'' +
