@@ -443,7 +443,7 @@ public class CauseService {
 
     private void setRatingsAndAverage(CauseEntity causeEntity, Cause cause) {
         List<CauseRating> causeRatings = causeRepository.findByIdentifier(causeEntity.getIdentifier())
-                .map(this.ratingRepository::findAllByCause)
+                .map(this.ratingRepository::findAllByCauseAndActiveIsTrue)
                 .map(ratingEntity -> this.fetchNestedComments(ratingEntity.collect(Collectors.toList()), (long) -1))
                 .orElse(Stream.empty())
                 .collect(Collectors.toList());
@@ -455,7 +455,7 @@ public class CauseService {
 
     public final List<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
-                .map(this.ratingRepository::findAllByCause)
+                .map(this.ratingRepository::findAllByCauseAndActiveIsTrue)
                 .map(ratingEntity -> this.fetchNestedComments(ratingEntity.collect(Collectors.toList()), (long) -1))
                 .orElse(Stream.empty())
                 .collect(Collectors.toList());
