@@ -50,7 +50,6 @@ public final class CorporateUser {
 
     @NotNull
     private String ercTokenAddress;
-    private int numberOfEmployees;
 
     @NotNull
     private String refferalCodeIdentifier;
@@ -151,14 +150,6 @@ public final class CorporateUser {
 
     public void setErcTokenAddress(String ercTokenAddress) {
         this.ercTokenAddress = ercTokenAddress;
-    }
-
-    public int getNumberOfEmployees() {
-        return numberOfEmployees;
-    }
-
-    public void setNumberOfEmployees(int numberOfEmployees) {
-        this.numberOfEmployees = numberOfEmployees;
     }
 
     public String getRefferalCodeIdentifier() {
