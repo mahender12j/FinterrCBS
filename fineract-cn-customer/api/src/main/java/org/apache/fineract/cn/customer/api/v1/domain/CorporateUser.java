@@ -33,8 +33,6 @@ public final class CorporateUser {
     private String identifier;
     private Customer.UserType type;
 
-    @NotNull
-    private String companyName;
     @NotBlank
     private String givenName;
     @NotBlank
@@ -58,22 +56,13 @@ public final class CorporateUser {
     private String refferalCodeIdentifier;
     private String refferalUserIdentifier;
 
-    private SocialMatrix socialMatrix;
-    private CustomerDocument corporateDocument;
     @NotNull
     private String refAccountNumber;
-    private Boolean deposited;
 
     @NotNull
     private String accountNumbers;
     @Valid
-    private List<Value> customValues;
-
-
-    private Customer.KycStatus kycStatus;
-    @NotNull
-    private Customer.RegistrationType registrationType;
-
+    private List<Value> customValues; //custom values - company name
 
     public CorporateUser() {
         super();
@@ -108,14 +97,6 @@ public final class CorporateUser {
         return type == null ? null : type.name();
     }
 
-    public String getRegistrationType() {
-        return registrationType == null ? null : registrationType.name();
-    }
-
-    public void setRegistrationType(String registrationType) {
-        this.registrationType = Customer.RegistrationType.valueOf(registrationType);
-    }
-
     public String getGivenName() {
         return givenName;
     }
@@ -138,14 +119,6 @@ public final class CorporateUser {
 
     public void setMiddleName(String middleName) {
         this.middleName = middleName;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
     }
 
     public Address getAddress() {
@@ -204,38 +177,6 @@ public final class CorporateUser {
         this.refferalUserIdentifier = refferalUserIdentifier;
     }
 
-    public SocialMatrix getSocialMatrix() {
-        return socialMatrix;
-    }
-
-    public void setSocialMatrix(SocialMatrix socialMatrix) {
-        this.socialMatrix = socialMatrix;
-    }
-
-    public CustomerDocument getCorporateDocument() {
-        return corporateDocument;
-    }
-
-    public void setCorporateDocument(CustomerDocument corporateDocument) {
-        this.corporateDocument = corporateDocument;
-    }
-
-    public Boolean getDeposited() {
-        return deposited;
-    }
-
-    public void setDeposited(Boolean deposited) {
-        this.deposited = deposited;
-    }
-
-    public String getKycStatus() {
-        return this.kycStatus != null ? this.kycStatus.name() : null;
-    }
-
-    public void setKycStatus(String kycStatus) {
-        this.kycStatus = Customer.KycStatus.valueOf(kycStatus);
-    }
-
     public String getAccountNumbers() {
         return accountNumbers;
     }
@@ -266,11 +207,9 @@ public final class CorporateUser {
                 "id=" + id +
                 ", identifier='" + identifier + '\'' +
                 ", type=" + type +
-                ", registrationType=" + registrationType +
                 ", givenName='" + givenName + '\'' +
                 ", surname='" + surname + '\'' +
                 ", middleName='" + middleName + '\'' +
-                ", companyName='" + companyName + '\'' +
                 ", address=" + address +
                 ", contactDetails=" + contactDetails +
                 ", designation='" + designation + '\'' +

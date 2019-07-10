@@ -152,7 +152,7 @@ public final class CustomerMapper {
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setIdentifier(customer.getIdentifier());
         customerEntity.setType(Customer.UserType.CORPORATE.name());
-        customerEntity.setRegistrationType(customer.getRegistrationType());
+        customerEntity.setRegistrationType(Customer.RegistrationType.EMAIL.name());
         customerEntity.setGivenName(customer.getGivenName());
         customerEntity.setMiddleName(customer.getMiddleName());
         customerEntity.setSurname(customer.getSurname());
@@ -161,7 +161,7 @@ public final class CustomerMapper {
         customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
         customerEntity.setEthAddress(customer.getErcTokenAddress());
-        customerEntity.setIsDeposited(customer.getDeposited());
+        customerEntity.setIsDeposited(false);
         customerEntity.setAccountNumbers(customer.getAccountNumbers());
         customerEntity.setDesignation(customer.getDesignation());
         customerEntity.setRefAccountNumber(customer.getAccountNumbers());
