@@ -474,7 +474,7 @@ public class CauseRestController {
     @ResponseBody
     ResponseEntity<Void> deleteCauseRating(@PathVariable("identifier") final String identifier,
                                            @PathVariable("ratingId") final Long ratingId) {
-        this.throwIfCauseExists(identifier);
+        this.throwIfCauseNotExists(identifier);
         this.throwIfRatingNotExists(ratingId);
 //        todo has implementation inside the method
         this.throwIfRatingOwnerIsNotOwnByCurrentUserOrCA(ratingId);
