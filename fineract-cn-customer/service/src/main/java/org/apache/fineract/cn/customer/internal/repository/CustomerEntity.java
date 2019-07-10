@@ -67,9 +67,11 @@ public class CustomerEntity {
     @Column(name = "application_date")
     @Convert(converter = LocalDateConverter.class)
     private LocalDate applicationDate;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, optional = false)
     private AddressEntity address;
+
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_on")

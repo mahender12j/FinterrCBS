@@ -138,18 +138,20 @@ public class CustomerAggregate {
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_CUSTOMER)
     public String createCustomer(final CreateCustomerCommand createCustomerCommand) {
         final Customer customer = createCustomerCommand.customer();
-        final AddressEntity savedAddress = this.addressRepository.save(AddressMapper.map(customer.getAddress()));
-        final CustomerEntity customerEntity = CustomerMapper.map(customer);
-        customerEntity.setCurrentState(Customer.UserState.PENDING.name());
-        customerEntity.setAddress(savedAddress);
-        final CustomerEntity savedCustomerEntity = this.customerRepository.save(customerEntity);
+//        final CustomerEntity customerEntity =
+//        customerEntity.setCurrentState(Customer.UserState.PENDING.name());
+
+        final CustomerEntity customerEntity = this.customerRepository.save(CustomerMapper.map(customer));
+
+        this.addressRepository.save(AddressMapper.map(customer.getAddress(), customerEntity));
+
         if (customer.getContactDetails() != null) {
             this.contactDetailRepository.save(
                     customer.getContactDetails()
                             .stream()
                             .map(contact -> {
                                 final ContactDetailEntity contactDetailEntity = ContactDetailMapper.map(contact);
-                                contactDetailEntity.setCustomer(savedCustomerEntity);
+                                contactDetailEntity.setCustomer(customerEntity);
                                 return contactDetailEntity;
                             })
                             .collect(Collectors.toList())
@@ -157,9 +159,9 @@ public class CustomerAggregate {
         }
 
         if (customer.getCustomValues() != null) {
-            this.setCustomValues(customer, savedCustomerEntity);
+            this.setCustomValues(customer, customerEntity);
         }
-        this.taskAggregate.onCustomerCommand(savedCustomerEntity, Command.Action.ACTIVATE);
+        this.taskAggregate.onCustomerCommand(customerEntity, Command.Action.ACTIVATE);
         return customer.getIdentifier();
     }
 
@@ -204,10 +206,13 @@ public class CustomerAggregate {
             this.setCustomValues(customer, customerEntity);
         }
 
+
+//        set customer address
         if (customer.getAddress() != null) {
             this.updateAddress(new UpdateAddressCommand(customer.getIdentifier(), customer.getAddress()));
         }
 
+//        set customer contact address
         if (customer.getContactDetails() != null) {
             this.updateContactDetails(new UpdateContactDetailsCommand(customer.getIdentifier(), customer.getContactDetails()));
         }
@@ -374,19 +379,9 @@ public class CustomerAggregate {
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_ADDRESS)
     public String updateAddress(final UpdateAddressCommand updateAddressCommand) {
         final CustomerEntity customerEntity = findCustomerEntityOrThrow(updateAddressCommand.identifier());
-        customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-        customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-
-        final AddressEntity oldAddressEntity = customerEntity.getAddress();
-
-        final AddressEntity newAddressEntity = this.addressRepository.save(AddressMapper.map(updateAddressCommand.address()));
-
-        customerEntity.setAddress(newAddressEntity);
-        this.customerRepository.save(customerEntity);
-
-        this.addressRepository.delete(oldAddressEntity);
-
-        return updateAddressCommand.identifier();
+        final AddressEntity addressEntity = AddressMapper.map(customerEntity.getAddress(), updateAddressCommand.address());
+        this.addressRepository.save(addressEntity);
+        return updateAddressCommand.address().toString();
     }
 
     @Transactional
@@ -394,8 +389,6 @@ public class CustomerAggregate {
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_CONTACT_DETAILS)
     public String updateContactDetails(final UpdateContactDetailsCommand updateContactDetailsCommand) {
         final CustomerEntity customerEntity = findCustomerEntityOrThrow(updateContactDetailsCommand.identifier());
-        customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-        customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
 
         final List<ContactDetailEntity> oldContactDetails = this.contactDetailRepository.findByCustomer(customerEntity);
         this.contactDetailRepository.delete(oldContactDetails);

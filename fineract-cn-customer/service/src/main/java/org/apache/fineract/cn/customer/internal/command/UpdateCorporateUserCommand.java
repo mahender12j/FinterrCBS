@@ -18,26 +18,24 @@
  */
 package org.apache.fineract.cn.customer.internal.command;
 
-import org.apache.fineract.cn.customer.api.v1.domain.ContactDetail;
 
-import java.util.List;
+import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
 
-public class UpdateContactDetailsCommand {
+public class UpdateCorporateUserCommand {
 
+    private final CorporateUser corporateUser;
     private final String identifier;
-    private final List<ContactDetail> contactDetails;
 
-    public UpdateContactDetailsCommand(final String identifier, final List<ContactDetail> contactDetails) {
-        super();
+    public UpdateCorporateUserCommand(CorporateUser corporateUser, String identifier) {
+        this.corporateUser = corporateUser;
         this.identifier = identifier;
-        this.contactDetails = contactDetails;
     }
 
-    public String identifier() {
-        return this.identifier;
+    public CorporateUser getCorporateUser() {
+        return corporateUser;
     }
 
-    public List<ContactDetail> contactDetails() {
-        return this.contactDetails;
+    public String getIdentifier() {
+        return identifier;
     }
 }

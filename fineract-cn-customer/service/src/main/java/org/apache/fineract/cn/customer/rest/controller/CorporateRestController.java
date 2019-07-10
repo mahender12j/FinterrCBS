@@ -28,6 +28,7 @@ import org.apache.fineract.cn.customer.api.v1.domain.ContactDetail;
 import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
 import org.apache.fineract.cn.customer.catalog.internal.service.FieldValueValidator;
 import org.apache.fineract.cn.customer.internal.command.CreateCorporateCommand;
+import org.apache.fineract.cn.customer.internal.command.UpdateCorporateUserCommand;
 import org.apache.fineract.cn.customer.internal.service.CorporateService;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.lang.ServiceException;
@@ -70,7 +71,7 @@ public class CorporateRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<CorporateUser> createCustomer(@RequestBody @Valid final CorporateUser corporateUser) {
+    ResponseEntity<CorporateUser> createCorporates(@RequestBody @Valid final CorporateUser corporateUser) {
         throwIfUserAlreadyExist(corporateUser.getIdentifier());
         throwIfUserContactDetailsIsAlreadyVerified(corporateUser.getContactDetails());
 
@@ -87,6 +88,30 @@ public class CorporateRestController {
     }
 
 
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
+    @RequestMapping(
+            value = "/corporates/{identifier}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<CorporateUser> updateCorporates(@PathVariable("identifier") final String identifier,
+                                                   @RequestBody final CorporateUser corporateUser) {
+        if (corporateUser.getCustomValues() != null) {
+            this.fieldValueValidator.validateValues(corporateUser.getCustomValues());
+        }
+        throwIfUserNotExist(identifier);
+        try {
+            CommandCallback<CorporateUser> commandCallback = this.commandGateway.process(new UpdateCorporateUserCommand(corporateUser, identifier), CorporateUser.class);
+            return ResponseEntity.ok(commandCallback.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Sorry! Something went wrong.");
+        }
+    }
+
+
     private void throwIfUserContactDetailsIsAlreadyVerified(List<ContactDetail> contactDetails) {
         contactDetails.forEach(contactDetail -> {
             if (this.corporateService.isContactDetailExist(contactDetail.getType(), contactDetail.getValue())) {
@@ -99,6 +124,14 @@ public class CorporateRestController {
     private void throwIfUserAlreadyExist(String identifier) {
         if (this.customerService.customerExists(identifier)) {
             throw ServiceException.conflict("User {0} already exists.", identifier);
+        }
+
+    }
+
+
+    private void throwIfUserNotExist(String identifier) {
+        if (!this.customerService.customerExists(identifier)) {
+            throw ServiceException.conflict("User {0} not exists.", identifier);
         }
 
     }

@@ -18,12 +18,7 @@
  */
 package org.apache.fineract.cn.customer.internal.repository;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "maat_addresses")
@@ -33,6 +28,10 @@ public class AddressEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private CustomerEntity customer;
     @Column(name = "street")
     private String street;
     @Column(name = "state")
@@ -52,14 +51,6 @@ public class AddressEntity {
     @Column(name = "nationality")
     private String nationality;
 
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
     public AddressEntity() {
         super();
     }
@@ -70,6 +61,14 @@ public class AddressEntity {
 
     public void setId(final Long id) {
         this.id = id;
+    }
+
+    public CustomerEntity getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(CustomerEntity customer) {
+        this.customer = customer;
     }
 
     public String getStreet() {
@@ -135,4 +134,13 @@ public class AddressEntity {
     public void setNationality(final String nationality) {
         this.nationality = nationality;
     }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
 }

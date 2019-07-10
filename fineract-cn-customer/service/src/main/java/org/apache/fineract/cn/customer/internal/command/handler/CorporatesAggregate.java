@@ -21,11 +21,14 @@ package org.apache.fineract.cn.customer.internal.command.handler;
 import org.apache.fineract.cn.command.annotation.Aggregate;
 import org.apache.fineract.cn.command.annotation.CommandHandler;
 import org.apache.fineract.cn.command.annotation.EventEmitter;
+import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.api.v1.CustomerEventConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
-import org.apache.fineract.cn.customer.api.v1.domain.Customer;
 import org.apache.fineract.cn.customer.catalog.internal.repository.*;
 import org.apache.fineract.cn.customer.internal.command.CreateCorporateCommand;
+import org.apache.fineract.cn.customer.internal.command.UpdateAddressCommand;
+import org.apache.fineract.cn.customer.internal.command.UpdateContactDetailsCommand;
+import org.apache.fineract.cn.customer.internal.command.UpdateCorporateUserCommand;
 import org.apache.fineract.cn.customer.internal.mapper.AddressMapper;
 import org.apache.fineract.cn.customer.internal.mapper.ContactDetailMapper;
 import org.apache.fineract.cn.customer.internal.mapper.CustomerMapper;
@@ -44,46 +47,39 @@ public class CorporatesAggregate {
     private final AddressRepository addressRepository;
     private final CustomerRepository customerRepository;
     private final ContactDetailRepository contactDetailRepository;
-    private final CommandRepository commandRepository;
     private final FieldValueRepository fieldValueRepository;
     private final CatalogRepository catalogRepository;
     private final FieldRepository fieldRepository;
+    private final CommandGateway commandGateway;
 
     @Autowired
     public CorporatesAggregate(final AddressRepository addressRepository,
                                final CustomerRepository customerRepository,
-                               final IdentificationCardRepository identificationCardRepository,
-                               final IdentificationCardScanRepository identificationCardScanRepository,
-                               final PortraitRepository portraitRepository,
                                final ContactDetailRepository contactDetailRepository,
                                final FieldValueRepository fieldValueRepository,
                                final CatalogRepository catalogRepository,
                                final FieldRepository fieldRepository,
-                               final CommandRepository commandRepository,
-                               final AmlDetailRepository amlDetailRepository,
-                               final TaskAggregate taskAggregate,
-                               final FieldRepository fieldRepository1) {
+                               final FieldRepository fieldRepository1,
+                               final CommandGateway commandGateway) {
         super();
         this.addressRepository = addressRepository;
         this.customerRepository = customerRepository;
         this.contactDetailRepository = contactDetailRepository;
-        this.commandRepository = commandRepository;
         this.fieldValueRepository = fieldValueRepository;
         this.catalogRepository = catalogRepository;
         this.fieldRepository = fieldRepository1;
+        this.commandGateway = commandGateway;
     }
 
     @Transactional
     @CommandHandler
-    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_CUSTOMER)
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_CORPORATE)
     public CorporateUser createCustomer(final CreateCorporateCommand createCorporateCommand) {
         CorporateUser corporateUser = createCorporateCommand.getCorporateUser();
 
-        final AddressEntity savedAddress = this.addressRepository.save(AddressMapper.map(corporateUser.getAddress()));
+        final CustomerEntity customerEntity = this.customerRepository.save(CustomerMapper.map(corporateUser));
 
-        final CustomerEntity customerEntity = CustomerMapper.map(corporateUser);
-        customerEntity.setAddress(savedAddress);
-        final CustomerEntity savedCustomerEntity = this.customerRepository.save(customerEntity);
+        final AddressEntity savedAddress = this.addressRepository.save(AddressMapper.map(corporateUser.getAddress(), customerEntity));
 
         if (corporateUser.getContactDetails() != null) {
             this.contactDetailRepository.save(
@@ -91,7 +87,7 @@ public class CorporatesAggregate {
                             .stream()
                             .map(contact -> {
                                 final ContactDetailEntity contactDetailEntity = ContactDetailMapper.map(contact);
-                                contactDetailEntity.setCustomer(savedCustomerEntity);
+                                contactDetailEntity.setCustomer(customerEntity);
                                 return contactDetailEntity;
                             })
                             .collect(Collectors.toList())
@@ -100,7 +96,7 @@ public class CorporatesAggregate {
 
 
         if (corporateUser.getCustomValues() != null) {
-            this.setCustomValues(corporateUser, savedCustomerEntity);
+            this.setCustomValues(corporateUser, customerEntity);
         }
 
         return new CorporateUser(customerEntity.getId(),
@@ -109,6 +105,40 @@ public class CorporatesAggregate {
                 customerEntity.getGivenName(),
                 customerEntity.getSurname(),
                 customerEntity.getDesignation());
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_CORPORATE)
+    public CorporateUser createCustomer(final UpdateCorporateUserCommand updateCorporateUserCommand) {
+        CorporateUser corporateUser = updateCorporateUserCommand.getCorporateUser();
+
+
+        final CorporateUser userEdit = updateCorporateUserCommand.getCorporateUser();
+        final CustomerEntity customerEntity = findCustomerEntityOrThrow(updateCorporateUserCommand.getIdentifier());
+
+        // update the address from the command
+        this.commandGateway.process(new UpdateAddressCommand(updateCorporateUserCommand.getIdentifier(), userEdit.getAddress()));
+        // update contact details from the command
+        this.commandGateway.process(new UpdateContactDetailsCommand(updateCorporateUserCommand.getIdentifier(), userEdit.getContactDetails()));
+
+
+        final CustomerEntity cEntity = CustomerMapper.map(customerEntity, corporateUser);
+        CustomerEntity updatedCEntity = this.customerRepository.save(cEntity); // save new customer data
+
+        if (corporateUser.getCustomValues() != null) {
+            this.fieldValueRepository.deleteByCustomer(updatedCEntity);
+            this.fieldValueRepository.flush();
+            this.setCustomValues(corporateUser, updatedCEntity);
+        }
+
+        return new CorporateUser(updatedCEntity.getId(),
+                updatedCEntity.getIdentifier(),
+                updatedCEntity.getType(),
+                updatedCEntity.getGivenName(),
+                updatedCEntity.getSurname(),
+                updatedCEntity.getDesignation());
     }
 
 
@@ -125,6 +155,12 @@ public class CorporatesAggregate {
                             return fieldValueEntity;
                         }).collect(Collectors.toList())
         );
+    }
+
+
+    private CustomerEntity findCustomerEntityOrThrow(String identifier) {
+        return this.customerRepository.findByIdentifier(identifier)
+                .orElseThrow(() -> ServiceException.notFound("Customer ''{0}'' not found", identifier));
     }
 
 }

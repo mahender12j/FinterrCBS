@@ -25,7 +25,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-public final class CorporateUser {
+public class CorporateUser {
 
 
     private Long id;
@@ -48,8 +48,7 @@ public final class CorporateUser {
     @Valid
     private Address address;
 
-    @NotNull
-    private String ercTokenAddress;
+    private String ethAddress;
 
     @NotNull
     private String refferalCodeIdentifier;
@@ -63,7 +62,7 @@ public final class CorporateUser {
     @Valid
     private List<Value> customValues; //custom values - company name
 
-    public CorporateUser() {
+    CorporateUser() {
         super();
     }
 
@@ -144,12 +143,12 @@ public final class CorporateUser {
         this.designation = designation;
     }
 
-    public String getErcTokenAddress() {
-        return ercTokenAddress;
+    public String getEthAddress() {
+        return ethAddress;
     }
 
-    public void setErcTokenAddress(String ercTokenAddress) {
-        this.ercTokenAddress = ercTokenAddress;
+    public void setEthAddress(String ethAddress) {
+        this.ethAddress = ethAddress;
     }
 
     public String getRefferalCodeIdentifier() {
