@@ -18,28 +18,17 @@
  */
 package org.apache.fineract.cn.customer.internal.service;
 
-import org.apache.fineract.cn.customer.api.v1.domain.ContactDetail;
-import org.apache.fineract.cn.customer.api.v1.domain.Customer;
-import org.apache.fineract.cn.customer.internal.repository.ContactDetailEntity;
 import org.apache.fineract.cn.customer.internal.repository.ContactDetailRepository;
-import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
-import org.apache.fineract.cn.customer.internal.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class CorporateService {
-
-    private final CustomerRepository customerRepository;
     private final ContactDetailRepository contactDetailRepository;
 
     @Autowired
-    public CorporateService(final CustomerRepository customerRepository,
-                            final ContactDetailRepository contactDetailRepository) {
+    public CorporateService(final ContactDetailRepository contactDetailRepository) {
         super();
-        this.customerRepository = customerRepository;
         this.contactDetailRepository = contactDetailRepository;
     }
 
@@ -48,17 +37,5 @@ public class CorporateService {
         return this.contactDetailRepository.findAllByTypeAndValueAndValidIsTrue(userType, value)
                 .stream()
                 .findAny().isPresent();
-    }
-
-    public boolean profileActivated(final CustomerEntity customerEntity) {
-
-//        List<ContactDetailEntity> detailEntityList =  customerEntity.getContactDetail();
-//        boolean isMobileNumberVerified =
-
-//        check profile fields
-//        check the mobile and email
-//        check the is deposited
-
-        return false;
     }
 }

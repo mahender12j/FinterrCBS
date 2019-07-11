@@ -22,6 +22,7 @@ import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.BusinessCustomer;
 import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
+import org.apache.fineract.cn.customer.api.v1.domain.UserVerification;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 import org.apache.fineract.cn.lang.DateOfBirth;
@@ -144,6 +145,16 @@ public final class CustomerMapper {
             customer.setDateOfRegistration(DateConverter.toIsoString(customerEntity.getDateOfRegistration()));
         }
         customer.setRefAccountNumber(customerEntity.getRefAccountNumber());
+        return customer;
+    }
+
+
+    public static Customer map(Customer customer, UserVerification userVerification) {
+        customer.setEmailVerified(userVerification.isEmailVerified());
+        customer.setMobileVerified(userVerification.isMobileVerified());
+        customer.setVerifiedMobile(userVerification.getVerifiedMobileNumber());
+        customer.setVerifiedEmail(userVerification.getVerifiedEmailAddress());
+        customer.setProfileComplete(userVerification.isProfileComplete());
         return customer;
     }
 

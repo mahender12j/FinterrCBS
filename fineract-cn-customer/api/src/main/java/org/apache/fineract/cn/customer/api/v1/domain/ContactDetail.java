@@ -28,7 +28,6 @@ public final class ContactDetail {
 
   public enum Type {
     EMAIL,
-    PHONE,
     MOBILE
   }
 

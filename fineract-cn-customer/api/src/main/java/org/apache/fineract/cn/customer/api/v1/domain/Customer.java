@@ -95,10 +95,8 @@ public final class Customer {
     private String ethAddress;
     private Boolean deposited;
 
-    //    used for front-end support
-    @JsonProperty(value = "isProfileComplete")
-    private boolean isProfileComplete;
     private KycStatus kycStatus;
+    private boolean kycVerified;
     private String accountNumbers;
     private Double avgMonthlyIncome;
     private String ngoName;
@@ -109,6 +107,17 @@ public final class Customer {
     private Double refferalBalance;
     private SocialMatrix socialMatrix;
     private CustomerDocument customerDocument;
+
+
+    //    used for front-end support
+    @JsonProperty(value = "isProfileComplete")
+    private boolean profileComplete;
+    @JsonProperty(value = "isEmailVerified")
+    private boolean emailVerified;
+    @JsonProperty(value = "isMobileVerified")
+    private boolean mobileVerified;
+    private String verifiedMobile;
+    private String verifiedEmail;
 
     public Customer() {
         super();
@@ -386,6 +395,14 @@ public final class Customer {
         this.kycStatus = kycStatus;
     }
 
+    public boolean isKycVerified() {
+        return kycVerified;
+    }
+
+    public void setKycVerified(boolean kycVerified) {
+        this.kycVerified = kycVerified;
+    }
+
     public Boolean getNgoProfileExist() {
         return ngoProfileExist;
     }
@@ -410,12 +427,48 @@ public final class Customer {
         this.customValues = customValues;
     }
 
+
+//    for the user status
+
+
     public boolean isProfileComplete() {
-        return isProfileComplete;
+        return profileComplete;
     }
 
     public void setProfileComplete(boolean profileComplete) {
-        isProfileComplete = profileComplete;
+        this.profileComplete = profileComplete;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public boolean isMobileVerified() {
+        return mobileVerified;
+    }
+
+    public void setMobileVerified(boolean mobileVerified) {
+        this.mobileVerified = mobileVerified;
+    }
+
+    public String getVerifiedMobile() {
+        return verifiedMobile;
+    }
+
+    public void setVerifiedMobile(String verifiedMobile) {
+        this.verifiedMobile = verifiedMobile;
+    }
+
+    public String getVerifiedEmail() {
+        return verifiedEmail;
+    }
+
+    public void setVerifiedEmail(String verifiedEmail) {
+        this.verifiedEmail = verifiedEmail;
     }
 
     @Override

@@ -100,7 +100,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetailOne.setValidated(Boolean.FALSE);
 
         ContactDetail contactDetailTwo = new ContactDetail();
-        contactDetailTwo.setType(ContactDetail.Type.PHONE.name());
+        contactDetailTwo.setType(ContactDetail.Type.MOBILE.name());
         contactDetailTwo.setGroup(ContactDetail.Group.BUSINESS.name());
         contactDetailTwo.setValue("233363640");
         contactDetailTwo.setPreferenceLevel(Integer.valueOf(2));
@@ -368,7 +368,7 @@ public class CustomerApiDocumentation extends AbstractCustomerTest {
         contactDetailTwo.setValidated(Boolean.FALSE);
 
         ContactDetail contactDetailThree = new ContactDetail();
-        contactDetailThree.setType(ContactDetail.Type.PHONE.name());
+        contactDetailThree.setType(ContactDetail.Type.MOBILE.name());
         contactDetailThree.setGroup(ContactDetail.Group.BUSINESS.name());
         contactDetailThree.setValue("237463690");
         contactDetailThree.setPreferenceLevel(Integer.valueOf(2));

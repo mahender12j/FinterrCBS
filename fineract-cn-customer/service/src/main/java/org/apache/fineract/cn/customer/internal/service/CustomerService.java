@@ -65,6 +65,7 @@ public class CustomerService {
     private final NgoProfileRepository ngoProfileRepository;
     private final FieldValueRepository fieldValueRepository;
     private final CorporateService corporateService;
+    private final DocumentService documentService;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -80,7 +81,8 @@ public class CustomerService {
                            final DocumentSubTypeRepository documentSubTypeRepository,
                            final NgoProfileRepository ngoProfileRepository,
                            final FieldValueRepository fieldValueRepository,
-                           final CorporateService corporateService) {
+                           final CorporateService corporateService,
+                           final DocumentService documentService) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -96,6 +98,7 @@ public class CustomerService {
         this.ngoProfileRepository = ngoProfileRepository;
         this.fieldValueRepository = fieldValueRepository;
         this.corporateService = corporateService;
+        this.documentService = documentService;
     }
 
     public HashMap<String, String> aerequest(AERequest aeRequest) throws IOException, NoSuchAlgorithmException, KeyManagementException {
@@ -300,15 +303,14 @@ public class CustomerService {
     public Customer findCustomer(final String identifier) {
         CustomerEntity customerEntity = customerRepository.findByIdentifier(identifier).orElseThrow(() -> ServiceException.notFound("Customer with identifier {0} not found in this system", identifier));
         Customer customer = CustomerMapper.map(customerEntity);
-        customer.setProfileComplete(this.corporateService.profileActivated(customerEntity));
         customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
         customer.setContactDetails(customerEntity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
-
-        if (this.ngoProfileRepository.existsByCustomerIdentifier(identifier)) {
-            customer.setNgoProfileExist(true);
-        } else {
-            customer.setNgoProfileExist(false);
-        }
+        customer.setNgoProfileExist(this.ngoProfileRepository.existsByCustomerIdentifier(identifier));
+        CustomerDocument customerDocument = this.documentService.findCustomerDocuments(customer.getIdentifier());
+        customer.setCustomerDocument(customerDocument);
+        customer.setKycStatus(customerDocument.getKycStatusText());
+        customer.setKycVerified(customerDocument.isKycStatus());
+        CustomerMapper.map(customer, this.userVerification(customerEntity));
 
         if (customerEntity.getReferenceCustomer() != null) {
             this.customerRepository.findByRefferalCodeIdentifier(customerEntity.getReferenceCustomer())
@@ -339,13 +341,6 @@ public class CustomerService {
 
         return customer;
     }
-
-//    private void setCustomerContactDetails(CustomerEntity customerEntity, Customer customer) {
-//        final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(customerEntity);
-//        if (contactDetailEntities != null) {
-//            customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
-//        }
-//    }
 
     public CustomerPage fetchCustomer(final String term, final Boolean includeClosed, final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
@@ -583,5 +578,23 @@ public class CustomerService {
         processStep.setTaskDefinitions(taskDefinitions);
 
         return processStep;
+    }
+
+
+    public UserVerification userVerification(final CustomerEntity customerEntity) {
+        List<ContactDetailEntity> contactDetail = customerEntity.getContactDetail();
+        UserVerification userVerification = new UserVerification();
+        userVerification.setEmailVerified(contactDetail.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name()) && entity.getValid()));
+        userVerification.setMobileVerified(contactDetail.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.MOBILE.name()) && entity.getValid()));
+        userVerification.setVerifiedMobileNumber(contactDetail.stream().filter(entity -> entity.getValid() && entity.getType().equals(ContactDetail.Type.MOBILE.name())).findAny().map(ContactDetailEntity::getValue).orElse(""));
+        userVerification.setVerifiedEmailAddress(contactDetail.stream().filter(entity -> entity.getValid() && entity.getType().equals(ContactDetail.Type.EMAIL.name())).findAny().map(ContactDetailEntity::getValue).orElse(""));
+        userVerification.setProfileComplete(getProfileCompleted(customerEntity));
+        return userVerification;
+    }
+
+    private boolean getProfileCompleted(CustomerEntity customerEntity) {
+
+
+        return false;
     }
 }
