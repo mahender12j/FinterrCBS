@@ -88,7 +88,7 @@ public class CorporateRestController {
     }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CORPORATE)
     @RequestMapping(
             value = "/corporates/{identifier}",
             method = RequestMethod.PUT,

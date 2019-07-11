@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.fineract.cn.customer.catalog.api.v1.domain.Value;
 import org.apache.fineract.cn.lang.DateOfBirth;
 import org.hibernate.validator.constraints.NotBlank;
@@ -93,6 +94,10 @@ public final class Customer {
     private String refferalUserIdentifier;
     private String ethAddress;
     private Boolean deposited;
+
+    //    used for front-end support
+    @JsonProperty(value = "isProfileComplete")
+    private boolean isProfileComplete;
     private KycStatus kycStatus;
     private String accountNumbers;
     private Double avgMonthlyIncome;
@@ -403,6 +408,14 @@ public final class Customer {
 
     public void setCustomValues(List<Value> customValues) {
         this.customValues = customValues;
+    }
+
+    public boolean isProfileComplete() {
+        return isProfileComplete;
+    }
+
+    public void setProfileComplete(boolean profileComplete) {
+        isProfileComplete = profileComplete;
     }
 
     @Override

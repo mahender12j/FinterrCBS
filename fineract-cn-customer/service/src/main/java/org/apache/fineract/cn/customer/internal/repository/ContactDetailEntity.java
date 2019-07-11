@@ -36,9 +36,11 @@ public class ContactDetailEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   private Long id;
-  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_id")
   private CustomerEntity customer;
+
   @Column(name = "a_type")
   private String type;
   @Column(name = "a_group")

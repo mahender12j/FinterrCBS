@@ -64,6 +64,7 @@ public class CustomerService {
     private final DocumentSubTypeRepository documentSubTypeRepository;
     private final NgoProfileRepository ngoProfileRepository;
     private final FieldValueRepository fieldValueRepository;
+    private final CorporateService corporateService;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -78,7 +79,8 @@ public class CustomerService {
                            final DocumentTypeRepository documentTypeRepository,
                            final DocumentSubTypeRepository documentSubTypeRepository,
                            final NgoProfileRepository ngoProfileRepository,
-                           final FieldValueRepository fieldValueRepository) {
+                           final FieldValueRepository fieldValueRepository,
+                           final CorporateService corporateService) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -93,6 +95,7 @@ public class CustomerService {
         this.documentSubTypeRepository = documentSubTypeRepository;
         this.ngoProfileRepository = ngoProfileRepository;
         this.fieldValueRepository = fieldValueRepository;
+        this.corporateService = corporateService;
     }
 
     public HashMap<String, String> aerequest(AERequest aeRequest) throws IOException, NoSuchAlgorithmException, KeyManagementException {
@@ -297,8 +300,9 @@ public class CustomerService {
     public Customer findCustomer(final String identifier) {
         CustomerEntity customerEntity = customerRepository.findByIdentifier(identifier).orElseThrow(() -> ServiceException.notFound("Customer with identifier {0} not found in this system", identifier));
         Customer customer = CustomerMapper.map(customerEntity);
+        customer.setProfileComplete(this.corporateService.profileActivated(customerEntity));
         customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
-        setCustomerContactDetails(customerEntity, customer);
+        customer.setContactDetails(customerEntity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
 
         if (this.ngoProfileRepository.existsByCustomerIdentifier(identifier)) {
             customer.setNgoProfileExist(true);
@@ -336,12 +340,12 @@ public class CustomerService {
         return customer;
     }
 
-    private void setCustomerContactDetails(CustomerEntity customerEntity, Customer customer) {
-        final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(customerEntity);
-        if (contactDetailEntities != null) {
-            customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
-        }
-    }
+//    private void setCustomerContactDetails(CustomerEntity customerEntity, Customer customer) {
+//        final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(customerEntity);
+//        if (contactDetailEntities != null) {
+//            customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
+//        }
+//    }
 
     public CustomerPage fetchCustomer(final String term, final Boolean includeClosed, final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
@@ -404,7 +408,7 @@ public class CustomerService {
                 final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
                 customerEntities.forEach(entity -> {
                     Customer tCustomer = CustomerMapper.map(entity);
-                    this.setCustomerContactDetails(entity, tCustomer);
+                    tCustomer.setContactDetails(customerEntity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
                     if (entity.getAccountNumbers() != null) {
                         Account acc = accountingAdaptor.findAccountByIdentifier(entity.getRefAccountNumber());
                         tCustomer.setRefferalBalance(acc.getBalance());
@@ -467,14 +471,11 @@ public class CustomerService {
     }
 
     public Optional<Customer> fetchCustomerByReferralcode(final String refferalCode) {
-
         return customerRepository.findByRefferalCodeIdentifier(refferalCode)
                 .map(customerEntity -> {
                     final Customer customer = CustomerMapper.map(customerEntity);
                     customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
-
-                    setCustomerContactDetails(customerEntity, customer);
-
+                    customer.setContactDetails(customerEntity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
                     return customer;
                 });
     }
