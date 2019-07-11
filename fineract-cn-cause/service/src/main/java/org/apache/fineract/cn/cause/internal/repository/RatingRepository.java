@@ -44,6 +44,6 @@ public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
 
     Optional<RatingEntity> findByIdAndCause(final Long id, final CauseEntity causeEntity);
 
-    Stream<RatingEntity> findAllByCause(final CauseEntity causeEntity);
+    Stream<RatingEntity> findAllByCauseAndActiveIsTrue(final CauseEntity causeEntity);
 }
 

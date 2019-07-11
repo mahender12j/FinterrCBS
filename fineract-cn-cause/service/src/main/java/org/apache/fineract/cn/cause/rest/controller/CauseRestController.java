@@ -465,7 +465,7 @@ public class CauseRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/{identifier}/ratings/{id}",
+            value = "/causes/{identifier}/ratings/{ratingId}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
@@ -474,7 +474,7 @@ public class CauseRestController {
     @ResponseBody
     ResponseEntity<Void> deleteCauseRating(@PathVariable("identifier") final String identifier,
                                            @PathVariable("ratingId") final Long ratingId) {
-        this.throwIfCauseExists(identifier);
+        this.throwIfCauseNotExists(identifier);
         this.throwIfRatingNotExists(ratingId);
 //        todo has implementation inside the method
         this.throwIfRatingOwnerIsNotOwnByCurrentUserOrCA(ratingId);

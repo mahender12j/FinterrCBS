@@ -21,17 +21,9 @@ package org.apache.fineract.cn.customer.internal.repository;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.*;
 
 import org.apache.fineract.cn.mariadb.util.LocalDateConverter;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
@@ -68,9 +60,11 @@ public class CustomerEntity {
     @Convert(converter = LocalDateConverter.class)
     private LocalDate applicationDate;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY, optional = false)
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private AddressEntity address;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ContactDetailEntity> contactDetail = new ArrayList<>();
 
     @Column(name = "created_by")
     private String createdBy;
@@ -317,6 +311,22 @@ public class CustomerEntity {
 
     public void setDateOfRegistration(LocalDateTime dateOfRegistration) {
         this.dateOfRegistration = dateOfRegistration;
+    }
+
+    public List<ContactDetailEntity> getContactDetail() {
+        return contactDetail;
+    }
+
+    public void setContactDetail(List<ContactDetailEntity> contactDetail) {
+        this.contactDetail = contactDetail;
+    }
+
+    public Boolean getDeposited() {
+        return isDeposited;
+    }
+
+    public void setDeposited(Boolean deposited) {
+        isDeposited = deposited;
     }
 
     public String getRefAccountNumber() {
