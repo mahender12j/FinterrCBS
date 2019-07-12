@@ -310,6 +310,7 @@ public class CustomerService {
         customer.setCustomerDocument(customerDocument);
         customer.setKycStatus(customerDocument.getKycStatusText());
         customer.setKycVerified(customerDocument.isKycStatus());
+//        this mapper should be always after kyc value is set cause in the mapper I am receiving the kycstatus to validate the user
         CustomerMapper.map(customer, this.userVerification(customerEntity));
 
         if (customerEntity.getReferenceCustomer() != null) {
