@@ -169,11 +169,9 @@ public class CustomerAggregate {
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_CUSTOMER)
     public String updateCustomer(final UpdateCustomerCommand updateCustomerCommand) {
-
         final Customer customer = updateCustomerCommand.customer();
         final CustomerEntity customerEntity = findCustomerEntityOrThrow(customer.getIdentifier());
         customerEntity.setGender(customer.getGender());
-
         if (customer.getGivenName() != null) {
             customerEntity.setGivenName(customer.getGivenName());
         }
@@ -392,6 +390,7 @@ public class CustomerAggregate {
 
         final List<ContactDetailEntity> oldContactDetails = this.contactDetailRepository.findByCustomer(customerEntity);
         this.contactDetailRepository.delete(oldContactDetails);
+        this.contactDetailRepository.flush();
 
         if (updateContactDetailsCommand.contactDetails() != null) {
             this.contactDetailRepository.save(
@@ -399,6 +398,7 @@ public class CustomerAggregate {
                             .stream()
                             .map(contact -> {
                                 final ContactDetailEntity newContactDetail = ContactDetailMapper.map(contact);
+                                newContactDetail.setValid(contact.getValidated());
                                 newContactDetail.setCustomer(customerEntity);
                                 return newContactDetail;
                             })

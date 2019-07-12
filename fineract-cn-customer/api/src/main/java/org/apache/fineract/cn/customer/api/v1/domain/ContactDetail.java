@@ -26,73 +26,78 @@ import javax.validation.constraints.NotNull;
 
 public final class ContactDetail {
 
-  public enum Type {
-    EMAIL,
-    MOBILE
-  }
+    public enum Type {
+        EMAIL,
+        MOBILE
+    }
 
-  public enum Group {
-    BUSINESS,
-    PRIVATE
-  }
+    public enum Group {
+        BUSINESS,
+        PRIVATE,
+        CADMIN,
+        SADMIN,
+        CORPORATE
+    }
 
-  @NotNull
-  private Type type;
-  @NotNull
-  private Group group;
-  @NotBlank
-  private String value;
-  @Min(1)
-  @Max(127)
-  private Integer preferenceLevel;  private Boolean validated;
+    @NotNull
+    private Type type;
+    @NotNull
+    private Group group;
+    @NotBlank
+    private String value;
+    @Min(1)
+    @Max(127)
+    private Integer preferenceLevel;
 
-  public ContactDetail() {
-    super();
-  }
+    private Boolean validated = false;
 
-  public String getType() {
-    return this.type.name();
-  }
+    public ContactDetail() {
+        super();
+    }
 
-  public void setType(final String type) {
-    this.type = Type.valueOf(type.toUpperCase());
-  }
+    public String getType() {
+        return this.type.name();
+    }
 
-  public String getValue() {
-    return this.value;
-  }
+    public void setType(final String type) {
+        this.type = Type.valueOf(type.toUpperCase());
+    }
 
-  public String getGroup() {
-    return this.group.name();
-  }
+    public String getValue() {
+        return this.value;
+    }
 
-  public void setGroup(final String group) {
-    this.group = Group.valueOf(group);
-  }
+    public String getGroup() {
+        return this.group.name();
+    }
 
-  public void setValue(final String value) {
-    this.value = value;
-  }
+    public void setGroup(final String group) {
+        this.group = Group.valueOf(group);
+    }
 
-  public Boolean getValidated() {
-    return this.validated;
-  }
+    public void setValue(final String value) {
+        this.value = value;
+    }
 
-  public void setValidated(final Boolean validated) {
-    this.validated = validated;
-  }
+    public Boolean getValidated() {
+        return this.validated;
+    }
 
-  public Integer getPreferenceLevel() {
-    return this.preferenceLevel;
-  }
+    public void setValidated(final Boolean validated) {
+        this.validated = validated;
+    }
 
-  public void setPreferenceLevel(final Integer preferenceLevel) {
-    this.preferenceLevel = preferenceLevel;
-  }
+    public Integer getPreferenceLevel() {
+        return this.preferenceLevel;
+    }
 
-  @Override
-	public String toString() {
-		return "ContactDetail [value=" + value + ", preferenceLevel=" + preferenceLevel + ", validated=" + validated
-				+ ", toString()=" + super.toString() + "]";
-	}
+    public void setPreferenceLevel(final Integer preferenceLevel) {
+        this.preferenceLevel = preferenceLevel;
+    }
+
+    @Override
+    public String toString() {
+        return "ContactDetail [value=" + value + ", preferenceLevel=" + preferenceLevel + ", validated=" + validated
+                + ", toString()=" + super.toString() + "]";
+    }
 }
