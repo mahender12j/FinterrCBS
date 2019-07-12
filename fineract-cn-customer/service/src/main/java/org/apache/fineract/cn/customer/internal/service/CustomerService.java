@@ -586,15 +586,56 @@ public class CustomerService {
         UserVerification userVerification = new UserVerification();
         userVerification.setEmailVerified(contactDetail.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name()) && entity.getValid()));
         userVerification.setMobileVerified(contactDetail.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.MOBILE.name()) && entity.getValid()));
-        userVerification.setVerifiedMobileNumber(contactDetail.stream().filter(entity -> entity.getValid() && entity.getType().equals(ContactDetail.Type.MOBILE.name())).findAny().map(ContactDetailEntity::getValue).orElse(""));
-        userVerification.setVerifiedEmailAddress(contactDetail.stream().filter(entity -> entity.getValid() && entity.getType().equals(ContactDetail.Type.EMAIL.name())).findAny().map(ContactDetailEntity::getValue).orElse(""));
+        userVerification.setVerifiedMobileNumber(contactDetail.stream().filter(entity -> entity.getValid() && entity.getType().equals(ContactDetail.Type.MOBILE.name())).findFirst().map(ContactDetailEntity::getValue).orElse(""));
+        userVerification.setVerifiedEmailAddress(contactDetail.stream().filter(entity -> entity.getValid() && entity.getType().equals(ContactDetail.Type.EMAIL.name())).findFirst().map(ContactDetailEntity::getValue).orElse(""));
         userVerification.setProfileComplete(getProfileCompleted(customerEntity));
         return userVerification;
     }
 
     private boolean getProfileCompleted(CustomerEntity customerEntity) {
 
+        if (customerEntity.getType().equals(Customer.UserType.CORPORATE.name())) {
+            AddressEntity addressEntity = customerEntity.getAddress();
+            List<ContactDetailEntity> detailEntityList = customerEntity.getContactDetail();
+            List<FieldValueEntity> fieldValueEntities = customerEntity.getFieldValueEntities();
+            return addressEntity != null &&
+                    addressEntity.getCountry() != null &&
+                    addressEntity.getState() != null &&
+                    addressEntity.getCity() != null &&
+                    addressEntity.getPostalCode() != null &&
+                    customerEntity.getDateOfBirth() != null &&
+                    customerEntity.getGender() != null &&
+                    fieldValueEntities.stream().anyMatch(entity -> entity.getField().getIdentifier().equals("companyName")) &&
+                    fieldValueEntities.stream().anyMatch(entity -> entity.getField().getIdentifier().equals("typeOfCompany")) &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name())) &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.MOBILE.name()));
 
-        return false;
+
+        } else if (customerEntity.getType().equals(Customer.UserType.PERSON.name())) {
+            AddressEntity addressEntity = customerEntity.getAddress();
+            List<ContactDetailEntity> detailEntityList = customerEntity.getContactDetail();
+            return addressEntity != null &&
+                    addressEntity.getCountry() != null &&
+                    customerEntity.getDateOfBirth() != null &&
+                    customerEntity.getGender() != null &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name())) &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.MOBILE.name()));
+
+        } else if (customerEntity.getType().equals(Customer.UserType.BUSINESS.name())) {
+            AddressEntity addressEntity = customerEntity.getAddress();
+            List<ContactDetailEntity> detailEntityList = customerEntity.getContactDetail();
+            return addressEntity != null &&
+                    addressEntity.getCountry() != null &&
+                    customerEntity.getRegistrationType() != null &&
+                    customerEntity.getNgoName() != null &&
+                    customerEntity.getGivenName() != null &&
+                    customerEntity.getNgoRegistrationNumber() != null &&
+                    customerEntity.getDateOfRegistration() != null &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name())) &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.MOBILE.name()));
+
+        } else {
+            return true;
+        }
     }
 }

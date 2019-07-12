@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
+import org.apache.fineract.cn.customer.catalog.internal.repository.FieldValueEntity;
 import org.apache.fineract.cn.mariadb.util.LocalDateConverter;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
@@ -65,6 +66,10 @@ public class CustomerEntity {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ContactDetailEntity> contactDetail = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<FieldValueEntity> fieldValueEntities = new ArrayList<>();
+
 
     @Column(name = "created_by")
     private String createdBy;
@@ -343,6 +348,14 @@ public class CustomerEntity {
 
     public void setRefAccountNumber(String refAccountNumber) {
         this.refAccountNumber = refAccountNumber;
+    }
+
+    public List<FieldValueEntity> getFieldValueEntities() {
+        return fieldValueEntities;
+    }
+
+    public void setFieldValueEntities(List<FieldValueEntity> fieldValueEntities) {
+        this.fieldValueEntities = fieldValueEntities;
     }
 
     @Override
