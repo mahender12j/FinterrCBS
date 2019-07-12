@@ -582,7 +582,7 @@ public class CustomerService {
     }
 
 
-    public UserVerification userVerification(final CustomerEntity customerEntity) {
+    private UserVerification userVerification(final CustomerEntity customerEntity) {
         List<ContactDetailEntity> contactDetail = customerEntity.getContactDetail();
         UserVerification userVerification = new UserVerification();
         userVerification.setEmailVerified(contactDetail.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name()) && entity.getValid()));

@@ -154,7 +154,7 @@ public final class CustomerMapper {
         customer.setMobileVerified(userVerification.isMobileVerified());
         customer.setVerifiedMobile(userVerification.getVerifiedMobileNumber());
         customer.setVerifiedEmail(userVerification.getVerifiedEmailAddress());
-        customer.setProfileComplete(userVerification.isProfileComplete() && customer.isKycVerified() && customer.getDeposited());
+        customer.setProfileComplete(userVerification.isProfileComplete());
         return customer;
     }
 
