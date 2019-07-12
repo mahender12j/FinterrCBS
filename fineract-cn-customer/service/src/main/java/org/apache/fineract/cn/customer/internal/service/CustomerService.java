@@ -604,7 +604,6 @@ public class CustomerService {
                     addressEntity.getState() != null &&
                     addressEntity.getCity() != null &&
                     addressEntity.getPostalCode() != null &&
-                    customerEntity.getDateOfBirth() != null &&
                     fieldValueEntities.stream().anyMatch(entity -> entity.getField().getIdentifier().equals("companyName")) &&
                     fieldValueEntities.stream().anyMatch(entity -> entity.getField().getIdentifier().equals("typeOfCompany")) &&
                     detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name())) &&
