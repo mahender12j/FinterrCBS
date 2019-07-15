@@ -22,6 +22,8 @@ import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -39,6 +41,9 @@ public class DocumentEntity {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
+
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<DocumentEntryEntity> documentEntryEntities = new ArrayList<>();
 
     @Column(name = "identifier", nullable = false)
     private String identifier;

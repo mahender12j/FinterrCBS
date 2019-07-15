@@ -64,6 +64,9 @@ public class CustomerEntity {
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private AddressEntity address;
 
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    private DocumentEntity documentEntity;
+
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ContactDetailEntity> contactDetail = new ArrayList<>();
 
@@ -356,6 +359,14 @@ public class CustomerEntity {
 
     public void setFieldValueEntities(List<FieldValueEntity> fieldValueEntities) {
         this.fieldValueEntities = fieldValueEntities;
+    }
+
+    public DocumentEntity getDocumentEntity() {
+        return documentEntity;
+    }
+
+    public void setDocumentEntity(DocumentEntity documentEntity) {
+        this.documentEntity = documentEntity;
     }
 
     @Override

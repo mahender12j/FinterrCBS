@@ -91,7 +91,7 @@ public class DocumentService {
 
 
     public List<Customer> findCustomersByKYCStatus(final String status) {
-        List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeIn(new HashSet<>(Arrays.asList(Customer.UserType.PERSON.name(), Customer.UserType.BUSINESS.name())));
+        List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeNotIn(new HashSet<>(Arrays.asList(Customer.UserType.SADMIN.name(), Customer.UserType.CADMIN.name())));
         return customerEntities.stream().map(entity -> {
             Customer customer = CustomerMapper.map(entity);
             final List<ContactDetailEntity> contactDetailEntities = contactDetailRepository.findByCustomer(entity);

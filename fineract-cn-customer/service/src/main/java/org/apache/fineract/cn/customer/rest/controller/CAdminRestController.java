@@ -41,16 +41,13 @@ public class CAdminRestController {
 
     private final CAdminService cAdminService;
     private final CustomerService customerService;
-    private final NGOService ngoService;
 
     @Autowired
     public CAdminRestController(final CAdminService cAdminService,
-                                final CustomerService customerService,
-                                final NGOService ngoService) {
+                                final CustomerService customerService) {
         super();
         this.cAdminService = cAdminService;
         this.customerService = customerService;
-        this.ngoService = ngoService;
     }
 
     //    GET NGO statistics
