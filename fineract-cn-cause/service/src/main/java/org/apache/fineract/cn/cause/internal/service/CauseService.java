@@ -361,7 +361,9 @@ public class CauseService {
                             .stream()
                             .filter(cdata -> cdata.getRef() == entity.getId()); //equal equal is used cause ref value can be null value which can cause null pointer issue
                     if (ratingEntityStream.findAny().isPresent()) {
-                        causeRating.setCauseRatings(fetchNestedComments(ratingEntities, entity.getId()).collect(Collectors.toList()));
+                        causeRating.setCauseRatings(fetchNestedComments(ratingEntities, entity.getId())
+                                .sorted(Comparator.comparing(CauseRating::getCreatedOn, Comparator.reverseOrder()))
+                                .collect(Collectors.toList()));
                     }
                     return causeRating;
                 });
