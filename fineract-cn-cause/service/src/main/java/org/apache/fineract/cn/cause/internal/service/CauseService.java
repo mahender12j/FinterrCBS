@@ -24,7 +24,9 @@ import org.apache.fineract.cn.cause.internal.mapper.*;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAdaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -108,6 +110,7 @@ public class CauseService {
     public Optional<CauseEntity> findCauseEntity(String identifier) {
         return causeRepository.findByIdentifier(identifier);
     }
+
                 /*
             ALL = 0
             RECENT_CAUSE = 1
@@ -115,57 +118,49 @@ public class CauseService {
             Most Popular = 3
             */
 
-    public CausePage fetchCauseForCustomer(final String param, final int sortBy, final Pageable pageable) {
 
+    public CausePage sortedCause(final int sortBy, List<Cause> causes, final Pageable pageable) {
+        CausePage causePage = new CausePage();
+        switch (sortBy) {
+            case 1:
+                causePage.setCauses(causes
+                        .stream()
+                        .sorted(Comparator.comparing(Cause::getCreatedOn, Comparator.reverseOrder())).collect(Collectors.toList()));
+                break;
+            case 2:
+                causePage.setCauses(causes
+                        .stream()
+                        .sorted((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised()))
+                        .collect(Collectors.toList()));
+                break;
+            case 3:
+                causePage.setCauses(causes
+                        .stream()
+                        .sorted(Comparator.comparing(Cause::getAvgRating, Comparator.reverseOrder()))
+                        .collect(Collectors.toList()));
+                break;
+            default:
+                break;
+
+        }
+
+        int start = pageable.getOffset();
+        int end = (start + pageable.getPageSize()) > causes.size() ? causes.size() : (start + pageable.getPageSize());
+        Page<Cause> pages = new PageImpl<Cause>(causes.subList(start, end), pageable, causes.size());
+        causePage.setTotalElements(pages.getTotalElements());
+        causePage.setTotalPages(pages.getTotalPages());
+        return causePage;
+
+    }
+
+
+    public CausePage fetchCauseForCustomer(final int sortBy, final String param, final Pageable pageable) {
         if (param == null) {
-            CausePage causePage = new CausePage();
-            final List<CauseEntity> causeEntities;
-            switch (sortBy) {
-                case 1:
-                    causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()))
-                            .stream()
-                            .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.reverseOrder()))
-                            .collect(Collectors.toList());
-
-                    final Page<CauseEntity> page = new PageImpl<>(causeEntities, pageable, causeEntities.size());
-                    causePage.setTotalPages(page.getTotalPages());
-                    causePage.setTotalElements(page.getTotalElements());
-                    causePage.setCauses(causeArrayList(page.getContent()));
-                    break;
-                case 2:
-                    causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
-                    List<Cause> topFundedcauses = causeArrayList(causeEntities)
-                            .stream()
-                            .sorted((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised()))
-                            .collect(Collectors.toList());
-
-                    final Page<Cause> topFundedcausesPage = new PageImpl<>(topFundedcauses, pageable, causeEntities.size());
-                    causePage.setTotalPages(topFundedcausesPage.getTotalPages());
-                    causePage.setTotalElements(topFundedcausesPage.getTotalElements());
-                    causePage.setCauses(topFundedcauses);
-                    break;
-                case 3:
-                    causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
-                    List<Cause> popularCauses = causeArrayList(causeEntities)
-                            .stream()
-                            .sorted(Comparator.comparing(Cause::getAvgRating, Comparator.reverseOrder()))
-                            .collect(Collectors.toList());
-
-                    final Page<Cause> popularCausesPage = new PageImpl<>(popularCauses, pageable, causeEntities.size());
-                    causePage.setTotalPages(popularCausesPage.getTotalPages());
-                    causePage.setTotalElements(popularCausesPage.getTotalElements());
-                    causePage.setCauses(popularCauses);
-                    break;
-                default:
-                    final Page<CauseEntity> allPage = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
-                    causePage.setTotalPages(allPage.getTotalPages());
-                    causePage.setTotalElements(allPage.getTotalElements());
-                    causePage.setCauses(causeArrayList(allPage.getContent()));
-                    break;
-            }
-            return causePage;
+            List<CauseEntity> causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
+            List<Cause> causes = this.causeEntitiesToCause(causeEntities);
+            return this.sortedCause(sortBy, causes, pageable);
         } else {
-            return fetchCauseByCategory(param, sortBy, pageable);
+            return fetchCauseByCategory(sortBy, param, pageable);
         }
     }
 
@@ -177,12 +172,12 @@ public class CauseService {
             causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(userIdentifier, Cause.State.DELETED.name(), pageable);
             causePage.setTotalPages(causeEntities.getTotalPages());
             causePage.setTotalElements(causeEntities.getTotalElements());
-            causePage.setCauses(causeArrayList(causeEntities.getContent()));
+            causePage.setCauses(causeEntitiesToCause(causeEntities.getContent()));
         } else {
             causeEntities = this.causeRepository.findByCreatedByAndCurrentState(userIdentifier, param, pageable);
             causePage.setTotalPages(causeEntities.getTotalPages());
             causePage.setTotalElements(causeEntities.getTotalElements());
-            causePage.setCauses(causeArrayList(causeEntities.getContent()));
+            causePage.setCauses(causeEntitiesToCause(causeEntities.getContent()));
         }
         return causePage;
     }
@@ -195,12 +190,12 @@ public class CauseService {
             causeEntities = this.causeRepository.findAll(pageable);
             causePage.setTotalPages(causeEntities.getTotalPages());
             causePage.setTotalElements(causeEntities.getTotalElements());
-            causePage.setCauses(causeArrayList(causeEntities.getContent()));
+            causePage.setCauses(causeEntitiesToCause(causeEntities.getContent()));
         } else {
             causeEntities = this.causeRepository.findByCurrentState(param, pageable);
             causePage.setTotalPages(causeEntities.getTotalPages());
             causePage.setTotalElements(causeEntities.getTotalElements());
-            causePage.setCauses(causeArrayList(causeEntities.getContent()));
+            causePage.setCauses(causeEntitiesToCause(causeEntities.getContent()));
         }
         return causePage;
     }
@@ -213,128 +208,29 @@ public class CauseService {
      Most Popular = 3
      */
 
-    private CausePage fetchCauseByCategory(final String categoryIdentifier, final int sortBy, final Pageable pageable) {
-        final CausePage causePage = new CausePage();
-        final List<CauseEntity> causeEntities;
-        Optional<CategoryEntity> categoryEntity;
+    private CausePage fetchCauseByCategory(final int sortBy, final String categoryIdentifier, final Pageable pageable) {
         if (categoryIdentifier != null) {
-            categoryEntity = this.categoryRepository.findByIdentifier(categoryIdentifier.toLowerCase());
-            if (categoryEntity.isPresent()) {
-
-                switch (sortBy) {
-                    case 1:
-                        causeEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()))
-                                .stream()
-                                .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.reverseOrder()))
-                                .collect(Collectors.toList());
-
-                        final Page<CauseEntity> page = new PageImpl<>(causeEntities, pageable, causeEntities.size());
-                        causePage.setTotalPages(page.getTotalPages());
-                        causePage.setTotalElements(page.getTotalElements());
-                        causePage.setCauses(causeArrayList(page.getContent()));
-                        break;
-                    case 2:
-
-                        causeEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
-                        List<Cause> topFundedcauses = causeArrayList(causeEntities)
-                                .stream()
-                                .sorted((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised()))
-                                .collect(Collectors.toList());
-
-                        final Page<Cause> topFundedcausesPage = new PageImpl<>(topFundedcauses, pageable, causeEntities.size());
-                        causePage.setTotalPages(topFundedcausesPage.getTotalPages());
-                        causePage.setTotalElements(topFundedcausesPage.getTotalElements());
-                        causePage.setCauses(topFundedcauses);
-
-                        break;
-                    case 3:
-                        causeEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
-                        List<Cause> popularCauses = causeArrayList(causeEntities)
-                                .stream()
-                                .sorted(Comparator.comparing(Cause::getAvgRating, Comparator.reverseOrder()))
-                                .collect(Collectors.toList());
-
-                        final Page<Cause> popularCausesPage = new PageImpl<>(popularCauses, pageable, causeEntities.size());
-                        causePage.setTotalPages(popularCausesPage.getTotalPages());
-                        causePage.setTotalElements(popularCausesPage.getTotalElements());
-                        causePage.setCauses(popularCauses);
-
-                        break;
-                    default:
-                        Page<CauseEntity> allCauseEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
-                        causePage.setCauses(causeArrayList(allCauseEntities.getContent()));
-                        causePage.setTotalPages(allCauseEntities.getTotalPages());
-                        causePage.setTotalElements(allCauseEntities.getTotalElements());
-                        break;
-                }
-
-            } else {
+            Optional<CategoryEntity> categoryEntity = this.categoryRepository.findByIdentifier(categoryIdentifier.toLowerCase());
+            return categoryEntity.map(categoryEntity1 -> {
+                final CausePage causePage = new CausePage();
+                List<CauseEntity> allCauseEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
+                List<Cause> causes = this.causeEntitiesToCause(allCauseEntities);
+                return this.sortedCause(sortBy, causes, pageable);
+            }).orElseGet(() -> {
+                final CausePage causePage = new CausePage();
                 causePage.setCauses(Collections.emptyList());
                 causePage.setTotalPages(1);
                 causePage.setTotalElements((long) 0);
-            }
+                return causePage;
+            });
         } else {
-
-
-                   /*
-            ALL = 0
-            RECENT_CAUSE = 1
-            Top-Funded = 2
-            Most Popular = 3
-            */
-
-            switch (sortBy) {
-                case 1:
-                    causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()))
-                            .stream()
-                            .sorted(Comparator.comparing(CauseEntity::getCreatedOn, Comparator.reverseOrder()))
-                            .collect(Collectors.toList());
-
-                    final Page<CauseEntity> page = new PageImpl<>(causeEntities, pageable, causeEntities.size());
-                    causePage.setTotalPages(page.getTotalPages());
-                    causePage.setTotalElements(page.getTotalElements());
-                    causePage.setCauses(causeArrayList(page.getContent()));
-                    break;
-                case 2:
-                    causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
-                    List<Cause> topFundedcauses = causeArrayList(causeEntities)
-                            .stream()
-                            .sorted((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised()))
-                            .collect(Collectors.toList());
-
-                    final Page<Cause> topFundedcausesPage = new PageImpl<>(topFundedcauses, pageable, causeEntities.size());
-                    causePage.setTotalPages(topFundedcausesPage.getTotalPages());
-                    causePage.setTotalElements(topFundedcausesPage.getTotalElements());
-                    causePage.setCauses(topFundedcauses);
-
-                    break;
-                case 3:
-                    causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
-                    List<Cause> popularCauses = causeArrayList(causeEntities)
-                            .stream()
-                            .sorted(Comparator.comparing(Cause::getAvgRating, Comparator.reverseOrder()))
-                            .collect(Collectors.toList());
-
-                    final Page<Cause> popularCausesPage = new PageImpl<>(popularCauses, pageable, causeEntities.size());
-                    causePage.setTotalPages(popularCausesPage.getTotalPages());
-                    causePage.setTotalElements(popularCausesPage.getTotalElements());
-                    causePage.setCauses(popularCauses);
-
-                    break;
-                default:
-                    Page<CauseEntity> allCauseEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()), pageable);
-                    causePage.setCauses(causeArrayList(allCauseEntities.getContent()));
-                    causePage.setTotalPages(allCauseEntities.getTotalPages());
-                    causePage.setTotalElements(allCauseEntities.getTotalElements());
-                    break;
-            }
+            List<CauseEntity> allCauseEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
+            List<Cause> causes = this.causeEntitiesToCause(allCauseEntities);
+            return this.sortedCause(sortBy, causes, pageable);
         }
-
-        return causePage;
-
     }
 
-    private ArrayList<Cause> causeArrayList(List<CauseEntity> causeEntities) {
+    private List<Cause> causeEntitiesToCause(List<CauseEntity> causeEntities) {
         final ArrayList<Cause> causes = new ArrayList<>(causeEntities.size());
         for (CauseEntity causeEntity : causeEntities) {
             final Cause cause = CauseMapper.map(causeEntity);
@@ -370,7 +266,6 @@ public class CauseService {
             setCauseDocuments(causeEntity, cause);
             setCauseExtendedAndResubmitValue(causeEntity, cause);
             setRatingsAndAverage(causeEntity, cause);
-
             return cause;
         });
     }
@@ -425,7 +320,7 @@ public class CauseService {
 
         NGOProfileStatistics statistics = new NGOProfileStatistics();
         statistics.setNgoStatistics(ngoStatistics);
-        statistics.setCauseList(this.causeArrayList(causeEntities));
+        statistics.setCauseList(this.causeEntitiesToCause(causeEntities));
 
         List<CauseJournalEntry> causeJournalEntries = causeStatistics.stream()
                 .flatMap(entry -> entry.getJournalEntry().stream()).collect(Collectors.toList());
@@ -433,13 +328,6 @@ public class CauseService {
         return statistics;
     }
 
-
-//    public final Stream<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
-//        return causeRepository.findByIdentifier(identifier)
-//                .map(this.ratingRepository::findAllByCause)
-//                .orElse(Stream.empty())
-//                .map(RatingMapper::map);
-//    }
 
     private void setRatingsAndAverage(CauseEntity causeEntity, Cause cause) {
         List<CauseRating> causeRatings = causeRepository.findByIdentifier(causeEntity.getIdentifier())
@@ -479,23 +367,6 @@ public class CauseService {
                 });
     }
 
-
-//    private List<CauseComment> fetchNastedComments(List<CommentEntity> commentEntities, final Long ref) {
-//        return commentEntities
-//                .stream()
-//                .filter(ent -> ent.getRef() == ref)  //equal equal is used cause ref value can be null value which can cause null pointer issue
-//                .map(entity -> {
-//                    CauseComment causeComment = CommentMapper.map(entity);
-//                    Stream<CommentEntity> childComment = commentEntities
-//                            .stream()
-//                            .filter(cdata -> cdata.getRef() == entity.getId()); //equal equal is used cause ref value can be null value which can cause null pointer issue
-//                    if (childComment.findAny().isPresent()) {
-//                        causeComment.setChildComments(fetchNastedComments(commentEntities, entity.getId()));
-//                    }
-//                    return causeComment;
-//                })
-//                .collect(Collectors.toList());
-//    }
 
     public final Optional<PortraitEntity> findPortrait(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
@@ -551,15 +422,5 @@ public class CauseService {
 
         return processStep;
     }
-
-
-    public Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
-        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
-        final int sizeToUse = size != null ? size : 20;
-        final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
-        final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
-        return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);
-    }
-
 }
 
