@@ -120,33 +120,35 @@ public class CauseService {
 
 
     private CausePage sortedCause(final int sortBy, List<Cause> causes, final Pageable pageable) {
-        CausePage causePage = new CausePage();
+        List<Cause> causeList = new ArrayList<>();
         switch (sortBy) {
             case 1:
-                causePage.setCauses(causes
+                causeList = causes
                         .stream()
-                        .sorted(Comparator.comparing(Cause::getCreatedOn, Comparator.reverseOrder())).collect(Collectors.toList()));
+                        .sorted(Comparator.comparing(Cause::getCreatedOn, Comparator.reverseOrder())).collect(Collectors.toList());
                 break;
             case 2:
-                causePage.setCauses(causes
+                causeList = causes
                         .stream()
                         .sorted((e1, e2) -> e2.getCauseStatistics().getTotalRaised().compareTo(e1.getCauseStatistics().getTotalRaised()))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList());
                 break;
             case 3:
-                causePage.setCauses(causes
+                causeList = causes
                         .stream()
                         .sorted(Comparator.comparing(Cause::getAvgRating, Comparator.reverseOrder()))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList());
                 break;
             default:
+                causeList = causes;
                 break;
 
         }
 
+        CausePage causePage = new CausePage();
         int start = pageable.getOffset();
         int end = (start + pageable.getPageSize()) > causes.size() ? causes.size() : (start + pageable.getPageSize());
-        Page<Cause> pages = new PageImpl<Cause>(causes.subList(start, end), pageable, causes.size());
+        Page<Cause> pages = new PageImpl<Cause>(causeList.subList(start, end), pageable, causes.size());
         causePage.setTotalElements(pages.getTotalElements());
         causePage.setTotalPages(pages.getTotalPages());
         causePage.setCauses(pages.getContent());
