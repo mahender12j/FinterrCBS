@@ -119,7 +119,7 @@ public class CauseService {
             */
 
 
-    public CausePage sortedCause(final int sortBy, List<Cause> causes, final Pageable pageable) {
+    private CausePage sortedCause(final int sortBy, List<Cause> causes, final Pageable pageable) {
         CausePage causePage = new CausePage();
         switch (sortBy) {
             case 1:
@@ -149,6 +149,7 @@ public class CauseService {
         Page<Cause> pages = new PageImpl<Cause>(causes.subList(start, end), pageable, causes.size());
         causePage.setTotalElements(pages.getTotalElements());
         causePage.setTotalPages(pages.getTotalPages());
+        causePage.setCauses(pages.getContent());
         return causePage;
 
     }
