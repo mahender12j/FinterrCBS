@@ -20,13 +20,12 @@ package org.apache.fineract.cn.customer.rest.controller;
 
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
-import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
 import org.apache.fineract.cn.customer.api.v1.domain.CAdminPage;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
 import org.apache.fineract.cn.customer.internal.service.CAdminService;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
-import org.apache.fineract.cn.customer.internal.service.NGOService;
+import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -41,13 +40,16 @@ public class CAdminRestController {
 
     private final CAdminService cAdminService;
     private final CustomerService customerService;
+    private final DocumentService documentService;
 
     @Autowired
     public CAdminRestController(final CAdminService cAdminService,
-                                final CustomerService customerService) {
+                                final CustomerService customerService,
+                                final DocumentService documentService) {
         super();
         this.cAdminService = cAdminService;
         this.customerService = customerService;
+        this.documentService = documentService;
     }
 
     //    GET NGO statistics
@@ -81,6 +83,22 @@ public class CAdminRestController {
     ResponseEntity<List<Customer>> getCadminCustomersByType(
             @RequestParam(value = "userType") final String userType) {
         return ResponseEntity.ok(this.cAdminService.findCustomerByType(userType));
+    }
+
+
+    //    get via kyc status used by cadmin / country admin
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CADMIN)
+    @RequestMapping(
+            value = "/cadmin/documents",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<List<Customer>> fetchCustomerByKycStatus(@RequestParam(value = "status") final String status) {
+        return ResponseEntity.ok(this.documentService.findCustomersByKYCStatus(status));
     }
 
 

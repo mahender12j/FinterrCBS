@@ -104,6 +104,8 @@ public class DocumentCommandHandler {
 
         existingDocument.setStatus(CustomerDocument.Status.APPROVED.name());
         existingDocument.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
+        existingDocument.setApprovedBy(UserContextHolder.checkedGetUser());
+        existingDocument.setApprovedOn(LocalDateTime.now());
         documentEntryRepository.save(existingDocument);
 
 //        customerRepository.findByIdentifier(command.getCustomerIdentifier())

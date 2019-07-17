@@ -66,7 +66,6 @@ public class CAdminService {
         CAdminPage cAdminPage = new CAdminPage();
         List<CustomerEntity> customerEntities = this.customerRepository.findAll();
         List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findAll();
-        List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findAll();
 
         CaAdminCauseData caAdminCauseData = this.causeAdaptor.fetchCauseData();
         final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).minusDays(7);
@@ -92,7 +91,7 @@ public class CAdminService {
         cAdminPage.setActiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, true));
         cAdminPage.setInactiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, false));
 
-        List<CustomerDocument> customerDocuments = customerEntities.stream().map(customerEntity -> this.findCustomerDocuments(customerEntity, documentTypeEntities, documentSubTypeEntities)).collect(Collectors.toList());
+        List<CustomerDocument> customerDocuments = customerEntities.stream().map(customerEntity -> this.findCustomerDocuments(customerEntity, documentTypeEntities)).collect(Collectors.toList());
 
         cAdminPage.setKycPending(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.PENDING.name())).count());
         cAdminPage.setKycRejected(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.REJECTED.name())).count());
@@ -124,8 +123,7 @@ public class CAdminService {
 
     }
 
-    CustomerDocument findCustomerDocuments(CustomerEntity customerEntity, List<DocumentTypeEntity> documentTypeEntities,
-                                           List<DocumentSubTypeEntity> documentSubTypeEntities) {
+    CustomerDocument findCustomerDocuments(CustomerEntity customerEntity, List<DocumentTypeEntity> documentTypeEntities) {
 
         List<DocumentTypeEntity> allTypeEntities = this.documentTypeRepository.findAll();
         List<DocumentSubTypeEntity> allSubTypeRepository = this.documentSubTypeRepository.findAll();
@@ -165,25 +163,32 @@ public class CAdminService {
             });
             customerDocument.setDocumentsTypes(documentsType);
 
+            //receive the documents master, all the types of documents per type in list
             Set<String> doc_master = documentTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getUserType().equals(customerEntity.getType()))
                     .map(DocumentTypeEntity::getUuid)
                     .collect(Collectors.toSet());
 
             final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
 
-            if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())) && isDocAvailable) {
-                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                customerDocument.setKycStatus(true);
 
-            } else if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                    && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))
-                    && isDocAvailable) {
-                customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
-                customerDocument.setKycStatus(false);
+            if (isDocAvailable) {
+                if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
+                    customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
+                    customerDocument.setKycStatus(true);
+
+                } else if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+                        && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
+                    customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
+                    customerDocument.setKycStatus(false);
+                } else {
+                    customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
+                    customerDocument.setKycStatus(false);
+                }
             } else {
-                customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
                 customerDocument.setKycStatus(false);
+                customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
             }
+
             return customerDocument;
 
         }).orElseGet(() -> {

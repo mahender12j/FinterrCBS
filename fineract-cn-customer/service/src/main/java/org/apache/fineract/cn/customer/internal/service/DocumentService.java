@@ -70,13 +70,6 @@ public class DocumentService {
         this.cAdminService = cAdminService;
     }
 
-
-//    public DocumentStorage addNewDocument(final MultipartFile multipartFile, final String customeridentifier, final String docType) throws IOException {
-//        DocumentStorageEntity storageEntity = DocumentMapper.map(multipartFile, customeridentifier, docType);
-//        DocumentStorageEntity entity = this.documentStorageRepository.save(storageEntity);
-//        return DocumentMapper.map(entity);
-//    }
-
     public Optional<DocumentStorageEntity> findDocumentStorageByUUID(final String uuid) {
         return this.documentStorageRepository.findByUuid(uuid);
     }
@@ -85,8 +78,7 @@ public class DocumentService {
     public CustomerDocument findCustomerDocuments(final String customerIdentifier) {
         final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
         List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findByActiveIsTrue();
-        List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findByActiveIsTrue();
-        return cAdminService.findCustomerDocuments(customerEntity, documentTypeEntities, documentSubTypeEntities);
+        return cAdminService.findCustomerDocuments(customerEntity, documentTypeEntities);
     }
 
 
@@ -99,7 +91,7 @@ public class DocumentService {
                 customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
             }
 
-//            set kyc documents
+//            set kyc documents for the customers, fetched by customers identifier
             CustomerDocument customerDocument = findCustomerDocuments(customer.getIdentifier());
             customer.setCustomerDocument(customerDocument);
             return customer;
@@ -195,16 +187,6 @@ public class DocumentService {
     public String getDocumentTypeTitle(final String uuid) {
         return this.documentTypeRepository.findByUuid(uuid).orElseThrow(() -> ServiceException.notFound("Document UserType Not Found")).getTitle();
     }
-//
-//    private String getDocumentSubTypeTitle(final String uuid) {
-//        Optional<DocumentSubTypeEntity> documentSubTypeEntity = this.documentSubTypeRepository.findByUuid(uuid);
-//        if (documentSubTypeEntity.isPresent()) {
-//            return documentSubTypeEntity.get().getTitle();
-//        } else {
-//            return "NOT-FOUND";
-//        }
-//    }
-
 
     public List<DocumentsMaster> findDocumentsTypesMaster(final String customerIdentifier) {
         final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
@@ -246,16 +228,6 @@ public class DocumentService {
     public Optional<DocumentSubTypeEntity> findDocumentSubTypeEntityByUuid(final DocumentTypeEntity documentType, final String uuid) {
         return this.documentSubTypeRepository.findByDocumentTypeAndUuid(documentType, uuid);
     }
-
-
-    public List<DocumentSubTypeEntity> findByDocumentTypeAndActiveIsTrue(final DocumentTypeEntity documentType) {
-        return this.documentSubTypeRepository.findByDocumentTypeAndActiveIsTrue(documentType);
-    }
-
-
-//    public Optional<DocumentTypeEntity> findDocumentTypeEntityByUserTypeAndUuid(final String userType, final String uuid) {
-//        return this.documentTypeRepository.findByUserTypeAndUuid(userType, uuid);
-//    }
 
     public Optional<DocumentTypeEntity> findByUserTypeAndUuidAndActiveTrue(final String userType, final String uuid) {
         return this.documentTypeRepository.findByUserTypeAndUuidAndActiveIsTrue(userType, uuid);

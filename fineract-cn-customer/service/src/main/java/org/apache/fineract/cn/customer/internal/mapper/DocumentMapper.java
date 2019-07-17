@@ -39,23 +39,23 @@ public class DocumentMapper {
     }
 
 
-    public static void setDocumentTypeStatus(List<DocumentEntryEntity> val, DocumentsType d) {
-        if (val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
-            d.setStatus(CustomerDocument.Status.APPROVED.name());
-        } else if (val.stream().noneMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                && val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
+    public static void setDocumentTypeStatus(List<DocumentEntryEntity> documentEntryEntities, DocumentsType documentsType) {
+        if (documentEntryEntities.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
+            documentsType.setStatus(CustomerDocument.Status.APPROVED.name());
+        } else if (documentEntryEntities.stream().noneMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+                && documentEntryEntities.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
 //            new requirements on the pending and rejected documents status on timestamp
-            val.stream().filter(documentEntryEntity -> documentEntryEntity.getStatus().equals(CustomerDocument.Status.REJECTED.name())).findFirst().ifPresent(documentEntryEntity -> {
-                boolean isAnyPendingDocumentPresentAfterRejected = val.stream().anyMatch(documentEntryEntity1 -> documentEntryEntity1.getCreatedOn().isAfter(documentEntryEntity.getCreatedOn()) && documentEntryEntity1.getStatus().equals(CustomerDocument.Status.PENDING.name()));
+            documentEntryEntities.stream().filter(documentEntryEntity -> documentEntryEntity.getStatus().equals(CustomerDocument.Status.REJECTED.name())).findFirst().ifPresent(documentEntryEntity -> {
+                boolean isAnyPendingDocumentPresentAfterRejected = documentEntryEntities.stream().anyMatch(documentEntryEntity1 -> documentEntryEntity1.getCreatedOn().isAfter(documentEntryEntity.getCreatedOn()) && documentEntryEntity1.getStatus().equals(CustomerDocument.Status.PENDING.name()));
                 if (isAnyPendingDocumentPresentAfterRejected) {
-                    d.setStatus(CustomerDocument.Status.PENDING.name());
+                    documentsType.setStatus(CustomerDocument.Status.PENDING.name());
                 } else {
-                    d.setStatus(CustomerDocument.Status.REJECTED.name());
+                    documentsType.setStatus(CustomerDocument.Status.REJECTED.name());
                 }
             });
 
         } else {
-            d.setStatus(CustomerDocument.Status.PENDING.name());
+            documentsType.setStatus(CustomerDocument.Status.PENDING.name());
         }
     }
 

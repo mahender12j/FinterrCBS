@@ -164,22 +164,6 @@ public class CustomerRestController {
                 term, (includeClosed != null ? includeClosed : Boolean.FALSE), this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
-    //    get via kyc status
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
-    @RequestMapping(
-            value = "/customers/kyc-documents",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<List<Customer>> fetchCustomerByKycStatus(
-            @RequestParam(value = "status") final String status) {
-        return ResponseEntity.ok(this.documentService.findCustomersByKYCStatus(status));
-    }
-
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
     @RequestMapping(
