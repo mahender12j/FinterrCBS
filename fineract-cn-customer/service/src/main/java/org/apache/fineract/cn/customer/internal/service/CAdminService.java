@@ -130,9 +130,13 @@ public class CAdminService {
 
         return this.documentRepository.findByCustomerId(customerEntity.getIdentifier()).map(documentEntity -> {
             CustomerDocument customerDocument = DocumentMapper.map(documentEntity);
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
-                    .stream()
-                    .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+
+            List<DocumentEntryEntity> documentEntryEntityList = this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name());
+
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                    documentEntryEntityList
+                            .stream()
+                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
 
             List<DocumentsType> documentsType = new ArrayList<>();
 
@@ -152,7 +156,7 @@ public class CAdminService {
                     documentsSubType.setCreatedOn(entity.getCreatedOn().toString());
                     documentsSubType.setDocRef(entity.getDocRef());
                     return documentsSubType;
-                }).collect(Collectors.toList());
+                }).collect(toList());
 
                 final DocumentsType type = new DocumentsType();
                 DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
@@ -164,30 +168,103 @@ public class CAdminService {
             customerDocument.setDocumentsTypes(documentsType);
 
             //receive the documents master, all the types of documents per type in list
-            Set<String> doc_master = documentTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getUserType().equals(customerEntity.getType()))
+            Set<String> doc_master = documentTypeEntities
+                    .stream()
+                    .filter(documentTypeEntity -> documentTypeEntity.getUserType().equals(customerEntity.getType()))
                     .map(DocumentTypeEntity::getUuid)
                     .collect(Collectors.toSet());
 
             final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
 
 
-            if (isDocAvailable) {
-                if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
-                    customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                    customerDocument.setKycStatus(true);
+//            check if each doc type has at least a approved document
+            if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
 
-                } else if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                        && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
-                    customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
-                    customerDocument.setKycStatus(false);
-                } else {
-                    customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
-                    customerDocument.setKycStatus(false);
-                }
+//                get approved doc list sort by approval data, the recent approved doc at first
+//                then get the latest approval doc date
+                documentEntryEntityList.stream().filter(doc -> doc.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+                        .max(Comparator.comparing(DocumentEntryEntity::getApprovedOn)).ifPresent(ent -> {
+                    if (isDocAvailable) {
+                        customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
+                        customerDocument.setKycStatus(true);
+
+                    } else {
+//                        this is the current master available in the type
+                        System.out.println("doc master in the main type entity: " + doc_master);
+
+
+                        Set<String> doc_available = documentEntryEntityList
+                                .stream()
+                                .map(DocumentEntryEntity::getType)
+                                .collect(Collectors.toSet());
+
+
+//                        documents available in the customers kyc list
+                        System.out.println("doc available in kyc list: " + doc_available);
+
+
+                        Set<String> doc_different = new HashSet<>(doc_master);
+//                        find if there is extra documents type uploaded which is not approved
+                        doc_different.removeAll(doc_available);
+
+
+                        this.documentTypeRepository.findByUuidIn(doc_different).stream().max(Comparator.comparing(DocumentTypeEntity::getCreatedOn)).ifPresent(documentTEntity -> {
+                            System.out.println("APPROVED ON" + ent.getApprovedOn());
+                            System.out.println("TYPE CREATED ON" + documentTEntity.getCreatedOn());
+
+                            if (documentTEntity.getCreatedOn().isAfter(ent.getApprovedOn())) {
+                                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
+                                customerDocument.setKycStatus(true);
+                            } else {
+//                                pening or not uploaded?
+                                System.out.println("PENDING OR NOT UPLOADED");
+                                customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
+                                customerDocument.setKycStatus(false);
+                            }
+                        });
+
+                        System.out.println("doc master: " + doc_master);
+                        System.out.println("doc diff: " + doc_different);
+                        System.out.println("doc available: " + doc_available);
+
+//                check if master have new doc after approved
+
+                    }
+                });
+
             } else {
-                customerDocument.setKycStatus(false);
-                customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
+                if (isDocAvailable) {
+                    if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+                            && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
+                        customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
+                        customerDocument.setKycStatus(false);
+                    } else {
+                        customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
+                        customerDocument.setKycStatus(false);
+                    }
+                } else {
+                    customerDocument.setKycStatus(false);
+                    customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
+                }
             }
+
+//            if (isDocAvailable) {
+//                if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
+//                    customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
+//                    customerDocument.setKycStatus(true);
+//
+//                } else if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+//                        && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
+//                    customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
+//                    customerDocument.setKycStatus(false);
+//                } else {
+//                    customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
+//                    customerDocument.setKycStatus(false);
+//                }
+//            } else {
+//                customerDocument.setKycStatus(false);
+//                customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
+//            }
 
             return customerDocument;
 
