@@ -58,6 +58,7 @@ public class DocumentTypeEntity {
 
     public DocumentTypeEntity() {
         this.uuid = UUID.randomUUID().toString();
+        this.createdOn = LocalDateTime.now();
     }
 
     public Long getId() {
