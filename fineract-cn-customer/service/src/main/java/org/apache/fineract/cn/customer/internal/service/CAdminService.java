@@ -91,7 +91,13 @@ public class CAdminService {
         cAdminPage.setActiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, true));
         cAdminPage.setInactiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, false));
 
-        List<CustomerDocument> customerDocuments = customerEntities.stream().map(customerEntity -> this.findCustomerDocuments(customerEntity, documentTypeEntities)).collect(Collectors.toList());
+        List<CustomerDocument> customerDocuments = customerEntities
+                .stream()
+                .map(customerEntity -> this.findCustomerDocuments(customerEntity, documentTypeEntities))
+                .filter(doc -> doc.getKycStatusText() != null)
+                .collect(Collectors.toList());
+
+        
 
         cAdminPage.setKycPending(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.PENDING.name())).count());
         cAdminPage.setKycRejected(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.REJECTED.name())).count());
