@@ -97,7 +97,6 @@ public class CAdminService {
                 .filter(doc -> doc.getKycStatusText() != null)
                 .collect(Collectors.toList());
 
-        
 
         cAdminPage.setKycPending(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.PENDING.name())).count());
         cAdminPage.setKycRejected(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.REJECTED.name())).count());
@@ -168,6 +167,7 @@ public class CAdminService {
                 DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
                 type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
                 type.setDocumentsSubType(documentsSubTypeList);
+                type.setUserType(customerEntity.getType());
                 type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
                 documentsType.add(type);
             });
@@ -185,7 +185,6 @@ public class CAdminService {
 
 //            check if each doc type has at least a approved document
             if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
-
 //                get approved doc list sort by approval data, the recent approved doc at first
 //                then get the latest approval doc date
                 documentEntryEntityList.stream().filter(doc -> doc.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
@@ -197,8 +196,6 @@ public class CAdminService {
                     } else {
 //                        this is the current master available in the type
                         System.out.println("doc master in the main type entity: " + doc_master);
-
-
                         Set<String> doc_available = documentEntryEntityList
                                 .stream()
                                 .map(DocumentEntryEntity::getType)
@@ -214,20 +211,34 @@ public class CAdminService {
                         doc_different.removeAll(doc_available);
 
 
-                        this.documentTypeRepository.findByUuidIn(doc_different).stream().max(Comparator.comparing(DocumentTypeEntity::getCreatedOn)).ifPresent(documentTEntity -> {
-                            System.out.println("APPROVED ON" + ent.getApprovedOn());
-                            System.out.println("TYPE CREATED ON" + documentTEntity.getCreatedOn());
+                        if (doc_different.size() == 0) {
+//                                pending or not uploaded?
+                            System.out.println("DIFFERENT IS ZERO, SO DOC WAS APPROVED BUT NOW DEACTIVATED");
+                            customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
+                            customerDocument.setKycStatus(true);
 
-                            if (documentTEntity.getCreatedOn().isAfter(ent.getApprovedOn())) {
-                                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                                customerDocument.setKycStatus(true);
-                            } else {
-//                                pening or not uploaded?
-                                System.out.println("PENDING OR NOT UPLOADED");
-                                customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
-                                customerDocument.setKycStatus(false);
-                            }
-                        });
+                        } else {
+
+                            this.documentTypeRepository.findByUuidIn(doc_different)
+                                    .stream()
+                                    .max(Comparator.comparing(DocumentTypeEntity::getCreatedOn))
+                                    .ifPresent(documentTEntity -> {
+
+                                        System.out.println("APPROVED ON: " + ent.getApprovedOn());
+                                        System.out.println("TYPE CREATED ON: " + documentTEntity.getCreatedOn());
+                                        if (documentTEntity.getCreatedOn().isAfter(ent.getApprovedOn())) {
+                                            customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
+                                            customerDocument.setKycStatus(true);
+                                        } else {
+//                                pending or not uploaded?
+                                            System.out.println("PENDING OR NOT UPLOADED");
+                                            customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
+                                            customerDocument.setKycStatus(false);
+                                        }
+                                    });
+                        }
+
+
 
                         System.out.println("doc master: " + doc_master);
                         System.out.println("doc diff: " + doc_different);
