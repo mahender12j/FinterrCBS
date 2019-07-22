@@ -37,3 +37,5 @@ fineract-cn-rhythm/spi/.classpath
 fineract-cn-rhythm/spi/.project
 fineract-cn-rhythm/spi/.settings/
 fineract-cn-rhythm/spi/bin/
+
+*.pem
