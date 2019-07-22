@@ -49,6 +49,10 @@ public class CustomerDocument {
     public CustomerDocument() {
     }
 
+    public CustomerDocument(String identifier) {
+        this.identifier = identifier;
+    }
+
     public String getIdentifier() {
         return identifier;
     }

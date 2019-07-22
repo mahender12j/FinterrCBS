@@ -189,6 +189,14 @@ public class DocumentEntity {
         this.rejectedOn = rejectedOn;
     }
 
+    public List<DocumentEntryEntity> getDocumentEntryEntities() {
+        return documentEntryEntities;
+    }
+
+    public void setDocumentEntryEntities(List<DocumentEntryEntity> documentEntryEntities) {
+        this.documentEntryEntities = documentEntryEntities;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
