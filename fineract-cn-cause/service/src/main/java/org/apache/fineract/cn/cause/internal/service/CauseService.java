@@ -347,7 +347,12 @@ public class CauseService {
     public final List<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
                 .map(this.ratingRepository::findAllByCauseAndActiveIsTrue)
-                .map(ratingEntity -> this.fetchNestedComments(ratingEntity.collect(Collectors.toList()), (long) -1))
+                .map(ratingEntity -> {
+                    List<RatingEntity> entities = ratingEntity
+                            .sorted(Comparator.comparing(RatingEntity::getCreatedOn, Comparator.reverseOrder()))
+                            .collect(Collectors.toList());
+                    return this.fetchNestedComments(entities, (long) -1);
+                })
                 .orElse(Stream.empty())
                 .collect(Collectors.toList());
 
@@ -365,7 +370,7 @@ public class CauseService {
                             .filter(cdata -> cdata.getRef() == entity.getId()); //equal equal is used cause ref value can be null value which can cause null pointer issue
                     if (ratingEntityStream.findAny().isPresent()) {
                         causeRating.setCauseRatings(fetchNestedComments(ratingEntities, entity.getId())
-                                .sorted(Comparator.comparing(CauseRating::getCreatedOn, Comparator.reverseOrder()))
+//                                .sorted(Comparator.comparing(CauseRating::getCreatedOn, Comparator.reverseOrder()))
                                 .collect(Collectors.toList()));
                     }
                     return causeRating;
