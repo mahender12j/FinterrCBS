@@ -1,16 +1,39 @@
+
+git checkout staging;
+
+echo "checkout to staging";
+
+git merge dev;
+
+
+echo "merge to dev";
+
+git push origin staging;
+
+echo "push to staging";
+
+
 ssh ubuntu@3.113.55.81 -i Fineract-Satging.pem << EOF
+
+echo "SSH access granted to staging ubuntu";
+
 cd FinterraCBS;
 
-git pull;
+echo "CD to root";
 
-cd fineract-cn-cause;
-bash r.sh;
+ git pull ssh staging;
 
-cd fineract-cn-customer;
-bash r.sh;
+echo "PULL Staging from the server";
 
-sudo docker-compose down; sudo docker-compose up -d --build;
+# cd fineract-cn-cause;
+# bash r.sh;
+
+# cd fineract-cn-customer;
+# bash r.sh;
+
+# sudo docker-compose down; sudo docker-compose up -d --build;
 
 EOF
 
-
+echo "checkout back to dev";
+git checkout dev;
