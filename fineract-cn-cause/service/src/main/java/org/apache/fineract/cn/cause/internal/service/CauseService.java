@@ -336,12 +336,13 @@ public class CauseService {
         List<CauseRating> causeRatings = causeRepository.findByIdentifier(causeEntity.getIdentifier())
                 .map(this.ratingRepository::findAllByCauseAndActiveIsTrue)
                 .map(ratingEntity -> {
+                    System.out.println("natural order");
                     List<RatingEntity> entities = ratingEntity
-                            .sorted(Comparator.comparing(RatingEntity::getCreatedOn, Comparator.reverseOrder()))
+                            .sorted(Comparator.comparing(RatingEntity::getCreatedOn, Comparator.naturalOrder()))
                             .collect(Collectors.toList());
                     return this.fetchNestedComments(entities, (long) -1);
-                }).orElse(Stream.empty())
-                .sorted(Comparator.comparing(CauseRating::getCreatedOn, Comparator.reverseOrder()))
+                })
+                .orElse(Stream.empty())
                 .collect(Collectors.toList());
 
         cause.setCauseRatings(causeRatings);
@@ -353,11 +354,13 @@ public class CauseService {
         return causeRepository.findByIdentifier(identifier)
                 .map(this.ratingRepository::findAllByCauseAndActiveIsTrue)
                 .map(ratingEntity -> {
-                    List<RatingEntity> entities = ratingEntity.collect(Collectors.toList());
+                    System.out.println("natural order");
+                    List<RatingEntity> entities = ratingEntity
+                            .sorted(Comparator.comparing(RatingEntity::getCreatedOn, Comparator.naturalOrder()))
+                            .collect(Collectors.toList());
                     return this.fetchNestedComments(entities, (long) -1);
                 })
                 .orElse(Stream.empty())
-                .sorted(Comparator.comparing(CauseRating::getCreatedOn, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
 
     }
