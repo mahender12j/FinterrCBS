@@ -336,7 +336,6 @@ public class CauseService {
         List<CauseRating> causeRatings = causeRepository.findByIdentifier(causeEntity.getIdentifier())
                 .map(this.ratingRepository::findAllByCauseAndActiveIsTrue)
                 .map(ratingEntity -> {
-                    System.out.println("natural order");
                     List<RatingEntity> entities = ratingEntity
                             .sorted(Comparator.comparing(RatingEntity::getCreatedOn, Comparator.naturalOrder()))
                             .collect(Collectors.toList());
@@ -354,7 +353,6 @@ public class CauseService {
         return causeRepository.findByIdentifier(identifier)
                 .map(this.ratingRepository::findAllByCauseAndActiveIsTrue)
                 .map(ratingEntity -> {
-                    System.out.println("natural order");
                     List<RatingEntity> entities = ratingEntity
                             .sorted(Comparator.comparing(RatingEntity::getCreatedOn, Comparator.naturalOrder()))
                             .collect(Collectors.toList());
