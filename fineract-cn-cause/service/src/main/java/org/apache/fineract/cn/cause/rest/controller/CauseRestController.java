@@ -824,7 +824,7 @@ public class CauseRestController {
         final Long maxSize = this.environment.getProperty("upload.image.max-size", Long.class);
 
         if (size > maxSize) {
-            throw ServiceException.badRequest("Image can''t exceed size of {0}", maxSize);
+            throw ServiceException.badRequest("Please upload a JPG, PNG, JPEG file not exceeding 1 MB", maxSize);
         }
     }
 
