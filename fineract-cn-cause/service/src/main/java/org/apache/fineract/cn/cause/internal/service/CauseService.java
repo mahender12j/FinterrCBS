@@ -335,8 +335,13 @@ public class CauseService {
     private void setRatingsAndAverage(CauseEntity causeEntity, Cause cause) {
         List<CauseRating> causeRatings = causeRepository.findByIdentifier(causeEntity.getIdentifier())
                 .map(this.ratingRepository::findAllByCauseAndActiveIsTrue)
-                .map(ratingEntity -> this.fetchNestedComments(ratingEntity.collect(Collectors.toList()), (long) -1))
-                .orElse(Stream.empty())
+                .map(ratingEntity -> {
+                    List<RatingEntity> entities = ratingEntity
+                            .sorted(Comparator.comparing(RatingEntity::getCreatedOn, Comparator.reverseOrder()))
+                            .collect(Collectors.toList());
+                    return this.fetchNestedComments(entities, (long) -1);
+                }).orElse(Stream.empty())
+                .sorted(Comparator.comparing(CauseRating::getCreatedOn, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
 
         cause.setCauseRatings(causeRatings);
@@ -348,12 +353,11 @@ public class CauseService {
         return causeRepository.findByIdentifier(identifier)
                 .map(this.ratingRepository::findAllByCauseAndActiveIsTrue)
                 .map(ratingEntity -> {
-                    List<RatingEntity> entities = ratingEntity
-                            .sorted(Comparator.comparing(RatingEntity::getCreatedOn, Comparator.reverseOrder()))
-                            .collect(Collectors.toList());
+                    List<RatingEntity> entities = ratingEntity.collect(Collectors.toList());
                     return this.fetchNestedComments(entities, (long) -1);
                 })
                 .orElse(Stream.empty())
+                .sorted(Comparator.comparing(CauseRating::getCreatedOn, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
 
     }
@@ -362,16 +366,14 @@ public class CauseService {
     private Stream<CauseRating> fetchNestedComments(List<RatingEntity> ratingEntities, final Long ref) {
         return ratingEntities
                 .stream()
-                .filter(ent -> ent.getRef() == ref)  //equal equal is used cause ref value can be null value which can cause null pointer issue
+                .filter(ent -> ent.getRef().equals(ref))  //equal equal is used cause ref value can be null value which can cause null pointer issue
                 .map(entity -> {
                     CauseRating causeRating = RatingMapper.map(entity);
                     Stream<RatingEntity> ratingEntityStream = ratingEntities
                             .stream()
-                            .filter(cdata -> cdata.getRef() == entity.getId()); //equal equal is used cause ref value can be null value which can cause null pointer issue
+                            .filter(cdata -> cdata.getRef().equals(entity.getId())); //equal equal is used cause ref value can be null value which can cause null pointer issue
                     if (ratingEntityStream.findAny().isPresent()) {
-                        causeRating.setCauseRatings(fetchNestedComments(ratingEntities, entity.getId())
-//                                .sorted(Comparator.comparing(CauseRating::getCreatedOn, Comparator.reverseOrder()))
-                                .collect(Collectors.toList()));
+                        causeRating.setCauseRatings(fetchNestedComments(ratingEntities, entity.getId()).collect(Collectors.toList()));
                     }
                     return causeRating;
                 });
