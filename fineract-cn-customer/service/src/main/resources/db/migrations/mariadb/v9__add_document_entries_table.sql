@@ -24,7 +24,7 @@ create table maat_documents_entry
     primary key,
   document_id       bigint                                    not null,
   document_name     varchar(256)                              not null,
-  uuid              varchar(65)                               not null,
+  typeUUID              varchar(65)                               not null,
   created_by        varchar(32)                               null,
   status            varchar(256)                              null,
   type              varchar(256)                              not null,

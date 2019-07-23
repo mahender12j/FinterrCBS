@@ -198,7 +198,7 @@ public class DocumentMapper {
 //            documents.setDocumentName(doc.getDocName());
 //            documents.setSubType(doc.getSubType());
 //            documents.setType(doc.getType());
-//            documents.setDocRef(doc.getUuid());
+//            documents.setDocRef(doc.getTypeUUID());
 //            documents.setCreatedBy(UserContextHolder.checkedGetUser());
 //            documents.setStatus(CustomerDocument.Status.PENDING.name());
 //            documents.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));

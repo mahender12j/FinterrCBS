@@ -152,6 +152,8 @@ public class CAdminService {
                     documentsSubType.setCreated_by(entity.getCreatedBy());
                     documentsSubType.setStatus(entity.getStatus());
                     documentsSubType.setType(this.getDocumentTypeTitle(allTypeEntities, entity.getType()));
+                    documentsSubType.setTypeUUID(entity.getType());
+                    documentsSubType.setSubTypeUUID(entity.getSubType());
                     documentsSubType.setSubType(this.getDocumentSubTypeTitle(allSubTypeRepository, entity.getSubType()));
                     documentsSubType.setUpdatedOn(entity.getUpdatedOn().toString());
                     documentsSubType.setApprovedBy(entity.getApprovedBy());
@@ -168,6 +170,7 @@ public class CAdminService {
                 type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
                 type.setDocumentsSubType(documentsSubTypeList);
                 type.setUserType(customerEntity.getType());
+                type.setUuid(key);
                 type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
                 documentsType.add(type);
             });
@@ -187,66 +190,48 @@ public class CAdminService {
             if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
 //                get approved doc list sort by approval data, the recent approved doc at first
 //                then get the latest approval doc date
-                documentEntryEntityList.stream().filter(doc -> doc.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                        .max(Comparator.comparing(DocumentEntryEntity::getApprovedOn)).ifPresent(ent -> {
-                    if (isDocAvailable) {
-                        customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                        customerDocument.setKycStatus(true);
-
-                    } else {
-//                        this is the current master available in the type
-//                        System.out.println("doc master in the main type entity: " + doc_master);
-                        Set<String> doc_available = documentEntryEntityList
-                                .stream()
-                                .map(DocumentEntryEntity::getType)
-                                .collect(Collectors.toSet());
+                Optional<DocumentEntryEntity> entryEntity = documentEntryEntityList.stream().filter(doc -> doc.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+                        .max(Comparator.comparing(DocumentEntryEntity::getApprovedOn));
 
 
-//                        documents available in the customers kyc list
-//                        System.out.println("doc available in kyc list: " + doc_available);
-
-
-                        Set<String> doc_different = new HashSet<>(doc_master);
-//                        find if there is extra documents type uploaded which is not approved
-                        doc_different.removeAll(doc_available);
-
-
-                        if (doc_different.size() == 0) {
-//                                pending or not uploaded?
-//                            System.out.println("DIFFERENT IS ZERO, SO DOC WAS APPROVED BUT NOW DEACTIVATED");
+                if (entryEntity.isPresent()) {
+                    entryEntity.ifPresent(ent -> {
+                        if (isDocAvailable) {
                             customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
                             customerDocument.setKycStatus(true);
-
                         } else {
-
-                            this.documentTypeRepository.findByUuidIn(doc_different)
+                            Set<String> doc_available = documentEntryEntityList
                                     .stream()
-                                    .max(Comparator.comparing(DocumentTypeEntity::getCreatedOn))
-                                    .ifPresent(documentTEntity -> {
+                                    .map(DocumentEntryEntity::getType)
+                                    .collect(Collectors.toSet());
 
-//                                        System.out.println("APPROVED ON: " + ent.getApprovedOn());
-//                                        System.out.println("TYPE CREATED ON: " + documentTEntity.getCreatedOn());
-                                        if (documentTEntity.getCreatedOn().isAfter(ent.getApprovedOn())) {
-                                            customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                                            customerDocument.setKycStatus(true);
-                                        } else {
-//                                pending or not uploaded?
-//                                            System.out.println("PENDING OR NOT UPLOADED");
-                                            customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
-                                            customerDocument.setKycStatus(false);
-                                        }
-                                    });
+                            Set<String> doc_different = new HashSet<>(doc_master);
+                            doc_different.removeAll(doc_available);
+                            if (doc_different.size() == 0) {
+                                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
+                                customerDocument.setKycStatus(true);
+
+                            } else {
+
+                                this.documentTypeRepository.findByUuidIn(doc_different)
+                                        .stream()
+                                        .max(Comparator.comparing(DocumentTypeEntity::getCreatedOn))
+                                        .ifPresent(documentTEntity -> {
+                                            if (documentTEntity.getCreatedOn().isAfter(ent.getApprovedOn())) {
+                                                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
+                                                customerDocument.setKycStatus(true);
+                                            } else {
+                                                customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
+                                                customerDocument.setKycStatus(false);
+                                            }
+                                        });
+                            }
                         }
-
-
-//                        System.out.println("doc master: " + doc_master);
-//                        System.out.println("doc diff: " + doc_different);
-//                        System.out.println("doc available: " + doc_available);
-
-//                check if master have new doc after approved
-
-                    }
-                });
+                    });
+                } else {
+                    customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
+                    customerDocument.setKycStatus(false);
+                }
 
             } else {
                 if (isDocAvailable) {

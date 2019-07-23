@@ -28,6 +28,7 @@ public class DocumentsType {
 
     @NotNull
     private String title;
+    private String uuid;
     @NotNull
     private String userType;
     private String status;
@@ -86,6 +87,14 @@ public class DocumentsType {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     @Override
