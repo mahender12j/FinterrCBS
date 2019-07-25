@@ -349,6 +349,9 @@ public class CustomerService {
             );
         }
 
+
+//        todo will be removed once the user data migration is completed from the db side, this is temporary for the users
+//        for running the kyc status update
         this.documentRepository.findByCustomer(customerEntity).ifPresent(documentEntity -> {
             if (!documentEntity.getStatus().equals(CustomerDocument.Status.APPROVED.name())) {
                 documentEntity.setStatus(findCustomerDocumentsStatus(customerEntity));
