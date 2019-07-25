@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Myrle Krantz
@@ -37,10 +38,11 @@ public interface DocumentTypeRepository extends JpaRepository<DocumentTypeEntity
 
     List<DocumentTypeEntity> findByUserType(final String userType);
 
-    //    @Query("SELECT c FROM DocumentTypeEntity c WHERE c.active = true")
-    List<DocumentTypeEntity> findByActiveIsTrue();
+    List<DocumentTypeEntity> findByUuidIn(final Set<String> stringSet);
 
-    Optional<DocumentTypeEntity> findByUserTypeAndUuid(final String userType, final String uuid);
+    List<DocumentTypeEntity> findByUuidNotIn(final Set<String> stringSet);
+
+    List<DocumentTypeEntity> findAllByActiveIsTrue();
 
     Optional<DocumentTypeEntity> findByUserTypeAndUuidAndActiveIsTrue(final String userType, final String uuid);
 

@@ -33,7 +33,7 @@ public final class ContactDetailMapper {
     contactDetailEntity.setGroup(contactDetail.getGroup());
     contactDetailEntity.setValue(contactDetail.getValue());
     contactDetailEntity.setPreferenceLevel(contactDetail.getPreferenceLevel());
-    contactDetailEntity.setValid(contactDetail.getValidated());
+    contactDetailEntity.setValid(false);
     return contactDetailEntity;
   }
 

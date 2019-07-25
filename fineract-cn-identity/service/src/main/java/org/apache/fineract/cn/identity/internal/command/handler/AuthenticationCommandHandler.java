@@ -281,9 +281,6 @@ public class AuthenticationCommandHandler {
                 privateSignature,
                 sourceApplicationName);
 
-
-        System.out.println("-----------------------access token generated");
-
         return new AuthenticationCommandResponse(
                 accessToken.getToken(), DateConverter.toIsoString(accessToken.getExpiration()),
                 refreshToken, DateConverter.toIsoString(refreshTokenExpiration),
@@ -336,8 +333,6 @@ public class AuthenticationCommandHandler {
                 .setPrivateKeyExp(privateSignatureEntity.getPrivateKeyExp())
                 .setPrivateKeyMod(privateSignatureEntity.getPrivateKeyMod())
                 .build();
-
-        System.out.println("---------------private key------------" + privateKey);
 
         final TenantAccessTokenSerializer.Specification x =
                 new TenantAccessTokenSerializer.Specification()

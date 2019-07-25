@@ -21,87 +21,90 @@ package org.apache.fineract.cn.customer.api.v1;
 @SuppressWarnings("unused")
 public interface CustomerEventConstants {
 
-  String DESTINATION = "customer-v1";
+    String DESTINATION = "customer-v1";
 
-  String SELECTOR_NAME = "action";
+    String SELECTOR_NAME = "action";
 
-  String INITIALIZE = "initialize";
+    String INITIALIZE = "initialize";
 
-  String POST_CUSTOMER = "post-customer";
-  String PUT_CUSTOMER = "put-customer";
-  String PUT_ADDRESS = "put-address";
-  String POST_AMLDETAILS = "post-amldetails";
-  String PUT_CONTACT_DETAILS = "put-contact-details";
-  String POST_IDENTIFICATION_CARD = "post-identification-card";
-  String PUT_IDENTIFICATION_CARD = "put-identification-card";
-  String DELETE_IDENTIFICATION_CARD = "delete-identification-card";
+    String POST_CORPORATE = "post-corporate";
+    String PUT_CORPORATE = "put-corporate";
 
-  String POST_NGO_PROFILE = "post-ngo-profile";
-  String PUT_NGO_PROFILE = "put-ngo-profile";
+    String POST_CUSTOMER = "post-customer";
+    String PUT_CUSTOMER = "put-customer";
+    String PUT_ADDRESS = "put-address";
+    String POST_AMLDETAILS = "post-amldetails";
+    String PUT_CONTACT_DETAILS = "put-contact-details";
+    String POST_IDENTIFICATION_CARD = "post-identification-card";
+    String PUT_IDENTIFICATION_CARD = "put-identification-card";
+    String DELETE_IDENTIFICATION_CARD = "delete-identification-card";
 
-  String POST_IDENTIFICATION_CARD_SCAN = "post-identification-card-scan";
-  String DELETE_IDENTIFICATION_CARD_SCAN = "delete-identification-card-scan";
+    String POST_NGO_PROFILE = "post-ngo-profile";
+    String PUT_NGO_PROFILE = "put-ngo-profile";
 
-  String ACTIVATE_CUSTOMER = "activate-customer";
-  String LOCK_CUSTOMER = "lock-customer";
-  String UNLOCK_CUSTOMER = "unlock-customer";
-  String CLOSE_CUSTOMER = "close-customer";
-  String REOPEN_CUSTOMER = "reopen-customer";
+    String POST_IDENTIFICATION_CARD_SCAN = "post-identification-card-scan";
+    String DELETE_IDENTIFICATION_CARD_SCAN = "delete-identification-card-scan";
 
-  String POST_TASK = "post-task";
-  String PUT_TASK = "put-task";
+    String ACTIVATE_CUSTOMER = "activate-customer";
+    String LOCK_CUSTOMER = "lock-customer";
+    String UNLOCK_CUSTOMER = "unlock-customer";
+    String CLOSE_CUSTOMER = "close-customer";
+    String REOPEN_CUSTOMER = "reopen-customer";
 
-  String POST_PORTRAIT = "post-portrait";
-  String DELETE_PORTRAIT = "delete-portrait";
+    String POST_TASK = "post-task";
+    String PUT_TASK = "put-task";
 
-  String POST_DOCUMENT_TYPE = "post-document_type";
-  String PUT_DOCUMENT_TYPE = "put-document_type";
+    String POST_PORTRAIT = "post-portrait";
+    String DELETE_PORTRAIT = "delete-portrait";
 
-  String POST_DOCUMENT_SUB_TYPE = "post-document_sub_type";
-  String PUT_DOCUMENT_SUB_TYPE = "put-document_sub_type";
+    String POST_DOCUMENT_TYPE = "post-document_type";
+    String PUT_DOCUMENT_TYPE = "put-document_type";
+
+    String POST_DOCUMENT_SUB_TYPE = "post-document_sub_type";
+    String PUT_DOCUMENT_SUB_TYPE = "put-document_sub_type";
 
 
-  String UPLOAD_DOCUMENT = "upload-document";
+    String UPLOAD_DOCUMENT = "upload-document";
 
-  String POST_DOCUMENT = "post-document";
-  String PUT_DOCUMENT = "put-document";
-  String UNDO_DOCUMENT = "undo-document";
-  String DELETE_DOCUMENT = "delete-document";
-  String POST_DOCUMENT_PAGE = "post-document-page";
-  String DELETE_DOCUMENT_PAGE = "delete-document-page";
-  String POST_DOCUMENT_COMPLETE = "post-document-complete";
+    String POST_DOCUMENT = "post-document";
+    String PUT_DOCUMENT = "put-document";
+    String UNDO_DOCUMENT = "undo-document";
+    String DELETE_DOCUMENT = "delete-document";
+    String POST_DOCUMENT_PAGE = "post-document-page";
+    String DELETE_DOCUMENT_PAGE = "delete-document-page";
+    String POST_DOCUMENT_COMPLETE = "post-document-complete";
 
-  String SELECTOR_INITIALIZE = SELECTOR_NAME + " = '" + INITIALIZE + "'";
+    String SELECTOR_INITIALIZE = SELECTOR_NAME + " = '" + INITIALIZE + "'";
 
-  String SELECTOR_POST_CUSTOMER = SELECTOR_NAME + " = '" + POST_CUSTOMER + "'";
-  String SELECTOR_PUT_CUSTOMER = SELECTOR_NAME + " = '" + PUT_CUSTOMER + "'";
-  String SELECTOR_PUT_ADDRESS = SELECTOR_NAME + " = '" + PUT_ADDRESS + "'";
-  String SELECTOR_PUT_CONTACT_DETAILS = SELECTOR_NAME + " = '" + PUT_CONTACT_DETAILS + "'";
+    String SELECTOR_POST_CUSTOMER = SELECTOR_NAME + " = '" + POST_CUSTOMER + "'";
+    String SELECTOR_PUT_CUSTOMER = SELECTOR_NAME + " = '" + PUT_CUSTOMER + "'";
+    String SELECTOR_PUT_ADDRESS = SELECTOR_NAME + " = '" + PUT_ADDRESS + "'";
+    String SELECTOR_PUT_CONTACT_DETAILS = SELECTOR_NAME + " = '" + PUT_CONTACT_DETAILS + "'";
 
-  String SELECTOR_POST_AMLDETAILS = SELECTOR_NAME + " = '" + POST_AMLDETAILS + "'";
-  String SELECTOR_POST_IDENTIFICATION_CARD = SELECTOR_NAME + " = '" + POST_IDENTIFICATION_CARD + "'";
-  String SELECTOR_PUT_IDENTIFICATION_CARD = SELECTOR_NAME + " = '" + PUT_IDENTIFICATION_CARD + "'";
-  String SELECTOR_DELETE_IDENTIFICATION_CARD = SELECTOR_NAME + " = '" + DELETE_IDENTIFICATION_CARD + "'";
+    String SELECTOR_POST_AMLDETAILS = SELECTOR_NAME + " = '" + POST_AMLDETAILS + "'";
+    String SELECTOR_POST_IDENTIFICATION_CARD = SELECTOR_NAME + " = '" + POST_IDENTIFICATION_CARD + "'";
+    String SELECTOR_PUT_IDENTIFICATION_CARD = SELECTOR_NAME + " = '" + PUT_IDENTIFICATION_CARD + "'";
+    String SELECTOR_DELETE_IDENTIFICATION_CARD = SELECTOR_NAME + " = '" + DELETE_IDENTIFICATION_CARD + "'";
 
-  String SELECTOR_POST_IDENTIFICATION_CARD_SCAN = SELECTOR_NAME + " = '" + POST_IDENTIFICATION_CARD_SCAN + "'";
-  String SELECTOR_DELETE_IDENTIFICATION_CARD_SCAN = SELECTOR_NAME + " = '" + DELETE_IDENTIFICATION_CARD_SCAN + "'";
+    String SELECTOR_POST_IDENTIFICATION_CARD_SCAN = SELECTOR_NAME + " = '" + POST_IDENTIFICATION_CARD_SCAN + "'";
+    String SELECTOR_DELETE_IDENTIFICATION_CARD_SCAN = SELECTOR_NAME + " = '" + DELETE_IDENTIFICATION_CARD_SCAN + "'";
 
-  String SELECTOR_ACTIVATE_CUSTOMER = SELECTOR_NAME + " = '" + ACTIVATE_CUSTOMER + "'";
-  String SELECTOR_LOCK_CUSTOMER = SELECTOR_NAME + " = '" + LOCK_CUSTOMER + "'";
-  String SELECTOR_UNLOCK_CUSTOMER = SELECTOR_NAME + " = '" + UNLOCK_CUSTOMER + "'";
-  String SELECTOR_CLOSE_CUSTOMER = SELECTOR_NAME + " = '" + CLOSE_CUSTOMER + "'";
-  String SELECTOR_REOPEN_CUSTOMER = SELECTOR_NAME + " = '" + REOPEN_CUSTOMER + "'";
+    String SELECTOR_ACTIVATE_CUSTOMER = SELECTOR_NAME + " = '" + ACTIVATE_CUSTOMER + "'";
+    String SELECTOR_LOCK_CUSTOMER = SELECTOR_NAME + " = '" + LOCK_CUSTOMER + "'";
+    String SELECTOR_UNLOCK_CUSTOMER = SELECTOR_NAME + " = '" + UNLOCK_CUSTOMER + "'";
+    String SELECTOR_CLOSE_CUSTOMER = SELECTOR_NAME + " = '" + CLOSE_CUSTOMER + "'";
+    String SELECTOR_REOPEN_CUSTOMER = SELECTOR_NAME + " = '" + REOPEN_CUSTOMER + "'";
 
-  String SELECTOR_POST_TASK = SELECTOR_NAME + " = '" + POST_TASK + "'";
-  String SELECTOR_PUT_TASK = SELECTOR_NAME + " = '" + PUT_TASK + "'";
+    String SELECTOR_POST_TASK = SELECTOR_NAME + " = '" + POST_TASK + "'";
+    String SELECTOR_PUT_TASK = SELECTOR_NAME + " = '" + PUT_TASK + "'";
 
-  String SELECTOR_PUT_PORTRAIT = SELECTOR_NAME + " = '" + POST_PORTRAIT + "'";
-  String SELECTOR_DELETE_PORTRAIT = SELECTOR_NAME + " = '" + DELETE_PORTRAIT + "'";
+    String SELECTOR_PUT_PORTRAIT = SELECTOR_NAME + " = '" + POST_PORTRAIT + "'";
+    String SELECTOR_DELETE_PORTRAIT = SELECTOR_NAME + " = '" + DELETE_PORTRAIT + "'";
 
-  String SELECTOR_POST_DOCUMENT = SELECTOR_NAME + " = '" + POST_DOCUMENT + "'";
-  String SELECTOR_PUT_DOCUMENT = SELECTOR_NAME + " = '" + PUT_DOCUMENT + "'";
-  String SELECTOR_DELETE_DOCUMENT = SELECTOR_NAME + " = '" + DELETE_DOCUMENT + "'";
-  String SELECTOR_POST_DOCUMENT_PAGE = SELECTOR_NAME + " = '" + POST_DOCUMENT_PAGE + "'";
-  String SELECTOR_DELETE_DOCUMENT_PAGE = SELECTOR_NAME + " = '" + DELETE_DOCUMENT_PAGE + "'";
-  String SELECTOR_POST_DOCUMENT_COMPLETE = SELECTOR_NAME + " = '" + POST_DOCUMENT_COMPLETE + "'";
+    String SELECTOR_POST_DOCUMENT = SELECTOR_NAME + " = '" + POST_DOCUMENT + "'";
+    String SELECTOR_PUT_DOCUMENT = SELECTOR_NAME + " = '" + PUT_DOCUMENT + "'";
+    String SELECTOR_DELETE_DOCUMENT = SELECTOR_NAME + " = '" + DELETE_DOCUMENT + "'";
+    String SELECTOR_POST_DOCUMENT_PAGE = SELECTOR_NAME + " = '" + POST_DOCUMENT_PAGE + "'";
+    String SELECTOR_DELETE_DOCUMENT_PAGE = SELECTOR_NAME + " = '" + DELETE_DOCUMENT_PAGE + "'";
+    String SELECTOR_POST_DOCUMENT_COMPLETE = SELECTOR_NAME + " = '" + POST_DOCUMENT_COMPLETE + "'";
 }

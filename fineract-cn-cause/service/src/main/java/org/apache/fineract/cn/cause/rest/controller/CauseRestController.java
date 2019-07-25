@@ -38,6 +38,9 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -87,7 +90,7 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Void>
-    initialize() throws InterruptedException {
+    initialize() {
         this.commandGateway.process(new InitializeServiceCommand());
         return ResponseEntity.accepted().build();
     }
@@ -138,10 +141,13 @@ public class CauseRestController {
                                           @RequestParam(value = "size", required = false) final Integer size,
                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
+
+        Pageable pageable = this.createPageRequest(pageIndex, size, sortColumn, sortDirection);
+
         if (includeClosed != null ? includeClosed : Boolean.TRUE) {
-            return ResponseEntity.ok(this.causeService.fetchCauseForNGO(param, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+            return ResponseEntity.ok(this.causeService.fetchCauseForNGO(param, pageable));
         } else {
-            return ResponseEntity.ok(this.causeService.fetchCauseForCustomer(param, sortBy == null ? 0 : sortBy, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+            return ResponseEntity.ok(this.causeService.fetchCauseForCustomer(sortBy == null ? 0 : sortBy, param, pageable));
         }
     }
 
@@ -450,45 +456,38 @@ public class CauseRestController {
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
-            value = "/causes/{identifier}/comments/{ratingid}",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-
-    public
-    @ResponseBody
-    ResponseEntity<CauseComment> causeComment(@PathVariable("identifier") final String identifier,
-                                              @PathVariable("ratingid") final Long ratingid,
-                                              @Valid @RequestBody final CauseComment causeComment) {
-        throwIfCauseNotExists(identifier);
-        throwIfRatingNotExists(ratingid);
-        if (causeComment.getRef() != null)
-            throwIfCommentNotExists(causeComment.getRef());
-
-        try {
-            CommandCallback<CauseComment> commandCallback = this.commandGateway.process(new CreateCommentCommand(identifier, ratingid, causeComment), CauseComment.class);
-            return ResponseEntity.ok(commandCallback.get());
-        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
-            throw ServiceException.badRequest("Sorry ! Something went wrong!!!");
-        }
-    }
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
             value = "/causes/{identifier}/ratings",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-
     public
     @ResponseBody
     ResponseEntity<List<CauseRating>> fetchCauseRatings(@PathVariable("identifier") final String identifier) {
         throwIfCauseNotExists(identifier);
-        return ResponseEntity.ok(this.causeService.fetchRatingsAndCommentsByCause(identifier).collect(Collectors.toList()));
+        return ResponseEntity.ok(this.causeService.fetchRatingsAndCommentsByCause(identifier));
     }
 
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/ratings/{ratingId}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> deleteCauseRating(@PathVariable("identifier") final String identifier,
+                                           @PathVariable("ratingId") final Long ratingId) {
+        this.throwIfCauseNotExists(identifier);
+        this.throwIfRatingNotExists(ratingId);
+//        todo has implementation inside the method
+        this.throwIfRatingOwnerIsNotOwnByCurrentUserOrCA(ratingId);
+
+        this.commandGateway.process(new DeleteCauseRatingCommand(identifier, ratingId));
+        return ResponseEntity.accepted().build();
+    }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
@@ -797,11 +796,13 @@ public class CauseRestController {
         }
     }
 
-    private void throwIfCommentNotExists(Long ref) {
-        if (!this.causeService.commentExists(ref)) {
-            throw ServiceException.notFound("Comment for ref {0} not found.", ref);
+    private void throwIfRatingOwnerIsNotOwnByCurrentUserOrCA(Long ratingId) {
+        // todo need to make sure ca is able to access this api, need to call customer api for this to know the current user role
+        if (!this.causeService.ratingExistsByCreatedBy(ratingId).isPresent()) {
+            throw ServiceException.badRequest("Rating {0} not owned by the current user", ratingId);
         }
     }
+
 
     private void throwIfDocumentNotValid(Cause cause) {
         if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("terms"))) {
@@ -823,7 +824,7 @@ public class CauseRestController {
         final Long maxSize = this.environment.getProperty("upload.image.max-size", Long.class);
 
         if (size > maxSize) {
-            throw ServiceException.badRequest("Image can''t exceed size of {0}", maxSize);
+            throw ServiceException.badRequest("Please upload a JPG, PNG, JPEG file not exceeding 1 MB", maxSize);
         }
     }
 
@@ -845,6 +846,15 @@ public class CauseRestController {
         if (causeEndDate.isBefore(LocalDateTime.now(Clock.systemDefaultZone()))) {
             throw ServiceException.conflict("Cause {0} required minimum two days at least. Current end date: {1}", causeEntity.getIdentifier(), causeEntity.getEndDate());
         }
+    }
+
+    public Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
+        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
+        final int sizeToUse = size != null ? size : 20;
+        final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
+        final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
+        System.out.println("page size down: " + sizeToUse);
+        return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);
     }
 
 }

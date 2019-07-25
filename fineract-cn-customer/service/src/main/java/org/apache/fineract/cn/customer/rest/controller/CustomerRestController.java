@@ -96,6 +96,20 @@ public class CustomerRestController {
         return ResponseEntity.accepted().build();
     }
 
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.SADMIN)
+    @RequestMapping(
+            value = "/aerequest",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<HashMap<String, String>> aerequest(
+            @RequestBody @Valid AERequest aeRequest) throws NoSuchAlgorithmException, IOException, KeyManagementException {
+        return ResponseEntity.ok(this.customerService.aerequest(aeRequest));
+    }
+
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.SADMIN)
     @RequestMapping(
             value = "/retrieveBankList",
@@ -105,12 +119,6 @@ public class CustomerRestController {
     )
     public ResponseEntity<HashMap<String, String>> fetchBankList(
             @RequestBody @Valid PaynetDetails paynetDetails) throws NoSuchAlgorithmException, IOException, KeyManagementException {
-        //        default value
-//        String final_checkSum = "566DACEE09ADFA8D65733CC05E7599964556E8FE1E7396A84717CAEA79DEC96022C226593B35B1E4EF441A8052C636861E1DC298CB3BA3C5FA1F6F7D409AE01DB0A9BBD26EA27F6DC98BFFE1758C1746922C6A9A8BA18120C15B4B8C05F994767A715C834C09B313895AEDB25E8CBA36B5CB7A82CB5496BA1857F4AB0BAEDD3E5239B5B5441729A683199B90C7AD9B537AD9DBE9168EDA1D1E82ECC0F111BA33DD4A6FB097FDA38DB80CFBF9FB8B7773E062C11545F6C7B94FBAC3707AF72297D11DF4A21C5E70C07F242ADA8F597F0C3BC16C14D840A0010B46BE96F8B5BA6CDAF21B9514B71D332B3543B19DBDDF6DCAF8A4EBE31A0445F9AD4A0C5C9BDC60";
-//        String fpx_msgType = "BE";
-//        String fpx_msgToken = "01";
-//        String fpx_sellerExId = "EX00009694";
-//        String fpx_version = "7.0";
         return ResponseEntity.ok(this.customerService.fetchBankList(paynetDetails));
     }
 
@@ -153,24 +161,7 @@ public class CustomerRestController {
                                                 @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                                 @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
         return ResponseEntity.ok(this.customerService.fetchCustomer(
-                term, (includeClosed != null ? includeClosed : Boolean.FALSE),
-                this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
-    }
-
-    //    get via kyc status
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
-    @RequestMapping(
-            value = "/customers/kyc-documents",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<List<Customer>> fetchCustomerByKycStatus(
-            @RequestParam(value = "status") final String status) {
-        return ResponseEntity.ok(this.documentService.findCustomersByKYCStatus(status));
+                term, (includeClosed != null ? includeClosed : Boolean.FALSE), this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
 
@@ -184,7 +175,6 @@ public class CustomerRestController {
     public
     @ResponseBody
     ResponseEntity<UserContactVerificationStatus> fetchCustomersContactDetails(@PathVariable("identifier") final String identifier) {
-//        throwIfCustomerNotExists(identifier);
         return ResponseEntity.ok(this.documentService.findCustomersContactDetails(identifier));
     }
 
@@ -197,12 +187,8 @@ public class CustomerRestController {
     )
     public @ResponseBody
     ResponseEntity<Customer> findCustomer(@PathVariable("identifier") final String identifier) {
-        final Optional<Customer> customer = this.customerService.findCustomer(identifier);
-        if (customer.isPresent()) {
-            return ResponseEntity.ok(customer.get());
-        } else {
-            throw ServiceException.notFound("Invalid Username");
-        }
+        Customer customer = this.customerService.findCustomer(identifier);
+        return ResponseEntity.ok(customer);
     }
 
     @Permittable(
@@ -232,14 +218,8 @@ public class CustomerRestController {
     public
     @ResponseBody
     Map<String, Boolean> findValidCustomer(@PathVariable("identifier") final String identifier) {
-        System.out.println("Customer exist api called");
-        if (this.customerService.customerExists(identifier)) {
-            System.out.println("Customer is present in DB");
-            return Collections.singletonMap("success", true);
-        } else {
-            System.out.println("Customer not present in DB");
-            throw ServiceException.notFound("Invalid Username");
-        }
+        if (this.customerService.customerExists(identifier)) return Collections.singletonMap("success", true);
+        else throw ServiceException.notFound("Invalid Username");
     }
 
 
@@ -312,44 +292,40 @@ public class CustomerRestController {
     @ResponseBody
     ResponseEntity<Void> customerCommand(@PathVariable("identifier") final String identifier,
                                          @RequestBody final Command command) {
-        final Optional<Customer> customerOptional = this.customerService.findCustomer(identifier);
-        if (customerOptional.isPresent()) {
-            final Customer customer = customerOptional.get();
-            final Command.Action action = Command.Action.valueOf(command.getAction());
-            final String currentState = customer.getCurrentState();
-            switch (action) {
-                case ACTIVATE:
-                    if (Customer.State.PENDING.name().equals(currentState)) {
-                        this.commandGateway.process(new ActivateCustomerCommand(identifier, command.getComment()));
-                    }
-                    break;
-                case LOCK:
-                    if (Customer.State.ACTIVE.name().equals(currentState)) {
-                        this.commandGateway.process(new LockCustomerCommand(identifier, command.getComment()));
-                    }
-                    break;
-                case UNLOCK:
-                    if (Customer.State.LOCKED.name().equals(currentState)) {
-                        this.commandGateway.process(new UnlockCustomerCommand(identifier, command.getComment()));
-                    }
-                    break;
-                case CLOSE:
-                    if (Customer.State.ACTIVE.name().equals(currentState)
-                            || Customer.State.LOCKED.name().equals(currentState)
-                            || Customer.State.PENDING.name().equals(currentState)) {
-                        this.commandGateway.process(new CloseCustomerCommand(identifier, command.getComment()));
-                    }
-                    break;
-                case REOPEN:
-                    if (Customer.State.CLOSED.name().equals(currentState)) {
-                        this.commandGateway.process(new ReopenCustomerCommand(identifier, command.getComment()));
-                    }
-                    break;
-                default:
-                    throw ServiceException.badRequest("Unsupported action {0}.", command.getAction());
-            }
-        } else {
-            throw ServiceException.notFound("Invalid Username");
+        final Customer customer = this.customerService.findCustomer(identifier);
+
+        final Command.Action action = Command.Action.valueOf(command.getAction());
+        final String currentState = customer.getCurrentState();
+        switch (action) {
+            case ACTIVATE:
+                if (Customer.UserState.PENDING.name().equals(currentState)) {
+                    this.commandGateway.process(new ActivateCustomerCommand(identifier, command.getComment()));
+                }
+                break;
+            case LOCK:
+                if (Customer.UserState.ACTIVE.name().equals(currentState)) {
+                    this.commandGateway.process(new LockCustomerCommand(identifier, command.getComment()));
+                }
+                break;
+            case UNLOCK:
+                if (Customer.UserState.LOCKED.name().equals(currentState)) {
+                    this.commandGateway.process(new UnlockCustomerCommand(identifier, command.getComment()));
+                }
+                break;
+            case CLOSE:
+                if (Customer.UserState.ACTIVE.name().equals(currentState)
+                        || Customer.UserState.LOCKED.name().equals(currentState)
+                        || Customer.UserState.PENDING.name().equals(currentState)) {
+                    this.commandGateway.process(new CloseCustomerCommand(identifier, command.getComment()));
+                }
+                break;
+            case REOPEN:
+                if (Customer.UserState.CLOSED.name().equals(currentState)) {
+                    this.commandGateway.process(new ReopenCustomerCommand(identifier, command.getComment()));
+                }
+                break;
+            default:
+                throw ServiceException.badRequest("Unsupported action {0}.", command.getAction());
         }
         return ResponseEntity.accepted().build();
     }
@@ -405,32 +381,30 @@ public class CustomerRestController {
     @ResponseBody
     ResponseEntity<Void> taskForCustomerExecuted(@PathVariable("identifier") final String identifier,
                                                  @PathVariable("taskIdentifier") final String taskIdentifier) {
-        final Optional<Customer> optionalCustomer = this.customerService.findCustomer(identifier);
-        if (optionalCustomer.isPresent()) {
-            final Customer customer = optionalCustomer.get();
-            final Optional<TaskDefinition> optionalTaskDefinition = this.taskService.findByIdentifier(taskIdentifier);
-            if (optionalTaskDefinition.isPresent()) {
-                final TaskDefinition taskDefinition = optionalTaskDefinition.get();
-                switch (TaskDefinition.Type.valueOf(taskDefinition.getType())) {
-                    case ID_CARD:
-                        final Stream<IdentificationCard> identificationCards = this.customerService.fetchIdentificationCardsByCustomer(identifier);
-                        if (!identificationCards.findAny().isPresent()) {
-                            throw ServiceException.conflict("No identification cards for customer found.");
-                        }
-                        break;
-                    case FOUR_EYES:
-                        if (customer.getCreatedBy().equals(UserContextHolder.checkedGetUser())) {
-                            throw ServiceException.conflict("Signing user must be different than creator.");
-                        }
-                        break;
-                }
-                this.commandGateway.process(new ExecuteTaskForCustomerCommand(identifier, taskIdentifier));
-            } else {
-                throw ServiceException.notFound("Task definition {0} not found.", taskIdentifier);
+        final Customer customer = this.customerService.findCustomer(identifier);
+
+        final Optional<TaskDefinition> optionalTaskDefinition = this.taskService.findByIdentifier(taskIdentifier);
+        if (optionalTaskDefinition.isPresent()) {
+            final TaskDefinition taskDefinition = optionalTaskDefinition.get();
+            switch (TaskDefinition.Type.valueOf(taskDefinition.getType())) {
+                case ID_CARD:
+                    final Stream<IdentificationCard> identificationCards = this.customerService.fetchIdentificationCardsByCustomer(identifier);
+                    if (!identificationCards.findAny().isPresent()) {
+                        throw ServiceException.conflict("No identification cards for customer found.");
+                    }
+                    break;
+                case FOUR_EYES:
+                    if (customer.getCreatedBy().equals(UserContextHolder.checkedGetUser())) {
+                        throw ServiceException.conflict("Signing user must be different than creator.");
+                    }
+                    break;
             }
+            this.commandGateway.process(new ExecuteTaskForCustomerCommand(identifier, taskIdentifier));
         } else {
-            throw ServiceException.notFound("Invalid Username");
+            throw ServiceException.notFound("Task definition {0} not found.", taskIdentifier);
         }
+
+
         return ResponseEntity.accepted().build();
     }
 
@@ -901,7 +875,9 @@ public class CustomerRestController {
         final Long maxSize = this.environment.getProperty("upload.image.max-size", Long.class);
 
         if (size > maxSize) {
-            throw ServiceException.badRequest("Image can''t exceed size of {0}", maxSize);
+            //throw ServiceException.badRequest("Image can''t exceed size of {0}", maxSize);
+            throw ServiceException.badRequest("Please upload a JPG, PNG, JPEG file not exceeding 1 MB", maxSize);
+            
         }
     }
 

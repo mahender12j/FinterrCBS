@@ -37,10 +37,10 @@ public final class CadminMapper {
         super();
     }
 
-    public static List<PerMonthRecord> map(List<CustomerEntity> customerEntities, Customer.Type type) {
+    public static List<PerMonthRecord> map(List<CustomerEntity> customerEntities, Customer.UserType userType) {
         final LocalDateTime oneYearBack = LocalDateTime.now().minusYears(1);
         Map<String, Long> byMonth = customerEntities.stream()
-                .filter(customerEntity -> customerEntity.getCreatedOn().isAfter(oneYearBack) && customerEntity.getType().equals(type.name()))
+                .filter(customerEntity -> customerEntity.getCreatedOn().isAfter(oneYearBack) && customerEntity.getType().equals(userType.name()))
                 .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
 
         return getPerMonthRecords(byMonth);
@@ -52,10 +52,10 @@ public final class CadminMapper {
     }
 
 
-    public static List<PerMonthRecord> mapByStatus(List<CustomerEntity> customerEntities, Customer.Type type, boolean customerStatus) {
+    public static List<PerMonthRecord> mapByStatus(List<CustomerEntity> customerEntities, Customer.UserType userType, boolean customerStatus) {
         final LocalDateTime oneYearBack = LocalDateTime.now().minusYears(1);
         Map<String, Long> byMonth = customerEntities.stream()
-                .filter(customerEntity -> customerEntity.getCreatedOn().isAfter(oneYearBack) && customerEntity.getType().equals(type.name()) && customerEntity.getIsDeposited() == customerStatus)
+                .filter(customerEntity -> customerEntity.getCreatedOn().isAfter(oneYearBack) && customerEntity.getType().equals(userType.name()) && customerEntity.getIsDeposited() == customerStatus)
                 .collect(Collectors.groupingBy(d -> d.getCreatedOn().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH), Collectors.counting()));
 
         return getPerMonthRecords(byMonth);

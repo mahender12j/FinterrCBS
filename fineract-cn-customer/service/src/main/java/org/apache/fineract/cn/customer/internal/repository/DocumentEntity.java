@@ -22,6 +22,8 @@ import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -40,15 +42,14 @@ public class DocumentEntity {
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<DocumentEntryEntity> documentEntryEntities = new ArrayList<>();
+
     @Column(name = "identifier", nullable = false)
     private String identifier;
 
-    @SuppressWarnings("DefaultAnnotationParam")
-    @Column(name = "description", nullable = true)
-    private String description;
-
-    @Column(name = "is_completed", nullable = false)
-    private Boolean completed;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -57,25 +58,6 @@ public class DocumentEntity {
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime createdOn;
 
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "approved_by")
-    private String approvedBy;
-
-    @Column(name = "approved_on")
-    @Convert(converter = LocalDateTimeConverter.class)
-    private LocalDateTime approvedOn;
-
-    @Column(name = "reason_for_reject")
-    private String reasonForReject;
-
-    @Column(name = "rejected_by")
-    private String rejectedBy;
-
-    @Column(name = "rejected_on")
-    @Convert(converter = LocalDateTimeConverter.class)
-    private LocalDateTime rejectedOn;
 
     public DocumentEntity() {
     }
@@ -104,22 +86,6 @@ public class DocumentEntity {
         this.identifier = identifier;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Boolean getCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(Boolean completed) {
-        this.completed = completed;
-    }
-
     public String getCreatedBy() {
         return createdBy;
     }
@@ -144,44 +110,12 @@ public class DocumentEntity {
         this.status = status;
     }
 
-    public String getApprovedBy() {
-        return approvedBy;
+    public List<DocumentEntryEntity> getDocumentEntryEntities() {
+        return documentEntryEntities;
     }
 
-    public void setApprovedBy(String approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    public LocalDateTime getApprovedOn() {
-        return approvedOn;
-    }
-
-    public void setApprovedOn(LocalDateTime approvedOn) {
-        this.approvedOn = approvedOn;
-    }
-
-    public String getReasonForReject() {
-        return reasonForReject;
-    }
-
-    public void setReasonForReject(String reasonForReject) {
-        this.reasonForReject = reasonForReject;
-    }
-
-    public String getRejectedBy() {
-        return rejectedBy;
-    }
-
-    public void setRejectedBy(String rejectedBy) {
-        this.rejectedBy = rejectedBy;
-    }
-
-    public LocalDateTime getRejectedOn() {
-        return rejectedOn;
-    }
-
-    public void setRejectedOn(LocalDateTime rejectedOn) {
-        this.rejectedOn = rejectedOn;
+    public void setDocumentEntryEntities(List<DocumentEntryEntity> documentEntryEntities) {
+        this.documentEntryEntities = documentEntryEntities;
     }
 
     @Override
@@ -203,17 +137,11 @@ public class DocumentEntity {
         return "DocumentEntity{" +
                 "id=" + id +
                 ", customer=" + customer +
+                ", documentEntryEntities=" + documentEntryEntities +
                 ", identifier='" + identifier + '\'' +
-                ", description='" + description + '\'' +
-                ", completed=" + completed +
+                ", status='" + status + '\'' +
                 ", createdBy='" + createdBy + '\'' +
                 ", createdOn=" + createdOn +
-                ", status='" + status + '\'' +
-                ", approvedBy='" + approvedBy + '\'' +
-                ", approvedOn=" + approvedOn +
-                ", reasonForReject='" + reasonForReject + '\'' +
-                ", rejectedBy='" + rejectedBy + '\'' +
-                ", rejectedOn=" + rejectedOn +
                 '}';
     }
 }

@@ -29,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
-import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,44 +65,36 @@ public class CAdminService {
     public CAdminPage getCaAdminStatistics() {
         CAdminPage cAdminPage = new CAdminPage();
         List<CustomerEntity> customerEntities = this.customerRepository.findAll();
-        List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findAll();
-        List<DocumentSubTypeEntity> documentSubTypeEntities = this.documentSubTypeRepository.findAll();
 
         CaAdminCauseData caAdminCauseData = this.causeAdaptor.fetchCauseData();
-
-//        System.out.println("object: " + caAdminCauseData.toString());
-
-//        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
-//        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
         final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).minusDays(7);
 
-//        System.out.println("Start Date Of This Week" + startDateOfThisWeek);
+        cAdminPage.setActiveMember(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.PERSON.name())).count());
+        cAdminPage.setNoOfMember(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.PERSON.name())).count());
+        cAdminPage.setNoOfMemberThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.PERSON.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setMemberPerMonth(CadminMapper.map(customerEntities, Customer.UserType.PERSON));
+        cAdminPage.setActiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.PERSON, true));
+        cAdminPage.setInactiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.PERSON, false));
 
 
-        cAdminPage.setActiveMember(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.Type.PERSON.name())).count());
-        cAdminPage.setNoOfMember(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.PERSON.name())).count());
-        cAdminPage.setNoOfMemberThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.PERSON.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
-        cAdminPage.setMemberPerMonth(CadminMapper.map(customerEntities, Customer.Type.PERSON));
-        cAdminPage.setActiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.PERSON, true));
-        cAdminPage.setInactiveMemberPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.PERSON, false));
+        cAdminPage.setActiveNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.BUSINESS.name())).count());
+        cAdminPage.setNoOfNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.BUSINESS.name())).count());
+        cAdminPage.setNoOfNGOThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.BUSINESS.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setNgoPerMonth(CadminMapper.map(customerEntities, Customer.UserType.BUSINESS));
+        cAdminPage.setActiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, true));
+        cAdminPage.setInactiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, false));
 
+        List<CustomerDocument> customerDocuments = customerEntities
+                .stream()
+                .map(this::findCustomerDocumentsByCustomerEntity)
+                .filter(doc -> doc.getKycStatusText() != null)
+                .collect(Collectors.toList());
 
-        cAdminPage.setActiveNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.Type.BUSINESS.name())).count());
-        cAdminPage.setNoOfNGO(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.BUSINESS.name())).count());
-        cAdminPage.setNoOfNGOThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.Type.BUSINESS.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
-        cAdminPage.setNgoPerMonth(CadminMapper.map(customerEntities, Customer.Type.BUSINESS));
-        cAdminPage.setActiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.BUSINESS, true));
-        cAdminPage.setInactiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.Type.BUSINESS, false));
-
-        List<CustomerDocument> customerDocuments = customerEntities.stream().map(customerEntity -> this.findCustomerDocuments(customerEntity, documentTypeEntities, documentSubTypeEntities)).collect(Collectors.toList());
 
         cAdminPage.setKycPending(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.PENDING.name())).count());
         cAdminPage.setKycRejected(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.REJECTED.name())).count());
         cAdminPage.setKycApproved(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.APPROVED.name())).count());
         cAdminPage.setKycNotUploaded(customerDocuments.stream().filter(customerDocument -> customerDocument.getKycStatusText().equals(CustomerDocument.Status.NOTUPLOADED.name())).count());
-
-//        System.out.println("No of Cause: " + caAdminCauseData.getNoOfCause());
-//        System.out.println("No of active Cause: " + caAdminCauseData.getActiveCause());
 
         cAdminPage.setNoOfCause(caAdminCauseData.getNoOfCause());
         cAdminPage.setNoOfCauseThisWeek(caAdminCauseData.getNoOfCauseThisWeek());
@@ -131,17 +121,17 @@ public class CAdminService {
 
     }
 
-    CustomerDocument findCustomerDocuments(CustomerEntity customerEntity, List<DocumentTypeEntity> documentTypeEntities,
-                                           List<DocumentSubTypeEntity> documentSubTypeEntities) {
-
+    CustomerDocument findCustomerDocumentsByCustomerEntity(CustomerEntity customerEntity) {
         List<DocumentTypeEntity> allTypeEntities = this.documentTypeRepository.findAll();
         List<DocumentSubTypeEntity> allSubTypeRepository = this.documentSubTypeRepository.findAll();
 
         return this.documentRepository.findByCustomerId(customerEntity.getIdentifier()).map(documentEntity -> {
             CustomerDocument customerDocument = DocumentMapper.map(documentEntity);
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity = this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
-                    .stream()
-                    .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                    this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
+                            .stream()
+                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
 
             List<DocumentsType> documentsType = new ArrayList<>();
 
@@ -152,6 +142,8 @@ public class CAdminService {
                     documentsSubType.setCreated_by(entity.getCreatedBy());
                     documentsSubType.setStatus(entity.getStatus());
                     documentsSubType.setType(this.getDocumentTypeTitle(allTypeEntities, entity.getType()));
+                    documentsSubType.setTypeUUID(entity.getType());
+                    documentsSubType.setSubTypeUUID(entity.getSubType());
                     documentsSubType.setSubType(this.getDocumentSubTypeTitle(allSubTypeRepository, entity.getSubType()));
                     documentsSubType.setUpdatedOn(entity.getUpdatedOn().toString());
                     documentsSubType.setApprovedBy(entity.getApprovedBy());
@@ -161,36 +153,24 @@ public class CAdminService {
                     documentsSubType.setCreatedOn(entity.getCreatedOn().toString());
                     documentsSubType.setDocRef(entity.getDocRef());
                     return documentsSubType;
-                }).collect(Collectors.toList());
+                }).collect(toList());
 
-                final DocumentsType type = new DocumentsType();
-                DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
-                type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
-                type.setDocumentsSubType(documentsSubTypeList);
-                type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
-                documentsType.add(type);
+                if (allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key)
+                        && documentTypeEntity.isActive())) {
+                    final DocumentsType type = new DocumentsType();
+                    DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
+                    type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
+                    type.setDocumentsSubType(documentsSubTypeList);
+                    type.setUserType(customerEntity.getType());
+                    type.setUuid(key);
+                    type.setMaxUpload(allTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getUuid().equals(key)).findFirst().map(DocumentTypeEntity::getMaxUpload).orElse(0));
+                    type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
+                    documentsType.add(type);
+                }
+
             });
             customerDocument.setDocumentsTypes(documentsType);
 
-            Set<String> doc_master = documentTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getUserType().equals(customerEntity.getType()))
-                    .map(DocumentTypeEntity::getUuid)
-                    .collect(Collectors.toSet());
-
-            final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
-
-            if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name())) && isDocAvailable) {
-                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                customerDocument.setKycStatus(true);
-
-            } else if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                    && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))
-                    && isDocAvailable) {
-                customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
-                customerDocument.setKycStatus(false);
-            } else {
-                customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
-                customerDocument.setKycStatus(false);
-            }
             return customerDocument;
 
         }).orElseGet(() -> {
@@ -200,16 +180,6 @@ public class CAdminService {
             return customerDocument;
 
         });
-
-//        if (documentEntity.isPresent()) {
-////                start document entity
-//
-//
-//        } else {
-//
-//
-//        }
-//        return customerDocument;
     }
 
 

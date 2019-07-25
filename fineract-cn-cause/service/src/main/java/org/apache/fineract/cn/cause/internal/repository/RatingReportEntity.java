@@ -27,35 +27,38 @@ import java.time.LocalDateTime;
  * @author Md Robiul Hassan
  */
 @Entity
-@Table(name = "cass_comments")
-public class CommentEntity {
+@Table(name = "cass_rating_reports")
+public class RatingReportEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "rating_id")
-    private RatingEntity rating;
+    private RatingEntity ratingEntity;
 
-    @Column(name = "comment")
-    private String comment;
+    @Column(name = "category")
+    private String category;
 
-    @Column(name = "ref")
-    private Long ref;
+    @Column(name = "description")
+    private String description;
 
-    @Column(name = "active", nullable = false)
-    private Boolean active = true;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "created_by")
     private String createdBy;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
 
     @Column(name = "created_on")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime createdOn;
 
-    public CommentEntity() {
+    public RatingReportEntity() {
         this.createdOn = LocalDateTime.now();
     }
 
@@ -67,28 +70,36 @@ public class CommentEntity {
         this.id = id;
     }
 
-    public RatingEntity getRating() {
-        return rating;
+    public RatingEntity getRatingEntity() {
+        return ratingEntity;
     }
 
-    public void setRating(RatingEntity rating) {
-        this.rating = rating;
+    public void setRatingEntity(RatingEntity ratingEntity) {
+        this.ratingEntity = ratingEntity;
     }
 
-    public String getComment() {
-        return comment;
+    public String getCategory() {
+        return category;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
-    public Boolean getActive() {
-        return active;
+    public String getDescription() {
+        return description;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getCreatedBy() {
@@ -99,6 +110,14 @@ public class CommentEntity {
         this.createdBy = createdBy;
     }
 
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
     public LocalDateTime getCreatedOn() {
         return createdOn;
     }
@@ -107,23 +126,16 @@ public class CommentEntity {
         this.createdOn = createdOn;
     }
 
-    public Long getRef() {
-        return ref;
-    }
-
-    public void setRef(Long ref) {
-        this.ref = ref;
-    }
-
     @Override
     public String toString() {
-        return "CommentEntity{" +
+        return "RatingReportEntity{" +
                 "id=" + id +
-                ", rating=" + rating +
-                ", comment='" + comment + '\'' +
-                ", active=" + active +
-                ", ref=" + ref +
+                ", ratingEntity=" + ratingEntity +
+                ", category='" + category + '\'' +
+                ", description='" + description + '\'' +
+                ", status='" + status + '\'' +
                 ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
                 ", createdOn=" + createdOn +
                 '}';
     }

@@ -27,7 +27,9 @@ public class DocumentsSubType {
     private String createdBy;
     private String status;
     private String type;
+    private String typeUUID;
     private String subType;
+    private String subTypeUUID;
     private String approvedBy;
     private String approvedOn;
     private String rejectedBy;
@@ -151,6 +153,22 @@ public class DocumentsSubType {
 
     public void setDocRef(String docRef) {
         this.docRef = docRef;
+    }
+
+    public String getTypeUUID() {
+        return typeUUID;
+    }
+
+    public void setTypeUUID(String typeUUID) {
+        this.typeUUID = typeUUID;
+    }
+
+    public String getSubTypeUUID() {
+        return subTypeUUID;
+    }
+
+    public void setSubTypeUUID(String subTypeUUID) {
+        this.subTypeUUID = subTypeUUID;
     }
 
     @Override

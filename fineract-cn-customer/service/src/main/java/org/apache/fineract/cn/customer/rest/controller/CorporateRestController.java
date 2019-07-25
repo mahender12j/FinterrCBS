@@ -1,0 +1,138 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.fineract.cn.customer.rest.controller;
+
+import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
+import org.apache.fineract.cn.anubis.annotation.Permittable;
+import org.apache.fineract.cn.command.domain.CommandCallback;
+import org.apache.fineract.cn.command.domain.CommandProcessingException;
+import org.apache.fineract.cn.command.gateway.CommandGateway;
+import org.apache.fineract.cn.customer.PermittableGroupIds;
+import org.apache.fineract.cn.customer.api.v1.domain.ContactDetail;
+import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
+import org.apache.fineract.cn.customer.catalog.internal.service.FieldValueValidator;
+import org.apache.fineract.cn.customer.internal.command.CreateCorporateCommand;
+import org.apache.fineract.cn.customer.internal.command.UpdateCorporateUserCommand;
+import org.apache.fineract.cn.customer.internal.service.CorporateService;
+import org.apache.fineract.cn.customer.internal.service.CustomerService;
+import org.apache.fineract.cn.lang.ServiceException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+@RestController
+@RequestMapping("/")
+public class CorporateRestController {
+
+    private final CustomerService customerService;
+    private final CorporateService corporateService;
+    private final CommandGateway commandGateway;
+    private final FieldValueValidator fieldValueValidator;
+
+    @Autowired
+    public CorporateRestController(final CustomerService customerService,
+                                   final CorporateService corporateService,
+                                   final CommandGateway commandGateway,
+                                   final FieldValueValidator fieldValueValidator) {
+        super();
+        this.customerService = customerService;
+        this.corporateService = corporateService;
+        this.commandGateway = commandGateway;
+        this.fieldValueValidator = fieldValueValidator;
+    }
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CORPORATE)
+    @RequestMapping(
+            value = "/corporates",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<CorporateUser> createCorporates(@RequestBody @Valid final CorporateUser corporateUser) {
+        throwIfUserAlreadyExist(corporateUser.getIdentifier());
+        throwIfUserContactDetailsIsAlreadyVerified(corporateUser.getContactDetails());
+
+        if (corporateUser.getCustomValues() != null) {
+            this.fieldValueValidator.validateValues(corporateUser.getCustomValues());
+        }
+
+        try {
+            CommandCallback<CorporateUser> res = this.commandGateway.process(new CreateCorporateCommand(corporateUser), CorporateUser.class);
+            return ResponseEntity.ok(res.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Sorry! Something went wrong");
+        }
+    }
+
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CORPORATE)
+    @RequestMapping(
+            value = "/corporates/{identifier}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<CorporateUser> updateCorporates(@PathVariable("identifier") final String identifier,
+                                                   @RequestBody final CorporateUser corporateUser) {
+        if (corporateUser.getCustomValues() != null) {
+            this.fieldValueValidator.validateValues(corporateUser.getCustomValues());
+        }
+        throwIfUserNotExist(identifier);
+        try {
+            CommandCallback<CorporateUser> commandCallback = this.commandGateway.process(new UpdateCorporateUserCommand(corporateUser, identifier), CorporateUser.class);
+            return ResponseEntity.ok(commandCallback.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Sorry! Something went wrong.");
+        }
+    }
+
+
+    private void throwIfUserContactDetailsIsAlreadyVerified(List<ContactDetail> contactDetails) {
+        contactDetails.forEach(contactDetail -> {
+            if (this.corporateService.isContactDetailExist(contactDetail.getType(), contactDetail.getValue())) {
+                throw ServiceException.conflict("Sorry! User is already registered with this {0}: {1}", contactDetail.getType(), contactDetail.getValue());
+            }
+        });
+    }
+
+
+    private void throwIfUserAlreadyExist(String identifier) {
+        if (this.customerService.customerExists(identifier)) {
+            throw ServiceException.conflict("User {0} already exists.", identifier);
+        }
+
+    }
+
+
+    private void throwIfUserNotExist(String identifier) {
+        if (!this.customerService.customerExists(identifier)) {
+            throw ServiceException.conflict("User {0} not exists.", identifier);
+        }
+
+    }
+}

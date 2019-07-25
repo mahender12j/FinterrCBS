@@ -29,22 +29,25 @@ import java.util.List;
 public class CauseRating {
     private Long id;
     @Max(value = 5, message = "rating range must be between 0-5")
-    @Min(value = 0, message = "rating range must be between 0-5")
+    @Min(value = -1, message = "rating range must be between 0-5")
     @NotNull
     private int rating;
     private String comment;
+    @NotNull
+    private Long ref; //ref is -1 when root and child will have 1-infinity, 0 is when child has no ref
     private boolean active = true;
     private String createdBy;
     private String createdOn;
-    private List<CauseComment> causeComments;
+    private List<CauseRating> causeRatings;
 
     public CauseRating() {
     }
 
-    public CauseRating(Long id, int rating, String comment, boolean active, String createdBy, String createdOn) {
+    public CauseRating(Long id, int rating, String comment, Long ref, boolean active, String createdBy, String createdOn) {
         this.id = id;
         this.rating = rating;
         this.comment = comment;
+        this.ref = ref;
         this.active = active;
         this.createdBy = createdBy;
         this.createdOn = createdOn;
@@ -90,20 +93,28 @@ public class CauseRating {
         this.createdOn = createdOn;
     }
 
-    public List<CauseComment> getCauseComments() {
-        return causeComments;
-    }
-
-    public void setCauseComments(List<CauseComment> causeComments) {
-        this.causeComments = causeComments;
-    }
-
     public String getComment() {
         return comment;
     }
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public Long getRef() {
+        return ref;
+    }
+
+    public void setRef(Long ref) {
+        this.ref = ref;
+    }
+
+    public List<CauseRating> getCauseRatings() {
+        return causeRatings;
+    }
+
+    public void setCauseRatings(List<CauseRating> causeRatings) {
+        this.causeRatings = causeRatings;
     }
 
     @Override

@@ -39,23 +39,28 @@ public class DocumentMapper {
     }
 
 
-    public static void setDocumentTypeStatus(List<DocumentEntryEntity> val, DocumentsType d) {
-        if (val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
-            d.setStatus(CustomerDocument.Status.APPROVED.name());
-        } else if (val.stream().noneMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                && val.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
+    public static void setDocumentTypeStatus(List<DocumentEntryEntity> documentEntryEntities, DocumentsType documentsType) {
+        if (documentEntryEntities.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
+            documentsType.setStatus(CustomerDocument.Status.APPROVED.name());
+        } else if (documentEntryEntities.stream().noneMatch(e -> e.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
+                && documentEntryEntities.stream().anyMatch(e -> e.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
 //            new requirements on the pending and rejected documents status on timestamp
-            val.stream().filter(documentEntryEntity -> documentEntryEntity.getStatus().equals(CustomerDocument.Status.REJECTED.name())).findFirst().ifPresent(documentEntryEntity -> {
-                boolean isAnyPendingDocumentPresentAfterRejected = val.stream().anyMatch(documentEntryEntity1 -> documentEntryEntity1.getCreatedOn().isAfter(documentEntryEntity.getCreatedOn()) && documentEntryEntity1.getStatus().equals(CustomerDocument.Status.PENDING.name()));
+            documentEntryEntities.stream().filter(documentEntryEntity -> documentEntryEntity.getStatus()
+                    .equals(CustomerDocument.Status.REJECTED.name())).findFirst().ifPresent(documentEntryEntity -> {
+                boolean isAnyPendingDocumentPresentAfterRejected = documentEntryEntities
+                        .stream()
+                        .anyMatch(entity -> entity.getCreatedOn()
+                                .isAfter(documentEntryEntity.getCreatedOn())
+                                && entity.getStatus().equals(CustomerDocument.Status.PENDING.name()));
                 if (isAnyPendingDocumentPresentAfterRejected) {
-                    d.setStatus(CustomerDocument.Status.PENDING.name());
+                    documentsType.setStatus(CustomerDocument.Status.PENDING.name());
                 } else {
-                    d.setStatus(CustomerDocument.Status.REJECTED.name());
+                    documentsType.setStatus(CustomerDocument.Status.REJECTED.name());
                 }
             });
 
         } else {
-            d.setStatus(CustomerDocument.Status.PENDING.name());
+            documentsType.setStatus(CustomerDocument.Status.PENDING.name());
         }
     }
 
@@ -113,7 +118,8 @@ public class DocumentMapper {
         ret.setCreatedBy(documentEntity.getCreatedBy());
         ret.setCreatedOn(DateConverter.toIsoString(documentEntity.getCreatedOn()));
         ret.setIdentifier(documentEntity.getIdentifier());
-        ret.setDescription(documentEntity.getDescription());
+        ret.setKycStatusText(documentEntity.getStatus());
+        ret.setKycStatus(documentEntity.getStatus().equals(CustomerDocument.Status.APPROVED.name()));
         return ret;
     }
 
@@ -133,11 +139,9 @@ public class DocumentMapper {
         final DocumentEntity ret = new DocumentEntity();
         ret.setCustomer(customerEntity);
         ret.setIdentifier(customerEntity.getIdentifier());
-        ret.setCompleted(false);
-        ret.setStatus(CustomerDocument.Status.PENDING.name());
+        ret.setStatus(CustomerDocument.Status.NOTUPLOADED.name());
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-        ret.setDescription(customerDocument.getDescription());
         return ret;
     }
 
@@ -145,18 +149,15 @@ public class DocumentMapper {
     public static DocumentEntity map(final CustomerDocumentsBody customerDocumentsBody, final CustomerEntity customerEntity) {
         final DocumentEntity ret = new DocumentEntity();
         ret.setCustomer(customerEntity);
-        ret.setCompleted(false);
         ret.setStatus(CustomerDocument.Status.PENDING.name());
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setIdentifier(customerEntity.getIdentifier());
-        ret.setDescription(customerDocumentsBody.getDescription());
         return ret;
     }
 
     public static DocumentEntryEntity map(final CustomerDocumentsBody customerDocumentsBody, final DocumentEntity documentEntity) {
         final DocumentEntryEntity ret = new DocumentEntryEntity();
-        ret.setDescription(customerDocumentsBody.getDescription());
         ret.setType(customerDocumentsBody.getType());
         ret.setSubType(customerDocumentsBody.getSubType());
         ret.setCreatedBy(documentEntity.getCreatedBy());
@@ -189,26 +190,6 @@ public class DocumentMapper {
         storageEntity.setDocType(docType);
         return storageEntity;
     }
-//
-//    public static List<DocumentEntryEntity> map(List<KycDocuments> kycDocuments, DocumentEntity documentEntity) {
-//        List<DocumentEntryEntity> documentEntryEntityList = new ArrayList<>();
-//        kycDocuments.forEach(doc -> {
-//            DocumentEntryEntity documents = new DocumentEntryEntity();
-//            documents.setDescription(doc.getDescription());
-//            documents.setDocumentName(doc.getDocName());
-//            documents.setSubType(doc.getSubType());
-//            documents.setType(doc.getType());
-//            documents.setDocRef(doc.getUuid());
-//            documents.setCreatedBy(UserContextHolder.checkedGetUser());
-//            documents.setStatus(CustomerDocument.Status.PENDING.name());
-//            documents.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
-//            documents.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
-//            documents.setDocument(documentEntity);
-//            documentEntryEntityList.add(documents);
-//        });
-//        return documentEntryEntityList;
-//    }
-
 
     public static DocumentEntryEntity map(KycDocuments kycDocuments, DocumentEntity documentEntity) {
         DocumentEntryEntity documents = new DocumentEntryEntity();

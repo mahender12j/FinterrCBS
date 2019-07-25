@@ -21,34 +21,58 @@ package org.apache.fineract.cn.customer.api.v1.domain;
 import org.apache.fineract.cn.lang.validation.constraints.ValidIdentifier;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * @author Myrle Krantz
+ * @author MD ROBIUL HASSAN
  */
-public class CustomerDocumentsBody {
+public class CustomerDocumentApproval {
 
-    private String type;
-    private String subType;
-
-    public CustomerDocumentsBody() {
+    public enum Status {
+        APPROVED,
+        REJECTED
     }
 
+    @NotNull
+    private Long id;
+    @NotNull
+    private Status status;
+    private String rejectedReason;
 
-    public String getType() {
-        return type;
+    public CustomerDocumentApproval() {
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public Long getId() {
+        return id;
     }
 
-    public String getSubType() {
-        return subType;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setSubType(String subType) {
-        this.subType = subType;
+    public String getStatus() {
+        return status.name();
+    }
+
+    public void setStatus(String status) {
+        this.status = Status.valueOf(status);
+    }
+
+    public String getRejectedReason() {
+        return rejectedReason;
+    }
+
+    public void setRejectedReason(String rejectedReason) {
+        this.rejectedReason = rejectedReason;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomerDocumentApproval{" +
+                "id='" + id + '\'' +
+                ", status=" + status +
+                ", rejectedReason='" + rejectedReason + '\'' +
+                '}';
     }
 }

@@ -16,28 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.customer.internal.command;
+package org.apache.fineract.cn.cause.internal.command;
 
-import org.apache.fineract.cn.customer.api.v1.domain.ContactDetail;
+public class DeleteCauseRatingCommand {
 
-import java.util.List;
+    private final String causeIdentifier;
+    private final Long ratingId;
 
-public class UpdateContactDetailsCommand {
-
-    private final String identifier;
-    private final List<ContactDetail> contactDetails;
-
-    public UpdateContactDetailsCommand(final String identifier, final List<ContactDetail> contactDetails) {
+    public DeleteCauseRatingCommand(final String causeIdentifier,
+                                    final Long ratingId) {
         super();
-        this.identifier = identifier;
-        this.contactDetails = contactDetails;
+        this.causeIdentifier = causeIdentifier;
+        this.ratingId = ratingId;
     }
 
-    public String identifier() {
-        return this.identifier;
+    public String getCauseIdentifier() {
+        return causeIdentifier;
     }
 
-    public List<ContactDetail> contactDetails() {
-        return this.contactDetails;
+    public Long getRatingId() {
+        return ratingId;
     }
 }
