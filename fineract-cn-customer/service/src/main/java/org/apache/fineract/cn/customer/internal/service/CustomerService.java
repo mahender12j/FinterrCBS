@@ -349,14 +349,12 @@ public class CustomerService {
             );
         }
 
-        DocumentEntity documentEntity = customerEntity.getDocumentEntity();
-
-        if (!documentEntity.getStatus().equals(CustomerDocument.Status.APPROVED.name())) {
-            documentEntity.setStatus(findCustomerDocumentsStatus(customerEntity));
-            this.documentRepository.save(documentEntity);
-        }
-
-
+        this.documentRepository.findByCustomer(customerEntity).ifPresent(documentEntity -> {
+            if (!documentEntity.getStatus().equals(CustomerDocument.Status.APPROVED.name())) {
+                documentEntity.setStatus(findCustomerDocumentsStatus(customerEntity));
+                this.documentRepository.save(documentEntity);
+            }
+        });
         return customer;
     }
 
