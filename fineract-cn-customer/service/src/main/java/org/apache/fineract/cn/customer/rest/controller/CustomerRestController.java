@@ -160,8 +160,7 @@ public class CustomerRestController {
                                                 @RequestParam(value = "size", required = false) final Integer size,
                                                 @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                                 @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
-        return ResponseEntity.ok(this.customerService.fetchCustomer(
-                term, (includeClosed != null ? includeClosed : Boolean.FALSE), this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+        return ResponseEntity.ok(this.customerService.fetchCustomer(term, (includeClosed != null ? includeClosed : Boolean.FALSE), this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
 
@@ -877,7 +876,7 @@ public class CustomerRestController {
         if (size > maxSize) {
             //throw ServiceException.badRequest("Image can''t exceed size of {0}", maxSize);
             throw ServiceException.badRequest("Please upload a JPG, PNG, JPEG file not exceeding 1 MB", maxSize);
-            
+
         }
     }
 

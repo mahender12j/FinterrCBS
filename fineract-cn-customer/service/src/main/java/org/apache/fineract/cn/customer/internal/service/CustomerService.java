@@ -428,9 +428,8 @@ public class CustomerService {
             }
         } else {
             if (term != null) {
-                customerEntities =
-                        this.customerRepository.findByCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
-                                Customer.UserState.CLOSED.name(), term, term, term, pageable);
+                customerEntities = this.customerRepository.findByCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
+                        Customer.UserState.CLOSED.name(), term, term, term, pageable);
             } else {
                 customerEntities = this.customerRepository.findByCurrentStateNot(Customer.UserState.CLOSED.name(), pageable);
             }
