@@ -155,17 +155,18 @@ public class CAdminService {
                     return documentsSubType;
                 }).collect(toList());
 
-                if (allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key) && documentTypeEntity.isActive())) {
-                    final DocumentsType type = new DocumentsType();
-                    DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
-                    type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
-                    type.setDocumentsSubType(documentsSubTypeList);
-                    type.setUserType(customerEntity.getType());
-                    type.setUuid(key);
-                    type.setMaxUpload(allTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getUuid().equals(key)).findFirst().map(DocumentTypeEntity::getMaxUpload).orElse(0));
-                    type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
-                    documentsType.add(type);
-                }
+//                if (allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key) && documentTypeEntity.isActive())) {
+                final DocumentsType type = new DocumentsType();
+                DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
+                type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
+                type.setDocumentsSubType(documentsSubTypeList);
+                type.setUserType(customerEntity.getType());
+                type.setUuid(key);
+                type.setActive(allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key) && documentTypeEntity.isActive()));
+                type.setMaxUpload(allTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getUuid().equals(key)).findFirst().map(DocumentTypeEntity::getMaxUpload).orElse(0));
+//                type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
+                documentsType.add(type);
+//                }
 
             });
             customerDocument.setDocumentsTypes(documentsType);
