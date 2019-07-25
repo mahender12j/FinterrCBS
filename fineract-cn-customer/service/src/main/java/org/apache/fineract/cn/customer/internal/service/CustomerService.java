@@ -48,6 +48,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class CustomerService {
 
@@ -64,6 +67,8 @@ public class CustomerService {
     private final DocumentSubTypeRepository documentSubTypeRepository;
     private final NgoProfileRepository ngoProfileRepository;
     private final FieldValueRepository fieldValueRepository;
+    private final DocumentRepository documentRepository;
+    private final DocumentEntryRepository documentEntryRepository;
     private final CorporateService corporateService;
     private final DocumentService documentService;
 
@@ -81,6 +86,8 @@ public class CustomerService {
                            final DocumentSubTypeRepository documentSubTypeRepository,
                            final NgoProfileRepository ngoProfileRepository,
                            final FieldValueRepository fieldValueRepository,
+                           final DocumentRepository documentRepository,
+                           final DocumentEntryRepository documentEntryRepository,
                            final CorporateService corporateService,
                            final DocumentService documentService) {
         super();
@@ -97,6 +104,8 @@ public class CustomerService {
         this.documentSubTypeRepository = documentSubTypeRepository;
         this.ngoProfileRepository = ngoProfileRepository;
         this.fieldValueRepository = fieldValueRepository;
+        this.documentRepository = documentRepository;
+        this.documentEntryRepository = documentEntryRepository;
         this.corporateService = corporateService;
         this.documentService = documentService;
     }
@@ -340,7 +349,72 @@ public class CustomerService {
             );
         }
 
+        DocumentEntity documentEntity = customerEntity.getDocumentEntity();
+
+        if (!documentEntity.getStatus().equals(CustomerDocument.Status.APPROVED.name())) {
+            documentEntity.setStatus(findCustomerDocumentsStatus(customerEntity));
+            this.documentRepository.save(documentEntity);
+        }
+
+
         return customer;
+    }
+
+
+    private String findCustomerDocumentsStatus(CustomerEntity customerEntity) {
+        List<DocumentTypeEntity> allTypeEntities = this.documentTypeRepository.findAll();
+        return this.documentRepository.findByCustomerId(customerEntity.getIdentifier()).map(documentEntity -> {
+
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                    this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
+                            .stream()
+                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+
+            List<DocumentsType> documentsType = new ArrayList<>();
+
+            documentEntryEntity.forEach((key, documentEntryEntities) -> {
+                final DocumentsType type = new DocumentsType();
+                DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
+                documentsType.add(type);
+
+            });
+
+            //receive the documents master, all the types of documents per type in list
+            Set<String> docMaster = allTypeEntities
+                    .stream()
+                    .filter((DocumentTypeEntity::isActive))
+                    .filter(documentTypeEntity -> documentTypeEntity.getUserType().equals(customerEntity.getType()))
+                    .map(DocumentTypeEntity::getUuid)
+                    .collect(Collectors.toSet());
+
+            Set<String> docAvailable = documentEntryEntity.keySet();
+
+            System.out.println("Documents master Type: " + docMaster);
+            System.out.println("Available documents Type: " + docAvailable);
+
+            boolean isAllDocApproved = documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()));
+            boolean isAnyDocumentRejected = documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()));
+
+            Set<String> docDifferent = new HashSet<>(docMaster);
+            docDifferent.removeAll(docAvailable);
+
+
+            System.out.println("same doc");
+            if (isAllDocApproved) {
+                System.out.println("APPROVED doc");
+                return CustomerDocument.Status.APPROVED.name();
+            } else if (isAnyDocumentRejected) {
+                System.out.println("REJECTED doc");
+                return CustomerDocument.Status.REJECTED.name();
+            } else if (docDifferent.size() == 0) {
+                System.out.println("PENDING doc");
+                return CustomerDocument.Status.PENDING.name();
+            } else {
+                System.out.println("NOTUPLOADED doc");
+                return CustomerDocument.Status.NOTUPLOADED.name();
+            }
+
+        }).orElse(CustomerDocument.Status.NOTUPLOADED.name());
     }
 
     public CustomerPage fetchCustomer(final String term, final Boolean includeClosed, final Pageable pageable) {
