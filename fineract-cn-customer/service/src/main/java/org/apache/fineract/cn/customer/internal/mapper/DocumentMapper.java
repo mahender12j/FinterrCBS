@@ -77,7 +77,7 @@ public class DocumentMapper {
         return documentsMaster;
     }
 
-    public static List<DocumentsMasterSubtype> map(List<DocumentSubTypeEntity> documentSubTypeEntities) {
+    public static List<DocumentsMasterSubtype> map(List<DocumentSubTypeEntity> documentSubTypeEntities, final DocumentTypeEntity documentTypeEntity) {
         List<DocumentsMasterSubtype> documentsMasterSubtypes = new ArrayList<>();
         documentSubTypeEntities.forEach(documentSubTypeEntity -> {
             DocumentsMasterSubtype documentsMasterSubtype = new DocumentsMasterSubtype();
@@ -85,6 +85,7 @@ public class DocumentMapper {
             documentsMasterSubtype.setUuid(documentSubTypeEntity.getUuid());
             documentsMasterSubtype.setId(documentSubTypeEntity.getId());
             documentsMasterSubtype.setActive(documentSubTypeEntity.isActive());
+            documentsMasterSubtype.setDocTypeUUID(documentTypeEntity.getUuid());
             documentsMasterSubtype.setDocTypeId(documentSubTypeEntity.getDocumentType().getId());
             documentsMasterSubtypes.add(documentsMasterSubtype);
         });
