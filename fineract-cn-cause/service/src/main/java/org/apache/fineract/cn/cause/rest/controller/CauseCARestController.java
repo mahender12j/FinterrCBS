@@ -32,6 +32,9 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -78,7 +81,7 @@ public class CauseCARestController {
                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
 
-        return ResponseEntity.ok(this.causeService.fetchAllCause(param, this.causeService.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+        return ResponseEntity.ok(this.causeService.fetchAllCause(param, this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
     }
 
 
@@ -99,4 +102,11 @@ public class CauseCARestController {
     // todo add adjustment factor for cause */ api to be implemented
 
 
+    public Pageable createPageRequest(final Integer pageIndex, final Integer size, final String sortColumn, final String sortDirection) {
+        final int pageIndexToUse = pageIndex != null ? pageIndex : 0;
+        final int sizeToUse = size != null ? size : 20;
+        final String sortColumnToUse = sortColumn != null ? sortColumn : "identifier";
+        final Sort.Direction direction = sortDirection != null ? Sort.Direction.valueOf(sortDirection.toUpperCase()) : Sort.Direction.ASC;
+        return new PageRequest(pageIndexToUse, sizeToUse, direction, sortColumnToUse);
+    }
 }

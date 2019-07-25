@@ -34,6 +34,7 @@ public class CauseComment {
     private Long ref;
     private String createdBy;
     private String createdOn;
+    private String type;
     //    ignore to post
     private List<CauseComment> childComments;
 
@@ -95,6 +96,14 @@ public class CauseComment {
 
     public void setRef(Long ref) {
         this.ref = ref;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public List<CauseComment> getChildComments() {

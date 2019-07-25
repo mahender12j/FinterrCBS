@@ -16,29 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.customer.internal.repository;
+package org.apache.fineract.cn.cause.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
+/**
+ * @author Md Robiul hassan
+ */
 @Repository
-public interface ContactDetailRepository extends JpaRepository<ContactDetailEntity, Long> {
+public interface RatingReportRepository extends JpaRepository<RatingReportEntity, Long> {
 
-    List<ContactDetailEntity> findByCustomer(final CustomerEntity customerEntity);
-
-    List<ContactDetailEntity> findByCustomerAndType(final CustomerEntity customerEntity, final String s);
-
-    List<ContactDetailEntity> findAllByValue(final String s);
-
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true  ELSE  false END FROM ContactDetailEntity c WHERE c.type = :type and c.value = :identifier and c.valid = true ")
-    Boolean existsByIdentifierAndTypeAndValid(@Param("identifier") final String identifier, @Param("type") final String type);
-
-    List<ContactDetailEntity> findAllByValueAndTypeAndValid(final String identifier, final String type, final boolean valid);
-
-    List<ContactDetailEntity> findAllByTypeAndValueAndValidIsTrue(final String type, final String value);
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM RatingReportEntity c WHERE c.id = :id")
+    Boolean existsByid(@Param("id") final Long id);
 
 }
+

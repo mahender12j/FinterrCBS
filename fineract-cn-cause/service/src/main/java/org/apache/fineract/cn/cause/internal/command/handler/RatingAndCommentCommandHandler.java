@@ -23,7 +23,7 @@ import org.apache.fineract.cn.cause.api.v1.domain.CauseComment;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
 import org.apache.fineract.cn.cause.internal.command.CreateCommentCommand;
 import org.apache.fineract.cn.cause.internal.command.CreateRatingCommand;
-import org.apache.fineract.cn.cause.internal.mapper.CommentMapper;
+import org.apache.fineract.cn.cause.internal.command.DeleteCauseRatingCommand;
 import org.apache.fineract.cn.cause.internal.mapper.RatingMapper;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.command.annotation.Aggregate;
@@ -33,8 +33,6 @@ import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 /**
  * @author Padma Raju Sattineni
  */
@@ -42,38 +40,15 @@ import java.util.Optional;
 public class RatingAndCommentCommandHandler {
     private final RatingRepository ratingRepository;
     private final CauseRepository causeRepository;
-    private final CommentRepository commentRepository;
 
     @Autowired
     public RatingAndCommentCommandHandler(
             final RatingRepository ratingRepository,
-            final CauseRepository causeRepository,
-            final CommentRepository commentRepository) {
+            final CauseRepository causeRepository) {
 
         this.ratingRepository = ratingRepository;
         this.causeRepository = causeRepository;
-        this.commentRepository = commentRepository;
     }
-
-
-    @Transactional
-    @CommandHandler
-    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.POST_COMMENTS)
-    public CauseComment createComment(final CreateCommentCommand commentCommand) {
-        CauseComment causeComment = commentCommand.getCauseComment();
-
-        findCauseEntityOrThrow(commentCommand.getCauseIdentifier());
-        RatingEntity entity = this.ratingRepository.findById(commentCommand.getRatingid()).orElseThrow(() -> ServiceException.notFound("Rating Not found {0}", commentCommand.getRatingid()));
-
-        CommentEntity commentEntity = this.commentRepository.save(CommentMapper.map(causeComment, entity));
-        return new CauseComment(commentEntity.getId(),
-                commentEntity.getComment(),
-                commentEntity.getActive(),
-                commentEntity.getRef(),
-                commentEntity.getCreatedBy(),
-                commentEntity.getCreatedOn().toString());
-    }
-
 
 
     private CauseEntity findCauseEntityOrThrow(String identifier) {
@@ -88,9 +63,26 @@ public class RatingAndCommentCommandHandler {
         final CauseEntity causeEntity = findCauseEntityOrThrow(createRatingCommand.getCauseIdentifier());
         CauseRating causeRating = createRatingCommand.getRating();
         RatingEntity ratingEntity = RatingMapper.map(causeRating, causeEntity);
-        //        save the data if not exist otherwise update
         RatingEntity entity = this.ratingRepository.save(ratingEntity);
-        return new CauseRating(entity.getId(), entity.getRating(), entity.getComment(), entity.getActive(), entity.getCreatedBy(), entity.getCreatedOn().toString());
+        return new CauseRating(entity.getId(),
+                entity.getRating(),
+                entity.getComment(),
+                entity.getRef(),
+                entity.getActive(),
+                entity.getCreatedBy(),
+                entity.getCreatedOn().toString());
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.DELETE_RATING)
+    public String deleteRating(final DeleteCauseRatingCommand deleteCauseRatingCommand) {
+        final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseRatingCommand.getCauseIdentifier());
+        final RatingEntity ratingEntity = this.ratingRepository.findByIdAndCause(deleteCauseRatingCommand.getRatingId(), causeEntity).orElseThrow(() -> ServiceException.notFound("Rating Not Found with ID {0} and cause ID {1}", deleteCauseRatingCommand.getRatingId(), deleteCauseRatingCommand.getCauseIdentifier()));
+        ratingEntity.setActive(false);
+        this.ratingRepository.save(ratingEntity);
+        return ratingEntity.toString();
     }
 
 

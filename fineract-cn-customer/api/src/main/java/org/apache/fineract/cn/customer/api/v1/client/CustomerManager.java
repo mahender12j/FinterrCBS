@@ -92,8 +92,8 @@ public interface CustomerManager {
         } catch (CustomerNotFoundException e) {
             return false;
         }
-        final Customer.State state = Customer.State.valueOf(customer.getCurrentState());
-        return (state == Customer.State.ACTIVE);
+        final Customer.UserState userState = Customer.UserState.valueOf(customer.getCurrentState());
+        return (userState == Customer.UserState.ACTIVE);
     }
 
 

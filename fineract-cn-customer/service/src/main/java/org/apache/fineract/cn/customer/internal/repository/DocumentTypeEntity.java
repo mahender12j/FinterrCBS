@@ -18,7 +18,10 @@
  */
 package org.apache.fineract.cn.customer.internal.repository;
 
+import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
+
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -48,9 +51,14 @@ public class DocumentTypeEntity {
     @Column(name = "max_upload", nullable = false)
     private int maxUpload;
 
+    @Column(name = "created_on")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime createdOn;
+
 
     public DocumentTypeEntity() {
         this.uuid = UUID.randomUUID().toString();
+        this.createdOn = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -99,6 +107,14 @@ public class DocumentTypeEntity {
 
     public void setMaxUpload(int maxUpload) {
         this.maxUpload = maxUpload;
+    }
+
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 
     @Override

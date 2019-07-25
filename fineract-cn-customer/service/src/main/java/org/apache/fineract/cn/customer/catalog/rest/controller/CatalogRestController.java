@@ -80,6 +80,9 @@ public class CatalogRestController {
     return ResponseEntity.accepted().build();
   }
 
+
+
+
   @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CATALOG)
   @RequestMapping(
       path = "",

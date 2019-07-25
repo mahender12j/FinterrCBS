@@ -16,28 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.customer.internal.command;
+package org.apache.fineract.cn.customer.internal.service;
 
-import org.apache.fineract.cn.customer.api.v1.domain.ContactDetail;
+import org.apache.fineract.cn.customer.internal.repository.ContactDetailRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+@Service
+public class CorporateService {
+    private final ContactDetailRepository contactDetailRepository;
 
-public class UpdateContactDetailsCommand {
-
-    private final String identifier;
-    private final List<ContactDetail> contactDetails;
-
-    public UpdateContactDetailsCommand(final String identifier, final List<ContactDetail> contactDetails) {
+    @Autowired
+    public CorporateService(final ContactDetailRepository contactDetailRepository) {
         super();
-        this.identifier = identifier;
-        this.contactDetails = contactDetails;
+        this.contactDetailRepository = contactDetailRepository;
     }
 
-    public String identifier() {
-        return this.identifier;
-    }
 
-    public List<ContactDetail> contactDetails() {
-        return this.contactDetails;
+    public boolean isContactDetailExist(final String userType, final String value) {
+        return this.contactDetailRepository.findAllByTypeAndValueAndValidIsTrue(userType, value)
+                .stream()
+                .findAny().isPresent();
     }
 }

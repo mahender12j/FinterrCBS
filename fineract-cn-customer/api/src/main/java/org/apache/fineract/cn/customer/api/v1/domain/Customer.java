@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.fineract.cn.customer.catalog.api.v1.domain.Value;
 import org.apache.fineract.cn.lang.DateOfBirth;
 import org.hibernate.validator.constraints.NotBlank;
@@ -28,11 +29,12 @@ import java.util.List;
 
 public final class Customer {
 
-    public enum Type {
+    public enum UserType {
         PERSON,
         BUSINESS,
         CADMIN,
-        SADMIN
+        SADMIN,
+        CORPORATE
     }
 
     public enum RegistrationType {
@@ -43,12 +45,13 @@ public final class Customer {
         EMAIL
     }
 
-    public enum State {
+    public enum UserState {
         PENDING,
         ACTIVE,
         LOCKED,
         REJECTED,
-        CLOSED
+        CLOSED,
+        NOT_REQUIRED
     }
 
     public enum KycStatus {
@@ -56,14 +59,15 @@ public final class Customer {
         PENDING,
         APPROVED,
         REJECTED,
-        PROCESSING
+        PROCESSING,
+        NOT_REQUIRED
     }
 
     private Long id;
     @NotBlank
     private String identifier;
     @NotNull
-    private Type type;
+    private UserType type;
     @NotNull
     private RegistrationType registrationType;
     @NotBlank
@@ -73,15 +77,12 @@ public final class Customer {
     private String middleName;
     private String gender;
     private DateOfBirth dateOfBirth;
-    private Boolean member;
-    private String accountBeneficiary;
+    private Boolean ngoProfileExist;
     private String referenceCustomer;
-    private String assignedOffice;
-    private String assignedEmployee;
     private Address address;
     @Valid
     private List<ContactDetail> contactDetails;
-    private State currentState;
+    private UserState currentState;
     private String applicationDate;
     private List<Value> customValues;
     private String createdBy;
@@ -93,8 +94,9 @@ public final class Customer {
     private String refferalUserIdentifier;
     private String ethAddress;
     private Boolean deposited;
-    private String depositedOn;
+
     private KycStatus kycStatus;
+    private boolean kycVerified;
     private String accountNumbers;
     private Double avgMonthlyIncome;
     private String ngoName;
@@ -105,6 +107,17 @@ public final class Customer {
     private Double refferalBalance;
     private SocialMatrix socialMatrix;
     private CustomerDocument customerDocument;
+
+
+    //    used for front-end support
+    @JsonProperty(value = "isProfileComplete")
+    private boolean profileComplete;
+    @JsonProperty(value = "isEmailVerified")
+    private boolean emailVerified;
+    @JsonProperty(value = "isMobileVerified")
+    private boolean mobileVerified;
+    private String verifiedMobile;
+    private String verifiedEmail;
 
     public Customer() {
         super();
@@ -123,7 +136,7 @@ public final class Customer {
     }
 
     public void setType(final String type) {
-        this.type = Type.valueOf(type);
+        this.type = UserType.valueOf(type);
     }
 
     public String getRegistrationType() {
@@ -166,44 +179,12 @@ public final class Customer {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public Boolean getMember() {
-        return this.member;
-    }
-
-    public void setMember(final Boolean member) {
-        this.member = member;
-    }
-
-    public String getAccountBeneficiary() {
-        return this.accountBeneficiary;
-    }
-
-    public void setAccountBeneficiary(final String accountBeneficiary) {
-        this.accountBeneficiary = accountBeneficiary;
-    }
-
     public String getReferenceCustomer() {
         return this.referenceCustomer;
     }
 
     public void setReferenceCustomer(final String referenceCustomer) {
         this.referenceCustomer = referenceCustomer;
-    }
-
-    public String getAssignedOffice() {
-        return this.assignedOffice;
-    }
-
-    public void setAssignedOffice(final String assignedOffice) {
-        this.assignedOffice = assignedOffice;
-    }
-
-    public String getAssignedEmployee() {
-        return this.assignedEmployee;
-    }
-
-    public void setAssignedEmployee(final String assignedEmployee) {
-        this.assignedEmployee = assignedEmployee;
     }
 
     public Address getAddress() {
@@ -227,23 +208,7 @@ public final class Customer {
     }
 
     public void setCurrentState(final String currentState) {
-        this.currentState = State.valueOf(currentState);
-    }
-
-    public String getApplicationDate() {
-        return this.applicationDate;
-    }
-
-    public void setApplicationDate(final String applicationDate) {
-        this.applicationDate = applicationDate;
-    }
-
-    public List<Value> getCustomValues() {
-        return this.customValues;
-    }
-
-    public void setCustomValues(final List<Value> customValues) {
-        this.customValues = customValues;
+        this.currentState = UserState.valueOf(currentState);
     }
 
     public String getCreatedBy() {
@@ -406,16 +371,16 @@ public final class Customer {
         this.id = id;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setType(UserType userType) {
+        this.type = userType;
     }
 
     public void setRegistrationType(RegistrationType registrationType) {
         this.registrationType = registrationType;
     }
 
-    public void setCurrentState(State currentState) {
-        this.currentState = currentState;
+    public void setCurrentState(UserState currentUserState) {
+        this.currentState = currentUserState;
     }
 
     public Boolean getDeposited() {
@@ -426,31 +391,123 @@ public final class Customer {
         this.deposited = deposited;
     }
 
-    public String getDepositedOn() {
-        return depositedOn;
-    }
-
-    public void setDepositedOn(String depositedOn) {
-        this.depositedOn = depositedOn;
-    }
-
     public void setKycStatus(KycStatus kycStatus) {
         this.kycStatus = kycStatus;
     }
 
+    public boolean isKycVerified() {
+        return kycVerified;
+    }
+
+    public void setKycVerified(boolean kycVerified) {
+        this.kycVerified = kycVerified;
+    }
+
+    public Boolean getNgoProfileExist() {
+        return ngoProfileExist;
+    }
+
+    public void setNgoProfileExist(Boolean ngoProfileExist) {
+        this.ngoProfileExist = ngoProfileExist;
+    }
+
+    public String getApplicationDate() {
+        return applicationDate;
+    }
+
+    public void setApplicationDate(String applicationDate) {
+        this.applicationDate = applicationDate;
+    }
+
+    public List<Value> getCustomValues() {
+        return customValues;
+    }
+
+    public void setCustomValues(List<Value> customValues) {
+        this.customValues = customValues;
+    }
+
+
+//    for the user status
+
+
+    public boolean isProfileComplete() {
+        return profileComplete;
+    }
+
+    public void setProfileComplete(boolean profileComplete) {
+        this.profileComplete = profileComplete;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public boolean isMobileVerified() {
+        return mobileVerified;
+    }
+
+    public void setMobileVerified(boolean mobileVerified) {
+        this.mobileVerified = mobileVerified;
+    }
+
+    public String getVerifiedMobile() {
+        return verifiedMobile;
+    }
+
+    public void setVerifiedMobile(String verifiedMobile) {
+        this.verifiedMobile = verifiedMobile;
+    }
+
+    public String getVerifiedEmail() {
+        return verifiedEmail;
+    }
+
+    public void setVerifiedEmail(String verifiedEmail) {
+        this.verifiedEmail = verifiedEmail;
+    }
+
     @Override
     public String toString() {
-        return "Customer [identifier=" + identifier + ", type=" + type + ", registrationType=" + registrationType
-                + ", givenName=" + givenName + ", middleName=" + middleName + ", surname=" + surname + ", member="
-                + member + ", accountBeneficiary=" + accountBeneficiary + ", referenceCustomer=" + referenceCustomer
-                + ", assignedOffice=" + assignedOffice + ", assignedEmployee=" + assignedEmployee
-                + ", currentState=" + currentState + ", applicationDate=" + applicationDate + ", createdBy="
-                + createdBy + ", createdOn=" + createdOn + ", lastModifiedBy=" + lastModifiedBy
-                + ", lastModifiedOn=" + lastModifiedOn + ", refferalCodeIdentifier=" + refferalCodeIdentifier
-                + ", ethAddress=" + ethAddress + ", isDeposited=" + deposited + ", depositedOn=" + depositedOn + ", kycStatus=" + kycStatus
-                + ", accountNumbers=" + accountNumbers + ", avgMonthlyIncome=" + avgMonthlyIncome + ", ngoName=" + ngoName + ", designation=" + designation + ", ngoRegistrationNumber="
-                + ngoRegistrationNumber + ", dateOfRegistration=" + dateOfRegistration + ",  refAccountNumber=" + refAccountNumber + ", refferalBalance= " + refferalBalance
-                + ", toString()=" + super.toString() + "]";
+        return "Customer{" +
+                "id=" + id +
+                ", identifier='" + identifier + '\'' +
+                ", type=" + type +
+                ", registrationType=" + registrationType +
+                ", givenName='" + givenName + '\'' +
+                ", surname='" + surname + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", gender='" + gender + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", ngoProfileExist=" + ngoProfileExist +
+                ", referenceCustomer='" + referenceCustomer + '\'' +
+                ", address=" + address +
+                ", contactDetails=" + contactDetails +
+                ", currentState=" + currentState +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdOn='" + createdOn + '\'' +
+                ", lastModifiedBy='" + lastModifiedBy + '\'' +
+                ", lastModifiedOn='" + lastModifiedOn + '\'' +
+                ", refferalCodeIdentifier='" + refferalCodeIdentifier + '\'' +
+                ", refferalUserIdentifier='" + refferalUserIdentifier + '\'' +
+                ", ethAddress='" + ethAddress + '\'' +
+                ", deposited=" + deposited +
+                ", kycStatus=" + kycStatus +
+                ", accountNumbers='" + accountNumbers + '\'' +
+                ", avgMonthlyIncome=" + avgMonthlyIncome +
+                ", ngoName='" + ngoName + '\'' +
+                ", designation='" + designation + '\'' +
+                ", ngoRegistrationNumber='" + ngoRegistrationNumber + '\'' +
+                ", dateOfRegistration='" + dateOfRegistration + '\'' +
+                ", refAccountNumber='" + refAccountNumber + '\'' +
+                ", refferalBalance=" + refferalBalance +
+                ", socialMatrix=" + socialMatrix +
+                ", customerDocument=" + customerDocument +
+                '}';
     }
 }
 

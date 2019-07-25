@@ -19,10 +19,7 @@
 package org.apache.fineract.cn.customer.internal.command.handler;
 
 import org.apache.fineract.cn.customer.api.v1.CustomerEventConstants;
-import org.apache.fineract.cn.customer.api.v1.domain.CustomerDocument;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentStorage;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentsMasterSubtype;
-import org.apache.fineract.cn.customer.api.v1.domain.DocumentsType;
+import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentEvent;
 import org.apache.fineract.cn.customer.api.v1.events.DocumentPageEvent;
 import org.apache.fineract.cn.customer.internal.command.*;
@@ -93,6 +90,48 @@ public class DocumentCommandHandler {
     }
 
 
+    //    todo update customer documents for approval and reject
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT)
+    public CustomerDocument process(final UpdateDocumentStatusCommand command) {
+
+
+        List<CustomerDocumentApproval> customerDocumentApprovals = command.getDocumentApproval();
+
+        CustomerEntity customerEntity = this.customerRepository.findByIdentifier(command.getCustomerIdentifier())
+                .orElseThrow(() -> ServiceException.notFound("Customer not found {0}", command.getCustomerIdentifier()));
+
+        List<DocumentEntryEntity> documentEntryEntityList = customerEntity
+                .getDocumentEntity()
+                .getDocumentEntryEntities()
+                .stream()
+                .filter(documentEntryEntity -> documentEntryEntity.getStatus().equals(CustomerDocument.Status.PENDING.name()))
+                .peek(documentEntryEntity -> customerDocumentApprovals
+                        .stream()
+                        .filter(documentApproval -> documentApproval.getId()
+                                .equals(documentEntryEntity.getId())).findFirst().ifPresent(documentApproval -> {
+                            System.out.println("Current document: " + documentApproval);
+
+                            if (documentApproval.getStatus().equals(CustomerDocumentApproval.Status.REJECTED.name())) {
+                                documentEntryEntity.setReasonForReject(documentApproval.getRejectedReason());
+                                documentEntryEntity.setStatus(CustomerDocumentApproval.Status.REJECTED.name());
+                                documentEntryEntity.setRejectedOn(LocalDateTime.now(Clock.systemUTC()));
+                                documentEntryEntity.setRejectedBy(UserContextHolder.checkedGetUser());
+                            } else if (documentApproval.getStatus().equals(CustomerDocumentApproval.Status.APPROVED.name())) {
+                                documentEntryEntity.setStatus(CustomerDocumentApproval.Status.APPROVED.name());
+                                documentEntryEntity.setApprovedBy(UserContextHolder.checkedGetUser());
+                                documentEntryEntity.setApprovedOn(LocalDateTime.now(Clock.systemUTC()));
+                            }
+
+                        })).collect(Collectors.toList());
+
+        this.documentEntryRepository.save(documentEntryEntityList);
+
+        return new CustomerDocument(command.getCustomerIdentifier());
+    }
+
+
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT)
@@ -104,6 +143,8 @@ public class DocumentCommandHandler {
 
         existingDocument.setStatus(CustomerDocument.Status.APPROVED.name());
         existingDocument.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
+        existingDocument.setApprovedBy(UserContextHolder.checkedGetUser());
+        existingDocument.setApprovedOn(LocalDateTime.now());
         documentEntryRepository.save(existingDocument);
 
 //        customerRepository.findByIdentifier(command.getCustomerIdentifier())

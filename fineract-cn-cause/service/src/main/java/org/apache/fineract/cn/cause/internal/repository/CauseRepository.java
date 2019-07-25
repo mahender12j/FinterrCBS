@@ -41,11 +41,7 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     Optional<CauseEntity> findByIdentifier(final String identifier);
 
-//    Page<CauseEntity> findByCurrentStateNotAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime, final Pageable pageable);
-
-//    List<CauseEntity> findByCurrentStateNotAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime);
-
-    Page<CauseEntity> findByCurrentStateAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime, final Pageable pageable);
+//    Page<CauseEntity> findByCurrentStateAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime, final Pageable pageable);
 
     List<CauseEntity> findByCurrentStateAndStartDateLessThanEqual(final String state, final LocalDateTime dateTime);
 
@@ -59,7 +55,7 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     List<CauseEntity> findByCreatedByAndCurrentState(final String createdBy, final String state);
 
-    Page<CauseEntity> findByCategoryAndCurrentStateAndStartDateLessThanEqual(CategoryEntity entity, final String state, final LocalDateTime localDateTime, Pageable pageable);
+//    Page<CauseEntity> findByCategoryAndCurrentStateAndStartDateLessThanEqual(CategoryEntity entity, final String state, final LocalDateTime localDateTime, Pageable pageable);
 
     List<CauseEntity> findByCategoryAndCurrentStateAndStartDateLessThanEqual(CategoryEntity entity, final String state, final LocalDateTime localDateTime);
 
@@ -70,7 +66,5 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     @Query("select c from CauseEntity c where c.approvedOn <= :calculated_date and c.currentState = :approve")
     List<CauseEntity> findByApproveDate(@Param("calculated_date") final LocalDateTime calculated_date, @Param("approve") String approve);
-
-//    select * from cass_causes where DATE_ADD(approved_on, interval 12 DAY) <= now()
 }
 

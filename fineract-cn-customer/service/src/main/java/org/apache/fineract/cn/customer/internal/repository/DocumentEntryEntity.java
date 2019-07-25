@@ -36,7 +36,7 @@ public class DocumentEntryEntity {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "document_id")
     private DocumentEntity document;
 

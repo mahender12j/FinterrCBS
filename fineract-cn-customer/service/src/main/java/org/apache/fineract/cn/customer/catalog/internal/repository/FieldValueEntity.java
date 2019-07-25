@@ -39,9 +39,11 @@ public class FieldValueEntity {
   private Long id;
   @ManyToOne(optional = false)
   @JoinColumn(name = "entity_id")
+
   private CustomerEntity customer;
   @ManyToOne(optional = false)
   @JoinColumn(name = "field_id")
+
   private FieldEntity field;
   @Column(name = "a_value", length = 4096, nullable = false)
   private String value;

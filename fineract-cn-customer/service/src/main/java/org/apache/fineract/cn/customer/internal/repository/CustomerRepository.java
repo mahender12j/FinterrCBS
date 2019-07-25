@@ -39,7 +39,7 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CustomerEntity c WHERE c.identifier = :identifier")
     Boolean existsByIdentifier(@Param("identifier") final String identifier);
 
-    List<CustomerEntity> findAllByTypeIn(final Set<String> type);
+    List<CustomerEntity> findAllByTypeNotIn(final Set<String> type);
 
     List<CustomerEntity> findAllByType(final String type);
 

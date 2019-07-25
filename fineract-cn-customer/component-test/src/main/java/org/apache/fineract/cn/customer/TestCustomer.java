@@ -23,7 +23,6 @@ import org.apache.fineract.cn.customer.api.v1.client.CustomerAlreadyExistsExcept
 import org.apache.fineract.cn.customer.api.v1.client.CustomerNotFoundException;
 import org.apache.fineract.cn.customer.api.v1.client.CustomerValidationException;
 import org.apache.fineract.cn.customer.api.v1.client.DocumentValidationException;
-import org.apache.fineract.cn.customer.api.v1.client.PortraitNotFoundException;
 import org.apache.fineract.cn.customer.api.v1.domain.Address;
 import org.apache.fineract.cn.customer.api.v1.domain.Command;
 import org.apache.fineract.cn.customer.api.v1.domain.ContactDetail;
@@ -104,7 +103,6 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertNotNull(foundCustomer.getAddress());
     Assert.assertNotNull(foundCustomer.getContactDetails());
     Assert.assertEquals(2, foundCustomer.getContactDetails().size());
-    Assert.assertEquals(customer.getMember(), foundCustomer.getMember());
 
   }
 
@@ -193,7 +191,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertTrue(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer activatedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.State.ACTIVE.name(), activatedCustomer.getCurrentState());
+    Assert.assertEquals(Customer.UserState.ACTIVE.name(), activatedCustomer.getCurrentState());
     Assert.assertNotNull(activatedCustomer.getApplicationDate());
   }
 
@@ -215,7 +213,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertFalse(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer lockedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.State.LOCKED.name(), lockedCustomer.getCurrentState());
+    Assert.assertEquals(Customer.UserState.LOCKED.name(), lockedCustomer.getCurrentState());
   }
 
   @Test
@@ -244,7 +242,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertTrue(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer unlockedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.State.ACTIVE.name(), unlockedCustomer.getCurrentState());
+    Assert.assertEquals(Customer.UserState.ACTIVE.name(), unlockedCustomer.getCurrentState());
     Assert.assertEquals(applicationDate, unlockedCustomer.getApplicationDate());
   }
 
@@ -266,7 +264,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertFalse(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer closedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.State.CLOSED.name(), closedCustomer.getCurrentState());
+    Assert.assertEquals(Customer.UserState.CLOSED.name(), closedCustomer.getCurrentState());
   }
 
   @Test
@@ -292,7 +290,7 @@ public class TestCustomer extends AbstractCustomerTest {
     Assert.assertTrue(this.customerManager.isCustomerInGoodStanding(customer.getIdentifier()));
 
     final Customer reopenedCustomer = this.customerManager.findCustomer(customer.getIdentifier());
-    Assert.assertEquals(Customer.State.ACTIVE.name(), reopenedCustomer.getCurrentState());
+    Assert.assertEquals(Customer.UserState.ACTIVE.name(), reopenedCustomer.getCurrentState());
 
   }
 

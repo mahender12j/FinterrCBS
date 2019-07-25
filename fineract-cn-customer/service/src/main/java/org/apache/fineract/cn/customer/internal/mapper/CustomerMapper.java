@@ -20,7 +20,9 @@ package org.apache.fineract.cn.customer.internal.mapper;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.BusinessCustomer;
+import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
 import org.apache.fineract.cn.customer.api.v1.domain.Customer;
+import org.apache.fineract.cn.customer.api.v1.domain.UserVerification;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 import org.apache.fineract.cn.lang.DateOfBirth;
@@ -47,12 +49,8 @@ public final class CustomerMapper {
         if (customer.getDateOfBirth() != null) {
             customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
         }
-        customerEntity.setMember(customer.getMember());
-        customerEntity.setAccountBeneficiary(customer.getAccountBeneficiary());
         customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
-        customerEntity.setAssignedOffice(customer.getAssignedOffice());
-        customerEntity.setAssignedEmployee(customer.getAssignedEmployee());
-        customerEntity.setCurrentState(customer.getCurrentState());
+        customerEntity.setCurrentState(Customer.UserState.PENDING.name());
         if (customer.getApplicationDate() != null) {
             final String editedApplicationDate;
             if (!customer.getApplicationDate().endsWith("Z")) {
@@ -71,13 +69,10 @@ public final class CustomerMapper {
         } else {
             customerEntity.setIsDeposited(Boolean.FALSE);
         }
-        if (customer.getDepositedOn() != null) {
-            customerEntity.setDepositedOn(LocalDateTime.parse(customer.getDepositedOn()));
-        }
         if (customer.getKycStatus() != null) {
             customerEntity.setKycStatus(customer.getKycStatus());
         } else {
-            customerEntity.setKycStatus("NOTUPLOADED");
+            customerEntity.setKycStatus(Customer.KycStatus.NOTUPLOADED.name());
         }
         customerEntity.setAccountNumbers(customer.getAccountNumbers());
         if (customer.getAvgMonthlyIncome() != null) {
@@ -109,11 +104,7 @@ public final class CustomerMapper {
         if (customerEntity.getDateOfBirth() != null) {
             customer.setDateOfBirth(DateOfBirth.fromLocalDate(customerEntity.getDateOfBirth().toLocalDate()));
         }
-        customer.setMember(customerEntity.getMember());
-        customer.setAccountBeneficiary(customerEntity.getAccountBeneficiary());
         customer.setReferenceCustomer(customerEntity.getReferenceCustomer());
-        customer.setAssignedOffice(customerEntity.getAssignedOffice());
-        customer.setAssignedEmployee(customerEntity.getAssignedEmployee());
         customer.setCurrentState(customerEntity.getCurrentState());
         if (customerEntity.getApplicationDate() != null) {
             final String editedApplicationDate =
@@ -135,10 +126,6 @@ public final class CustomerMapper {
         } else {
             customer.setDeposited(false);
         }
-        if (customerEntity.getDepositedOn() != null) {
-            customer.setDepositedOn(DateConverter.toIsoString(customerEntity.getDepositedOn()));
-        }
-
         if (customerEntity.getKycStatus() != null) {
             customer.setKycStatus(customerEntity.getKycStatus());
         } else {
@@ -159,6 +146,57 @@ public final class CustomerMapper {
         }
         customer.setRefAccountNumber(customerEntity.getRefAccountNumber());
         return customer;
+    }
+
+
+    public static Customer map(Customer customer, UserVerification userVerification) {
+        customer.setEmailVerified(userVerification.isEmailVerified());
+        customer.setMobileVerified(userVerification.isMobileVerified());
+        customer.setVerifiedMobile(userVerification.getVerifiedMobileNumber());
+        customer.setVerifiedEmail(userVerification.getVerifiedEmailAddress());
+        customer.setProfileComplete(userVerification.isProfileComplete());
+        return customer;
+    }
+
+
+    public static CustomerEntity map(final CorporateUser customer) {
+        final CustomerEntity customerEntity = new CustomerEntity();
+        customerEntity.setIdentifier(customer.getIdentifier());
+        customerEntity.setType(Customer.UserType.CORPORATE.name());
+        customerEntity.setRegistrationType(Customer.RegistrationType.EMAIL.name());
+        customerEntity.setGivenName(customer.getGivenName());
+        customerEntity.setMiddleName(customer.getMiddleName());
+        customerEntity.setSurname(customer.getSurname());
+        customerEntity.setCurrentState(Customer.UserState.NOT_REQUIRED.name());
+        customerEntity.setCreatedBy(UserContextHolder.checkedGetUser());
+        customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
+        customerEntity.setEthAddress(customer.getEthAddress());
+        customerEntity.setIsDeposited(false);
+        customerEntity.setAccountNumbers(customer.getAccountNumbers());
+        customerEntity.setDesignation(customer.getDesignation());
+        customerEntity.setRefAccountNumber(customer.getAccountNumbers());
+        customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
+        customerEntity.setLastModifiedOn(LocalDateTime.now());
+        customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
+        customerEntity.setAccountNumbers(customer.getAccountNumbers());
+        customerEntity.setKycStatus(Customer.KycStatus.NOT_REQUIRED.name());
+        return customerEntity;
+    }
+
+
+    //    update map
+    public static CustomerEntity map(final CustomerEntity customerEntity, final CorporateUser customer) {
+        customerEntity.setType(Customer.UserType.CORPORATE.name());
+        customerEntity.setGivenName(customer.getGivenName());
+        customerEntity.setMiddleName(customer.getMiddleName());
+        customerEntity.setSurname(customer.getSurname());
+        customerEntity.setCreatedBy(UserContextHolder.checkedGetUser());
+        customerEntity.setEthAddress(customer.getEthAddress());
+        customerEntity.setDesignation(customer.getDesignation());
+        customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
+        customerEntity.setLastModifiedOn(LocalDateTime.now());
+        return customerEntity;
     }
 
 

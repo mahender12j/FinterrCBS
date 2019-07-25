@@ -21,6 +21,10 @@ package org.apache.fineract.cn.customer.internal.service;
 import org.apache.fineract.cn.accounting.api.v1.domain.Account;
 import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
+import org.apache.fineract.cn.customer.catalog.api.v1.domain.Value;
+import org.apache.fineract.cn.customer.catalog.internal.repository.FieldEntity;
+import org.apache.fineract.cn.customer.catalog.internal.repository.FieldValueEntity;
+import org.apache.fineract.cn.customer.catalog.internal.repository.FieldValueRepository;
 import org.apache.fineract.cn.customer.internal.mapper.*;
 import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.customer.internal.service.helperService.AccountingAdaptor;
@@ -32,7 +36,10 @@ import org.springframework.stereotype.Service;
 
 import javax.net.ssl.*;
 import java.io.*;
-import java.net.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -55,6 +62,10 @@ public class CustomerService {
     private final TaskInstanceRepository taskInstanceRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final DocumentSubTypeRepository documentSubTypeRepository;
+    private final NgoProfileRepository ngoProfileRepository;
+    private final FieldValueRepository fieldValueRepository;
+    private final CorporateService corporateService;
+    private final DocumentService documentService;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -67,7 +78,11 @@ public class CustomerService {
                            final TaskDefinitionRepository taskDefinitionRepository,
                            final TaskInstanceRepository taskInstanceRepository,
                            final DocumentTypeRepository documentTypeRepository,
-                           final DocumentSubTypeRepository documentSubTypeRepository) {
+                           final DocumentSubTypeRepository documentSubTypeRepository,
+                           final NgoProfileRepository ngoProfileRepository,
+                           final FieldValueRepository fieldValueRepository,
+                           final CorporateService corporateService,
+                           final DocumentService documentService) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -80,26 +95,90 @@ public class CustomerService {
         this.taskInstanceRepository = taskInstanceRepository;
         this.documentTypeRepository = documentTypeRepository;
         this.documentSubTypeRepository = documentSubTypeRepository;
+        this.ngoProfileRepository = ngoProfileRepository;
+        this.fieldValueRepository = fieldValueRepository;
+        this.corporateService = corporateService;
+        this.documentService = documentService;
     }
 
-
-    public HashMap<String, String> fetchBankList(PaynetDetails paynetDetails) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+    public HashMap<String, String> aerequest(AERequest aeRequest) throws IOException, NoSuchAlgorithmException, KeyManagementException {
         HashMap<String, String> respMap = new HashMap<>();
-//        default value
-//        String final_checkSum = "566DACEE09ADFA8D65733CC05E7599964556E8FE1E7396A84717CAEA79DEC96022C226593B35B1E4EF441A8052C636861E1DC298CB3BA3C5FA1F6F7D409AE01DB0A9BBD26EA27F6DC98BFFE1758C1746922C6A9A8BA18120C15B4B8C05F994767A715C834C09B313895AEDB25E8CBA36B5CB7A82CB5496BA1857F4AB0BAEDD3E5239B5B5441729A683199B90C7AD9B537AD9DBE9168EDA1D1E82ECC0F111BA33DD4A6FB097FDA38DB80CFBF9FB8B7773E062C11545F6C7B94FBAC3707AF72297D11DF4A21C5E70C07F242ADA8F597F0C3BC16C14D840A0010B46BE96F8B5BA6CDAF21B9514B71D332B3543B19DBDDF6DCAF8A4EBE31A0445F9AD4A0C5C9BDC60";
-//        String fpx_msgType = "BE";
-//        String fpx_msgToken = "01";
-//        String fpx_sellerExId = "EX00009694";
-//        String fpx_version = "7.0";
+        try {
+            StringBuilder postDataStrBuilder = new StringBuilder();
+            postDataStrBuilder.append("fpx_msgType=").append(URLEncoder.encode(aeRequest.getFpx_msgType(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_msgToken=").append(URLEncoder.encode(aeRequest.getFpx_msgToken(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerExId=").append(URLEncoder.encode(aeRequest.getFpx_sellerExId(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerExOrderNo=").append(URLEncoder.encode(aeRequest.getFpx_sellerExOrderNo(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerTxnTime=").append(URLEncoder.encode(aeRequest.getFpx_sellerTxnTime(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerOrderNo=").append(URLEncoder.encode(aeRequest.getFpx_sellerOrderNo(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerId=").append(URLEncoder.encode(aeRequest.getFpx_sellerId(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_sellerBankCode=").append(URLEncoder.encode(aeRequest.getFpx_sellerBankCode(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_txnCurrency=").append(URLEncoder.encode(aeRequest.getFpx_txnCurrency(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_txnAmount=").append(URLEncoder.encode(aeRequest.getFpx_txnAmount(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerEmail=").append(URLEncoder.encode(aeRequest.getFpx_buyerEmail(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerName=").append(URLEncoder.encode(aeRequest.getFpx_buyerName(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerBankId=").append(URLEncoder.encode(aeRequest.getFpx_buyerBankId(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerBankBranch=").append(URLEncoder.encode(aeRequest.getFpx_buyerBankBranch(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerAccNo=").append(URLEncoder.encode(aeRequest.getFpx_buyerAccNo(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerId=").append(URLEncoder.encode(aeRequest.getFpx_buyerId(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_makerName=").append(URLEncoder.encode(aeRequest.getFpx_makerName(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_buyerIban=").append(URLEncoder.encode(aeRequest.getFpx_buyerIban(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_productDesc=").append(URLEncoder.encode(aeRequest.getFpx_productDesc(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_version=").append(URLEncoder.encode(aeRequest.getFpx_version(), "UTF-8"));
+            postDataStrBuilder.append("&fpx_checkSum=").append(URLEncoder.encode(aeRequest.getFpx_checkSum(), "UTF-8"));
 
-        StringBuilder postDataStrBuilder = new StringBuilder();
-        postDataStrBuilder.append("fpx_msgType=").append(URLEncoder.encode(paynetDetails.getFpx_msgType(), "UTF-8"));
-        postDataStrBuilder.append("&fpx_msgToken=").append(URLEncoder.encode(paynetDetails.getFpx_msgToken(), "UTF-8"));
-        postDataStrBuilder.append("&fpx_sellerExId=").append(URLEncoder.encode(paynetDetails.getFpx_sellerExId(), "UTF-8"));
-        postDataStrBuilder.append("&fpx_version=").append(URLEncoder.encode(paynetDetails.getFpx_version(), "UTF-8"));
-        postDataStrBuilder.append("&fpx_checkSum=").append(URLEncoder.encode(paynetDetails.getFinal_checkSum(), "UTF-8"));
 
-//Create a trust manager that does not validate certificate chains only for testing environment
+// Create a trust manager that does not validate certificate chains only for testing environment
+            createTrustManager();
+
+            URLConnection conn = (HttpsURLConnection) new URL("https://uat.mepsfpx.com.my/FPXMain/sellerNVPTxnStatus.jsp").openConnection();
+
+            conn.setDoOutput(true);
+            BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+            outputWriter.write(postDataStrBuilder.toString(), 0, postDataStrBuilder.toString().length());
+            outputWriter.flush();
+            outputWriter.close();
+            BufferedReader inputReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String strResponse = null;
+            while ((strResponse = inputReader.readLine()) != null) {
+//                System.out.println("Response is .." + strResponse);
+                if (strResponse.length() > 0)
+                    break;
+            }
+
+//            System.out.println("strResponse:[" + strResponse + "] result:[" + Objects.requireNonNull(strResponse).trim() + "] " + (strResponse.trim()).equals("PROSESSING ERROR"));
+            inputReader.close();
+            if (strResponse.trim().equals("msgfromfpx= PROSESSING ERROR")) {
+                System.out.println("An error occurred!..Response[" + strResponse + "]");
+                throw ServiceException.internalError("An error occurred!..Response {0}", strResponse);
+            } else {
+                StringTokenizer strToknzr = new StringTokenizer(strResponse, "&");
+                while (strToknzr.hasMoreElements()) {
+                    String temp = strToknzr.nextToken();
+                    if (temp.contains("=")) {
+                        String[] nvp = temp.split("=");
+                        String name = nvp[0];
+                        String value = "";
+                        if (nvp.length == 2)
+                            value = URLDecoder.decode(nvp[1], "UTF-8");
+                        respMap.put(name, value);
+                    } else {
+                        System.out.println("Parsing Error!" + temp);
+                        throw ServiceException.internalError("Parsing Error! {0}", temp);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("<HR><H3>Error :" + e);
+            throw ServiceException.internalError("Something went wrong !");
+        }
+
+        return respMap;
+
+    }
+
+    private void createTrustManager() throws NoSuchAlgorithmException, KeyManagementException {
         TrustManager[] trustAllCerts = new TrustManager[]
                 {
                         new X509TrustManager() {
@@ -137,6 +216,21 @@ public class CustomerService {
                 return true;
             }
         });
+    }
+
+
+    public HashMap<String, String> fetchBankList(PaynetDetails paynetDetails) throws
+            IOException, NoSuchAlgorithmException, KeyManagementException {
+        HashMap<String, String> respMap = new HashMap<>();
+        StringBuilder postDataStrBuilder = new StringBuilder();
+        postDataStrBuilder.append("fpx_msgType=").append(URLEncoder.encode(paynetDetails.getFpx_msgType(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_msgToken=").append(URLEncoder.encode(paynetDetails.getFpx_msgToken(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_sellerExId=").append(URLEncoder.encode(paynetDetails.getFpx_sellerExId(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_version=").append(URLEncoder.encode(paynetDetails.getFpx_version(), "UTF-8"));
+        postDataStrBuilder.append("&fpx_checkSum=").append(URLEncoder.encode(paynetDetails.getFinal_checkSum(), "UTF-8"));
+
+//Create a trust manager that does not validate certificate chains only for testing environment
+        createTrustManager();
 
         URLConnection conn = (HttpsURLConnection) new URL("https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList").openConnection();
 
@@ -206,15 +300,22 @@ public class CustomerService {
 
     }
 
-    public Optional<Customer> findCustomer(final String identifier) {
+    public Customer findCustomer(final String identifier) {
         CustomerEntity customerEntity = customerRepository.findByIdentifier(identifier).orElseThrow(() -> ServiceException.notFound("Customer with identifier {0} not found in this system", identifier));
-
         Customer customer = CustomerMapper.map(customerEntity);
         customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
+        customer.setContactDetails(customerEntity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
+        customer.setNgoProfileExist(this.ngoProfileRepository.existsByCustomerIdentifier(identifier));
+        CustomerDocument customerDocument = this.documentService.findCustomerDocuments(customer.getIdentifier());
+        customer.setCustomerDocument(customerDocument);
+        customer.setKycStatus(customerDocument.getKycStatusText());
+        customer.setKycVerified(customerDocument.isKycStatus());
+//        this mapper should be always after kyc value is set cause in the mapper I am receiving the kycstatus to validate the user
+        CustomerMapper.map(customer, this.userVerification(customerEntity));
 
         if (customerEntity.getReferenceCustomer() != null) {
-            Optional<CustomerEntity> reffCustomer = this.customerRepository.findByRefferalCodeIdentifier(customerEntity.getReferenceCustomer());
-            reffCustomer.ifPresent(reff -> customer.setRefferalUserIdentifier(reff.getIdentifier()));
+            this.customerRepository.findByRefferalCodeIdentifier(customerEntity.getReferenceCustomer())
+                    .ifPresent(reff -> customer.setRefferalUserIdentifier(reff.getIdentifier()));
         }
 
         customer.setSocialMatrix(getSocialMatrix(customerEntity));
@@ -223,17 +324,23 @@ public class CustomerService {
             customer.setRefferalBalance(account.getBalance());
         }
 
-
-        setCustomerContactDetails(customerEntity, customer);
-        return Optional.of(customer);
-
-    }
-
-    private void setCustomerContactDetails(CustomerEntity customerEntity, Customer customer) {
-        final List<ContactDetailEntity> contactDetailEntities = this.contactDetailRepository.findByCustomer(customerEntity);
-        if (contactDetailEntities != null) {
-            customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
+        final List<FieldValueEntity> fieldValueEntities = this.fieldValueRepository.findByCustomer(customerEntity);
+        if (fieldValueEntities != null) {
+            customer.setCustomValues(
+                    fieldValueEntities
+                            .stream()
+                            .map(fieldValueEntity -> {
+                                final Value value = new Value();
+                                value.setValue(fieldValueEntity.getValue());
+                                final FieldEntity fieldEntity = fieldValueEntity.getField();
+                                value.setCatalogIdentifier(fieldEntity.getCatalog().getIdentifier());
+                                value.setFieldIdentifier(fieldEntity.getIdentifier());
+                                return value;
+                            }).collect(Collectors.toList())
+            );
         }
+
+        return customer;
     }
 
     public CustomerPage fetchCustomer(final String term, final Boolean includeClosed, final Pageable pageable) {
@@ -249,9 +356,9 @@ public class CustomerService {
             if (term != null) {
                 customerEntities =
                         this.customerRepository.findByCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
-                                Customer.State.CLOSED.name(), term, term, term, pageable);
+                                Customer.UserState.CLOSED.name(), term, term, term, pageable);
             } else {
-                customerEntities = this.customerRepository.findByCurrentStateNot(Customer.State.CLOSED.name(), pageable);
+                customerEntities = this.customerRepository.findByCurrentStateNot(Customer.UserState.CLOSED.name(), pageable);
             }
         }
 
@@ -267,14 +374,15 @@ public class CustomerService {
         return customerPage;
     }
 
-    public CustomerRefPage fetchCustomerReferrals(final String refferalcode, final String searchKey, final Pageable pageable) {
+    public CustomerRefPage fetchCustomerReferrals(final String refferalcode, final String searchKey,
+                                                  final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
         CustomerEntity customerEntity = customerRepository.findByRefferalCodeIdentifier(refferalcode).orElseThrow(() -> ServiceException.notFound("Customer with refferal code {0} not found", refferalcode));
 
         if (searchKey != null) {
-            customerEntities = this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, Customer.State.CLOSED.name(), searchKey, searchKey, searchKey, pageable);
+            customerEntities = this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, Customer.UserState.CLOSED.name(), searchKey, searchKey, searchKey, pageable);
         } else {
-            customerEntities = this.customerRepository.findByReferenceCustomerAndIsDepositedAndCurrentStateNot(refferalcode, true, Customer.State.CLOSED.name(), pageable);
+            customerEntities = this.customerRepository.findByReferenceCustomerAndIsDepositedAndCurrentStateNot(refferalcode, true, Customer.UserState.CLOSED.name(), pageable);
         }
 
 
@@ -296,7 +404,7 @@ public class CustomerService {
                 final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
                 customerEntities.forEach(entity -> {
                     Customer tCustomer = CustomerMapper.map(entity);
-                    this.setCustomerContactDetails(entity, tCustomer);
+                    tCustomer.setContactDetails(customerEntity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
                     if (entity.getAccountNumbers() != null) {
                         Account acc = accountingAdaptor.findAccountByIdentifier(entity.getRefAccountNumber());
                         tCustomer.setRefferalBalance(acc.getBalance());
@@ -359,14 +467,11 @@ public class CustomerService {
     }
 
     public Optional<Customer> fetchCustomerByReferralcode(final String refferalCode) {
-
         return customerRepository.findByRefferalCodeIdentifier(refferalCode)
                 .map(customerEntity -> {
                     final Customer customer = CustomerMapper.map(customerEntity);
                     customer.setAddress(AddressMapper.map(customerEntity.getAddress()));
-
-                    setCustomerContactDetails(customerEntity, customer);
-
+                    customer.setContactDetails(customerEntity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
                     return customer;
                 });
     }
@@ -411,12 +516,14 @@ public class CustomerService {
                 .orElseGet(Collections::emptyList);
     }
 
-    private Optional<IdentificationCardScanEntity> findIdentificationCardEntity(final String number, final String identifier) {
+    private Optional<IdentificationCardScanEntity> findIdentificationCardEntity(final String number,
+                                                                                final String identifier) {
         final Optional<IdentificationCardEntity> cardEntity = this.identificationCardRepository.findByNumber(number);
         return cardEntity.flatMap(card -> this.identificationCardScanRepository.findByIdentifierAndIdentificationCard(identifier, card));
     }
 
-    public Optional<IdentificationCardScan> findIdentificationCardScan(final String number, final String identifier) {
+    public Optional<IdentificationCardScan> findIdentificationCardScan(final String number,
+                                                                       final String identifier) {
         return this.findIdentificationCardEntity(number, identifier).map(IdentificationCardScanMapper::map);
     }
 
@@ -429,8 +536,8 @@ public class CustomerService {
                 .map(customerEntity -> {
                     final List<ProcessStep> processSteps = new ArrayList<>();
 
-                    final Customer.State state = Customer.State.valueOf(customerEntity.getCurrentState());
-                    switch (state) {
+                    final Customer.UserState userState = Customer.UserState.valueOf(customerEntity.getCurrentState());
+                    switch (userState) {
                         case PENDING:
                             processSteps.add(this.buildProcessStep(customerEntity, Command.Action.ACTIVATE));
                             processSteps.add(this.buildProcessStep(customerEntity, Command.Action.CLOSE));
@@ -472,5 +579,62 @@ public class CustomerService {
         processStep.setTaskDefinitions(taskDefinitions);
 
         return processStep;
+    }
+
+
+    private UserVerification userVerification(final CustomerEntity customerEntity) {
+        List<ContactDetailEntity> contactDetail = customerEntity.getContactDetail();
+        UserVerification userVerification = new UserVerification();
+        userVerification.setEmailVerified(contactDetail.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name()) && entity.getValid()));
+        userVerification.setMobileVerified(contactDetail.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.MOBILE.name()) && entity.getValid()));
+        userVerification.setVerifiedMobileNumber(contactDetail.stream().filter(entity -> entity.getValid() && entity.getType().equals(ContactDetail.Type.MOBILE.name())).findFirst().map(ContactDetailEntity::getValue).orElse(""));
+        userVerification.setVerifiedEmailAddress(contactDetail.stream().filter(entity -> entity.getValid() && entity.getType().equals(ContactDetail.Type.EMAIL.name())).findFirst().map(ContactDetailEntity::getValue).orElse(""));
+        userVerification.setProfileComplete(getProfileCompleted(customerEntity));
+        return userVerification;
+    }
+
+    private boolean getProfileCompleted(CustomerEntity customerEntity) {
+
+        if (customerEntity.getType().equals(Customer.UserType.CORPORATE.name())) {
+            AddressEntity addressEntity = customerEntity.getAddress();
+            List<ContactDetailEntity> detailEntityList = customerEntity.getContactDetail();
+            List<FieldValueEntity> fieldValueEntities = customerEntity.getFieldValueEntities();
+            return addressEntity != null &&
+                    addressEntity.getCountry() != null &&
+                    addressEntity.getState() != null &&
+                    addressEntity.getCity() != null &&
+                    addressEntity.getPostalCode() != null &&
+                    fieldValueEntities.stream().anyMatch(entity -> entity.getField().getIdentifier().equals("companyName")) &&
+                    fieldValueEntities.stream().anyMatch(entity -> entity.getField().getIdentifier().equals("typeOfCompany")) &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name())) &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.MOBILE.name()));
+
+
+        } else if (customerEntity.getType().equals(Customer.UserType.PERSON.name())) {
+            AddressEntity addressEntity = customerEntity.getAddress();
+            List<ContactDetailEntity> detailEntityList = customerEntity.getContactDetail();
+            return addressEntity != null &&
+                    addressEntity.getCountry() != null &&
+                    customerEntity.getDateOfBirth() != null &&
+                    customerEntity.getGender() != null &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name())) &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.MOBILE.name()));
+
+        } else if (customerEntity.getType().equals(Customer.UserType.BUSINESS.name())) {
+            AddressEntity addressEntity = customerEntity.getAddress();
+            List<ContactDetailEntity> detailEntityList = customerEntity.getContactDetail();
+            return addressEntity != null &&
+                    addressEntity.getCountry() != null &&
+                    customerEntity.getRegistrationType() != null &&
+                    customerEntity.getNgoName() != null &&
+                    customerEntity.getGivenName() != null &&
+                    customerEntity.getNgoRegistrationNumber() != null &&
+                    customerEntity.getDateOfRegistration() != null &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.EMAIL.name())) &&
+                    detailEntityList.stream().anyMatch(entity -> entity.getType().equals(ContactDetail.Type.MOBILE.name()));
+
+        } else {
+            return true;
+        }
     }
 }

@@ -74,6 +74,6 @@ flyway:
 
 upload:
   image:
-    max-size: 524288
+    max-size: 1048576
 
 

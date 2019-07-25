@@ -20,6 +20,7 @@ package org.apache.fineract.cn.customer.internal.mapper;
 
 import org.apache.fineract.cn.customer.api.v1.domain.Address;
 import org.apache.fineract.cn.customer.internal.repository.AddressEntity;
+import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 
 public final class AddressMapper {
 
@@ -29,6 +30,36 @@ public final class AddressMapper {
 
     public static AddressEntity map(final Address address) {
         final AddressEntity addressEntity = new AddressEntity();
+        addressEntity.setStreet(address.getStreet());
+        addressEntity.setCity(address.getCity());
+        addressEntity.setPostalCode(address.getPostalCode());
+        addressEntity.setRegion(address.getRegion());
+        addressEntity.setCountryCode(address.getCountryCode());
+        addressEntity.setCountry(address.getCountry());
+        addressEntity.setNationalityCode(address.getNationalityCode());
+        addressEntity.setNationality(address.getNationality());
+        addressEntity.setState(address.getState());
+        return addressEntity;
+    }
+
+
+    public static AddressEntity map(final Address address, final CustomerEntity customerEntity) {
+        final AddressEntity addressEntity = new AddressEntity();
+        addressEntity.setCustomer(customerEntity);
+        addressEntity.setStreet(address.getStreet());
+        addressEntity.setCity(address.getCity());
+        addressEntity.setPostalCode(address.getPostalCode());
+        addressEntity.setRegion(address.getRegion());
+        addressEntity.setCountryCode(address.getCountryCode());
+        addressEntity.setCountry(address.getCountry());
+        addressEntity.setNationalityCode(address.getNationalityCode());
+        addressEntity.setNationality(address.getNationality());
+        addressEntity.setState(address.getState());
+        return addressEntity;
+    }
+
+
+    public static AddressEntity map(final AddressEntity addressEntity, final Address address) {
         addressEntity.setStreet(address.getStreet());
         addressEntity.setCity(address.getCity());
         addressEntity.setPostalCode(address.getPostalCode());

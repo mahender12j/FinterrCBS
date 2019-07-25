@@ -16,24 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.cause.internal.repository;
+package org.apache.fineract.cn.customer.internal.command;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import org.apache.fineract.cn.customer.api.v1.domain.CorporateUser;
 
-import java.util.stream.Stream;
+public class CreateCorporateCommand {
 
-/**
- * @author Md Robiul Hassan
- */
-@Repository
-public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
+    private final CorporateUser corporateUser;
 
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN 'true' ELSE 'false' END FROM CommentEntity c WHERE c.id = :id")
-    Boolean existsByid(@Param("id") final Long id);
+    public CreateCorporateCommand(final CorporateUser corporateUser) {
+        super();
+        this.corporateUser = corporateUser;
+    }
 
-    Stream<CommentEntity> findByRating(final RatingEntity ratingEntity);
+
+    public CorporateUser getCorporateUser() {
+        return corporateUser;
+    }
 }
-
