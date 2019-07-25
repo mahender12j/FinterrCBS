@@ -29,7 +29,7 @@ import org.apache.fineract.cn.customer.internal.repository.*;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.fineract.cn.api.util.UserContextHolder;
@@ -39,6 +39,9 @@ import org.apache.fineract.cn.command.annotation.EventEmitter;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author Myrle Krantz
@@ -79,10 +82,11 @@ public class DocumentCommandHandler {
                                 .map(command.getCustomerDocument(), entity))))
                 .orElseThrow(() -> ServiceException.notFound("Customer {0} not found", command.getCustomeridentifier()));
 
+        List<KycDocuments> kycDocuments = command.getCustomerDocument().getKycDocuments();
 
-        List<DocumentEntryEntity> documentEntryEntityList = command.getCustomerDocument().getKycDocuments()
+        List<DocumentEntryEntity> documentEntryEntityList = kycDocuments
                 .stream()
-                .map(kycDocuments -> DocumentMapper.map(kycDocuments, documentEntity))
+                .map(documents -> DocumentMapper.map(documents, documentEntity))
                 .collect(Collectors.toList());
 
         this.documentEntryRepository.save(documentEntryEntityList);
@@ -96,14 +100,13 @@ public class DocumentCommandHandler {
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT)
     public CustomerDocument process(final UpdateDocumentStatusCommand command) {
 
-
         List<CustomerDocumentApproval> customerDocumentApprovals = command.getDocumentApproval();
-
         CustomerEntity customerEntity = this.customerRepository.findByIdentifier(command.getCustomerIdentifier())
                 .orElseThrow(() -> ServiceException.notFound("Customer not found {0}", command.getCustomerIdentifier()));
 
-        List<DocumentEntryEntity> documentEntryEntityList = customerEntity
-                .getDocumentEntity()
+        DocumentEntity documentEntity = customerEntity.getDocumentEntity();
+
+        List<DocumentEntryEntity> documentEntryEntityList = documentEntity
                 .getDocumentEntryEntities()
                 .stream()
                 .filter(documentEntryEntity -> documentEntryEntity.getStatus().equals(CustomerDocument.Status.PENDING.name()))
@@ -112,7 +115,6 @@ public class DocumentCommandHandler {
                         .filter(documentApproval -> documentApproval.getId()
                                 .equals(documentEntryEntity.getId())).findFirst().ifPresent(documentApproval -> {
                             System.out.println("Current document: " + documentApproval);
-
                             if (documentApproval.getStatus().equals(CustomerDocumentApproval.Status.REJECTED.name())) {
                                 documentEntryEntity.setReasonForReject(documentApproval.getRejectedReason());
                                 documentEntryEntity.setStatus(CustomerDocumentApproval.Status.REJECTED.name());
@@ -127,6 +129,12 @@ public class DocumentCommandHandler {
                         })).collect(Collectors.toList());
 
         this.documentEntryRepository.save(documentEntryEntityList);
+
+
+        if (!documentEntity.getStatus().equals(CustomerDocument.Status.APPROVED.name())) {
+            documentEntity.setStatus(findCustomerDocumentsStatus(customerEntity));
+            this.documentRepository.save(documentEntity);
+        }
 
         return new CustomerDocument(command.getCustomerIdentifier());
     }
@@ -146,14 +154,6 @@ public class DocumentCommandHandler {
         existingDocument.setApprovedBy(UserContextHolder.checkedGetUser());
         existingDocument.setApprovedOn(LocalDateTime.now());
         documentEntryRepository.save(existingDocument);
-
-//        customerRepository.findByIdentifier(command.getCustomerIdentifier())
-//                .map(customerEntity -> DocumentMapper.map(command.getCustomerDocumentId(), customerEntity))
-//                .ifPresent(documentEntity -> {
-//                    documentEntity.setId(existingDocument.getId());
-//                    documentRepository.save(documentEntity);
-//                });
-
         return new DocumentEvent(command.getCustomerIdentifier(), command.getCustomerDocumentId().toString());
     }
 
@@ -188,7 +188,6 @@ public class DocumentCommandHandler {
     @CommandHandler
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_DOCUMENT_TYPE)
     public CreateDocumentTypeCommandResponse process(final CreateDocumentTypeCommand command) {
-
         final DocumentTypeEntity documentTypeEntity = DocumentMapper.map(command.getDocumentsType());
         DocumentTypeEntity typeEntity = this.documentTypeRepository.save(documentTypeEntity);
         return new CreateDocumentTypeCommandResponse(typeEntity.getTitle(), typeEntity.getUserType(), typeEntity.isActive(), typeEntity.getUuid());
@@ -281,10 +280,67 @@ public class DocumentCommandHandler {
 
         documentEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         documentEntity.setCreatedBy(UserContextHolder.checkedGetUser());
-        documentEntity.setCompleted(true);
         documentRepository.save(documentEntity);
 
 
         return new DocumentEvent(command.getCustomerIdentifier(), command.getDocumentIdentifier());
     }
+
+
+    String findCustomerDocumentsStatus(CustomerEntity customerEntity) {
+        List<DocumentTypeEntity> allTypeEntities = this.documentTypeRepository.findAll();
+        return this.documentRepository.findByCustomerId(customerEntity.getIdentifier()).map(documentEntity -> {
+
+            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                    this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
+                            .stream()
+                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+
+            List<DocumentsType> documentsType = new ArrayList<>();
+
+            documentEntryEntity.forEach((key, documentEntryEntities) -> {
+                final DocumentsType type = new DocumentsType();
+                DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
+                documentsType.add(type);
+
+            });
+
+            //receive the documents master, all the types of documents per type in list
+            Set<String> docMaster = allTypeEntities
+                    .stream()
+                    .filter((DocumentTypeEntity::isActive))
+                    .filter(documentTypeEntity -> documentTypeEntity.getUserType().equals(customerEntity.getType()))
+                    .map(DocumentTypeEntity::getUuid)
+                    .collect(Collectors.toSet());
+
+            Set<String> docAvailable = documentEntryEntity.keySet();
+
+            System.out.println("Documents master Type: " + docMaster);
+            System.out.println("Available documents Type: " + docAvailable);
+
+            boolean isAllDocApproved = documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()));
+            boolean isAnyDocumentRejected = documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()));
+
+            Set<String> docDifferent = new HashSet<>(docMaster);
+            docDifferent.removeAll(docAvailable);
+
+
+            System.out.println("same doc");
+            if (isAllDocApproved) {
+                System.out.println("APPROVED doc");
+                return CustomerDocument.Status.APPROVED.name();
+            } else if (isAnyDocumentRejected) {
+                System.out.println("REJECTED doc");
+                return CustomerDocument.Status.REJECTED.name();
+            } else if (docDifferent.size() == 0) {
+                System.out.println("PENDING doc");
+                return CustomerDocument.Status.PENDING.name();
+            } else {
+                System.out.println("NOTUPLOADED doc");
+                return CustomerDocument.Status.NOTUPLOADED.name();
+            }
+
+        }).orElse(CustomerDocument.Status.NOTUPLOADED.name());
+    }
+
 }

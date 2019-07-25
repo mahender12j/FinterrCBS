@@ -29,21 +29,12 @@ import java.util.Objects;
  */
 public class CustomerDocumentsBody {
 
-    @Length(max = 4096)
-    private String description;
     private String type;
     private String subType;
 
     public CustomerDocumentsBody() {
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public String getType() {
         return type;

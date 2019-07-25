@@ -65,16 +65,9 @@ public class CAdminService {
     public CAdminPage getCaAdminStatistics() {
         CAdminPage cAdminPage = new CAdminPage();
         List<CustomerEntity> customerEntities = this.customerRepository.findAll();
-        List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findAll();
 
         CaAdminCauseData caAdminCauseData = this.causeAdaptor.fetchCauseData();
         final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).minusDays(7);
-
-
-//        todo next release we need to complete for release of the fund
-//        final DayOfWeek firstDayOfWeek = WeekFields.ISO.getFirstDayOfWeek();
-//        final LocalDateTime startDateOfThisWeek = LocalDateTime.now(Clock.systemUTC()).with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
-//        System.out.println("Start Date Of This Week" + startDateOfThisWeek);
 
         cAdminPage.setActiveMember(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.PERSON.name())).count());
         cAdminPage.setNoOfMember(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.PERSON.name())).count());
@@ -93,7 +86,7 @@ public class CAdminService {
 
         List<CustomerDocument> customerDocuments = customerEntities
                 .stream()
-                .map(customerEntity -> this.findCustomerDocuments(customerEntity, documentTypeEntities))
+                .map(this::findCustomerDocumentsByCustomerEntity)
                 .filter(doc -> doc.getKycStatusText() != null)
                 .collect(Collectors.toList());
 
@@ -128,18 +121,15 @@ public class CAdminService {
 
     }
 
-    CustomerDocument findCustomerDocuments(CustomerEntity customerEntity, List<DocumentTypeEntity> documentTypeEntities) {
-
+    CustomerDocument findCustomerDocumentsByCustomerEntity(CustomerEntity customerEntity) {
         List<DocumentTypeEntity> allTypeEntities = this.documentTypeRepository.findAll();
         List<DocumentSubTypeEntity> allSubTypeRepository = this.documentSubTypeRepository.findAll();
 
         return this.documentRepository.findByCustomerId(customerEntity.getIdentifier()).map(documentEntity -> {
             CustomerDocument customerDocument = DocumentMapper.map(documentEntity);
 
-            List<DocumentEntryEntity> documentEntryEntityList = this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name());
-
             final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
-                    documentEntryEntityList
+                    this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
                             .stream()
                             .collect(groupingBy(DocumentEntryEntity::getType, toList()));
 
@@ -165,107 +155,21 @@ public class CAdminService {
                     return documentsSubType;
                 }).collect(toList());
 
-                final DocumentsType type = new DocumentsType();
-                DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
-                type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
-                type.setDocumentsSubType(documentsSubTypeList);
-                type.setUserType(customerEntity.getType());
-                type.setUuid(key);
-                type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
-                documentsType.add(type);
+                if (allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key)
+                        && documentTypeEntity.isActive())) {
+                    final DocumentsType type = new DocumentsType();
+                    DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
+                    type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
+                    type.setDocumentsSubType(documentsSubTypeList);
+                    type.setUserType(customerEntity.getType());
+                    type.setUuid(key);
+                    type.setMaxUpload(allTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getUuid().equals(key)).findFirst().map(DocumentTypeEntity::getMaxUpload).orElse(0));
+                    type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
+                    documentsType.add(type);
+                }
+
             });
             customerDocument.setDocumentsTypes(documentsType);
-
-            //receive the documents master, all the types of documents per type in list
-            Set<String> doc_master = documentTypeEntities
-                    .stream()
-                    .filter(documentTypeEntity -> documentTypeEntity.getUserType().equals(customerEntity.getType()))
-                    .map(DocumentTypeEntity::getUuid)
-                    .collect(Collectors.toSet());
-
-            final boolean isDocAvailable = documentEntryEntity.keySet().equals(doc_master);
-
-
-//            check if each doc type has at least a approved document
-            if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
-//                get approved doc list sort by approval data, the recent approved doc at first
-//                then get the latest approval doc date
-                Optional<DocumentEntryEntity> entryEntity = documentEntryEntityList.stream().filter(doc -> doc.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                        .max(Comparator.comparing(DocumentEntryEntity::getApprovedOn));
-
-
-                if (entryEntity.isPresent()) {
-                    entryEntity.ifPresent(ent -> {
-                        if (isDocAvailable) {
-                            customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                            customerDocument.setKycStatus(true);
-                        } else {
-                            Set<String> doc_available = documentEntryEntityList
-                                    .stream()
-                                    .map(DocumentEntryEntity::getType)
-                                    .collect(Collectors.toSet());
-
-                            Set<String> doc_different = new HashSet<>(doc_master);
-                            doc_different.removeAll(doc_available);
-                            if (doc_different.size() == 0) {
-                                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                                customerDocument.setKycStatus(true);
-
-                            } else {
-
-                                this.documentTypeRepository.findByUuidIn(doc_different)
-                                        .stream()
-                                        .max(Comparator.comparing(DocumentTypeEntity::getCreatedOn))
-                                        .ifPresent(documentTEntity -> {
-                                            if (documentTEntity.getCreatedOn().isAfter(ent.getApprovedOn())) {
-                                                customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-                                                customerDocument.setKycStatus(true);
-                                            } else {
-                                                customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
-                                                customerDocument.setKycStatus(false);
-                                            }
-                                        });
-                            }
-                        }
-                    });
-                } else {
-                    customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
-                    customerDocument.setKycStatus(false);
-                }
-
-            } else {
-                if (isDocAvailable) {
-                    if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-                            && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
-                        customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
-                        customerDocument.setKycStatus(false);
-                    } else {
-                        customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
-                        customerDocument.setKycStatus(false);
-                    }
-                } else {
-                    customerDocument.setKycStatus(false);
-                    customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
-                }
-            }
-
-//            if (isDocAvailable) {
-//                if (documentsType.stream().allMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))) {
-//                    customerDocument.setKycStatusText(CustomerDocument.Status.APPROVED.name());
-//                    customerDocument.setKycStatus(true);
-//
-//                } else if (documentsType.stream().noneMatch(type -> type.getStatus().equals(CustomerDocument.Status.APPROVED.name()))
-//                        && documentsType.stream().anyMatch(type -> type.getStatus().equals(CustomerDocument.Status.REJECTED.name()))) {
-//                    customerDocument.setKycStatusText(CustomerDocument.Status.REJECTED.name());
-//                    customerDocument.setKycStatus(false);
-//                } else {
-//                    customerDocument.setKycStatusText(CustomerDocument.Status.PENDING.name());
-//                    customerDocument.setKycStatus(false);
-//                }
-//            } else {
-//                customerDocument.setKycStatus(false);
-//                customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
-//            }
 
             return customerDocument;
 
@@ -276,16 +180,6 @@ public class CAdminService {
             return customerDocument;
 
         });
-
-//        if (documentEntity.isPresent()) {
-////                start document entity
-//
-//
-//        } else {
-//
-//
-//        }
-//        return customerDocument;
     }
 
 

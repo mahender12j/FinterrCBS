@@ -40,7 +40,9 @@ public interface DocumentTypeRepository extends JpaRepository<DocumentTypeEntity
 
     List<DocumentTypeEntity> findByUuidIn(final Set<String> stringSet);
 
-    List<DocumentTypeEntity> findByActiveIsTrue();
+    List<DocumentTypeEntity> findByUuidNotIn(final Set<String> stringSet);
+
+    List<DocumentTypeEntity> findAllByActiveIsTrue();
 
     Optional<DocumentTypeEntity> findByUserTypeAndUuidAndActiveIsTrue(final String userType, final String uuid);
 

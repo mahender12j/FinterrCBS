@@ -77,8 +77,11 @@ public class DocumentService {
 
     public CustomerDocument findCustomerDocuments(final String customerIdentifier) {
         final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
-        List<DocumentTypeEntity> documentTypeEntities = this.documentTypeRepository.findByActiveIsTrue();
-        return cAdminService.findCustomerDocuments(customerEntity, documentTypeEntities);
+        return cAdminService.findCustomerDocumentsByCustomerEntity(customerEntity);
+    }
+
+    public Optional<DocumentEntity> documentEntity(final CustomerEntity customerEntity) {
+        return this.documentRepository.findByCustomer(customerEntity);
     }
 
 
