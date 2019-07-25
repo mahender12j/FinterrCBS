@@ -143,7 +143,7 @@ public class CAdminService {
                     documentsSubType.setStatus(entity.getStatus());
                     documentsSubType.setType(this.getDocumentTypeTitle(allTypeEntities, entity.getType()));
                     documentsSubType.setTypeUUID(entity.getType());
-                    documentsSubType.setSubTypeUUID(entity.getSubType());
+                    documentsSubType.setSubTypeUUID(key);
                     documentsSubType.setSubType(this.getDocumentSubTypeTitle(allSubTypeRepository, entity.getSubType()));
                     documentsSubType.setUpdatedOn(entity.getUpdatedOn().toString());
                     documentsSubType.setApprovedBy(entity.getApprovedBy());
@@ -155,8 +155,7 @@ public class CAdminService {
                     return documentsSubType;
                 }).collect(toList());
 
-                if (allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key)
-                        && documentTypeEntity.isActive())) {
+                if (allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key) && documentTypeEntity.isActive())) {
                     final DocumentsType type = new DocumentsType();
                     DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
                     type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
