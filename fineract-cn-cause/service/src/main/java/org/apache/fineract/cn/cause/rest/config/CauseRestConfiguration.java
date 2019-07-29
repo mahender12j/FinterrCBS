@@ -26,6 +26,7 @@ import org.apache.fineract.cn.cassandra.config.EnableCassandra;
 import org.apache.fineract.cn.cause.ServiceConstants;
 import org.apache.fineract.cn.cause.internal.config.CauseServiceConfiguration;
 import org.apache.fineract.cn.command.config.EnableCommandProcessing;
+import org.apache.fineract.cn.customer.api.v1.client.CustomerManager;
 import org.apache.fineract.cn.lang.ApplicationName;
 import org.apache.fineract.cn.lang.config.EnableApplicationName;
 import org.apache.fineract.cn.lang.config.EnableServiceException;
@@ -55,7 +56,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableApplicationName
 @EnableFeignClients(
         clients = {
-                JournalManager.class
+                JournalManager.class,
+                CustomerManager.class
         }
 )
 @ComponentScan({

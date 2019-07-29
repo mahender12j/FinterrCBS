@@ -425,6 +425,10 @@ public class CustomerService {
         }).orElse(CustomerDocument.Status.NOTUPLOADED.name());
     }
 
+    public List<Customer> fetchAllCustomers() {
+        return this.customerRepository.findAll().stream().map(CustomerMapper::map).collect(toList());
+    }
+
     public CustomerPage fetchCustomer(final String term, final Boolean includeClosed, final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
         if (includeClosed) {

@@ -23,6 +23,8 @@ import org.apache.fineract.cn.cause.api.v1.domain.*;
 import org.apache.fineract.cn.cause.internal.mapper.*;
 import org.apache.fineract.cn.cause.internal.repository.*;
 import org.apache.fineract.cn.cause.internal.service.helper.service.AccountingAdaptor;
+import org.apache.fineract.cn.cause.internal.service.helper.service.CustomerAdaptor;
+import org.apache.fineract.cn.customer.api.v1.domain.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -50,6 +52,7 @@ public class CauseService {
     private final AccountingAdaptor accountingAdaptor;
     private final CauseStateRepository causeStateRepository;
     private final CauseUpdateRepository causeUpdateRepository;
+    private final CustomerAdaptor customerAdaptor;
 
     @Autowired
     public CauseService(final CauseRepository causeRepository,
@@ -63,7 +66,8 @@ public class CauseService {
                         final TaskDefinitionRepository taskDefinitionRepository,
                         final TaskInstanceRepository taskInstanceRepository,
                         final CauseStateRepository causeStateRepository,
-                        final CauseUpdateRepository causeUpdateRepository) {
+                        final CauseUpdateRepository causeUpdateRepository,
+                        final CustomerAdaptor customerAdaptor) {
         super();
         this.causeRepository = causeRepository;
         this.portraitRepository = portraitRepository;
@@ -77,6 +81,7 @@ public class CauseService {
         this.documentRepository = documentRepository;
         this.causeStateRepository = causeStateRepository;
         this.causeUpdateRepository = causeUpdateRepository;
+        this.customerAdaptor = customerAdaptor;
     }
 
     public Boolean causeExists(final String identifier) {
@@ -215,7 +220,6 @@ public class CauseService {
         if (categoryIdentifier != null) {
             Optional<CategoryEntity> categoryEntity = this.categoryRepository.findByIdentifier(categoryIdentifier.toLowerCase());
             return categoryEntity.map(categoryEntity1 -> {
-                final CausePage causePage = new CausePage();
                 List<CauseEntity> allCauseEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                 List<Cause> causes = this.causeEntitiesToCause(allCauseEntities);
                 return this.sortedCause(sortBy, causes, pageable);
@@ -235,8 +239,13 @@ public class CauseService {
 
     private List<Cause> causeEntitiesToCause(List<CauseEntity> causeEntities) {
         final ArrayList<Cause> causes = new ArrayList<>(causeEntities.size());
+        final List<Customer> customers = this.customerAdaptor.fetchAllCustomers();
         for (CauseEntity causeEntity : causeEntities) {
             final Cause cause = CauseMapper.map(causeEntity);
+            customers.stream().filter(customer -> customer.getIdentifier().equals(causeEntity.getCreatedBy())).findFirst().ifPresent(customer -> {
+                cause.setCreatedByUrl(customer.getPortraitUrl());
+            });
+
 
             if (cause.getAccountNumber() != null) {
                 final List<CauseJournalEntry> journalEntry = this.accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
@@ -255,9 +264,14 @@ public class CauseService {
     }
 
     public Optional<Cause> findCause(final String identifier) {
+        final List<Customer> customers = this.customerAdaptor.fetchAllCustomers();
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
             List<CauseUpdateEntity> entities = this.causeUpdateRepository.findByCauseEntity(causeEntity);
             final Cause cause = CauseMapper.map(causeEntity);
+            customers.stream().filter(customer -> customer.getIdentifier().equals(causeEntity.getCreatedBy())).findFirst().ifPresent(customer -> {
+                cause.setCreatedByUrl(customer.getPortraitUrl());
+            });
+
             Address address = AddressMapper.map(this.addressRepository.findByCause(causeEntity));
             cause.setAddress(address);
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));

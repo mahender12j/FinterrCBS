@@ -47,7 +47,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -163,6 +162,20 @@ public class CustomerRestController {
                                                 @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                                 @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
         return ResponseEntity.ok(this.customerService.fetchCustomer(term, (includeClosed != null ? includeClosed : Boolean.FALSE), this.createPageRequest(pageIndex, size, sortColumn, sortDirection)));
+    }
+
+
+    //    for fiegn client
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
+    @RequestMapping(value = "/customers/all",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<List<Customer>> fetchAllUsers() {
+        return ResponseEntity.ok(this.customerService.fetchAllCustomers());
     }
 
 
@@ -640,7 +653,7 @@ public class CustomerRestController {
                                                     @PathVariable("number") final String number,
                                                     @RequestParam("scanIdentifier") @ValidIdentifier final String scanIdentifier,
                                                     @RequestParam("description") @Size(max = 4096) final String description,
-                                                    @RequestBody final MultipartFile image) throws Exception {
+                                                    @RequestBody final MultipartFile image) {
         this.throwIfCustomerNotExists(identifier);
         this.throwIfIdentificationCardNotExists(number);
         this.throwIfInvalidSize(image.getSize());
@@ -702,20 +715,6 @@ public class CustomerRestController {
         this.throwIfCustomerNotExists(identifier);
         return ResponseEntity.ok(this.customerService.updateCustomerPortrait(identifier, portrait));
     }
-
-//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
-//    @RequestMapping(
-//            value = "/customers/{identifier}/portrait",
-//            method = RequestMethod.DELETE,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.ALL_VALUE
-//    )
-//    public @ResponseBody
-//    ResponseEntity<Void> deletePortrait(@PathVariable("identifier") final String identifier) {
-//        this.commandGateway.process(new DeletePortraitCommand(identifier));
-//
-//        return ResponseEntity.accepted().build();
-//    }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.TASK)
     @RequestMapping(

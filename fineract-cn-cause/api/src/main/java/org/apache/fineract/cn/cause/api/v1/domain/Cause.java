@@ -65,14 +65,6 @@ public class Cause {
     private Boolean resubmitted;
     private Boolean extended;
 
-
-    //    todo comment out for unused value
-//    private Double actualRaisedFiat;
-//    private Double actualRaisedFin;
-//    @NotNull
-//    private Double minAmount;
-//    @NotNull
-//    private Double maxAmount;
     @NotNull
     private String acceptedDenominationAmounts;
     private Double successFees;
@@ -85,6 +77,7 @@ public class Cause {
     private String approvedBy;
     private String approvedOn;
     private String createdBy;
+    private String createdByUrl;
     private String createdOn;
     private String lastModifiedBy;
     private String lastModifiedOn;
@@ -367,6 +360,7 @@ public class Cause {
     public void setAvgRating(double avgRating) {
         this.avgRating = avgRating;
     }
+
     public Boolean getResubmitted() {
         return resubmitted;
     }
@@ -517,6 +511,14 @@ public class Cause {
 
     public void setNumberOfDaysLeftForNextUpdate(int numberOfDaysLeftForNextUpdate) {
         NumberOfDaysLeftForNextUpdate = numberOfDaysLeftForNextUpdate;
+    }
+
+    public String getCreatedByUrl() {
+        return createdByUrl;
+    }
+
+    public void setCreatedByUrl(String createdByUrl) {
+        this.createdByUrl = createdByUrl;
     }
 
     @Override
