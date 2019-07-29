@@ -37,6 +37,7 @@ public class CauseRating {
     private Long ref; //ref is -1 when root and child will have 1-infinity, 0 is when child has no ref
     private boolean active = true;
     private String createdBy;
+    private String createdByUrl;
     private String createdOn;
     private List<CauseRating> causeRatings;
 
@@ -115,6 +116,14 @@ public class CauseRating {
 
     public void setCauseRatings(List<CauseRating> causeRatings) {
         this.causeRatings = causeRatings;
+    }
+
+    public String getCreatedByUrl() {
+        return createdByUrl;
+    }
+
+    public void setCreatedByUrl(String createdByUrl) {
+        this.createdByUrl = createdByUrl;
     }
 
     @Override

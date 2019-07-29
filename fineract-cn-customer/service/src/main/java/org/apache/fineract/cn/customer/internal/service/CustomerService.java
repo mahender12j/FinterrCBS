@@ -429,6 +429,7 @@ public class CustomerService {
         return this.customerRepository.findAll().stream().map(CustomerMapper::map).collect(toList());
     }
 
+
     public CustomerPage fetchCustomer(final String term, final Boolean includeClosed, final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
         if (includeClosed) {

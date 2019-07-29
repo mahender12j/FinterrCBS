@@ -38,6 +38,7 @@ public final class CauseJournalEntry {
     private String transactionType;
     @NotEmpty
     private String clerk;
+    private String clerkUrl;
     private String note;
     @NotNull
     @Valid
@@ -128,12 +129,11 @@ public final class CauseJournalEntry {
         this.anonymous = anonymous;
     }
 
+    public String getClerkUrl() {
+        return clerkUrl;
+    }
 
-    public static enum State {
-        PENDING,
-        PROCESSED;
-
-        private State() {
-        }
+    public void setClerkUrl(String clerkUrl) {
+        this.clerkUrl = clerkUrl;
     }
 }

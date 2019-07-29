@@ -48,5 +48,9 @@ public class CustomerAdaptor {
     public List<Customer> fetchAllCustomers() {
         return this.customerManager.fetchAllCustomers();
     }
+
+    public Customer findCustomerByIdentifier(final String identifier) {
+        return this.customerManager.fetchCustomersByIdentifier(identifier);
+    }
 }
 

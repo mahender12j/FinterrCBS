@@ -28,6 +28,7 @@ import org.apache.fineract.cn.customer.ServiceConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.catalog.internal.service.FieldValueValidator;
 import org.apache.fineract.cn.customer.internal.command.*;
+import org.apache.fineract.cn.customer.internal.mapper.CustomerMapper;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.DocumentService;
@@ -165,7 +166,7 @@ public class CustomerRestController {
     }
 
 
-    //    for fiegn client
+    //    for feign client
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
     @RequestMapping(value = "/customers/all",
             method = RequestMethod.GET,
@@ -176,6 +177,20 @@ public class CustomerRestController {
     @ResponseBody
     ResponseEntity<List<Customer>> fetchAllUsers() {
         return ResponseEntity.ok(this.customerService.fetchAllCustomers());
+    }
+
+
+    //    for feign client
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
+    @RequestMapping(value = "/customers/find/{identifier}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Customer> fetchUserByIdentifier(@PathVariable("identifier") final String identifier) {
+        return ResponseEntity.ok(this.customerService.getCustomerEntity(identifier).map(CustomerMapper::map).orElseThrow(() -> ServiceException.notFound("Customer Not Found")));
     }
 
 

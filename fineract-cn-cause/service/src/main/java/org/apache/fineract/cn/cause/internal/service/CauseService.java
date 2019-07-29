@@ -264,13 +264,10 @@ public class CauseService {
     }
 
     public Optional<Cause> findCause(final String identifier) {
-        final List<Customer> customers = this.customerAdaptor.fetchAllCustomers();
         return causeRepository.findByIdentifier(identifier).map(causeEntity -> {
             List<CauseUpdateEntity> entities = this.causeUpdateRepository.findByCauseEntity(causeEntity);
             final Cause cause = CauseMapper.map(causeEntity);
-            customers.stream().filter(customer -> customer.getIdentifier().equals(causeEntity.getCreatedBy())).findFirst().ifPresent(customer -> {
-                cause.setCreatedByUrl(customer.getPortraitUrl());
-            });
+            cause.setCreatedByUrl(this.customerAdaptor.findCustomerByIdentifier(causeEntity.getCreatedBy()).getPortraitUrl());
 
             Address address = AddressMapper.map(this.addressRepository.findByCause(causeEntity));
             cause.setAddress(address);
@@ -278,7 +275,9 @@ public class CauseService {
             cause.setNumberOfUpdateProvided(entities.size());
             if (cause.getAccountNumber() != null) {
                 final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
+                CauseStatistics causeStatistics = CauseStatisticsMapper.map(journalEntry);
+                causeStatistics.setJournalEntry(causeStatistics.getJournalEntry().stream().peek(causeJournalEntry -> causeJournalEntry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(causeJournalEntry.getClerk()).getPortraitUrl())).collect(Collectors.toList()));
+                cause.setCauseStatistics(causeStatistics);
             }
             setCauseDocuments(causeEntity, cause);
             setCauseExtendedAndResubmitValue(causeEntity, cause);
@@ -384,6 +383,7 @@ public class CauseService {
                 .filter(ent -> ent.getRef().equals(ref))  //equal equal is used cause ref value can be null value which can cause null pointer issue
                 .map(entity -> {
                     CauseRating causeRating = RatingMapper.map(entity);
+                    causeRating.setCreatedByUrl(this.customerAdaptor.findCustomerByIdentifier(entity.getCreatedBy()).getPortraitUrl());
                     Stream<RatingEntity> ratingEntityStream = ratingEntities
                             .stream()
                             .filter(cdata -> cdata.getRef().equals(entity.getId())); //equal equal is used cause ref value can be null value which can cause null pointer issue
