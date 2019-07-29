@@ -247,10 +247,7 @@ public class CauseService {
             });
 
 
-            if (cause.getAccountNumber() != null) {
-                final List<CauseJournalEntry> journalEntry = this.accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                cause.setCauseStatistics(CauseStatisticsMapper.map(journalEntry));
-            }
+            setCauseStatistics(cause);
 
             cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
@@ -273,17 +270,22 @@ public class CauseService {
             cause.setAddress(address);
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
             cause.setNumberOfUpdateProvided(entities.size());
-            if (cause.getAccountNumber() != null) {
-                final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-                CauseStatistics causeStatistics = CauseStatisticsMapper.map(journalEntry);
-                causeStatistics.setJournalEntry(causeStatistics.getJournalEntry().stream().peek(causeJournalEntry -> causeJournalEntry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(causeJournalEntry.getClerk()).getPortraitUrl())).collect(Collectors.toList()));
-                cause.setCauseStatistics(causeStatistics);
-            }
+            setCauseStatistics(cause);
             setCauseDocuments(causeEntity, cause);
             setCauseExtendedAndResubmitValue(causeEntity, cause);
             setRatingsAndAverage(causeEntity, cause);
             return cause;
         });
+    }
+
+
+    private void setCauseStatistics(Cause cause) {
+        if (cause.getAccountNumber() != null) {
+            final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
+            CauseStatistics causeStatistics = CauseStatisticsMapper.map(journalEntry);
+            causeStatistics.setJournalEntry(causeStatistics.getJournalEntry().stream().peek(causeJournalEntry -> causeJournalEntry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(causeJournalEntry.getClerk()).getPortraitUrl())).collect(Collectors.toList()));
+            cause.setCauseStatistics(causeStatistics);
+        }
     }
 
 
