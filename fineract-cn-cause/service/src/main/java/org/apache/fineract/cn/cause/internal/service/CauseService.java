@@ -265,7 +265,6 @@ public class CauseService {
             List<CauseUpdateEntity> entities = this.causeUpdateRepository.findByCauseEntity(causeEntity);
             final Cause cause = CauseMapper.map(causeEntity);
             cause.setCreatedByUrl(this.customerAdaptor.findCustomerByIdentifier(causeEntity.getCreatedBy()).getPortraitUrl());
-
             Address address = AddressMapper.map(this.addressRepository.findByCause(causeEntity));
             cause.setAddress(address);
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
@@ -283,7 +282,9 @@ public class CauseService {
         if (cause.getAccountNumber() != null) {
             final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
             CauseStatistics causeStatistics = CauseStatisticsMapper.map(journalEntry);
-            causeStatistics.setJournalEntry(causeStatistics.getJournalEntry().stream().peek(causeJournalEntry -> causeJournalEntry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(causeJournalEntry.getClerk()).getPortraitUrl())).collect(Collectors.toList()));
+//            causeStatistics.setJournalEntry(causeStatistics.getJournalEntry().stream().peek(causeJournalEntry -> {
+//                causeJournalEntry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(causeJournalEntry.getClerk()).getPortraitUrl());
+//            }).collect(Collectors.toList()));
             cause.setCauseStatistics(causeStatistics);
         }
     }
