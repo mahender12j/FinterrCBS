@@ -33,6 +33,7 @@ public class CauseFiles {
     private String uuid;
     private String type;
     private String docName;
+    private String docUrl;
 
     public CauseFiles() {
         super();
@@ -60,6 +61,14 @@ public class CauseFiles {
 
     public void setDocName(String docName) {
         this.docName = docName;
+    }
+
+    public String getDocUrl() {
+        return docUrl;
+    }
+
+    public void setDocUrl(String docUrl) {
+        this.docUrl = docUrl;
     }
 
     @Override

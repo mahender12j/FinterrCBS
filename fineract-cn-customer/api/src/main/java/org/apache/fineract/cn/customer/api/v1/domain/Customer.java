@@ -118,6 +118,7 @@ public final class Customer {
     private boolean mobileVerified;
     private String verifiedMobile;
     private String verifiedEmail;
+    private String portraitUrl;
 
     public Customer() {
         super();
@@ -469,6 +470,14 @@ public final class Customer {
 
     public void setVerifiedEmail(String verifiedEmail) {
         this.verifiedEmail = verifiedEmail;
+    }
+
+    public String getPortraitUrl() {
+        return portraitUrl;
+    }
+
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
     }
 
     @Override

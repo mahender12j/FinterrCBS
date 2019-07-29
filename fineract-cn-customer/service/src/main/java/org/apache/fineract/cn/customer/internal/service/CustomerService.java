@@ -309,6 +309,13 @@ public class CustomerService {
 
     }
 
+    public Customer updateCustomerPortrait(final String identifier, final CustomerPortrait customerPortrait) {
+        CustomerEntity customerEntity = this.customerRepository.findByIdentifier(identifier).orElseThrow(() -> ServiceException.notFound("Customer Not Found {0}", identifier));
+        customerEntity.setPortraitUrl(customerPortrait.getPortraitUrl());
+        return CustomerMapper.map(customerRepository.save(customerEntity));
+
+    }
+
     public Customer findCustomer(final String identifier) {
         CustomerEntity customerEntity = customerRepository.findByIdentifier(identifier).orElseThrow(() -> ServiceException.notFound("Customer with identifier {0} not found in this system", identifier));
         Customer customer = CustomerMapper.map(customerEntity);

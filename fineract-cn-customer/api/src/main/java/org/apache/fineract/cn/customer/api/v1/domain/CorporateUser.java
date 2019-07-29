@@ -50,6 +50,8 @@ public class CorporateUser {
 
     private String ethAddress;
 
+    private String portraitUrl;
+
     @NotNull
     private String refferalCodeIdentifier;
     private String refferalUserIdentifier;
@@ -189,6 +191,14 @@ public class CorporateUser {
 
     public void setCustomValues(List<Value> customValues) {
         this.customValues = customValues;
+    }
+
+    public String getPortraitUrl() {
+        return portraitUrl;
+    }
+
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
     }
 
     @Override

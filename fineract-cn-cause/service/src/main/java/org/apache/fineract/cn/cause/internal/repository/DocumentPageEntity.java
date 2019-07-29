@@ -44,6 +44,9 @@ public class DocumentPageEntity {
     @Column(name = "document_name")
     private String documentName;
 
+    @Column(name = "doc_url")
+    private String docUrl;
+
 
     public DocumentPageEntity() {
     }
@@ -90,6 +93,14 @@ public class DocumentPageEntity {
         this.documentName = documentName;
     }
 
+
+    public String getDocUrl() {
+        return docUrl;
+    }
+
+    public void setDocUrl(String docUrl) {
+        this.docUrl = docUrl;
+    }
 
     @Override
     public String toString() {

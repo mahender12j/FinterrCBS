@@ -27,6 +27,7 @@ public class CauseDocumentPage {
     private String type;
     private String documentName;
     private String docRef;
+    private String docUrl;
 
 
     public CauseDocumentPage() {
@@ -62,6 +63,14 @@ public class CauseDocumentPage {
 
     public void setDocRef(String docRef) {
         this.docRef = docRef;
+    }
+
+    public String getDocUrl() {
+        return docUrl;
+    }
+
+    public void setDocUrl(String docUrl) {
+        this.docUrl = docUrl;
     }
 
     @Override

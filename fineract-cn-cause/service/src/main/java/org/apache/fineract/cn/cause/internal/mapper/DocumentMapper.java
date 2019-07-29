@@ -44,19 +44,6 @@ public class DocumentMapper {
         super();
     }
 
-
-//    public static DocumentPageEntity map(
-//            final MultipartFile multipartFile,
-//            final DocumentEntity documentEntity) throws IOException {
-//        final DocumentPageEntity ret = new DocumentPageEntity();
-//        ret.setDocument(documentEntity);
-//        ret.setImage(multipartFile.getBytes());
-//        ret.setDocumentName(multipartFile.getOriginalFilename());
-//        ret.setSize(multipartFile.getSize());
-//        ret.setContentType(multipartFile.getContentType());
-//        return ret;
-//    }
-
     public static CauseDocument map(final DocumentEntity documentEntity) {
         final CauseDocument ret = new CauseDocument();
         ret.setId(documentEntity.getId());
@@ -97,6 +84,7 @@ public class DocumentMapper {
         pageEntity.setDocRef(causeFiles.getUuid());
         pageEntity.setDocumentName(causeFiles.getDocName());
         pageEntity.setType(causeFiles.getType());
+        pageEntity.setDocUrl(causeFiles.getDocUrl());
         return pageEntity;
     }
 
@@ -109,6 +97,7 @@ public class DocumentMapper {
             causeDocumentPage.setType(d.getType().toLowerCase());
             causeDocumentPage.setDocumentName(d.getDocumentName());
             causeDocumentPage.setDocRef(d.getDocRef());
+            causeDocumentPage.setDocUrl(d.getDocUrl());
             documentPages.add(causeDocumentPage);
         });
 
@@ -123,6 +112,7 @@ public class DocumentMapper {
             files.setDocName(d.getDocumentName());
             files.setType(d.getType().toLowerCase());
             files.setUuid(d.getDocRef());
+            files.setDocUrl(d.getDocUrl());
             causeFiles.add(files);
         });
 
@@ -138,6 +128,7 @@ public class DocumentMapper {
             entity.setDocRef(d.getUuid());
             entity.setDocumentName(d.getDocName());
             entity.setType(d.getType());
+            entity.setDocUrl(d.getDocUrl());
             documentPageEntityList.add(entity);
         });
 
@@ -149,6 +140,7 @@ public class DocumentMapper {
         CauseDocumentPage causeDocumentPage = new CauseDocumentPage();
         causeDocumentPage.setType(pageEntity.getType().toLowerCase());
         causeDocumentPage.setId(pageEntity.getId());
+        causeDocumentPage.setDocUrl(pageEntity.getDocUrl());
         causeDocumentPage.setDocRef(pageEntity.getDocRef());
         causeDocumentPage.setDocumentName(pageEntity.getDocumentName());
 
@@ -159,6 +151,7 @@ public class DocumentMapper {
         List<DocumentPageEntity> documentPageEntityList = new ArrayList<>();
         cause.getCauseFiles().forEach(causeFiles -> {
             DocumentPageEntity pageEntity = new DocumentPageEntity();
+            pageEntity.setDocUrl(causeFiles.getDocUrl());
             pageEntity.setDocRef(causeFiles.getUuid());
             pageEntity.setType(causeFiles.getType().toLowerCase());
             pageEntity.setDocumentName(causeFiles.getDocName());

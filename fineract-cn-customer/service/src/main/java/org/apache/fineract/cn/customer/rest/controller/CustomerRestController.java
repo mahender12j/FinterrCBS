@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.customer.rest.controller;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.util.UserContextHolder;
@@ -27,7 +28,7 @@ import org.apache.fineract.cn.customer.ServiceConstants;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.catalog.internal.service.FieldValueValidator;
 import org.apache.fineract.cn.customer.internal.command.*;
-import org.apache.fineract.cn.customer.internal.repository.PortraitEntity;
+import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.customer.internal.service.CustomerService;
 import org.apache.fineract.cn.customer.internal.service.DocumentService;
 import org.apache.fineract.cn.customer.internal.service.TaskService;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -678,27 +680,13 @@ public class CustomerRestController {
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
-    @RequestMapping(
-            value = "/customers/{identifier}/portrait",
+    @RequestMapping(value = "/customers/{identifier}/portrait",
             method = RequestMethod.GET,
             consumes = MediaType.ALL_VALUE
     )
-    public ResponseEntity<byte[]> getPortrait(@PathVariable("identifier") final String identifier) {
-
-        Optional<PortraitEntity> entity = this.customerService.findPortrait(identifier);
-
-        if (entity.isPresent()) {
-            return entity.map(portrait -> ResponseEntity
-                    .ok()
-                    .contentType(MediaType.parseMediaType(portrait.getContentType()))
-                    .contentLength(portrait.getImage().length)
-                    .body(portrait.getImage())).orElse(null);
-        } else {
-            return ResponseEntity
-                    .ok()
-                    .contentType(MediaType.parseMediaType(MediaType.APPLICATION_JSON_VALUE))
-                    .body(null);
-        }
+    public ResponseEntity<Map<String, String>> getPortrait(@PathVariable("identifier") final String identifier) {
+        CustomerEntity customerEntity = this.customerService.getCustomerEntity(identifier).orElseThrow(() -> ServiceException.notFound("Sorry! Customer Not found"));
+        return ResponseEntity.ok(ImmutableMap.of("portraitUrl", customerEntity.getPortraitUrl()));
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
@@ -706,43 +694,28 @@ public class CustomerRestController {
             value = "/customers/{identifier}/portrait",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+            consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
-    ResponseEntity<Void> postPortrait(@PathVariable("identifier") final String identifier,
-                                      @RequestBody final MultipartFile portrait) {
-        if (portrait == null) {
-            throw ServiceException.badRequest("Portrait not found");
-        }
-
+    ResponseEntity<Customer> postPortrait(@PathVariable("identifier") final String identifier,
+                                          @Valid @RequestBody final CustomerPortrait portrait) {
         this.throwIfCustomerNotExists(identifier);
-        this.throwIfInvalidSize(portrait.getSize());
-        this.throwIfInvalidContentType(portrait.getContentType());
-
-        try {
-            this.commandGateway.process(new DeletePortraitCommand(identifier), String.class).get();
-        } catch (Throwable e) {
-            logger.warn("Could not delete portrait: {0}", e.getMessage());
-        }
-
-        this.commandGateway.process(new CreatePortraitCommand(identifier, portrait));
-
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok(this.customerService.updateCustomerPortrait(identifier, portrait));
     }
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
-    @RequestMapping(
-            value = "/customers/{identifier}/portrait",
-            method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public @ResponseBody
-    ResponseEntity<Void> deletePortrait(@PathVariable("identifier") final String identifier) {
-        this.commandGateway.process(new DeletePortraitCommand(identifier));
-
-        return ResponseEntity.accepted().build();
-    }
+//    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
+//    @RequestMapping(
+//            value = "/customers/{identifier}/portrait",
+//            method = RequestMethod.DELETE,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.ALL_VALUE
+//    )
+//    public @ResponseBody
+//    ResponseEntity<Void> deletePortrait(@PathVariable("identifier") final String identifier) {
+//        this.commandGateway.process(new DeletePortraitCommand(identifier));
+//
+//        return ResponseEntity.accepted().build();
+//    }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.TASK)
     @RequestMapping(

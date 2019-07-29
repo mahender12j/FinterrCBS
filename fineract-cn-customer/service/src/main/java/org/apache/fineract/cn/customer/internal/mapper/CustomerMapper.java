@@ -88,6 +88,7 @@ public final class CustomerMapper {
             customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
         }
         customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
+        customerEntity.setPortraitUrl(customer.getPortraitUrl());
         return customerEntity;
     }
 
@@ -101,6 +102,7 @@ public final class CustomerMapper {
         customer.setMiddleName(customerEntity.getMiddleName());
         customer.setGender(customerEntity.getGender());
         customer.setSurname(customerEntity.getSurname());
+        customer.setPortraitUrl(customerEntity.getPortraitUrl());
         if (customerEntity.getDateOfBirth() != null) {
             customer.setDateOfBirth(DateOfBirth.fromLocalDate(customerEntity.getDateOfBirth().toLocalDate()));
         }
@@ -181,6 +183,7 @@ public final class CustomerMapper {
         customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
         customerEntity.setAccountNumbers(customer.getAccountNumbers());
         customerEntity.setKycStatus(Customer.KycStatus.NOT_REQUIRED.name());
+        customerEntity.setPortraitUrl(customer.getPortraitUrl());
         return customerEntity;
     }
 

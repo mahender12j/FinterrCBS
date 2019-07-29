@@ -107,6 +107,8 @@ public class CustomerEntity {
     private LocalDateTime dateOfRegistration;
     @Column(name = "ref_account_number")
     private String refAccountNumber;
+    @Column(name = "portrait_url")
+    private String portraitUrl;
 
     public CustomerEntity() {
         super();
@@ -367,6 +369,14 @@ public class CustomerEntity {
 
     public void setDocumentEntity(DocumentEntity documentEntity) {
         this.documentEntity = documentEntity;
+    }
+
+    public String getPortraitUrl() {
+        return portraitUrl;
+    }
+
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
     }
 
     @Override
