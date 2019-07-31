@@ -280,10 +280,14 @@ public class CauseService {
     private CauseStatistics getCauseStatistics(Cause cause) {
         CauseStatistics causeStatistics = new CauseStatistics();
         if (cause.getAccountNumber() != null) {
-            final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber()).stream().peek(entry -> {
-                if (entry.isAnonymous()) entry.setClerk("Anonymous");
-                entry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(entry.getClerk()).getPortraitUrl());
-            }).collect(Collectors.toList());
+            final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber())
+                    .stream().peek(entry -> {
+                        if (entry.isAnonymous()) {
+                            entry.setClerk("Anonymous");
+                        } else {
+                            entry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(entry.getClerk()).getPortraitUrl());
+                        }
+                    }).collect(Collectors.toList());
 
             causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().map(CauseCreditor::getAmount).orElse("0"))).sum());
             causeStatistics.setTotalSupporter(journalEntry.stream().map(CauseJournalEntry::getClerk).collect(Collectors.toSet()).size());
