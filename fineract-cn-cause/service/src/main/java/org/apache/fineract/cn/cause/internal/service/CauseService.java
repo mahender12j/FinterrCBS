@@ -246,8 +246,7 @@ public class CauseService {
                 cause.setCreatedByUrl(customer.getPortraitUrl());
             });
 
-
-            setCauseStatistics(cause);
+            cause.setCauseStatistics(this.getCauseStatistics(cause));
 
             cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
@@ -269,7 +268,7 @@ public class CauseService {
             cause.setAddress(address);
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
             cause.setNumberOfUpdateProvided(entities.size());
-            setCauseStatistics(cause);
+            cause.setCauseStatistics(this.getCauseStatistics(cause));
             setCauseDocuments(causeEntity, cause);
             setCauseExtendedAndResubmitValue(causeEntity, cause);
             setRatingsAndAverage(causeEntity, cause);
@@ -278,15 +277,20 @@ public class CauseService {
     }
 
 
-    private void setCauseStatistics(Cause cause) {
+    private CauseStatistics getCauseStatistics(Cause cause) {
+        CauseStatistics causeStatistics = new CauseStatistics();
         if (cause.getAccountNumber() != null) {
-            final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-            CauseStatistics causeStatistics = CauseStatisticsMapper.map(journalEntry);
-//            causeStatistics.setJournalEntry(causeStatistics.getJournalEntry().stream().peek(causeJournalEntry -> {
-//                causeJournalEntry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(causeJournalEntry.getClerk()).getPortraitUrl());
-//            }).collect(Collectors.toList()));
+            final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber()).stream().peek(entry -> {
+                if (entry.isAnonymous()) entry.setClerk("Anonymous");
+                entry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(entry.getClerk()).getPortraitUrl());
+            }).collect(Collectors.toList());
+
+            causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().map(CauseCreditor::getAmount).orElse("0"))).sum());
+            causeStatistics.setTotalSupporter(journalEntry.stream().map(CauseJournalEntry::getClerk).collect(Collectors.toSet()).size());
+            causeStatistics.setJournalEntry(journalEntry);
             cause.setCauseStatistics(causeStatistics);
         }
+        return causeStatistics;
     }
 
 
@@ -315,7 +319,10 @@ public class CauseService {
 
     public NGOStatistics fetchCauseByCreatedBy(final String identifier) {
         final List<CauseEntity> causeEntities = this.causeRepository.findByCreatedByAndCurrentStateNot(identifier, Cause.State.DELETED.name());
-        ArrayList<CauseStatistics> causeStatistics = causeEntities.stream().filter(causeEntity -> causeEntity.getAccountNumber() != null).map(causeEntity -> CauseStatisticsMapper.map(accountingAdaptor.fetchJournalEntriesJournalEntries(causeEntity.getAccountNumber()))).collect(Collectors.toCollection(() -> new ArrayList<>(causeEntities.size())));
+        ArrayList<CauseStatistics> causeStatistics = causeEntities.stream()
+                .filter(causeEntity -> causeEntity.getAccountNumber() != null)
+                .map(causeEntity -> this.getCauseStatistics(CauseMapper.map(causeEntity)))
+                .collect(Collectors.toCollection(() -> new ArrayList<>(causeEntities.size())));
         final NGOStatistics ngoStatistics = new NGOStatistics();
         ngoStatistics.setTotalRaisedAmount(causeStatistics.stream().mapToDouble(CauseStatistics::getTotalRaised).sum());
         ngoStatistics.setTotalSupporter(causeStatistics.stream().mapToInt(CauseStatistics::getTotalSupporter).sum());
@@ -328,8 +335,7 @@ public class CauseService {
         ArrayList<CauseStatistics> causeStatistics = causeEntities
                 .stream()
                 .filter(causeEntity -> causeEntity.getAccountNumber() != null)
-                .map(causeEntity -> accountingAdaptor.fetchJournalEntriesJournalEntries(causeEntity.getAccountNumber()))
-                .map(CauseStatisticsMapper::map)
+                .map(causeEntity -> this.getCauseStatistics(CauseMapper.map(causeEntity)))
                 .collect(Collectors.toCollection(() -> new ArrayList<>(causeEntities.size())));
 
         final NGOStatistics ngoStatistics = new NGOStatistics();

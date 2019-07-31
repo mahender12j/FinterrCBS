@@ -32,16 +32,16 @@ public final class CauseStatisticsMapper {
         super();
     }
 
-    public static CauseStatistics map(final List<CauseJournalEntry> journalEntry) {
-        Set<String> uniqueClerk = journalEntry.stream().map(CauseJournalEntry::getClerk).collect(Collectors.toSet());
-        CauseStatistics causeStatistics = new CauseStatistics();
-        causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().map(CauseCreditor::getAmount).orElse("0"))).sum());
-        causeStatistics.setJournalEntry(journalEntry.stream().peek(entry -> {
-            if (entry.isAnonymous()) entry.setClerk("Anonymous");
-        }).collect(Collectors.toList()));
-        causeStatistics.setTotalSupporter(uniqueClerk.size());
-        return causeStatistics;
-    }
+//    public static CauseStatistics map(final List<CauseJournalEntry> journalEntry) {
+//        Set<String> uniqueClerk = journalEntry.stream().map(CauseJournalEntry::getClerk).collect(Collectors.toSet());
+//        CauseStatistics causeStatistics = new CauseStatistics();
+//        causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().map(CauseCreditor::getAmount).orElse("0"))).sum());
+//        causeStatistics.setJournalEntry(journalEntry.stream().peek(entry -> {
+//            if (entry.isAnonymous()) entry.setClerk("Anonymous");
+//        }).collect(Collectors.toList()));
+//        causeStatistics.setTotalSupporter(uniqueClerk.size());
+//        return causeStatistics;
+//    }
 
 
 }
