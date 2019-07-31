@@ -76,7 +76,6 @@ public interface CustomerManager {
             produces = MediaType.ALL_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    @ThrowsException(status = HttpStatus.NOT_FOUND, exception = CustomerNotFoundException.class)
     Customer fetchCustomersByIdentifier(@PathVariable("identifier") final String identifier);
 
 
