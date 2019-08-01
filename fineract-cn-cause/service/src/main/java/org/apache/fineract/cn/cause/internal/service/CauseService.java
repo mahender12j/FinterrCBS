@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -351,8 +352,10 @@ public class CauseService {
         statistics.setNgoStatistics(ngoStatistics);
         statistics.setCauseList(this.causeEntitiesToCause(causeEntities));
 
-        List<CauseJournalEntry> causeJournalEntries = causeStatistics.stream()
-                .flatMap(entry -> entry.getJournalEntry().stream()).collect(Collectors.toList());
+        List<CauseJournalEntry> causeJournalEntries = causeStatistics.stream().flatMap(entry -> entry.getJournalEntry().stream())
+                .sorted(Comparator.comparing(causeJournalEntry -> LocalDateTime.parse(causeJournalEntry.getTransactionDate().substring(0, causeJournalEntry.getTransactionDate().length() - 1),
+                        DateTimeFormatter.ISO_LOCAL_DATE_TIME), Comparator.reverseOrder()))
+                .collect(Collectors.toList());
         statistics.setCauseJournalEntries(causeJournalEntries);
         return statistics;
     }
