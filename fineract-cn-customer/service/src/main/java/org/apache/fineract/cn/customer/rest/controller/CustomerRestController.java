@@ -137,7 +137,7 @@ public class CustomerRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<CustomerEntity> createCustomer(@RequestBody @Valid final Customer customer) throws InterruptedException {
+    ResponseEntity<Customer> createCustomer(@RequestBody @Valid final Customer customer) throws InterruptedException {
         if (this.customerService.customerExists(customer.getIdentifier())) {
             throw ServiceException.conflict("Customer {0} already exists.", customer.getIdentifier());
         }
@@ -148,7 +148,7 @@ public class CustomerRestController {
 
         try {
             CommandCallback<String> commandCallback = this.commandGateway.process(new CreateCustomerCommand(customer), String.class);
-            return ResponseEntity.ok(this.customerService.getCustomerEntity(commandCallback.get()).orElseThrow(() -> ServiceException.notFound("Customer not found")));
+            return ResponseEntity.ok(this.customerService.findCustomer(commandCallback.get()));
         } catch (CommandProcessingException | ExecutionException e) {
             throw ServiceException.internalError("Sorry! Something went wrong");
         }
