@@ -22,6 +22,8 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.util.UserContextHolder;
+import org.apache.fineract.cn.command.domain.CommandCallback;
+import org.apache.fineract.cn.command.domain.CommandProcessingException;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.customer.PermittableGroupIds;
 import org.apache.fineract.cn.customer.ServiceConstants;
@@ -53,6 +55,7 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -134,7 +137,7 @@ public class CustomerRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> createCustomer(@RequestBody @Valid final Customer customer) throws InterruptedException {
+    ResponseEntity<CustomerEntity> createCustomer(@RequestBody @Valid final Customer customer) throws InterruptedException {
         if (this.customerService.customerExists(customer.getIdentifier())) {
             throw ServiceException.conflict("Customer {0} already exists.", customer.getIdentifier());
         }
@@ -143,8 +146,12 @@ public class CustomerRestController {
             this.fieldValueValidator.validateValues(customer.getCustomValues());
         }
 
-        this.commandGateway.process(new CreateCustomerCommand(customer));
-        return ResponseEntity.accepted().build();
+        try {
+            CommandCallback<String> commandCallback = this.commandGateway.process(new CreateCustomerCommand(customer), String.class);
+            return ResponseEntity.ok(this.customerService.getCustomerEntity(commandCallback.get()).orElseThrow(() -> ServiceException.notFound("Customer not found")));
+        } catch (CommandProcessingException | ExecutionException e) {
+            throw ServiceException.internalError("Sorry! Something went wrong");
+        }
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
