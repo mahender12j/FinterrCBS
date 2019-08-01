@@ -21,6 +21,8 @@ package org.apache.fineract.cn.identity.rest;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.util.UserContextHolder;
+import org.apache.fineract.cn.command.domain.CommandCallback;
+import org.apache.fineract.cn.command.domain.CommandProcessingException;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.identity.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.identity.api.v1.domain.*;
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -73,17 +76,20 @@ public class UserRestController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTITY_MANAGEMENT)
     public @ResponseBody
-    ResponseEntity<Void> create(@RequestBody @Valid final UserWithPassword instance) {
+    ResponseEntity<String> create(@RequestBody @Valid final UserWithPassword instance) {
         if (instance == null)
             throw ServiceException.badRequest("Instance may not be null.");
 
         if (service.findByIdentifier(instance.getIdentifier()).isPresent())
-            //throw ServiceException.conflict("Instance already exists with identifier:" + instance.getIdentifier());
             throw ServiceException.conflict("This username is already taken. Please try another one.");
 
         final CreateUserCommand createCommand = new CreateUserCommand(instance);
-        this.commandGateway.process(createCommand);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        try {
+            CommandCallback<String> commandCallback = this.commandGateway.process(createCommand, String.class);
+            return new ResponseEntity<>(commandCallback.get(), HttpStatus.ACCEPTED);
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Sorry! Something went wrong");
+        }
     }
 
 

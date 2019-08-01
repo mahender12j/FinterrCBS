@@ -42,56 +42,51 @@ import org.springframework.util.Assert;
 @Component
 public class UserCommandHandler {
 
-  private final Users usersRepository;
-  private final UserEntityCreator userEntityCreator;
+    private final Users usersRepository;
+    private final UserEntityCreator userEntityCreator;
 
-  @Autowired
-  UserCommandHandler(
-          final Users usersRepository,
-          final UserEntityCreator userEntityCreator)
-  {
-    this.usersRepository = usersRepository;
-    this.userEntityCreator = userEntityCreator;
-  }
+    @Autowired
+    UserCommandHandler(
+            final Users usersRepository,
+            final UserEntityCreator userEntityCreator) {
+        this.usersRepository = usersRepository;
+        this.userEntityCreator = userEntityCreator;
+    }
 
-  @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
-  @EventEmitter(selectorName = EventConstants.OPERATION_HEADER, selectorValue = EventConstants.OPERATION_PUT_USER_ROLEIDENTIFIER)
-  public String process(final ChangeUserRoleCommand command) {
-    final UserEntity user = usersRepository.get(command.getIdentifier())
-        .orElseThrow(() -> ServiceException.notFound(
-            "User " + command.getIdentifier() + " doesn't exist."));
+    @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
+    @EventEmitter(selectorName = EventConstants.OPERATION_HEADER, selectorValue = EventConstants.OPERATION_PUT_USER_ROLEIDENTIFIER)
+    public String process(final ChangeUserRoleCommand command) {
+        final UserEntity user = usersRepository.get(command.getIdentifier())
+                .orElseThrow(() -> ServiceException.notFound(
+                        "User " + command.getIdentifier() + " doesn't exist."));
 
-    user.setRole(command.getRole());
-    usersRepository.add(user);
+        user.setRole(command.getRole());
+        usersRepository.add(user);
 
-    return user.getIdentifier();
-  }
+        return user.getIdentifier();
+    }
 
-  @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
-  @EventEmitter(selectorName = EventConstants.OPERATION_HEADER, selectorValue = EventConstants.OPERATION_PUT_USER_PASSWORD)
-  public String process(final ChangeUserPasswordCommand command) {
-    final UserEntity user = usersRepository.get(command.getIdentifier())
-        .orElseThrow(() -> ServiceException.notFound(
-            "User " + command.getIdentifier() + " doesn't exist."));
+    @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
+    @EventEmitter(selectorName = EventConstants.OPERATION_HEADER, selectorValue = EventConstants.OPERATION_PUT_USER_PASSWORD)
+    public String process(final ChangeUserPasswordCommand command) {
+        final UserEntity user = usersRepository.get(command.getIdentifier())
+                .orElseThrow(() -> ServiceException.notFound(
+                        "User " + command.getIdentifier() + " doesn't exist."));
 
-    final UserEntity userWithNewPassword = userEntityCreator.build(
-            user.getIdentifier(), user.getRole(), command.getPassword(),
-            !SecurityContextHolder.getContext().getAuthentication().getName().equals(command.getIdentifier()));
-    usersRepository.add(userWithNewPassword);
+        final UserEntity userWithNewPassword = userEntityCreator.build(
+                user.getIdentifier(), user.getRole(), command.getPassword(),
+                !SecurityContextHolder.getContext().getAuthentication().getName().equals(command.getIdentifier()));
+        usersRepository.add(userWithNewPassword);
 
-    return user.getIdentifier();
-  }
+        return user.getIdentifier();
+    }
 
-  @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
-  @EventEmitter(selectorName = EventConstants.OPERATION_HEADER, selectorValue = EventConstants.OPERATION_POST_USER)
-  public String process(final CreateUserCommand command) {
-    Assert.hasText(command.getPassword());
-
-    final UserEntity userEntity = userEntityCreator.build(
-        command.getIdentifier(), command.getRole(), command.getPassword(), true);
-
-    usersRepository.add(userEntity);
-
-    return command.getIdentifier();
-  }
+    @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
+    @EventEmitter(selectorName = EventConstants.OPERATION_HEADER, selectorValue = EventConstants.OPERATION_POST_USER)
+    public String process(final CreateUserCommand command) {
+        Assert.hasText(command.getPassword());
+        final UserEntity userEntity = userEntityCreator.build(command.getIdentifier(), command.getRole(), command.getPassword(), true);
+        usersRepository.add(userEntity);
+        return command.getIdentifier();
+    }
 }
