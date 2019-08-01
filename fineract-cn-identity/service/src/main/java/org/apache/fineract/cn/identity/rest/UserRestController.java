@@ -76,7 +76,7 @@ public class UserRestController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.IDENTITY_MANAGEMENT)
     public @ResponseBody
-    ResponseEntity<String> create(@RequestBody @Valid final UserWithPassword instance) {
+    ResponseEntity<User> create(@RequestBody @Valid final UserWithPassword instance) {
         if (instance == null)
             throw ServiceException.badRequest("Instance may not be null.");
 
@@ -86,7 +86,7 @@ public class UserRestController {
         final CreateUserCommand createCommand = new CreateUserCommand(instance);
         try {
             CommandCallback<String> commandCallback = this.commandGateway.process(createCommand, String.class);
-            return new ResponseEntity<>(commandCallback.get(), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(checkIdentifier(commandCallback.get()), HttpStatus.ACCEPTED);
         } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
             throw ServiceException.internalError("Sorry! Something went wrong");
         }
