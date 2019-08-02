@@ -404,7 +404,7 @@ public class CauseRestController {
     public
     @ResponseBody
     ResponseEntity<Void> rejectExtendedCause(@PathVariable("identifier") final String identifier,
-                                             @RequestBody CauseStateRejected causeStateRejected) {
+                                             @Valid @RequestBody CauseStateRejected causeStateRejected) {
         throwIfActionLessThanOneTimes(identifier, new HashSet<>(Collections.singletonList(EXTENDED.name())));
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
 

@@ -18,7 +18,7 @@
  */
 package org.apache.fineract.cn.cause.api.v1.domain;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Md Robiul hassan
@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 public class CauseStateRejected {
 
 
+    @NotNull
     private String rejectionReason;
 
     public CauseStateRejected() {
