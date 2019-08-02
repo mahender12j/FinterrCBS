@@ -325,12 +325,13 @@ public class CauseService {
 
 
         if (causeEntity.getExtended()) {
-            final Set<String> causeStates = new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()));
+            final Set<String> causeStates = new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name()));
             this.causeStateRepository.findByCauseAndTypeIn(causeEntity, causeStates)
                     .stream()
-                    .max(Comparator.comparing(CauseStateEntity::getCreatedOn)).ifPresent(causeStateEntity -> {
-                cause.setCauseState(CauseStateMapper.map(causeStateEntity));
-            });
+                    .max(Comparator.comparing(CauseStateEntity::getCreatedOn))
+                    .ifPresent(causeStateEntity -> {
+                        cause.setCauseState(CauseStateMapper.map(causeStateEntity));
+                    });
         }
     }
 
