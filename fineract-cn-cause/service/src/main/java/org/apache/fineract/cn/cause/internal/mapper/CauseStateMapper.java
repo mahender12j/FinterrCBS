@@ -37,6 +37,8 @@ public final class CauseStateMapper {
         causeState.setNewDate(causeStateEntity.getNewDate().toString());
         causeState.setStatus(causeStateEntity.getStatus());
         causeState.setType(causeStateEntity.getType());
+        causeState.setRejectionReason(causeStateEntity.getComment());
+        causeState.setId(causeStateEntity.getId());
         return causeState;
     }
 

@@ -32,8 +32,6 @@ public class CauseState {
     private String type;
     private String rejectionReason;
     private String status;
-    private LocalDateTime createdOn;
-    private LocalDateTime modifiedAt;
 
     public CauseState() {
     }
@@ -78,28 +76,12 @@ public class CauseState {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
-    }
-
-    public void setCreatedOn(LocalDateTime createdOn) {
-        this.createdOn = createdOn;
-    }
-
     public String getRejectionReason() {
         return rejectionReason;
     }
 
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
-    }
-
-    public LocalDateTime getModifiedAt() {
-        return modifiedAt;
-    }
-
-    public void setModifiedAt(LocalDateTime modifiedAt) {
-        this.modifiedAt = modifiedAt;
     }
 
     @Override
@@ -111,8 +93,6 @@ public class CauseState {
                 ", type='" + type + '\'' +
                 ", rejectionReason='" + rejectionReason + '\'' +
                 ", status='" + status + '\'' +
-                ", createdOn=" + createdOn +
-                ", modifiedAt=" + modifiedAt +
                 '}';
     }
 }
