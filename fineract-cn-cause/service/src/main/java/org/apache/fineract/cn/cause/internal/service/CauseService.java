@@ -174,13 +174,21 @@ public class CauseService {
     }
 
 
-    public CausePage fetchCauseForCADMIN(final Pageable pageable) {
+    public CausePage fetchCauseForCADMIN(final String param, final Pageable pageable) {
         final Page<CauseEntity> causeEntities;
         CausePage causePage = new CausePage();
-        causeEntities = this.causeRepository.findByCurrentStateNot(Cause.State.DELETED.name(), pageable);
-        causePage.setTotalPages(causeEntities.getTotalPages());
-        causePage.setTotalElements(causeEntities.getTotalElements());
-        causePage.setCauses(causeEntitiesToCause(causeEntities.getContent()));
+        final String userIdentifier = UserContextHolder.checkedGetUser();
+        if (param == null) {
+            causeEntities = this.causeRepository.findByCurrentStateNot(Cause.State.DELETED.name(), pageable);
+            causePage.setTotalPages(causeEntities.getTotalPages());
+            causePage.setTotalElements(causeEntities.getTotalElements());
+            causePage.setCauses(causeEntitiesToCause(causeEntities.getContent()));
+        } else {
+            causeEntities = this.causeRepository.findByCurrentState(param, pageable);
+            causePage.setTotalPages(causeEntities.getTotalPages());
+            causePage.setTotalElements(causeEntities.getTotalElements());
+            causePage.setCauses(causeEntitiesToCause(causeEntities.getContent()));
+        }
         return causePage;
     }
 

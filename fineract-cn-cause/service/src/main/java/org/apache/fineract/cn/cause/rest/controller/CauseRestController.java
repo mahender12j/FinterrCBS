@@ -160,7 +160,7 @@ public class CauseRestController {
         if (currentUserType.equals("BUSINESS")) {
             return ResponseEntity.ok(this.causeService.fetchCauseForNGO(param, pageable));
         } else if (currentUserType.equals("CADMIN")) {
-            return ResponseEntity.ok(this.causeService.fetchCauseForCADMIN(pageable));
+            return ResponseEntity.ok(this.causeService.fetchCauseForCADMIN(param, pageable));
         } else {
             return ResponseEntity.ok(this.causeService.fetchCauseForCustomer(sortBy == null ? 0 : sortBy, param, pageable));
         }
