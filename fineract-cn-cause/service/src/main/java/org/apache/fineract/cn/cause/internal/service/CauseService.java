@@ -173,6 +173,18 @@ public class CauseService {
         }
     }
 
+
+    public CausePage fetchCauseForCADMIN(final Pageable pageable) {
+        final Page<CauseEntity> causeEntities;
+        CausePage causePage = new CausePage();
+        causeEntities = this.causeRepository.findByCurrentStateNot(Cause.State.DELETED.name(), pageable);
+        causePage.setTotalPages(causeEntities.getTotalPages());
+        causePage.setTotalElements(causeEntities.getTotalElements());
+        causePage.setCauses(causeEntitiesToCause(causeEntities.getContent()));
+        return causePage;
+    }
+
+
     public CausePage fetchCauseForNGO(final String param, final Pageable pageable) {
         final Page<CauseEntity> causeEntities;
         CausePage causePage = new CausePage();

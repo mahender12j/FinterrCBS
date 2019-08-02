@@ -30,6 +30,7 @@ import org.apache.fineract.cn.cause.internal.repository.CauseStateRepository;
 import org.apache.fineract.cn.cause.internal.repository.PortraitEntity;
 import org.apache.fineract.cn.cause.internal.service.CauseService;
 import org.apache.fineract.cn.cause.internal.service.TaskService;
+import org.apache.fineract.cn.cause.internal.service.helper.service.CustomerAdaptor;
 import org.apache.fineract.cn.command.domain.CommandCallback;
 import org.apache.fineract.cn.command.domain.CommandProcessingException;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
@@ -52,7 +53,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import static org.apache.fineract.cn.cause.api.v1.domain.Cause.State.*;
 
@@ -66,13 +66,16 @@ public class CauseRestController {
     private final TaskService taskService;
     private final Environment environment;
     private final CauseStateRepository causeStateRepository;
+    private final CustomerAdaptor customerAdaptor;
 
     @Autowired
     public CauseRestController(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
                                final CommandGateway commandGateway,
                                final CauseService causeService,
                                final TaskService taskService,
-                               final Environment environment, CauseStateRepository causeStateRepository) {
+                               final Environment environment,
+                               final CauseStateRepository causeStateRepository,
+                               final CustomerAdaptor customerAdaptor) {
         super();
         this.logger = logger;
         this.commandGateway = commandGateway;
@@ -80,6 +83,7 @@ public class CauseRestController {
         this.taskService = taskService;
         this.environment = environment;
         this.causeStateRepository = causeStateRepository;
+        this.customerAdaptor = customerAdaptor;
     }
 
     @Permittable(value = AcceptedTokenType.SYSTEM)
@@ -125,6 +129,16 @@ public class CauseRestController {
             Most Popular = 3
             */
 
+
+//    public enum UserType {
+//        PERSON,
+//        BUSINESS,
+//        CADMIN,
+//        SADMIN,
+//        CORPORATE
+//    }
+
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes",
@@ -132,20 +146,21 @@ public class CauseRestController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE
     )
-    public
-    @ResponseBody
+    public @ResponseBody
     ResponseEntity<CausePage> fetchCauses(@RequestParam(value = "param", required = false) final String param,
                                           @RequestParam(value = "sortBy", required = false) final Integer sortBy,
-                                          @RequestParam(value = "includeClosed", required = false) final Boolean includeClosed,
                                           @RequestParam(value = "pageIndex", required = false) final Integer pageIndex,
                                           @RequestParam(value = "size", required = false) final Integer size,
                                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
 
         Pageable pageable = this.createPageRequest(pageIndex, size, sortColumn, sortDirection);
+        String currentUserType = this.customerAdaptor.findCustomerByIdentifier(UserContextHolder.checkedGetUser()).getType();
 
-        if (includeClosed != null ? includeClosed : Boolean.TRUE) {
+        if (currentUserType.equals("BUSINESS")) {
             return ResponseEntity.ok(this.causeService.fetchCauseForNGO(param, pageable));
+        } else if (currentUserType.equals("CADMIN")) {
+            return ResponseEntity.ok(this.causeService.fetchCauseForCADMIN(pageable));
         } else {
             return ResponseEntity.ok(this.causeService.fetchCauseForCustomer(sortBy == null ? 0 : sortBy, param, pageable));
         }

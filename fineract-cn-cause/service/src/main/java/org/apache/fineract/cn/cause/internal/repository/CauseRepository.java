@@ -49,6 +49,8 @@ public interface CauseRepository extends JpaRepository<CauseEntity, Long> {
 
     Page<CauseEntity> findByCreatedByAndCurrentStateNot(final String createdBy, final String state, final Pageable pageable);
 
+    Page<CauseEntity> findByCurrentStateNot(final String state, final Pageable pageable);
+
     Page<CauseEntity> findByCurrentState(final String state, final Pageable pageable);
 
     Page<CauseEntity> findByCreatedByAndCurrentState(final String createdBy, final String state, final Pageable pageable);
