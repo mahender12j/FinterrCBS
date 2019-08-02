@@ -322,6 +322,16 @@ public class CauseService {
     private void setCauseExtendedAndResubmitValue(CauseEntity causeEntity, Cause cause) {
         cause.setNumberOfExtended(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name()))));
         cause.setNumberOfResubmit(this.causeStateRepository.totalStateByCauseIdentifier(causeEntity.getIdentifier(), new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()))));
+
+
+        if (causeEntity.getExtended()) {
+            final Set<String> causeStates = new HashSet<>(Collections.singletonList(Cause.State.PENDING.name()));
+            this.causeStateRepository.findByCauseAndTypeIn(causeEntity, causeStates)
+                    .stream()
+                    .max(Comparator.comparing(CauseStateEntity::getCreatedOn)).ifPresent(causeStateEntity -> {
+                cause.setCauseState(CauseStateMapper.map(causeStateEntity));
+            });
+        }
     }
 
 

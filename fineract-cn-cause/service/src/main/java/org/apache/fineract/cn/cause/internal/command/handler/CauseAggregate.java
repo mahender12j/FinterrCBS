@@ -317,16 +317,39 @@ public class CauseAggregate {
         final CauseEntity causeEntity = findCauseEntityOrThrow(approveExtendedCauseCommand.getIdentifier());
         List<CauseStateEntity> stateEntity = causeStateRepository.findByCauseAndTypeIn(causeEntity, new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name())));
 
-        causeEntity.setExtended(false);
-        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-        CauseStateEntity latestStateEntity = stateEntity.stream().max(Comparator.comparing(CauseStateEntity::getCreatedOn)).get();
-        causeEntity.setEndDate(latestStateEntity.getNewDate());
-        this.causeRepository.save(causeEntity);
-
-        this.causeStateRepository.save(stateEntity.stream().peek(entity -> entity.setStatus(Cause.State.APPROVED.name())).collect(Collectors.toList()));
+        stateEntity.stream().max(Comparator.comparing(CauseStateEntity::getCreatedOn)).ifPresent(causeStateEntity -> {
+            causeEntity.setEndDate(causeStateEntity.getNewDate());
+            causeEntity.setExtended(false);
+            causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+            this.causeRepository.save(causeEntity);
+            causeStateEntity.setStatus(Cause.State.APPROVED.name());
+            this.causeStateRepository.save(causeStateEntity);
+        });
 
 
         return approveExtendedCauseCommand.getIdentifier();
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.REJECT_EXTENDED_CAUSE)
+    public String ApproveCause(final RejectExtendedCauseCommand rejectExtendedCauseCommand) {
+
+        final CauseEntity causeEntity = findCauseEntityOrThrow(rejectExtendedCauseCommand.getIdentifier());
+        List<CauseStateEntity> stateEntity = causeStateRepository.findByCauseAndTypeIn(causeEntity, new HashSet<>(Collections.singletonList(Cause.State.EXTENDED.name())));
+
+        stateEntity.stream().max(Comparator.comparing(CauseStateEntity::getCreatedOn)).ifPresent(causeStateEntity -> {
+            causeEntity.setEndDate(causeStateEntity.getNewDate());
+            causeEntity.setExtended(false);
+            causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+            this.causeRepository.save(causeEntity);
+            causeStateEntity.setStatus(Cause.State.REJECTED.name());
+            causeStateEntity.setComment(rejectExtendedCauseCommand.getCauseStateRejected().getRejectionReason());
+            this.causeStateRepository.save(causeStateEntity);
+        });
+
+        return rejectExtendedCauseCommand.getIdentifier();
     }
 
     private void updateCauseStateForApproval(CauseEntity causeEntity) {

@@ -123,6 +123,7 @@ public class Cause {
     private double avgRating;
     private List<CauseRating> causeRatings;
     private List<CauseFiles> causeFiles;
+    private CauseState causeState;
 
     public Cause() {
         super();
@@ -519,6 +520,14 @@ public class Cause {
 
     public void setCreatedByUrl(String createdByUrl) {
         this.createdByUrl = createdByUrl;
+    }
+
+    public CauseState getCauseState() {
+        return causeState;
+    }
+
+    public void setCauseState(CauseState causeState) {
+        this.causeState = causeState;
     }
 
     @Override

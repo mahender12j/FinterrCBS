@@ -64,10 +64,6 @@ public final class CauseMapper {
         causeEntity.setSoftTarget(cause.getSoftTarget());
         causeEntity.setHardTarget(cause.getHardTarget());
         causeEntity.setIsTaxExamption(cause.getTaxExemption());
-//        causeEntity.setActualRaisedFiat(cause.getActualRaisedFiat());
-//        causeEntity.setActualRaisedFin(cause.getActualRaisedFin());
-//        causeEntity.setMinAmount(cause.getMinAmount());
-//        causeEntity.setMaxAmount(cause.getMaxAmount());
         causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
         causeEntity.setManagementFee(cause.getSuccessFees());
         causeEntity.setFinCollLimit(cause.getFinCollLimit());
