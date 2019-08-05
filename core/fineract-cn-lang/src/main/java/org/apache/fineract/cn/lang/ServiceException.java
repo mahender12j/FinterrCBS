@@ -44,6 +44,13 @@ public final class ServiceException extends RuntimeException {
         .build());
   }
 
+    public static ServiceException notFoundPass(final String message, final Object... args) {
+        return new ServiceException(ServiceError
+                .create(408)
+                .message(MessageFormat.format(message, args))
+                .build());
+    }
+
   public static ServiceException conflict(final String message, final Object... args) {
 
     return new ServiceException(ServiceError

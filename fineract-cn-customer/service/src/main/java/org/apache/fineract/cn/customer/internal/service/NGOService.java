@@ -18,20 +18,23 @@
  */
 package org.apache.fineract.cn.customer.internal.service;
 
-import org.apache.fineract.cn.customer.api.v1.domain.*;
+import com.google.common.collect.ImmutableMap;
+import org.apache.fineract.cn.customer.api.v1.domain.Customer;
+import org.apache.fineract.cn.customer.api.v1.domain.NgoFile;
+import org.apache.fineract.cn.customer.api.v1.domain.NgoProfile;
 import org.apache.fineract.cn.customer.internal.mapper.NgoProfileMapper;
-import org.apache.fineract.cn.customer.internal.repository.*;
+import org.apache.fineract.cn.customer.internal.repository.NgoFileRepository;
+import org.apache.fineract.cn.customer.internal.repository.NgoProfileEntity;
+import org.apache.fineract.cn.customer.internal.repository.NgoProfileRepository;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.format.TextStyle;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -59,7 +62,8 @@ public class NGOService {
 
     public NgoProfile getNgoProfile(final String identifier) {
         Customer customer = this.customerService.findCustomer(identifier);
-        NgoProfileEntity profileEntity = this.profileRepository.findByCustomerId(customer.getId()).orElseThrow(() -> ServiceException.notFound("This NGO details are not yet updated"));
+        NgoProfileEntity profileEntity = this.profileRepository.findByCustomerId(customer.getId())
+                .orElseThrow(() -> ServiceException.notFoundPass("This NGO details are not yet updated"));
         NgoProfile profile = NgoProfileMapper.map(profileEntity);
         profile.setNgoDetails(customer);
 
