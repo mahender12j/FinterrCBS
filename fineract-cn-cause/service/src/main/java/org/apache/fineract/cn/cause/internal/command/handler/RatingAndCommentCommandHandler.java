@@ -19,14 +19,15 @@
 package org.apache.fineract.cn.cause.internal.command.handler;
 
 import org.apache.fineract.cn.cause.api.v1.CauseEventConstants;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseComment;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseRating;
-import org.apache.fineract.cn.cause.internal.command.CreateCommentCommand;
 import org.apache.fineract.cn.cause.internal.command.CreateRatingCommand;
 import org.apache.fineract.cn.cause.internal.command.DeleteCauseRatingCommand;
 import org.apache.fineract.cn.cause.internal.command.EditCauseRatingCommand;
 import org.apache.fineract.cn.cause.internal.mapper.RatingMapper;
-import org.apache.fineract.cn.cause.internal.repository.*;
+import org.apache.fineract.cn.cause.internal.repository.CauseEntity;
+import org.apache.fineract.cn.cause.internal.repository.CauseRepository;
+import org.apache.fineract.cn.cause.internal.repository.RatingEntity;
+import org.apache.fineract.cn.cause.internal.repository.RatingRepository;
 import org.apache.fineract.cn.command.annotation.Aggregate;
 import org.apache.fineract.cn.command.annotation.CommandHandler;
 import org.apache.fineract.cn.command.annotation.EventEmitter;
@@ -86,16 +87,21 @@ public class RatingAndCommentCommandHandler {
         return ratingEntity.toString();
     }
 
-
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.EDIT_RATING)
     public String editRating(final EditCauseRatingCommand editCauseRatingCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(editCauseRatingCommand.getCauseIdentifier());
         CauseRating causeRating = editCauseRatingCommand.getCauseRating();
-        causeEntity.getRatingEntities().stream().filter(ent -> ent.getId().equals(editCauseRatingCommand.getRatingId())).findFirst().ifPresent(ratingEntity -> {
-            ratingEntity.setComment(causeRating.getComment());
+        causeEntity.getRatingEntities()
+                .stream()
+                .filter(ent -> ent.getId().equals(editCauseRatingCommand.getRatingId()))
+                .findFirst().ifPresent(ratingEntity -> {
+            if (causeRating.getComment() != null) {
+                ratingEntity.setComment(causeRating.getComment());
+            }
             ratingEntity.setRating(causeRating.getRating());
+
             this.ratingRepository.save(ratingEntity);
         });
         return causeRating.toString();
