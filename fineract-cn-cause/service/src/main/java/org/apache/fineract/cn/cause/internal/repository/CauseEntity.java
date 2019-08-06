@@ -18,10 +18,13 @@
  */
 package org.apache.fineract.cn.cause.internal.repository;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Padma Raju Sattineni
@@ -81,6 +84,11 @@ public class CauseEntity {
     private Boolean isResubmited;
     @Column(name = "is_extended", nullable = false)
     private Boolean isExtended;
+
+    @JsonIgnoreProperties("ratingEntities")
+    @OneToMany(mappedBy = "cause", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<RatingEntity> ratingEntities = new ArrayList<>();
+
 
 //    todo comment out on 20 Jun, 2019
 //
@@ -520,6 +528,15 @@ public class CauseEntity {
 
     public void setFeeRevisionRequired(boolean feeRevisionRequired) {
         isFeeRevisionRequired = feeRevisionRequired;
+    }
+
+
+    public List<RatingEntity> getRatingEntities() {
+        return ratingEntities;
+    }
+
+    public void setRatingEntities(List<RatingEntity> ratingEntities) {
+        this.ratingEntities = ratingEntities;
     }
 
     @Override

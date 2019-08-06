@@ -83,6 +83,7 @@ public interface CauseEventConstants {
     String POST_RATING = "post-rating";
     String PUT_RATING = "put-rating";
     String DELETE_RATING = "delete-rating";
+    String EDIT_RATING = "edit-rating";
     String POST_RATING_COMPLETE = "post-rating-complete";
 
     String POST_DOCUMENT = "post-document";

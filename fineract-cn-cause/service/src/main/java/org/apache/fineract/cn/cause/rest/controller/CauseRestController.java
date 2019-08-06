@@ -528,6 +528,28 @@ public class CauseRestController {
         return ResponseEntity.accepted().build();
     }
 
+
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @RequestMapping(
+            value = "/causes/{identifier}/ratings/{ratingId}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public
+    @ResponseBody
+    ResponseEntity<Void> editCauseRating(@PathVariable("identifier") final String identifier,
+                                         @PathVariable("ratingId") final Long ratingId,
+                                         @Valid @RequestBody final CauseRating rating) {
+        this.throwIfCauseNotExists(identifier);
+        this.throwIfRatingNotExists(ratingId);
+//        todo has implementation inside the method
+        this.throwIfRatingOwnerIsNotOwnByCurrentUserOrCA(ratingId);
+
+        this.commandGateway.process(new EditCauseRatingCommand(identifier, ratingId, rating));
+        return ResponseEntity.accepted().build();
+    }
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/{identifier}/tasks/{taskIdentifier}",
