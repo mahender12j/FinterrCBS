@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.cn.customer.api.v1.domain;
 
+import java.util.List;
+
 public final class SocialMatrix {
 
     private Double greenContribution; // leave 1-5
@@ -27,6 +29,16 @@ public final class SocialMatrix {
     private Double myPower; // 1-5
     private Double myPowerPercentage; // percentage
     private int myInfluence;
+
+    //    added for corporate
+    private int myInfluenceEmployee;
+    private int myInfluenceEmployeeThisMonth;
+    private int myInfluenceNgo;
+    private int myInfluenceNgoThisMonth;
+//    added for corporate
+
+    private List<PerMonthRecord> myPowerPerMonth; // per month power
+    private List<PerMonthRecord> myPowerPerMonthCorporate; // per month power corporate
 
     public SocialMatrix() {
     }
@@ -87,6 +99,54 @@ public final class SocialMatrix {
 
     public void setTotalTrees(int totalTrees) {
         this.totalTrees = totalTrees;
+    }
+
+    public List<PerMonthRecord> getMyPowerPerMonth() {
+        return myPowerPerMonth;
+    }
+
+    public void setMyPowerPerMonth(List<PerMonthRecord> myPowerPerMonth) {
+        this.myPowerPerMonth = myPowerPerMonth;
+    }
+
+    public List<PerMonthRecord> getMyPowerPerMonthCorporate() {
+        return myPowerPerMonthCorporate;
+    }
+
+    public void setMyPowerPerMonthCorporate(List<PerMonthRecord> myPowerPerMonthCorporate) {
+        this.myPowerPerMonthCorporate = myPowerPerMonthCorporate;
+    }
+
+    public int getMyInfluenceEmployee() {
+        return myInfluenceEmployee;
+    }
+
+    public void setMyInfluenceEmployee(int myInfluenceEmployee) {
+        this.myInfluenceEmployee = myInfluenceEmployee;
+    }
+
+    public int getMyInfluenceEmployeeThisMonth() {
+        return myInfluenceEmployeeThisMonth;
+    }
+
+    public void setMyInfluenceEmployeeThisMonth(int myInfluenceEmployeeThisMonth) {
+        this.myInfluenceEmployeeThisMonth = myInfluenceEmployeeThisMonth;
+    }
+
+    public int getMyInfluenceNgo() {
+        return myInfluenceNgo;
+    }
+
+    public void setMyInfluenceNgo(int myInfluenceNgo) {
+        this.myInfluenceNgo = myInfluenceNgo;
+    }
+
+    public int getMyInfluenceNgoThisMonth() {
+        return myInfluenceNgoThisMonth;
+    }
+
+    public void setMyInfluenceNgoThisMonth(int myInfluenceNgoThisMonth) {
+        this.myInfluenceNgoThisMonth = myInfluenceNgoThisMonth;
     }
 
     @Override

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.fineract.cn.customer.catalog.internal.repository.FieldValueEntity;
 import org.apache.fineract.cn.mariadb.util.LocalDateConverter;
 import org.apache.fineract.cn.mariadb.util.LocalDateTimeConverter;
@@ -61,15 +62,19 @@ public class CustomerEntity {
     @Convert(converter = LocalDateConverter.class)
     private LocalDate applicationDate;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @JsonIgnoreProperties("address") //used to ignore the jsonn for response
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AddressEntity address;
 
+    @JsonIgnoreProperties("documentEntity")
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private DocumentEntity documentEntity;
 
+    @JsonIgnoreProperties("contactDetail")
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ContactDetailEntity> contactDetail = new ArrayList<>();
 
+    @JsonIgnoreProperties("fieldValueEntities")
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<FieldValueEntity> fieldValueEntities = new ArrayList<>();
 

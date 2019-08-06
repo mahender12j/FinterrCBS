@@ -508,10 +508,10 @@ public class CustomerService {
     private SocialMatrix getSocialMatrix(CustomerEntity entity) {
         SocialMatrix socialMatrix = new SocialMatrix();
         String accountNumber = entity.getAccountNumbers();
+        final LocalDateTime localDateTime = LocalDateTime.now();
 
         if (accountNumber != null) {
             List<AccountEntry> accountEntryList = accountingAdaptor.fetchAccountEntries(accountNumber);
-            final LocalDateTime localDateTime = LocalDateTime.now();
             double totalBCDP = accountEntryList.stream()
                     .filter(d -> d.getTransactionType().equals("BCDP") && d.getType().equals("CREDIT"))
                     .filter(d -> {
@@ -547,8 +547,23 @@ public class CustomerService {
         }
 
 
+        List<CustomerEntity> refferedCustomers = this.customerRepository.findAllByreferenceCustomerAndIsDepositedIsTrue(entity.getRefferalCodeIdentifier());
+
         socialMatrix.setGoldenDonorPercentage(socialMatrix.getGoldenDonor() * 20);
-        socialMatrix.setMyInfluence(customerRepository.findAllByRefferalCodeIdentifierActive(entity.getRefferalCodeIdentifier()));
+        socialMatrix.setMyInfluence(refferedCustomers.size());
+        socialMatrix.setMyInfluenceEmployee((int) refferedCustomers.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.PERSON.name())).count());
+        socialMatrix.setMyInfluenceNgo((int) refferedCustomers.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.BUSINESS.name())).count());
+        socialMatrix.setMyInfluenceEmployeeThisMonth((int) refferedCustomers.stream()
+                .filter(customerEntity -> customerEntity.getType()
+                        .equals(Customer.UserType.PERSON.name()) &&
+                        customerEntity.getCreatedOn().getMonth().getValue() == localDateTime.getMonth().getValue() &&
+                        customerEntity.getCreatedOn().getYear() == localDateTime.getYear())
+                .count());
+        socialMatrix.setMyInfluenceNgoThisMonth((int) refferedCustomers
+                .stream()
+                .filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.BUSINESS.name()) &&
+                        customerEntity.getCreatedOn().getMonth().getValue() == localDateTime.getMonth().getValue() &&
+                        customerEntity.getCreatedOn().getYear() == localDateTime.getYear()).count());
         return socialMatrix;
     }
 
