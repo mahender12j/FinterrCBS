@@ -76,7 +76,8 @@ public class DocumentService {
 
 
     public CustomerDocument findCustomerDocuments(final String customerIdentifier) {
-        final CustomerEntity customerEntity = this.customerRepository.findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
+        final CustomerEntity customerEntity = this.customerRepository
+                .findByIdentifier(customerIdentifier).orElseThrow(() -> ServiceException.notFound("Customer not found"));
         return cAdminService.findCustomerDocumentsByCustomerEntity(customerEntity);
     }
 
@@ -86,12 +87,14 @@ public class DocumentService {
 
 
     public List<Customer> findCustomersByKYCStatus(final String status) {
-        List<CustomerEntity> customerEntities = this.customerRepository.findAllByTypeNotIn(new HashSet<>(Arrays.asList(Customer.UserType.SADMIN.name(), Customer.UserType.CADMIN.name())));
+        List<CustomerEntity> customerEntities = this.customerRepository
+                .findAllByTypeNotIn(new HashSet<>(Arrays.asList(Customer.UserType.SADMIN.name(), Customer.UserType.CADMIN.name())));
         return customerEntities.stream().map(entity -> {
             Customer customer = CustomerMapper.map(entity);
             final List<ContactDetailEntity> contactDetailEntities = contactDetailRepository.findByCustomer(entity);
             if (contactDetailEntities != null) {
-                customer.setContactDetails(contactDetailEntities.stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
+                customer.setContactDetails(contactDetailEntities.stream()
+                        .map(ContactDetailMapper::map).collect(Collectors.toList()));
             }
 
 //            set kyc documents for the customers, fetched by customers identifier

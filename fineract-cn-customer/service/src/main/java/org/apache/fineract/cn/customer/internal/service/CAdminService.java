@@ -125,61 +125,62 @@ public class CAdminService {
         List<DocumentTypeEntity> allTypeEntities = this.documentTypeRepository.findAll();
         List<DocumentSubTypeEntity> allSubTypeRepository = this.documentSubTypeRepository.findAll();
 
-        return this.documentRepository.findByCustomerId(customerEntity.getIdentifier()).map(documentEntity -> {
-            CustomerDocument customerDocument = DocumentMapper.map(documentEntity);
+        return this.documentRepository.findByCustomerId(customerEntity.getIdentifier())
+                .map(documentEntity -> {
+                    CustomerDocument customerDocument = DocumentMapper.map(documentEntity);
 
-            final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
-                    this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
-                            .stream()
-                            .collect(groupingBy(DocumentEntryEntity::getType, toList()));
+                    final Map<String, List<DocumentEntryEntity>> documentEntryEntity =
+                            this.documentEntryRepository.findByDocumentAndStatusNot(documentEntity, CustomerDocument.Status.DELETED.name())
+                                    .stream()
+                                    .collect(groupingBy(DocumentEntryEntity::getType, toList()));
 
-            List<DocumentsType> documentsType = new ArrayList<>();
+                    List<DocumentsType> documentsType = new ArrayList<>();
 
-            documentEntryEntity.forEach((key, documentEntryEntities) -> {
-                final List<DocumentsSubType> documentsSubTypeList = documentEntryEntities.stream().map(entity -> {
-                    final DocumentsSubType documentsSubType = new DocumentsSubType();
-                    documentsSubType.setId(entity.getId());
-                    documentsSubType.setCreated_by(entity.getCreatedBy());
-                    documentsSubType.setStatus(entity.getStatus());
-                    documentsSubType.setType(this.getDocumentTypeTitle(allTypeEntities, entity.getType()));
-                    documentsSubType.setTypeUUID(entity.getType());
-                    documentsSubType.setSubTypeUUID(key);
-                    documentsSubType.setSubType(this.getDocumentSubTypeTitle(allSubTypeRepository, entity.getSubType()));
-                    documentsSubType.setUpdatedOn(entity.getUpdatedOn().toString());
-                    documentsSubType.setApprovedBy(entity.getApprovedBy());
-                    documentsSubType.setRejectedBy(entity.getRejectedBy());
-                    documentsSubType.setReasonForReject(entity.getReasonForReject());
-                    documentsSubType.setDescription(entity.getDescription());
-                    documentsSubType.setCreatedOn(entity.getCreatedOn().toString());
-                    documentsSubType.setDocRef(entity.getDocRef());
-                    return documentsSubType;
-                }).collect(toList());
+                    documentEntryEntity.forEach((key, documentEntryEntities) -> {
+                        final List<DocumentsSubType> documentsSubTypeList = documentEntryEntities.stream().map(entity -> {
+                            final DocumentsSubType documentsSubType = new DocumentsSubType();
+                            documentsSubType.setId(entity.getId());
+                            documentsSubType.setCreated_by(entity.getCreatedBy());
+                            documentsSubType.setStatus(entity.getStatus());
+                            documentsSubType.setType(this.getDocumentTypeTitle(allTypeEntities, entity.getType()));
+                            documentsSubType.setTypeUUID(entity.getType());
+                            documentsSubType.setSubTypeUUID(key);
+                            documentsSubType.setSubType(this.getDocumentSubTypeTitle(allSubTypeRepository, entity.getSubType()));
+                            documentsSubType.setUpdatedOn(entity.getUpdatedOn().toString());
+                            documentsSubType.setApprovedBy(entity.getApprovedBy());
+                            documentsSubType.setRejectedBy(entity.getRejectedBy());
+                            documentsSubType.setReasonForReject(entity.getReasonForReject());
+                            documentsSubType.setDescription(entity.getDescription());
+                            documentsSubType.setCreatedOn(entity.getCreatedOn().toString());
+                            documentsSubType.setDocRef(entity.getDocRef());
+                            return documentsSubType;
+                        }).collect(toList());
 
 //                if (allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key) && documentTypeEntity.isActive())) {
-                final DocumentsType type = new DocumentsType();
-                DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
-                type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
-                type.setDocumentsSubType(documentsSubTypeList);
-                type.setUserType(customerEntity.getType());
-                type.setUuid(key);
-                type.setActive(allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key) && documentTypeEntity.isActive()));
-                type.setMaxUpload(allTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getUuid().equals(key)).findFirst().map(DocumentTypeEntity::getMaxUpload).orElse(0));
+                        final DocumentsType type = new DocumentsType();
+                        DocumentMapper.setDocumentTypeStatus(documentEntryEntities, type);
+                        type.setTitle(this.getDocumentTypeTitle(allTypeEntities, key));
+                        type.setDocumentsSubType(documentsSubTypeList);
+                        type.setUserType(customerEntity.getType());
+                        type.setUuid(key);
+                        type.setActive(allTypeEntities.stream().anyMatch(documentTypeEntity -> documentTypeEntity.getUuid().equals(key) && documentTypeEntity.isActive()));
+                        type.setMaxUpload(allTypeEntities.stream().filter(documentTypeEntity -> documentTypeEntity.getUuid().equals(key)).findFirst().map(DocumentTypeEntity::getMaxUpload).orElse(0));
 //                type.setActive(documentsSubTypeList.stream().anyMatch(dcoSubType -> dcoSubType.getStatus().equals(CustomerDocument.Status.APPROVED.name())));
-                documentsType.add(type);
+                        documentsType.add(type);
 //                }
 
-            });
-            customerDocument.setDocumentsTypes(documentsType);
+                    });
+                    customerDocument.setDocumentsTypes(documentsType);
 
-            return customerDocument;
+                    return customerDocument;
 
-        }).orElseGet(() -> {
-            CustomerDocument customerDocument = new CustomerDocument();
-            customerDocument.setKycStatus(false);
-            customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
-            return customerDocument;
+                }).orElseGet(() -> {
+                    CustomerDocument customerDocument = new CustomerDocument();
+                    customerDocument.setKycStatus(false);
+                    customerDocument.setKycStatusText(CustomerDocument.Status.NOTUPLOADED.name());
+                    return customerDocument;
 
-        });
+                });
     }
 
 
