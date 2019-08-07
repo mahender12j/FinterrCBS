@@ -97,6 +97,8 @@ public class RatingAndCommentCommandHandler {
                 .stream()
                 .filter(ent -> ent.getId().equals(editCauseRatingCommand.getRatingId()))
                 .findFirst().ifPresent(ratingEntity -> {
+
+            System.out.println(causeRating);
             if (causeRating.getComment() != null) {
                 ratingEntity.setComment(causeRating.getComment());
             }

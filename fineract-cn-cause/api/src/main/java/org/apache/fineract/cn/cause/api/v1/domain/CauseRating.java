@@ -129,10 +129,15 @@ public class CauseRating {
     @Override
     public String toString() {
         return "CauseRating{" +
-                "rating='" + rating + '\'' +
+                "id=" + id +
+                ", rating=" + rating +
+                ", comment='" + comment + '\'' +
+                ", ref=" + ref +
                 ", active=" + active +
                 ", createdBy='" + createdBy + '\'' +
+                ", createdByUrl='" + createdByUrl + '\'' +
                 ", createdOn='" + createdOn + '\'' +
+                ", causeRatings=" + causeRatings +
                 '}';
     }
 }
