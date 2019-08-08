@@ -460,7 +460,11 @@ public class CustomerService {
         return customerPage;
     }
 
-    public CustomerRefPage fetchCustomerReferrals(final String refferalcode, final String searchKey,
+
+
+//    customer refferal
+    public CustomerRefPage fetchCustomerReferrals(final String refferalcode,
+                                                  final String searchKey,
                                                   final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
         CustomerEntity customerEntity = customerRepository.findByRefferalCodeIdentifier(refferalcode).orElseThrow(() -> ServiceException.notFound("Customer with refferal code {0} not found", refferalcode));
@@ -490,6 +494,7 @@ public class CustomerService {
                 final ArrayList<Customer> customers = new ArrayList<>(customerEntities.getSize());
                 customerEntities.forEach(entity -> {
                     Customer tCustomer = CustomerMapper.map(entity);
+                    CustomerMapper.map(tCustomer, this.userVerification(customerEntity));
                     tCustomer.setContactDetails(customerEntity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
                     if (entity.getAccountNumbers() != null) {
                         Account acc = accountingAdaptor.findAccountByIdentifier(entity.getRefAccountNumber());
