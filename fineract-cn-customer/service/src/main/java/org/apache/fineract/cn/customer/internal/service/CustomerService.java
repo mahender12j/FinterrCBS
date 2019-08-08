@@ -472,12 +472,14 @@ public class CustomerService {
 
 //        checking user type and givening the response to the corporate and other user
         if (this.getCustomerEntity(UserContextHolder.checkedGetUser()).get().getType().equals(Customer.UserType.CORPORATE.name())) {
+            System.out.println("user type: corporate");
             if (searchKey != null) {
                 customerEntities = this.customerRepository.findByReferenceCustomerAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, searchKey, searchKey, searchKey, pageable);
             } else {
                 customerEntities = this.customerRepository.findByReferenceCustomer(refferalcode, pageable);
             }
         } else {
+            System.out.println("user type not: corporate");
             if (searchKey != null) {
                 customerEntities = this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, Customer.UserState.CLOSED.name(), searchKey, searchKey, searchKey, pageable);
             } else {
@@ -505,7 +507,7 @@ public class CustomerService {
                 customerEntities.forEach(entity -> {
                     Customer tCustomer = CustomerMapper.map(entity);
                     CustomerMapper.map(tCustomer, this.userVerification(customerEntity));
-                    tCustomer.setContactDetails(customerEntity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
+                    tCustomer.setContactDetails(entity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
                     if (entity.getAccountNumbers() != null) {
                         Account acc = accountingAdaptor.findAccountByIdentifier(entity.getRefAccountNumber());
                         tCustomer.setRefferalBalance(acc.getBalance());
