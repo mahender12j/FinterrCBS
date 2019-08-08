@@ -20,6 +20,7 @@ package org.apache.fineract.cn.customer.internal.service;
 
 import org.apache.fineract.cn.accounting.api.v1.domain.Account;
 import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
+import org.apache.fineract.cn.api.util.UserContextHolder;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.catalog.api.v1.domain.Value;
 import org.apache.fineract.cn.customer.catalog.internal.repository.FieldEntity;
@@ -461,18 +462,27 @@ public class CustomerService {
     }
 
 
-
-//    customer refferal
+    //    customer refferal
     public CustomerRefPage fetchCustomerReferrals(final String refferalcode,
                                                   final String searchKey,
                                                   final Pageable pageable) {
         final Page<CustomerEntity> customerEntities;
         CustomerEntity customerEntity = customerRepository.findByRefferalCodeIdentifier(refferalcode).orElseThrow(() -> ServiceException.notFound("Customer with refferal code {0} not found", refferalcode));
 
-        if (searchKey != null) {
-            customerEntities = this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, Customer.UserState.CLOSED.name(), searchKey, searchKey, searchKey, pageable);
+
+//        checking user type and givening the response to the corporate and other user
+        if (this.getCustomerEntity(UserContextHolder.checkedGetUser()).get().getType().equals(Customer.UserType.CORPORATE.name())) {
+            if (searchKey != null) {
+                customerEntities = this.customerRepository.findByReferenceCustomerAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, searchKey, searchKey, searchKey, pageable);
+            } else {
+                customerEntities = this.customerRepository.findByReferenceCustomer(refferalcode, pageable);
+            }
         } else {
-            customerEntities = this.customerRepository.findByReferenceCustomerAndIsDepositedAndCurrentStateNot(refferalcode, true, Customer.UserState.CLOSED.name(), pageable);
+            if (searchKey != null) {
+                customerEntities = this.customerRepository.findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(refferalcode, Customer.UserState.CLOSED.name(), searchKey, searchKey, searchKey, pageable);
+            } else {
+                customerEntities = this.customerRepository.findByReferenceCustomerAndIsDepositedAndCurrentStateNot(refferalcode, true, Customer.UserState.CLOSED.name(), pageable);
+            }
         }
 
 

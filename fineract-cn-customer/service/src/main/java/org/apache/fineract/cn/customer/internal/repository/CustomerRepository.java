@@ -43,9 +43,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
 
     List<CustomerEntity> findAllByType(final String type);
 
-//    @Query("select COUNT(c) from  CustomerEntity c where c.referenceCustomer=:identifier AND c.isDeposited = 1")
-//    Integer findAllByRefferalCodeIdentifierActive(@Param("identifier") final String identifier);
-
     List<CustomerEntity> findAllByreferenceCustomerAndIsDepositedIsTrue(final String identifier);
 
     Page<CustomerEntity> findByIdentifierContainingOrGivenNameContainingOrSurnameContaining(
@@ -61,9 +58,13 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
 
     Page<CustomerEntity> findByReferenceCustomerAndIsDepositedAndCurrentStateNot(final String refferalCodeIdentifier, final Boolean isDeposited, final String state, final Pageable pageable);
 
+    Page<CustomerEntity> findByReferenceCustomer(final String refferalCodeIdentifier, final Pageable pageable);
+
     Page<CustomerEntity> findByCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
             final String state, final String identifier, final String givenName, final String surname, final Pageable pageable);
 
     Page<CustomerEntity> findByReferenceCustomerAndCurrentStateNotAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(
             final String refferalCodeIdentifier, final String state, final String identifier, final String givenName, final String surname, final Pageable pageable);
+
+    Page<CustomerEntity> findByReferenceCustomerAndIdentifierContainingOrGivenNameContainingOrSurnameContaining(final String refferalCodeIdentifier, final String identifier, final String givenName, final String surname, final Pageable pageable);
 }

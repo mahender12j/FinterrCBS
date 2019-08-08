@@ -281,6 +281,7 @@ public class CustomerRestController {
         return ResponseEntity.accepted().build();
     }
 
+//    this has multiple implementations based on user type
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
     @RequestMapping(
             value = "/customers/{referralcode}/referrals",
