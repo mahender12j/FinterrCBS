@@ -217,6 +217,9 @@ public class DocumentCommandHandler {
         DocumentTypeEntity documentTypeEntity = documentTypeRepository.findByUuid(command.getUuid()).orElseThrow(() -> ServiceException.notFound("Document not found"));
         final DocumentSubTypeEntity documentSubTypeEntity = DocumentMapper.map(command.getDocumentsSubType(), documentTypeEntity);
         this.documentSubTypeRepository.save(documentSubTypeEntity);
+
+//        updating the status for document type
+        this.putDocumentTypeActivate(new UpdateDocumentTypeActivationCommand(documentSubTypeEntity.getDocumentType().getId()));
         return new DocumentEvent(command.getUuid(), command.getDocumentsSubType().toString());
     }
 
@@ -231,7 +234,26 @@ public class DocumentCommandHandler {
         documentSubTypeEntity.setTitle(documentsType.getTitle());
         documentSubTypeEntity.setActive(documentsType.isActive());
         this.documentSubTypeRepository.save(documentSubTypeEntity);
+
+        //        updating the status for document type
+        this.putDocumentTypeActivate(new UpdateDocumentTypeActivationCommand(documentSubTypeEntity.getDocumentType().getId()));
         return new DocumentEvent(subTypeCommand.getuuid(), subTypeCommand.getDocumentsType().toString());
+    }
+
+
+    @Transactional
+    @CommandHandler
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_DOCUMENT_TYPE_ACTIVATE)
+    public void putDocumentTypeActivate(final UpdateDocumentTypeActivationCommand activationCommand) {
+        DocumentTypeEntity documentTypeEntity = this.documentTypeRepository.findOne(activationCommand.getid());
+        final List<DocumentSubTypeEntity> documentSubTypeEntity = documentSubTypeRepository.findByDocumentType(documentTypeEntity);
+        boolean anyActivatedSubTypeExist = documentSubTypeEntity.stream().anyMatch(DocumentSubTypeEntity::isActive);
+        if (anyActivatedSubTypeExist) {
+            documentTypeEntity.setActive(true);
+        } else {
+            documentTypeEntity.setActive(false);
+        }
+        this.documentTypeRepository.save(documentTypeEntity);
     }
 
 
