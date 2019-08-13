@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author Padma Raju Sattineni
+ * @author Md Robiul Hassan
  */
 public class RatingMapper {
     private RatingMapper() {
@@ -49,7 +49,7 @@ public class RatingMapper {
         ret.setRating(ratingEntity.getRating());
         ret.setRef(ratingEntity.getRef());
         ret.setComment(ratingEntity.getComment());
-        ret.setUpdatedOn(ratingEntity.getUpdatedOn().toString());
+        ret.setUpdatedOn(DateConverter.toIsoString(ratingEntity.getUpdatedOn()));
         return ret;
     }
 

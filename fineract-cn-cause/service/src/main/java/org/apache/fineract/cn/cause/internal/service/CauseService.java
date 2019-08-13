@@ -405,6 +405,10 @@ public class CauseService {
                 .collect(Collectors.toList());
 
         cause.setCauseRatings(causeRatings);
+        cause.setTotalComments(this.ratingRepository.findAllByCauseAndActiveIsTrue(causeEntity).count());
+        cause.setTotalRating(this.ratingRepository.findAllByCauseAndActiveIsTrue(causeEntity)
+                .filter(ratingEntity -> ratingEntity.getRating() != -1)
+                .count());
         cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
     }
 

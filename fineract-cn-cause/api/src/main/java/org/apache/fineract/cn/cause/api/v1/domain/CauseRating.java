@@ -45,7 +45,7 @@ public class CauseRating {
     public CauseRating() {
     }
 
-    public CauseRating(Long id, int rating, String comment, Long ref, boolean active, String createdBy, String createdOn) {
+    public CauseRating(Long id, int rating, String comment, Long ref, boolean active, String createdBy, String createdOn, String updatedOn) {
         this.id = id;
         this.rating = rating;
         this.comment = comment;
@@ -53,6 +53,7 @@ public class CauseRating {
         this.active = active;
         this.createdBy = createdBy;
         this.createdOn = createdOn;
+        this.updatedOn = updatedOn;
     }
 
     public Long getId() {

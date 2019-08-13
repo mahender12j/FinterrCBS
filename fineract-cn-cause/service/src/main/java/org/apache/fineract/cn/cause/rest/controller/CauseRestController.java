@@ -540,16 +540,20 @@ public class CauseRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> editCauseRating(@PathVariable("identifier") final String identifier,
-                                         @PathVariable("ratingId") final Long ratingId,
-                                         @Valid @RequestBody final CauseRating rating) {
+    ResponseEntity<CauseRating> editCauseRating(@PathVariable("identifier") final String identifier,
+                                                @PathVariable("ratingId") final Long ratingId,
+                                                @Valid @RequestBody final CauseRating rating) {
         this.throwIfCauseNotExists(identifier);
         this.throwIfRatingNotExists(ratingId);
 //        todo has implementation inside the method
         this.throwIfRatingOwnerIsNotOwnByCurrentUserOrCA(ratingId);
 
-        this.commandGateway.process(new EditCauseRatingCommand(identifier, ratingId, rating));
-        return ResponseEntity.accepted().build();
+        try {
+            CommandCallback<CauseRating> commandCallback = this.commandGateway.process(new EditCauseRatingCommand(identifier, ratingId, rating), CauseRating.class);
+            return ResponseEntity.ok(commandCallback.get());
+        } catch (CommandProcessingException | InterruptedException | ExecutionException e) {
+            throw ServiceException.internalError("Sorry! Something went wrong");
+        }
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)

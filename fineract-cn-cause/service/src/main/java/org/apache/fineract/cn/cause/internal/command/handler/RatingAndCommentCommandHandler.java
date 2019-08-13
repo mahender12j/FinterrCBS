@@ -31,6 +31,7 @@ import org.apache.fineract.cn.cause.internal.repository.RatingRepository;
 import org.apache.fineract.cn.command.annotation.Aggregate;
 import org.apache.fineract.cn.command.annotation.CommandHandler;
 import org.apache.fineract.cn.command.annotation.EventEmitter;
+import org.apache.fineract.cn.lang.DateConverter;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,7 +75,8 @@ public class RatingAndCommentCommandHandler {
                 entity.getRef(),
                 entity.getActive(),
                 entity.getCreatedBy(),
-                entity.getCreatedOn().toString());
+                DateConverter.toIsoString(entity.getCreatedOn()),
+                DateConverter.toIsoString(entity.getUpdatedOn()));
     }
 
 
@@ -93,23 +95,31 @@ public class RatingAndCommentCommandHandler {
     @Transactional
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.EDIT_RATING)
-    public String editRating(final EditCauseRatingCommand editCauseRatingCommand) {
+    public CauseRating editRating(final EditCauseRatingCommand editCauseRatingCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(editCauseRatingCommand.getCauseIdentifier());
         CauseRating causeRating = editCauseRatingCommand.getCauseRating();
-        causeEntity.getRatingEntities()
+
+        RatingEntity entity = causeEntity.getRatingEntities()
                 .stream()
                 .filter(ent -> ent.getId().equals(editCauseRatingCommand.getRatingId()))
-                .findFirst().ifPresent(ratingEntity -> {
+                .findFirst().map(ratingEntity -> {
 
-            System.out.println(causeRating);
-            if (causeRating.getComment() != null) {
-                ratingEntity.setComment(causeRating.getComment());
-            }
-            ratingEntity.setUpdatedOn(LocalDateTime.now());
-            ratingEntity.setRating(causeRating.getRating());
-            this.ratingRepository.save(ratingEntity);
-        });
-        return causeRating.toString();
+                    if (causeRating.getComment() != null) {
+                        ratingEntity.setComment(causeRating.getComment());
+                    }
+                    ratingEntity.setUpdatedOn(LocalDateTime.now());
+                    ratingEntity.setRating(causeRating.getRating());
+                    return this.ratingRepository.save(ratingEntity);
+                }).get();
+
+        return new CauseRating(entity.getId(),
+                entity.getRating(),
+                entity.getComment(),
+                entity.getRef(),
+                entity.getActive(),
+                entity.getCreatedBy(),
+                DateConverter.toIsoString(entity.getCreatedOn()),
+                DateConverter.toIsoString(entity.getUpdatedOn()));
     }
 
 

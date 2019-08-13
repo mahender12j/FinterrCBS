@@ -121,6 +121,8 @@ public class Cause {
     private Long numberOfExtended;
 
     private double avgRating;
+    private Long totalRating;
+    private Long totalComments;
     private List<CauseRating> causeRatings;
     private List<CauseFiles> causeFiles;
     private CauseState causeState;
@@ -528,6 +530,22 @@ public class Cause {
 
     public void setCauseState(CauseState causeState) {
         this.causeState = causeState;
+    }
+
+    public Long getTotalRating() {
+        return totalRating;
+    }
+
+    public void setTotalRating(Long totalRating) {
+        this.totalRating = totalRating;
+    }
+
+    public Long getTotalComments() {
+        return totalComments;
+    }
+
+    public void setTotalComments(Long totalComments) {
+        this.totalComments = totalComments;
     }
 
     @Override
