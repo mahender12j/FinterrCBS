@@ -35,6 +35,8 @@ import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 /**
  * @author Padma Raju Sattineni
  */
@@ -83,6 +85,7 @@ public class RatingAndCommentCommandHandler {
         final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseRatingCommand.getCauseIdentifier());
         final RatingEntity ratingEntity = this.ratingRepository.findByIdAndCause(deleteCauseRatingCommand.getRatingId(), causeEntity).orElseThrow(() -> ServiceException.notFound("Rating Not Found with ID {0} and cause ID {1}", deleteCauseRatingCommand.getRatingId(), deleteCauseRatingCommand.getCauseIdentifier()));
         ratingEntity.setActive(false);
+        ratingEntity.setUpdatedOn(LocalDateTime.now());
         this.ratingRepository.save(ratingEntity);
         return ratingEntity.toString();
     }
@@ -102,8 +105,8 @@ public class RatingAndCommentCommandHandler {
             if (causeRating.getComment() != null) {
                 ratingEntity.setComment(causeRating.getComment());
             }
+            ratingEntity.setUpdatedOn(LocalDateTime.now());
             ratingEntity.setRating(causeRating.getRating());
-
             this.ratingRepository.save(ratingEntity);
         });
         return causeRating.toString();

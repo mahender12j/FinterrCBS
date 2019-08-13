@@ -35,7 +35,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @SuppressWarnings("unused")
-@FeignClient(name = "cause-v1", path = "/cause/v1", configuration = CauseFeignClientConfig.class)
+@FeignClient(name = "cause-v1", path = "/cause-v1", configuration = CauseFeignClientConfig.class)
 public interface CauseManager {
 
     @RequestMapping(

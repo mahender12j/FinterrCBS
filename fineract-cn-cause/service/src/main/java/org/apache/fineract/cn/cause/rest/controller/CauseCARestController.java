@@ -85,7 +85,8 @@ public class CauseCARestController {
     }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @Permittable(value = AcceptedTokenType.TENANT,
+            groupId = PermittableGroupIds.CAUSE)
     @RequestMapping(
             value = "/causes/cadmin/all",
             method = RequestMethod.GET,

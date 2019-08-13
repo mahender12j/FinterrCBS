@@ -34,7 +34,9 @@ public final class Customer {
         BUSINESS,
         CADMIN,
         SADMIN,
-        CORPORATE
+        CORPORATE,
+        TRUST,
+        FUNDMANAGER
     }
 
     public enum RegistrationType {

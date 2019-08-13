@@ -59,8 +59,13 @@ public class RatingEntity {
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime createdOn;
 
+    @Column(name = "updated_on")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime updatedOn;
+
     public RatingEntity() {
         this.createdOn = LocalDateTime.now();
+        this.updatedOn = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -125,6 +130,14 @@ public class RatingEntity {
 
     public void setRef(Long ref) {
         this.ref = ref;
+    }
+
+    public LocalDateTime getUpdatedOn() {
+        return updatedOn;
+    }
+
+    public void setUpdatedOn(LocalDateTime updatedOn) {
+        this.updatedOn = updatedOn;
     }
 
     @Override

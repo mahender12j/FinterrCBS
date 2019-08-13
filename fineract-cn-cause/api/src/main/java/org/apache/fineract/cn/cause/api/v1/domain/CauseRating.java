@@ -39,6 +39,7 @@ public class CauseRating {
     private String createdBy;
     private String createdByUrl;
     private String createdOn;
+    private String updatedOn;
     private List<CauseRating> causeRatings;
 
     public CauseRating() {
@@ -124,6 +125,14 @@ public class CauseRating {
 
     public void setCreatedByUrl(String createdByUrl) {
         this.createdByUrl = createdByUrl;
+    }
+
+    public String getUpdatedOn() {
+        return updatedOn;
+    }
+
+    public void setUpdatedOn(String updatedOn) {
+        this.updatedOn = updatedOn;
     }
 
     @Override

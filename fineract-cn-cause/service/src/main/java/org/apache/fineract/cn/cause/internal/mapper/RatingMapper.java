@@ -49,6 +49,7 @@ public class RatingMapper {
         ret.setRating(ratingEntity.getRating());
         ret.setRef(ratingEntity.getRef());
         ret.setComment(ratingEntity.getComment());
+        ret.setUpdatedOn(ratingEntity.getUpdatedOn().toString());
         return ret;
     }
 
@@ -59,6 +60,7 @@ public class RatingMapper {
         ret.setActive(rating.isActive());
         ret.setCreatedBy(UserContextHolder.checkedGetUser());
         ret.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
+        ret.setUpdatedOn(LocalDateTime.now(Clock.systemUTC()));
         ret.setRating(rating.getRating());
         ret.setComment(rating.getComment());
         ret.setRef(rating.getRef());
