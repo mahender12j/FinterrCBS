@@ -18,11 +18,6 @@
  */
 package org.apache.fineract.cn.rhythm.service.internal.service;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
 import org.apache.fineract.cn.rhythm.api.v1.domain.ClockOffset;
 import org.apache.fineract.cn.rhythm.service.ServiceConstants;
 import org.apache.fineract.cn.rhythm.service.internal.mapper.BeatMapper;
@@ -36,6 +31,11 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * @author Myrle Krantz
@@ -96,8 +96,7 @@ public class Drummer {
             });
 
         } catch (final InvalidDataAccessResourceUsageException e) {
-            logger.info("InvalidDataAccessResourceUsageException in check for scheduled beats, probably " +
-                    "because initialize hasn't been called yet. {}", e);
+            logger.info("InvalidDataAccessResourceUsageException in check for scheduled beats, probably because initialize hasn't been called yet. {}", e);
         }
         logger.info("checkForBeatsNeeded end.");
     }
