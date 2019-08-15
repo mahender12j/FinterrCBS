@@ -180,9 +180,9 @@ public class CauseRestController {
         throwIfCauseNotExists(identifier);
         this.causeService.findCauseEntity(identifier).map(causeEntity -> {
             if (Arrays.stream(Cause.RemovableCauseState.values()).anyMatch(c -> c.name().equals(causeEntity.getCurrentState()))) {
-                throw ServiceException.conflict("Unable to delete this cause!");
-            } else {
                 return causeEntity;
+            } else {
+                throw ServiceException.conflict("Unable to delete this cause!");
             }
         });
 
