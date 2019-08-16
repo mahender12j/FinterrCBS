@@ -407,9 +407,12 @@ public class CauseService {
         cause.setCauseRatings(causeRatings);
         cause.setTotalComments(this.ratingRepository.findAllByCauseAndActiveIsTrue(causeEntity).count());
         cause.setTotalRating(this.ratingRepository.findAllByCauseAndActiveIsTrue(causeEntity)
-                .filter(ratingEntity -> ratingEntity.getRating() != -1)
+                .filter(ratingEntity -> ratingEntity.getRating() > 0)
                 .count());
-        cause.setAvgRating(causeRatings.stream().mapToDouble(CauseRating::getRating).average().orElse(0));
+        cause.setAvgRating(causeRatings.stream()
+                .filter(causeRating -> causeRating.getRating() > 0)
+                .mapToDouble(CauseRating::getRating).average()
+                .orElse(0));
     }
 
 
