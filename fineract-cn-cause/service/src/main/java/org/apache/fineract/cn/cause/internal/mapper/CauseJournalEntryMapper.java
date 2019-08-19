@@ -22,7 +22,6 @@ import org.apache.fineract.cn.accounting.api.v1.domain.JournalEntry;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseCreditor;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDebtor;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseJournalEntry;
-import org.apache.fineract.cn.lang.DateConverter;
 
 import java.util.stream.Collectors;
 
@@ -37,7 +36,7 @@ public class CauseJournalEntryMapper {
         journalEntry.setTransactionIdentifier(entry.getTransactionIdentifier());
         journalEntry.setTransactionDate(entry.getTransactionDate());
         journalEntry.setTransactionType(entry.getTransactionType());
-        journalEntry.setClerk(entry.isAnonymous() ? "Anonymous" : entry.getClerk());
+        journalEntry.setClerk(entry.getClerk());
         journalEntry.setNote(entry.getNote());
         journalEntry.setDebtors(
                 entry.getDebtors()
