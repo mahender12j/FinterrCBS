@@ -713,7 +713,8 @@ public class CustomerService {
 
     private boolean getProfileCompleted(CustomerEntity customerEntity) {
 
-        if (customerEntity.getType().equals(Customer.UserType.CORPORATE.name())) {
+        if (customerEntity.getType().equals(Customer.UserType.CORPORATE.name()) ||
+                customerEntity.getType().equals(Customer.UserType.TRUST.name())) {
             AddressEntity addressEntity = customerEntity.getAddress();
             List<ContactDetailEntity> detailEntityList = customerEntity.getContactDetail();
             List<FieldValueEntity> fieldValueEntities = customerEntity.getFieldValueEntities();
