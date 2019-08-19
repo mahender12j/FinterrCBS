@@ -305,13 +305,7 @@ public class CauseService {
             causeStatistics.setTotalSupporter(journalEntry.stream().map(CauseJournalEntry::getClerk).collect(Collectors.toSet()).size());
             causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().map(CauseCreditor::getAmount).orElse("0"))).sum());
 
-            causeStatistics.setJournalEntry(journalEntry.stream().peek(entry -> {
-                if (entry.isAnonymous()) {
-                    entry.setClerk("Anonymous");
-                } else {
-                    entry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(entry.getClerk()).getPortraitUrl());
-                }
-            }).collect(Collectors.toList()));
+            causeStatistics.setJournalEntry(journalEntry.stream().peek(entry -> entry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(entry.getClerk()).getPortraitUrl())).collect(Collectors.toList()));
             cause.setCauseStatistics(causeStatistics);
         }
         return causeStatistics;
