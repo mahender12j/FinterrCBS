@@ -164,7 +164,7 @@ public final class CustomerMapper {
     public static CustomerEntity map(final CorporateUser customer) {
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setIdentifier(customer.getIdentifier());
-        customerEntity.setType(Customer.UserType.CORPORATE.name());
+        customerEntity.setType(customer.getType());
         customerEntity.setRegistrationType(Customer.RegistrationType.EMAIL.name());
         customerEntity.setGivenName(customer.getGivenName());
         customerEntity.setMiddleName(customer.getMiddleName());
@@ -190,7 +190,7 @@ public final class CustomerMapper {
 
     //    update map
     public static CustomerEntity map(final CustomerEntity customerEntity, final CorporateUser customer) {
-        customerEntity.setType(Customer.UserType.CORPORATE.name());
+//        customerEntity.setType(Customer.UserType.CORPORATE.name());
         customerEntity.setGivenName(customer.getGivenName());
         customerEntity.setMiddleName(customer.getMiddleName());
         customerEntity.setSurname(customer.getSurname());

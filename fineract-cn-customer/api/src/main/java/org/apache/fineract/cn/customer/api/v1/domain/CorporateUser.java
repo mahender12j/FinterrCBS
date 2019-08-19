@@ -27,11 +27,15 @@ import java.util.List;
 
 public class CorporateUser {
 
+    public enum UserType {
+        CORPORATE,
+        TRUST,
+    }
 
     private Long id;
     @NotBlank
     private String identifier;
-    private Customer.UserType type;
+    private UserType type;
 
     @NotBlank
     private String givenName;
@@ -71,7 +75,7 @@ public class CorporateUser {
     public CorporateUser(Long id, String identifier, String type, String givenName, String surname, String designation) {
         this.id = id;
         this.identifier = identifier;
-        this.type = Customer.UserType.valueOf(type);
+        this.type = UserType.valueOf(type);
         this.givenName = givenName;
         this.surname = surname;
         this.designation = designation;
