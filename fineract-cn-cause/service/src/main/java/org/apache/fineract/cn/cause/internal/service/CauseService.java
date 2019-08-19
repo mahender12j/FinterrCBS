@@ -404,16 +404,44 @@ public class CauseService {
                 .collect(Collectors.toList());
 
         cause.setCauseRatings(causeRatings);
-        cause.setTotalComments(this.ratingRepository.findAllByCauseAndActiveIsTrue(causeEntity).count());
-        cause.setTotalRating(this.ratingRepository.findAllByCauseAndActiveIsTrue(causeEntity)
-                .filter(ratingEntity -> ratingEntity.getRating() > 0)
-                .count());
+        cause.setTotalRating(getCauseRatingsCount(causeRatings));
+        cause.setTotalComments(getCauseCommentsCount(causeRatings));
         cause.setAvgRating(causeRatings.stream()
                 .filter(causeRating -> causeRating.getRating() > 0)
                 .mapToDouble(CauseRating::getRating).average()
                 .orElse(0));
     }
 
+
+    private long getCauseCommentsCount(List<CauseRating> causeRatings) {
+        long totalComments = 0;
+        for (CauseRating causeRating : causeRatings) {
+            if (causeRating.getCauseRatings() == null) {
+                totalComments = totalComments + 1;
+            } else {
+                totalComments = totalComments + 1;
+                totalComments = totalComments + getCauseCommentsCount(causeRating.getCauseRatings());
+            }
+        }
+        return totalComments;
+    }
+
+    private long getCauseRatingsCount(List<CauseRating> causeRatings) {
+        long totalRating = 0;
+        for (CauseRating causeRating : causeRatings) {
+            if (causeRating.getCauseRatings() == null) {
+                if (causeRating.getRating() > 0) {
+                    totalRating = totalRating + 1;
+                }
+            } else {
+                if (causeRating.getRating() > 0) {
+                    totalRating = totalRating + 1;
+                }
+                totalRating = totalRating + getCauseRatingsCount(causeRating.getCauseRatings());
+            }
+        }
+        return totalRating;
+    }
 
     public final List<CauseRating> fetchRatingsAndCommentsByCause(final String identifier) {
         return causeRepository.findByIdentifier(identifier)
