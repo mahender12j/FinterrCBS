@@ -84,6 +84,23 @@ public class CAdminService {
         cAdminPage.setActiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, true));
         cAdminPage.setInactiveNgoPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.BUSINESS, false));
 
+
+        cAdminPage.setActiveTrust(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.TRUST.name())).count());
+        cAdminPage.setNoOfTrust(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.TRUST.name())).count());
+        cAdminPage.setNoOfTrustThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.TRUST.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setTrustPerMonth(CadminMapper.map(customerEntities, Customer.UserType.TRUST));
+        cAdminPage.setActiveTrustPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.TRUST, true));
+        cAdminPage.setInactiveTrustPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.TRUST, false));
+
+
+        cAdminPage.setActiveTrust(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.CORPORATE.name())).count());
+        cAdminPage.setNoOfTrust(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.CORPORATE.name())).count());
+        cAdminPage.setNoOfTrustThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.CORPORATE.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setTrustPerMonth(CadminMapper.map(customerEntities, Customer.UserType.CORPORATE));
+        cAdminPage.setActiveTrustPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.CORPORATE, true));
+        cAdminPage.setInactiveTrustPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.CORPORATE, false));
+
+
         List<CustomerDocument> customerDocuments = customerEntities
                 .stream()
                 .map(this::findCustomerDocumentsByCustomerEntity)

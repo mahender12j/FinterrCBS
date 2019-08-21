@@ -36,6 +36,22 @@ public class CAdminPage {
     private List<PerMonthRecord> inactiveMemberPerMonth;
     private List<PerMonthRecord> activeMemberPerMonth;
 
+
+    private Long NoOfTrust;
+    private Long ActiveTrust;
+    private Long NoOfTrustThisWeek;
+    private List<PerMonthRecord> trustPerMonth;
+    private List<PerMonthRecord> inactiveTrustPerMonth;
+    private List<PerMonthRecord> activeTrustPerMonth;
+
+
+    private Long NoOfCorporate;
+    private Long ActiveCorporate;
+    private Long NoOfCorporateThisWeek;
+    private List<PerMonthRecord> corporatePerMonth;
+    private List<PerMonthRecord> inactiveCorporatePerMonth;
+    private List<PerMonthRecord> activeCorporatePerMonth;
+
     private Long noOfCause;
     private Long activeCause;
     private Long noOfCauseThisWeek;
@@ -263,5 +279,101 @@ public class CAdminPage {
 
     public void setTotalPromoCode(Long totalPromoCode) {
         this.totalPromoCode = totalPromoCode;
+    }
+
+    public Long getNoOfTrust() {
+        return NoOfTrust;
+    }
+
+    public void setNoOfTrust(Long noOfTrust) {
+        NoOfTrust = noOfTrust;
+    }
+
+    public Long getActiveTrust() {
+        return ActiveTrust;
+    }
+
+    public void setActiveTrust(Long activeTrust) {
+        ActiveTrust = activeTrust;
+    }
+
+    public Long getNoOfTrustThisWeek() {
+        return NoOfTrustThisWeek;
+    }
+
+    public void setNoOfTrustThisWeek(Long noOfTrustThisWeek) {
+        NoOfTrustThisWeek = noOfTrustThisWeek;
+    }
+
+    public List<PerMonthRecord> getTrustPerMonth() {
+        return trustPerMonth;
+    }
+
+    public void setTrustPerMonth(List<PerMonthRecord> trustPerMonth) {
+        this.trustPerMonth = trustPerMonth;
+    }
+
+    public List<PerMonthRecord> getInactiveTrustPerMonth() {
+        return inactiveTrustPerMonth;
+    }
+
+    public void setInactiveTrustPerMonth(List<PerMonthRecord> inactiveTrustPerMonth) {
+        this.inactiveTrustPerMonth = inactiveTrustPerMonth;
+    }
+
+    public List<PerMonthRecord> getActiveTrustPerMonth() {
+        return activeTrustPerMonth;
+    }
+
+    public void setActiveTrustPerMonth(List<PerMonthRecord> activeTrustPerMonth) {
+        this.activeTrustPerMonth = activeTrustPerMonth;
+    }
+
+    public Long getNoOfCorporate() {
+        return NoOfCorporate;
+    }
+
+    public void setNoOfCorporate(Long noOfCorporate) {
+        NoOfCorporate = noOfCorporate;
+    }
+
+    public Long getActiveCorporate() {
+        return ActiveCorporate;
+    }
+
+    public void setActiveCorporate(Long activeCorporate) {
+        ActiveCorporate = activeCorporate;
+    }
+
+    public Long getNoOfCorporateThisWeek() {
+        return NoOfCorporateThisWeek;
+    }
+
+    public void setNoOfCorporateThisWeek(Long noOfCorporateThisWeek) {
+        NoOfCorporateThisWeek = noOfCorporateThisWeek;
+    }
+
+    public List<PerMonthRecord> getCorporatePerMonth() {
+        return corporatePerMonth;
+    }
+
+    public void setCorporatePerMonth(List<PerMonthRecord> corporatePerMonth) {
+        this.corporatePerMonth = corporatePerMonth;
+    }
+
+    public List<PerMonthRecord> getInactiveCorporatePerMonth() {
+        return inactiveCorporatePerMonth;
+    }
+
+    public void setInactiveCorporatePerMonth(List<PerMonthRecord> inactiveCorporatePerMonth) {
+        this.inactiveCorporatePerMonth = inactiveCorporatePerMonth;
+    }
+
+    public List<PerMonthRecord> getActiveCorporatePerMonth() {
+        return activeCorporatePerMonth;
+    }
+
+    public void setActiveCorporatePerMonth(List<PerMonthRecord> activeCorporatePerMonth) {
+        this.activeCorporatePerMonth = activeCorporatePerMonth;
     }
 }

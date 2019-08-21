@@ -228,7 +228,7 @@ public class CustomerService {
         });
     }
 
-
+//    https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList
     public HashMap<String, String> fetchBankList(PaynetDetails paynetDetails) throws
             IOException, NoSuchAlgorithmException, KeyManagementException {
         HashMap<String, String> respMap = new HashMap<>();
