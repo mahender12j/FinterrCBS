@@ -140,8 +140,8 @@ public class CustomerService {
 
 // Create a trust manager that does not validate certificate chains only for testing environment
             createTrustManager();
-
-            URLConnection conn = (HttpsURLConnection) new URL("https://uat.mepsfpx.com.my/FPXMain/sellerNVPTxnStatus.jsp").openConnection();
+//            https://uat.mepsfpx.com.my/FPXMain/sellerNVPTxnStatus.jsp
+            URLConnection conn = (HttpsURLConnection) new URL(aeRequest.getFpx_url()).openConnection();
 
             conn.setDoOutput(true);
             BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
@@ -242,7 +242,7 @@ public class CustomerService {
 //Create a trust manager that does not validate certificate chains only for testing environment
         createTrustManager();
 
-        URLConnection conn = (HttpsURLConnection) new URL("https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList").openConnection();
+        URLConnection conn = (HttpsURLConnection) new URL(paynetDetails.getFpx_url()).openConnection();
 
         conn.setDoOutput(true);
         BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));

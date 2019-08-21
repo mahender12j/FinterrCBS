@@ -33,6 +33,9 @@ public final class PaynetDetails {
     @NotNull
     private String fpx_version;
 
+    @NotNull
+    private String fpx_url;
+
     public PaynetDetails() {
     }
 
@@ -74,5 +77,13 @@ public final class PaynetDetails {
 
     public void setFpx_version(String fpx_version) {
         this.fpx_version = fpx_version;
+    }
+
+    public String getFpx_url() {
+        return fpx_url;
+    }
+
+    public void setFpx_url(String fpx_url) {
+        this.fpx_url = fpx_url;
     }
 }

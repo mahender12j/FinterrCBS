@@ -65,6 +65,9 @@ public final class AERequest {
     @NotNull
     private String fpx_checkSum;
 
+    @NotNull
+    private String fpx_url;
+
     public AERequest() {
     }
 
@@ -234,5 +237,13 @@ public final class AERequest {
 
     public void setFpx_checkSum(String fpx_checkSum) {
         this.fpx_checkSum = fpx_checkSum;
+    }
+
+    public String getFpx_url() {
+        return fpx_url;
+    }
+
+    public void setFpx_url(String fpx_url) {
+        this.fpx_url = fpx_url;
     }
 }
