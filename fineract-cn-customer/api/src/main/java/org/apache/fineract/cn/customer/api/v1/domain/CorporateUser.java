@@ -30,6 +30,7 @@ public class CorporateUser {
     public enum UserType {
         CORPORATE,
         TRUST,
+        FUNDMANAGER
     }
 
     private Long id;

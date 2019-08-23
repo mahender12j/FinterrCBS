@@ -449,10 +449,12 @@ public class DocumentsRestController {
             this.documentService.findDocumentSubTypeEntityByUuid(documentTypeEntity, documents.getSubType()).orElseThrow(() -> ServiceException.notFound("Document sub-types not available"));
 
 
-            int uploadedDocSize = this.documentService.findAllByTypeAndStatusNot(documentTypeEntity.getUuid()).size();
+            int uploadedDocSize = (int) this.documentService.findAllByTypeAndStatusNot(documentTypeEntity.getUuid())
+                    .stream().filter(documentEntryEntity -> !documentEntryEntity.getStatus().equals(CustomerDocument.Status.REJECTED.name())).count();
 
             int docSize = (int) kycDocuments.stream()
-                    .filter(doc -> this.documentService.getDocumentTypeTitle(doc.getType()).equals(documentTypeEntity.getTitle())).count();
+                    .filter(doc ->
+                            this.documentService.getDocumentTypeTitle(doc.getType()).equals(documentTypeEntity.getTitle())).count();
 
 
             if (documentTypeEntity.getMaxUpload() < (docSize + uploadedDocSize)) {

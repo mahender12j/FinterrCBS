@@ -93,12 +93,20 @@ public class CAdminService {
         cAdminPage.setInactiveTrustPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.TRUST, false));
 
 
-        cAdminPage.setActiveTrust(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.CORPORATE.name())).count());
-        cAdminPage.setNoOfTrust(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.CORPORATE.name())).count());
-        cAdminPage.setNoOfTrustThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.CORPORATE.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
-        cAdminPage.setTrustPerMonth(CadminMapper.map(customerEntities, Customer.UserType.CORPORATE));
-        cAdminPage.setActiveTrustPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.CORPORATE, true));
-        cAdminPage.setInactiveTrustPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.CORPORATE, false));
+        cAdminPage.setActiveCorporate(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.CORPORATE.name())).count());
+        cAdminPage.setNoOfCorporate(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.CORPORATE.name())).count());
+        cAdminPage.setNoOfCorporateThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.CORPORATE.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setCorporatePerMonth(CadminMapper.map(customerEntities, Customer.UserType.CORPORATE));
+        cAdminPage.setActiveCorporatePerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.CORPORATE, true));
+        cAdminPage.setInactiveCorporatePerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.CORPORATE, false));
+
+
+        cAdminPage.setActiveFundManager(customerEntities.stream().filter(customerEntity -> customerEntity.getIsDeposited() && customerEntity.getType().equals(Customer.UserType.FUNDMANAGER.name())).count());
+        cAdminPage.setNoOfFundManager(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.FUNDMANAGER.name())).count());
+        cAdminPage.setNoOfFundManagerThisWeek(customerEntities.stream().filter(customerEntity -> customerEntity.getType().equals(Customer.UserType.FUNDMANAGER.name()) && customerEntity.getCreatedOn().isAfter(startDateOfThisWeek)).count());
+        cAdminPage.setFundManagerPerMonth(CadminMapper.map(customerEntities, Customer.UserType.FUNDMANAGER));
+        cAdminPage.setActiveFundManagerPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.FUNDMANAGER, true));
+        cAdminPage.setInactiveFundManagerPerMonth(CadminMapper.mapByStatus(customerEntities, Customer.UserType.FUNDMANAGER, false));
 
 
         List<CustomerDocument> customerDocuments = customerEntities

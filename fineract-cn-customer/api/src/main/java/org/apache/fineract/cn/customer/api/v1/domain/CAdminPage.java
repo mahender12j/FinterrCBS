@@ -52,6 +52,15 @@ public class CAdminPage {
     private List<PerMonthRecord> inactiveCorporatePerMonth;
     private List<PerMonthRecord> activeCorporatePerMonth;
 
+
+    private Long NoOfFundManager;
+    private Long ActiveFundManager;
+    private Long NoOfFundManagerThisWeek;
+    private List<PerMonthRecord> fundManagerPerMonth;
+    private List<PerMonthRecord> inactiveFundManagerPerMonth;
+    private List<PerMonthRecord> activeFundManagerPerMonth;
+
+
     private Long noOfCause;
     private Long activeCause;
     private Long noOfCauseThisWeek;
@@ -375,5 +384,103 @@ public class CAdminPage {
 
     public void setActiveCorporatePerMonth(List<PerMonthRecord> activeCorporatePerMonth) {
         this.activeCorporatePerMonth = activeCorporatePerMonth;
+    }
+
+    public Long getNoOfFundManager() {
+        return NoOfFundManager;
+    }
+
+    public void setNoOfFundManager(Long noOfFundManager) {
+        NoOfFundManager = noOfFundManager;
+    }
+
+    public Long getActiveFundManager() {
+        return ActiveFundManager;
+    }
+
+    public void setActiveFundManager(Long activeFundManager) {
+        ActiveFundManager = activeFundManager;
+    }
+
+    public Long getNoOfFundManagerThisWeek() {
+        return NoOfFundManagerThisWeek;
+    }
+
+    public void setNoOfFundManagerThisWeek(Long noOfFundManagerThisWeek) {
+        NoOfFundManagerThisWeek = noOfFundManagerThisWeek;
+    }
+
+    public List<PerMonthRecord> getFundManagerPerMonth() {
+        return fundManagerPerMonth;
+    }
+
+    public void setFundManagerPerMonth(List<PerMonthRecord> fundManagerPerMonth) {
+        this.fundManagerPerMonth = fundManagerPerMonth;
+    }
+
+    public List<PerMonthRecord> getInactiveFundManagerPerMonth() {
+        return inactiveFundManagerPerMonth;
+    }
+
+    public void setInactiveFundManagerPerMonth(List<PerMonthRecord> inactiveFundManagerPerMonth) {
+        this.inactiveFundManagerPerMonth = inactiveFundManagerPerMonth;
+    }
+
+    public List<PerMonthRecord> getActiveFundManagerPerMonth() {
+        return activeFundManagerPerMonth;
+    }
+
+    public void setActiveFundManagerPerMonth(List<PerMonthRecord> activeFundManagerPerMonth) {
+        this.activeFundManagerPerMonth = activeFundManagerPerMonth;
+    }
+
+    @Override
+    public String toString() {
+        return "CAdminPage{" +
+                "noOfNGO=" + noOfNGO +
+                ", activeNGO=" + activeNGO +
+                ", noOfNGOThisWeek=" + noOfNGOThisWeek +
+                ", ngoPerMonth=" + ngoPerMonth +
+                ", inactiveNgoPerMonth=" + inactiveNgoPerMonth +
+                ", activeNgoPerMonth=" + activeNgoPerMonth +
+                ", NoOfMember=" + NoOfMember +
+                ", ActiveMember=" + ActiveMember +
+                ", NoOfMemberThisWeek=" + NoOfMemberThisWeek +
+                ", memberPerMonth=" + memberPerMonth +
+                ", inactiveMemberPerMonth=" + inactiveMemberPerMonth +
+                ", activeMemberPerMonth=" + activeMemberPerMonth +
+                ", NoOfTrust=" + NoOfTrust +
+                ", ActiveTrust=" + ActiveTrust +
+                ", NoOfTrustThisWeek=" + NoOfTrustThisWeek +
+                ", trustPerMonth=" + trustPerMonth +
+                ", inactiveTrustPerMonth=" + inactiveTrustPerMonth +
+                ", activeTrustPerMonth=" + activeTrustPerMonth +
+                ", NoOfCorporate=" + NoOfCorporate +
+                ", ActiveCorporate=" + ActiveCorporate +
+                ", NoOfCorporateThisWeek=" + NoOfCorporateThisWeek +
+                ", corporatePerMonth=" + corporatePerMonth +
+                ", inactiveCorporatePerMonth=" + inactiveCorporatePerMonth +
+                ", activeCorporatePerMonth=" + activeCorporatePerMonth +
+                ", NoOfFundManager=" + NoOfFundManager +
+                ", ActiveFundManager=" + ActiveFundManager +
+                ", NoOfFundManagerThisWeek=" + NoOfFundManagerThisWeek +
+                ", fundManagerPerMonth=" + fundManagerPerMonth +
+                ", inactiveFundManagerPerMonth=" + inactiveFundManagerPerMonth +
+                ", activeFundManagerPerMonth=" + activeFundManagerPerMonth +
+                ", noOfCause=" + noOfCause +
+                ", activeCause=" + activeCause +
+                ", noOfCauseThisWeek=" + noOfCauseThisWeek +
+                ", causePerMonth=" + causePerMonth +
+                ", inactiveCausePerMonth=" + inactiveCausePerMonth +
+                ", activeCausePerMonth=" + activeCausePerMonth +
+                ", kycApproved=" + kycApproved +
+                ", kycPending=" + kycPending +
+                ", kycRejected=" + kycRejected +
+                ", kycNotUploaded=" + kycNotUploaded +
+                ", causePending=" + causePending +
+                ", causeCompleted=" + causeCompleted +
+                ", activePromoCode=" + activePromoCode +
+                ", totalPromoCode=" + totalPromoCode +
+                '}';
     }
 }
