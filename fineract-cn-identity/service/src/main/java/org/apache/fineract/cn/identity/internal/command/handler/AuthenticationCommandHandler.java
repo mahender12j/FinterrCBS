@@ -282,9 +282,12 @@ public class AuthenticationCommandHandler {
                 sourceApplicationName);
 
         return new AuthenticationCommandResponse(
-                accessToken.getToken(), DateConverter.toIsoString(accessToken.getExpiration()),
-                refreshToken, DateConverter.toIsoString(refreshTokenExpiration),
-                passwordExpiration.map(DateConverter::toIsoString).orElse(null));
+                accessToken.getToken(),
+                DateConverter.toIsoString(accessToken.getExpiration()),
+                refreshToken,
+                DateConverter.toIsoString(refreshTokenExpiration),
+                passwordExpiration.map(DateConverter::toIsoString).orElse(null),
+                user.getRole());
     }
 
     private Optional<LocalDateTime> getExpiration(final UserEntity user) {

@@ -22,11 +22,12 @@ package org.apache.fineract.cn.identity.internal.util;
  * @author Myrle Krantz
  */
 public interface IdentityConstants {
-  String SU_ROLE = "pharaoh";
-  String SU_NAME = "antony";
-  int ITERATION_COUNT = 4096;
-  int HASH_LENGTH = 256;
-  int CURRENT_VERSION = 0;
-  String LOGGER_NAME = "identity-logger";
-  String JSON_SERIALIZER_NAME = "identity-json-serializer";
+    String SU_ROLE = "pharaoh";
+    String SU_NAME = "antony";
+    int ITERATION_COUNT = 4096;
+    int HASH_LENGTH = 256;
+    int CURRENT_VERSION = 0;
+    String LOGGER_NAME = "identity-logger";
+    String JSON_SERIALIZER_NAME = "identity-json-serializer";
+    String DEACTIVATE_USER_ROLE = "deactivate";
 }

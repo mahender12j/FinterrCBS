@@ -16,16 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.cn.identity.api.v1;
+package org.apache.fineract.cn.identity.internal.command;
 
 /**
  * @author Myrle Krantz
  */
 @SuppressWarnings("unused")
-public interface PermittableGroupIds {
-    String IDENTITY_MANAGEMENT_DEACTIVATE = "identity__v1__deactivate";
-    String IDENTITY_MANAGEMENT = "identity__v1__users";
-    String ROLE_MANAGEMENT = "identity__v1__roles";
-    String SELF_MANAGEMENT = "identity__v1__self";
-    String APPLICATION_SELF_MANAGEMENT = "identity__v1__app_self";
+public class DeactivateUserRoleCommand {
+    private String identifier;
+
+    public DeactivateUserRoleCommand() {
+    }
+
+    public DeactivateUserRoleCommand(final String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    @Override
+    public String toString() {
+        return "DeactivateUserRoleCommand{" +
+                "identifier='" + identifier + '\'' +
+                '}';
+    }
 }

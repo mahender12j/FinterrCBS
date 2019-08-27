@@ -26,8 +26,10 @@ import org.apache.fineract.cn.identity.api.v1.events.EventConstants;
 import org.apache.fineract.cn.identity.internal.command.ChangeUserPasswordCommand;
 import org.apache.fineract.cn.identity.internal.command.ChangeUserRoleCommand;
 import org.apache.fineract.cn.identity.internal.command.CreateUserCommand;
+import org.apache.fineract.cn.identity.internal.command.DeactivateUserRoleCommand;
 import org.apache.fineract.cn.identity.internal.repository.UserEntity;
 import org.apache.fineract.cn.identity.internal.repository.Users;
+import org.apache.fineract.cn.identity.internal.util.IdentityConstants;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,6 +63,19 @@ public class UserCommandHandler {
                         "User " + command.getIdentifier() + " doesn't exist."));
 
         user.setRole(command.getRole());
+        usersRepository.add(user);
+
+        return user.getIdentifier();
+    }
+
+
+    @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
+    @EventEmitter(selectorName = EventConstants.OPERATION_HEADER, selectorValue = EventConstants.OPERATION_PUT_USER_ROLEIDENTIFIER_DEACTIVE)
+    public String process(final DeactivateUserRoleCommand command) {
+        final UserEntity user = usersRepository.get(command.getIdentifier())
+                .orElseThrow(() -> ServiceException.notFound("User " + command.getIdentifier() + " doesn't exist."));
+        user.setRoleTemp(user.getRole());
+        user.setRole(IdentityConstants.DEACTIVATE_USER_ROLE);
         usersRepository.add(user);
 
         return user.getIdentifier();

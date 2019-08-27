@@ -38,6 +38,7 @@ public interface EventConstants {
 
   String OPERATION_POST_USER = "post-user";
   String OPERATION_PUT_USER_ROLEIDENTIFIER = "put-user-roleidentifier";
+  String OPERATION_PUT_USER_ROLEIDENTIFIER_DEACTIVE = "put-user-roleidentifier-deactive";
   String OPERATION_PUT_USER_PASSWORD = "put-user-password";
 
   String OPERATION_PUT_APPLICATION_SIGNATURE =   "put-application-signature";

@@ -185,6 +185,7 @@ public class AuthorizationRestController {
         return new Authentication(
                 commandResponse.getAccessToken(),
                 commandResponse.getRefreshToken(),
+                commandResponse.getRole(),
                 commandResponse.getAccessTokenExpiration(),
                 commandResponse.getRefreshTokenExpiration(),
                 commandResponse.getPasswordExpiration());

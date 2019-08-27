@@ -38,6 +38,9 @@ public class Authentication {
     private String refreshToken;
 
     @NotBlank
+    private String role;
+
+    @NotBlank
     private String accessTokenExpiration;
 
     @NotBlank
@@ -56,12 +59,14 @@ public class Authentication {
     public Authentication(
             final String accessToken,
             final String refreshToken,
+            final String role,
             final String accessTokenExpiration,
             final String refreshTokenExpiration,
             final String passwordExpiration) {
         this.tokenType = "bearer";
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.role = role;
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
         this.passwordExpiration = passwordExpiration;
@@ -113,6 +118,14 @@ public class Authentication {
 
     public void setPasswordExpiration(String passwordExpiration) {
         this.passwordExpiration = passwordExpiration;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override
