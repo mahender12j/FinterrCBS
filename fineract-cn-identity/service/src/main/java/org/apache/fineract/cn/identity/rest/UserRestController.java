@@ -135,7 +135,11 @@ public class UserRestController {
         if (userIdentifier.equals(IdentityConstants.SU_NAME))
             throw ServiceException.badRequest("Role of user with identifier: " + userIdentifier + " cannot be changed.");
 
-        checkIdentifier(userIdentifier);
+        User user = checkIdentifier(userIdentifier);
+
+        if (user.getRole().equals(IdentityConstants.DEACTIVATE_USER_ROLE)) {
+            throw ServiceException.conflict("Sorry! This user is already deactivate");
+        }
 
         final DeactivateUserRoleCommand changeCommand = new DeactivateUserRoleCommand(userIdentifier);
         this.commandGateway.process(changeCommand);
