@@ -23,10 +23,7 @@ import org.apache.fineract.cn.command.annotation.CommandHandler;
 import org.apache.fineract.cn.command.annotation.CommandLogLevel;
 import org.apache.fineract.cn.command.annotation.EventEmitter;
 import org.apache.fineract.cn.identity.api.v1.events.EventConstants;
-import org.apache.fineract.cn.identity.internal.command.ChangeUserPasswordCommand;
-import org.apache.fineract.cn.identity.internal.command.ChangeUserRoleCommand;
-import org.apache.fineract.cn.identity.internal.command.CreateUserCommand;
-import org.apache.fineract.cn.identity.internal.command.DeactivateUserRoleCommand;
+import org.apache.fineract.cn.identity.internal.command.*;
 import org.apache.fineract.cn.identity.internal.repository.UserEntity;
 import org.apache.fineract.cn.identity.internal.repository.Users;
 import org.apache.fineract.cn.identity.internal.util.IdentityConstants;
@@ -78,6 +75,18 @@ public class UserCommandHandler {
         user.setRole(IdentityConstants.DEACTIVATE_USER_ROLE);
         usersRepository.add(user);
 
+        return user.getIdentifier();
+    }
+
+
+    @CommandHandler(logStart = CommandLogLevel.INFO, logFinish = CommandLogLevel.INFO)
+    @EventEmitter(selectorName = EventConstants.OPERATION_HEADER, selectorValue = EventConstants.OPERATION_PUT_USER_ROLEIDENTIFIER_ACTIVE)
+    public String process(final ActivateUserRoleCommand command) {
+        final UserEntity user = usersRepository.get(command.getIdentifier())
+                .orElseThrow(() -> ServiceException.notFound("User " + command.getIdentifier() + " doesn't exist."));
+        user.setRole(user.getRoleTemp());
+        user.setRoleTemp("");
+        usersRepository.add(user);
         return user.getIdentifier();
     }
 

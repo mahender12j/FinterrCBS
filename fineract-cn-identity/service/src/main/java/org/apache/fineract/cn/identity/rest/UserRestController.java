@@ -26,10 +26,7 @@ import org.apache.fineract.cn.command.domain.CommandProcessingException;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
 import org.apache.fineract.cn.identity.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.identity.api.v1.domain.*;
-import org.apache.fineract.cn.identity.internal.command.ChangeUserPasswordCommand;
-import org.apache.fineract.cn.identity.internal.command.ChangeUserRoleCommand;
-import org.apache.fineract.cn.identity.internal.command.CreateUserCommand;
-import org.apache.fineract.cn.identity.internal.command.DeactivateUserRoleCommand;
+import org.apache.fineract.cn.identity.internal.command.*;
 import org.apache.fineract.cn.identity.internal.service.UserService;
 import org.apache.fineract.cn.identity.internal.util.IdentityConstants;
 import org.apache.fineract.cn.lang.ServiceException;
@@ -142,6 +139,25 @@ public class UserRestController {
         }
 
         final DeactivateUserRoleCommand changeCommand = new DeactivateUserRoleCommand(userIdentifier);
+        this.commandGateway.process(changeCommand);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+
+    @RequestMapping(value = PathConstants.IDENTIFIER_RESOURCE_STRING + "/activate",
+            method = RequestMethod.PUT,
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Permittable(value = AcceptedTokenType.TENANT,
+            groupId = PermittableGroupIds.IDENTITY_MANAGEMENT_DEACTIVATE)
+    public @ResponseBody
+    ResponseEntity<Void> changeUserRoleToActivate(
+            @PathVariable(PathConstants.IDENTIFIER_PATH_VARIABLE) final String userIdentifier) {
+        if (userIdentifier.equals(IdentityConstants.SU_NAME))
+            throw ServiceException.badRequest("Role of user with identifier: " + userIdentifier + " cannot be changed.");
+        checkIdentifier(userIdentifier);
+
+        final ActivateUserRoleCommand changeCommand = new ActivateUserRoleCommand(userIdentifier);
         this.commandGateway.process(changeCommand);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
