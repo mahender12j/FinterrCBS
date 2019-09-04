@@ -148,6 +148,7 @@ public class CustomerRestController {
 
         try {
             CommandCallback<String> commandCallback = this.commandGateway.process(new CreateCustomerCommand(customer), String.class);
+            System.out.println("command callback" + commandCallback.get());
             return ResponseEntity.ok(this.customerService.findCustomer(commandCallback.get()));
         } catch (CommandProcessingException | ExecutionException e) {
             throw ServiceException.internalError("Sorry! Something went wrong");
@@ -281,7 +282,7 @@ public class CustomerRestController {
         return ResponseEntity.accepted().build();
     }
 
-//    this has multiple implementations based on user type
+    //    this has multiple implementations based on user type
 //    todo need to implement
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
     @RequestMapping(
