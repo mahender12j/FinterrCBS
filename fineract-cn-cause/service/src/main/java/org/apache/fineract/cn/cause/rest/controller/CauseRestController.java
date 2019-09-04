@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.cause.rest.controller;
 
+import org.apache.catalina.User;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.util.UserContextHolder;
@@ -157,11 +158,18 @@ public class CauseRestController {
         Pageable pageable = this.createPageRequest(pageIndex, size, sortColumn, sortDirection);
         String currentUserType = this.customerAdaptor.findCustomerByIdentifier(UserContextHolder.checkedGetUser()).getType();
 
+        System.out.println("current User Type: " + currentUserType);
+
+        System.out.println("UserContext: " + UserContextHolder.checkedGetUser());
+
         if (currentUserType.equals("BUSINESS")) {
+            System.out.println("BUSINESS");
             return ResponseEntity.ok(this.causeService.fetchCauseForNGO(param, pageable));
         } else if (currentUserType.equals("CADMIN")) {
+            System.out.println("CADMIN");
             return ResponseEntity.ok(this.causeService.fetchCauseForCADMIN(param, pageable));
         } else {
+            System.out.println("OTHER");
             return ResponseEntity.ok(this.causeService.fetchCauseForCustomer(sortBy == null ? 0 : sortBy, param, pageable));
         }
     }
