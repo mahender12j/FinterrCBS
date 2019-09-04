@@ -64,22 +64,24 @@ public final class CustomerMapper {
         customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
         customerEntity.setEthAddress(customer.getEthAddress());
-//        if (customer.getDeposited() != null) {
-//            customerEntity.setIsDeposited(customer.getDeposited());
-//        } else {
-//            customerEntity.setIsDeposited(Boolean.FALSE);
-//        }
-//        if (customer.getKycStatus() != null) {
-//            customerEntity.setKycStatus(customer.getKycStatus());
-//        } else {
-//            customerEntity.setKycStatus(Customer.KycStatus.NOTUPLOADED.name());
-//        }
+        System.out.println("deposited------------> " + customer.getDeposited());
+        if (customer.getDeposited() != null) {
+            customerEntity.setIsDeposited(customer.getDeposited());
+        } else {
+            customerEntity.setIsDeposited(false);
+        }
+        System.out.println("kyc status-------------->: " + customer.getKycStatus());
+        if (customer.getKycStatus() != null) {
+            customerEntity.setKycStatus(customer.getKycStatus());
+        } else {
+            customerEntity.setKycStatus(Customer.KycStatus.NOTUPLOADED.name());
+        }
         customerEntity.setAccountNumbers(customer.getAccountNumbers());
-//        if (customer.getAvgMonthlyIncome() != null) {
-//            customerEntity.setAvgMonthlyIncome(customer.getAvgMonthlyIncome());
-//        } else {
-//            customerEntity.setAvgMonthlyIncome(0.0);
-//        }
+        if (customer.getAvgMonthlyIncome() != null) {
+            customerEntity.setAvgMonthlyIncome(customer.getAvgMonthlyIncome());
+        } else {
+            customerEntity.setAvgMonthlyIncome(0.0);
+        }
 
         customerEntity.setNgoName(customer.getNgoName());
         customerEntity.setDesignation(customer.getDesignation());
