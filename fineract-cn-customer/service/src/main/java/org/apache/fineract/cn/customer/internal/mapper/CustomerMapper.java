@@ -26,6 +26,7 @@ import org.apache.fineract.cn.customer.api.v1.domain.UserVerification;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 import org.apache.fineract.cn.lang.DateOfBirth;
+import org.joda.time.DateTime;
 
 import java.sql.Date;
 import java.time.Clock;
@@ -47,21 +48,15 @@ public final class CustomerMapper {
         customerEntity.setSurname(customer.getSurname());
         customerEntity.setGender(customer.getGender());
         System.out.println("customer.getDateOfBirth()-------------> " + customer.getDateOfBirth());
-//        if (customer.getDateOfBirth() != null) {
-//            customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
-//        }
+        if (customer.getDateOfBirth() != null) {
+            customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
+        }
         customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
         customerEntity.setCurrentState(Customer.UserState.PENDING.name());
         System.out.println("customer.getApplicationDate()------------------> " + customer.getApplicationDate());
-//        if (customer.getApplicationDate() != null) {
-//            final String editedApplicationDate;
-//            if (!customer.getApplicationDate().endsWith("Z")) {
-//                editedApplicationDate = customer.getApplicationDate() + "Z";
-//            } else {
-//                editedApplicationDate = customer.getApplicationDate();
-//            }
-//            customerEntity.setApplicationDate(DateConverter.dateFromIsoString(editedApplicationDate));
-//        }
+        if (customer.getApplicationDate() != null) {
+            customerEntity.setApplicationDate(Date.valueOf(customer.getApplicationDate()).toLocalDate());
+        }
         customerEntity.setCreatedBy(UserContextHolder.checkedGetUser());
         customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
@@ -89,9 +84,9 @@ public final class CustomerMapper {
         customerEntity.setDesignation(customer.getDesignation());
         customerEntity.setNgoRegistrationNumber(customer.getNgoRegistrationNumber());
         System.out.println("customer.getDateOfRegistration()------------> " + customer.getDateOfRegistration());
-//        if (customer.getDateOfRegistration() != null) {
-//            customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
-//        }
+        if (customer.getDateOfRegistration() != null) {
+            customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
+        }
         customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
         customerEntity.setPortraitUrl(customer.getPortraitUrl());
         return customerEntity;
