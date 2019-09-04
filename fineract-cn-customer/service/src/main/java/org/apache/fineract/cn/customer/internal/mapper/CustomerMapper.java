@@ -128,8 +128,9 @@ public final class CustomerMapper {
         } else {
             customer.setDeposited(false);
         }
-
-        customer.setActivationDate(customerEntity.getActivationDate().toString());
+        if (customerEntity.getActivationDate() != null) {
+            customer.setActivationDate(customerEntity.getActivationDate().toString());
+        }
 
         if (customerEntity.getKycStatus() != null) {
             customer.setKycStatus(customerEntity.getKycStatus());

@@ -78,7 +78,6 @@ public class CustomerEntity {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<FieldValueEntity> fieldValueEntities = new ArrayList<>();
 
-
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "created_on")
@@ -97,8 +96,8 @@ public class CustomerEntity {
     private Boolean isDeposited;
 
     // added for the customer is deposited date
-    @Column(name = "activation_date")
     @Convert(converter = LocalDateTimeConverter.class)
+    @Column(name = "activation_date")
     private LocalDateTime activationDate;
 
     @Column(name = "kyc_status")

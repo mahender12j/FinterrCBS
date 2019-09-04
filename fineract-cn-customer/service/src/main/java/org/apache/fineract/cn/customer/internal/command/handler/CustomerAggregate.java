@@ -141,25 +141,25 @@ public class CustomerAggregate {
         System.out.println("customer object-------------" + createCustomerCommand.customer());
         final CustomerEntity customerEntity = this.customerRepository.save(CustomerMapper.map(customer));
         System.out.println("customer entitty: ---------------: " + customerEntity);
-//        AddressEntity addressEntity = this.addressRepository.save(AddressMapper.map(customer.getAddress(), customerEntity));
-//        System.out.println("Address entity: --------------" + addressEntity);
-//        if (customer.getContactDetails() != null) {
-//            this.contactDetailRepository.save(
-//                    customer.getContactDetails()
-//                            .stream()
-//                            .map(contact -> {
-//                                final ContactDetailEntity contactDetailEntity = ContactDetailMapper.map(contact);
-//                                contactDetailEntity.setCustomer(customerEntity);
-//                                return contactDetailEntity;
-//                            })
-//                            .collect(Collectors.toList())
-//            );
-//        }
-//
-//        if (customer.getCustomValues() != null) {
-//            this.setCustomValues(customer, customerEntity);
-//        }
-//        this.taskAggregate.onCustomerCommand(customerEntity, Command.Action.ACTIVATE);
+        AddressEntity addressEntity = this.addressRepository.save(AddressMapper.map(customer.getAddress(), customerEntity));
+        System.out.println("Address entity: --------------" + addressEntity);
+        if (customer.getContactDetails() != null) {
+            this.contactDetailRepository.save(
+                    customer.getContactDetails()
+                            .stream()
+                            .map(contact -> {
+                                final ContactDetailEntity contactDetailEntity = ContactDetailMapper.map(contact);
+                                contactDetailEntity.setCustomer(customerEntity);
+                                return contactDetailEntity;
+                            })
+                            .collect(Collectors.toList())
+            );
+        }
+
+        if (customer.getCustomValues() != null) {
+            this.setCustomValues(customer, customerEntity);
+        }
+        this.taskAggregate.onCustomerCommand(customerEntity, Command.Action.ACTIVATE);
         return customer.getIdentifier();
     }
 
