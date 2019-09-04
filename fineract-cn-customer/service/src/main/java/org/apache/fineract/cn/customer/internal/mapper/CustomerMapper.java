@@ -46,11 +46,13 @@ public final class CustomerMapper {
         customerEntity.setMiddleName(customer.getMiddleName());
         customerEntity.setSurname(customer.getSurname());
         customerEntity.setGender(customer.getGender());
+        System.out.println("customer.getDateOfBirth()-------------> " + customer.getDateOfBirth());
 //        if (customer.getDateOfBirth() != null) {
 //            customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
 //        }
         customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
         customerEntity.setCurrentState(Customer.UserState.PENDING.name());
+        System.out.println("customer.getApplicationDate()------------------> " + customer.getApplicationDate());
 //        if (customer.getApplicationDate() != null) {
 //            final String editedApplicationDate;
 //            if (!customer.getApplicationDate().endsWith("Z")) {
@@ -86,6 +88,7 @@ public final class CustomerMapper {
         customerEntity.setNgoName(customer.getNgoName());
         customerEntity.setDesignation(customer.getDesignation());
         customerEntity.setNgoRegistrationNumber(customer.getNgoRegistrationNumber());
+        System.out.println("customer.getDateOfRegistration()------------> " + customer.getDateOfRegistration());
 //        if (customer.getDateOfRegistration() != null) {
 //            customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
 //        }
