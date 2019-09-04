@@ -139,27 +139,29 @@ public class CustomerAggregate {
     public String createCustomer(final CreateCustomerCommand createCustomerCommand) {
         final Customer customer = createCustomerCommand.customer();
         System.out.println("customer object-------------" + createCustomerCommand.customer());
-        final CustomerEntity customerEntity = this.customerRepository.save(CustomerMapper.map(customer));
-        System.out.println("customer entitty: ---------------: " + customerEntity);
-        AddressEntity addressEntity = this.addressRepository.save(AddressMapper.map(customer.getAddress(), customerEntity));
-        System.out.println("Address entity: --------------" + addressEntity);
-        if (customer.getContactDetails() != null) {
-            this.contactDetailRepository.save(
-                    customer.getContactDetails()
-                            .stream()
-                            .map(contact -> {
-                                final ContactDetailEntity contactDetailEntity = ContactDetailMapper.map(contact);
-                                contactDetailEntity.setCustomer(customerEntity);
-                                return contactDetailEntity;
-                            })
-                            .collect(Collectors.toList())
-            );
-        }
-
-        if (customer.getCustomValues() != null) {
-            this.setCustomValues(customer, customerEntity);
-        }
-        this.taskAggregate.onCustomerCommand(customerEntity, Command.Action.ACTIVATE);
+        CustomerEntity ent = CustomerMapper.map(customer);
+        System.out.println("ent--------------> " + ent);
+//        final CustomerEntity customerEntity = this.customerRepository.save(ent);
+//        System.out.println("customer entitty: ---------------: " + customerEntity);
+//        AddressEntity addressEntity = this.addressRepository.save(AddressMapper.map(customer.getAddress(), customerEntity));
+//        System.out.println("Address entity: --------------" + addressEntity);
+//        if (customer.getContactDetails() != null) {
+//            this.contactDetailRepository.save(
+//                    customer.getContactDetails()
+//                            .stream()
+//                            .map(contact -> {
+//                                final ContactDetailEntity contactDetailEntity = ContactDetailMapper.map(contact);
+//                                contactDetailEntity.setCustomer(customerEntity);
+//                                return contactDetailEntity;
+//                            })
+//                            .collect(Collectors.toList())
+//            );
+//        }
+//
+//        if (customer.getCustomValues() != null) {
+//            this.setCustomValues(customer, customerEntity);
+//        }
+//        this.taskAggregate.onCustomerCommand(customerEntity, Command.Action.ACTIVATE);
         return customer.getIdentifier();
     }
 
