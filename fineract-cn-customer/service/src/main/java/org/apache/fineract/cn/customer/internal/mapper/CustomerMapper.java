@@ -46,47 +46,47 @@ public final class CustomerMapper {
         customerEntity.setMiddleName(customer.getMiddleName());
         customerEntity.setSurname(customer.getSurname());
         customerEntity.setGender(customer.getGender());
-        if (customer.getDateOfBirth() != null) {
-            customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
-        }
+//        if (customer.getDateOfBirth() != null) {
+//            customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
+//        }
         customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
         customerEntity.setCurrentState(Customer.UserState.PENDING.name());
-        if (customer.getApplicationDate() != null) {
-            final String editedApplicationDate;
-            if (!customer.getApplicationDate().endsWith("Z")) {
-                editedApplicationDate = customer.getApplicationDate() + "Z";
-            } else {
-                editedApplicationDate = customer.getApplicationDate();
-            }
-            customerEntity.setApplicationDate(DateConverter.dateFromIsoString(editedApplicationDate));
-        }
+//        if (customer.getApplicationDate() != null) {
+//            final String editedApplicationDate;
+//            if (!customer.getApplicationDate().endsWith("Z")) {
+//                editedApplicationDate = customer.getApplicationDate() + "Z";
+//            } else {
+//                editedApplicationDate = customer.getApplicationDate();
+//            }
+//            customerEntity.setApplicationDate(DateConverter.dateFromIsoString(editedApplicationDate));
+//        }
         customerEntity.setCreatedBy(UserContextHolder.checkedGetUser());
         customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
         customerEntity.setEthAddress(customer.getEthAddress());
-        if (customer.getDeposited() != null) {
-            customerEntity.setIsDeposited(customer.getDeposited());
-        } else {
-            customerEntity.setIsDeposited(Boolean.FALSE);
-        }
-        if (customer.getKycStatus() != null) {
-            customerEntity.setKycStatus(customer.getKycStatus());
-        } else {
-            customerEntity.setKycStatus(Customer.KycStatus.NOTUPLOADED.name());
-        }
+//        if (customer.getDeposited() != null) {
+//            customerEntity.setIsDeposited(customer.getDeposited());
+//        } else {
+//            customerEntity.setIsDeposited(Boolean.FALSE);
+//        }
+//        if (customer.getKycStatus() != null) {
+//            customerEntity.setKycStatus(customer.getKycStatus());
+//        } else {
+//            customerEntity.setKycStatus(Customer.KycStatus.NOTUPLOADED.name());
+//        }
         customerEntity.setAccountNumbers(customer.getAccountNumbers());
-        if (customer.getAvgMonthlyIncome() != null) {
-            customerEntity.setAvgMonthlyIncome(customer.getAvgMonthlyIncome());
-        } else {
-            customerEntity.setAvgMonthlyIncome(0.0);
-        }
+//        if (customer.getAvgMonthlyIncome() != null) {
+//            customerEntity.setAvgMonthlyIncome(customer.getAvgMonthlyIncome());
+//        } else {
+//            customerEntity.setAvgMonthlyIncome(0.0);
+//        }
 
         customerEntity.setNgoName(customer.getNgoName());
         customerEntity.setDesignation(customer.getDesignation());
         customerEntity.setNgoRegistrationNumber(customer.getNgoRegistrationNumber());
-        if (customer.getDateOfRegistration() != null) {
-            customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
-        }
+//        if (customer.getDateOfRegistration() != null) {
+//            customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
+//        }
         customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
         customerEntity.setPortraitUrl(customer.getPortraitUrl());
         return customerEntity;
