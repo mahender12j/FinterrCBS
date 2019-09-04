@@ -138,8 +138,11 @@ public class CustomerAggregate {
     @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.POST_CUSTOMER)
     public String createCustomer(final CreateCustomerCommand createCustomerCommand) {
         final Customer customer = createCustomerCommand.customer();
+        System.out.println("customer object-------------" + createCustomerCommand.customer());
         final CustomerEntity customerEntity = this.customerRepository.save(CustomerMapper.map(customer));
-        this.addressRepository.save(AddressMapper.map(customer.getAddress(), customerEntity));
+        System.out.println("customer entitty: ---------------: " + customerEntity);
+        AddressEntity addressEntity = this.addressRepository.save(AddressMapper.map(customer.getAddress(), customerEntity));
+        System.out.println("Address entity: --------------" + addressEntity);
         if (customer.getContactDetails() != null) {
             this.contactDetailRepository.save(
                     customer.getContactDetails()
@@ -167,6 +170,13 @@ public class CustomerAggregate {
         final Customer customer = updateCustomerCommand.customer();
         final CustomerEntity customerEntity = findCustomerEntityOrThrow(customer.getIdentifier());
         customerEntity.setGender(customer.getGender());
+
+        System.out.println("customer is deposited------------: " + customer.getDeposited());
+//        setting deposited date
+        if (customer.getDeposited()) {
+            customerEntity.setActivationDate(LocalDateTime.now(Clock.systemUTC()));
+        }
+
         if (customer.getGivenName() != null) {
             customerEntity.setGivenName(customer.getGivenName());
         }

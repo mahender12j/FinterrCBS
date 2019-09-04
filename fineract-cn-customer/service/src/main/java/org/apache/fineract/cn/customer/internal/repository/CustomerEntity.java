@@ -62,7 +62,7 @@ public class CustomerEntity {
     @Convert(converter = LocalDateConverter.class)
     private LocalDate applicationDate;
 
-    @JsonIgnoreProperties("address") //used to ignore the jsonn for response
+    @JsonIgnoreProperties("address") //used to ignore the json for response
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AddressEntity address;
 
@@ -95,6 +95,12 @@ public class CustomerEntity {
     private String ethAddress;
     @Column(name = "is_deposited")
     private Boolean isDeposited;
+
+    // added for the customer is deposited date
+    @Column(name = "activation_date")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime activationDate;
+
     @Column(name = "kyc_status")
     private String kycStatus;
     @Column(name = "account_numbers")
@@ -382,6 +388,14 @@ public class CustomerEntity {
 
     public void setPortraitUrl(String portraitUrl) {
         this.portraitUrl = portraitUrl;
+    }
+
+    public LocalDateTime getActivationDate() {
+        return activationDate;
+    }
+
+    public void setActivationDate(LocalDateTime activationDate) {
+        this.activationDate = activationDate;
     }
 
     @Override

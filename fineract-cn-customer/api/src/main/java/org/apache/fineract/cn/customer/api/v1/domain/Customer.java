@@ -96,6 +96,7 @@ public final class Customer {
     private String refferalUserIdentifier;
     private String ethAddress;
     private Boolean deposited;
+    private String activationDate;
 
     private KycStatus kycStatus;
     private boolean kycVerified;
@@ -430,8 +431,15 @@ public final class Customer {
         this.customValues = customValues;
     }
 
+    public String getActivationDate() {
+        return activationDate;
+    }
 
-//    for the user status
+    public void setActivationDate(String activationDate) {
+        this.activationDate = activationDate;
+    }
+
+    //    for the user status
 
 
     public boolean isProfileComplete() {

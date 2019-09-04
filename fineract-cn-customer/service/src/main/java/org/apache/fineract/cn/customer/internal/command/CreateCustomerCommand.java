@@ -32,4 +32,11 @@ public class CreateCustomerCommand {
     public Customer customer() {
         return this.customer;
     }
+
+    @Override
+    public String toString() {
+        return "CreateCustomerCommand{" +
+                "customer=" + customer +
+                '}';
+    }
 }
