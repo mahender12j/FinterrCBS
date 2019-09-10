@@ -21,6 +21,7 @@ package org.apache.fineract.cn.customer.internal.service;
 import org.apache.fineract.cn.accounting.api.v1.domain.Account;
 import org.apache.fineract.cn.accounting.api.v1.domain.AccountEntry;
 import org.apache.fineract.cn.api.util.UserContextHolder;
+import org.apache.fineract.cn.cause.api.v1.domain.CaAdminCauseData;
 import org.apache.fineract.cn.customer.api.v1.domain.*;
 import org.apache.fineract.cn.customer.catalog.api.v1.domain.Value;
 import org.apache.fineract.cn.customer.catalog.internal.repository.FieldEntity;
@@ -29,6 +30,7 @@ import org.apache.fineract.cn.customer.catalog.internal.repository.FieldValueRep
 import org.apache.fineract.cn.customer.internal.mapper.*;
 import org.apache.fineract.cn.customer.internal.repository.*;
 import org.apache.fineract.cn.customer.internal.service.helperService.AccountingAdaptor;
+import org.apache.fineract.cn.customer.internal.service.helperService.CauseAdaptor;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -70,8 +72,8 @@ public class CustomerService {
     private final FieldValueRepository fieldValueRepository;
     private final DocumentRepository documentRepository;
     private final DocumentEntryRepository documentEntryRepository;
-    private final CorporateService corporateService;
     private final DocumentService documentService;
+    private final CauseAdaptor causeAdaptor;
 
     @Autowired
     public CustomerService(final CustomerRepository customerRepository,
@@ -89,8 +91,8 @@ public class CustomerService {
                            final FieldValueRepository fieldValueRepository,
                            final DocumentRepository documentRepository,
                            final DocumentEntryRepository documentEntryRepository,
-                           final CorporateService corporateService,
-                           final DocumentService documentService) {
+                           final DocumentService documentService,
+                           final CauseAdaptor causeAdaptor) {
         super();
         this.customerRepository = customerRepository;
         this.identificationCardRepository = identificationCardRepository;
@@ -107,7 +109,7 @@ public class CustomerService {
         this.fieldValueRepository = fieldValueRepository;
         this.documentRepository = documentRepository;
         this.documentEntryRepository = documentEntryRepository;
-        this.corporateService = corporateService;
+        this.causeAdaptor = causeAdaptor;
         this.documentService = documentService;
     }
 
@@ -228,7 +230,7 @@ public class CustomerService {
         });
     }
 
-//    https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList
+    //    https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList
     public HashMap<String, String> fetchBankList(PaynetDetails paynetDetails) throws
             IOException, NoSuchAlgorithmException, KeyManagementException {
         HashMap<String, String> respMap = new HashMap<>();
@@ -338,7 +340,7 @@ public class CustomerService {
         customer.setSocialMatrix(getSocialMatrix(customerEntity));
         if (customer.getRefAccountNumber() != null) {
             Account account = accountingAdaptor.findAccountByIdentifier(customer.getRefAccountNumber());
-            customer.setRefferalBalance(account.getBalance());
+            customer.setReferralBalance(account.getBalance());
         }
 
         final List<FieldValueEntity> fieldValueEntities = this.fieldValueRepository.findByCustomer(customerEntity);
@@ -487,6 +489,8 @@ public class CustomerService {
             }
         }
 
+        CaAdminCauseData caAdminCauseData = this.causeAdaptor.fetchCauseData();
+        System.out.println("caAdminCauseData ----------------> " + caAdminCauseData);
 
         final CustomerRefPage customerRefPage = new CustomerRefPage();
         customerRefPage.setTotalPages(customerEntities.getTotalPages());
@@ -510,7 +514,7 @@ public class CustomerService {
                     tCustomer.setContactDetails(entity.getContactDetail().stream().map(ContactDetailMapper::map).collect(Collectors.toList()));
                     if (entity.getAccountNumbers() != null) {
                         Account acc = accountingAdaptor.findAccountByIdentifier(entity.getRefAccountNumber());
-                        tCustomer.setRefferalBalance(acc.getBalance());
+                        tCustomer.setReferralBalance(acc.getBalance());
                         tCustomer.setSocialMatrix(getSocialMatrix(entity));
                     }
                     customers.add(tCustomer);

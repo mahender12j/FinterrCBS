@@ -198,7 +198,10 @@ public class CustomerRestController {
     public
     @ResponseBody
     ResponseEntity<Customer> fetchUserByIdentifier(@PathVariable("identifier") final String identifier) {
-        return ResponseEntity.ok(this.customerService.getCustomerEntity(identifier).map(CustomerMapper::map).orElseThrow(() -> ServiceException.notFound("Customer Not Found")));
+        System.out.println("feign client customer: " + identifier);
+        return ResponseEntity.ok(this.customerService.getCustomerEntity(identifier)
+                .map(CustomerMapper::map)
+                .orElseThrow(() -> ServiceException.notFound("Customer Not Found")));
     }
 
 

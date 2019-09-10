@@ -158,6 +158,7 @@ public class CauseService {
         causePage.setTotalElements(pages.getTotalElements());
         causePage.setTotalPages(pages.getTotalPages());
         causePage.setCauses(pages.getContent());
+        System.out.println("return sorted cause");
         return causePage;
 
     }
@@ -165,10 +166,13 @@ public class CauseService {
 
     public CausePage fetchCauseForCustomer(final int sortBy, final String param, final Pageable pageable) {
         if (param == null) {
+            System.out.println("fetch causeent");
             List<CauseEntity> causeEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
             List<Cause> causes = this.causeEntitiesToCause(causeEntities);
+            System.out.println("sort cause");
             return this.sortedCause(sortBy, causes, pageable);
         } else {
+            System.out.println("fetch by category");
             return fetchCauseByCategory(sortBy, param, pageable);
         }
     }
@@ -241,10 +245,12 @@ public class CauseService {
         if (categoryIdentifier != null) {
             Optional<CategoryEntity> categoryEntity = this.categoryRepository.findByIdentifier(categoryIdentifier.toLowerCase());
             return categoryEntity.map(categoryEntity1 -> {
+                System.out.println("main");
                 List<CauseEntity> allCauseEntities = this.causeRepository.findByCategoryAndCurrentStateAndStartDateLessThanEqual(categoryEntity.get(), Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
                 List<Cause> causes = this.causeEntitiesToCause(allCauseEntities);
                 return this.sortedCause(sortBy, causes, pageable);
             }).orElseGet(() -> {
+                System.out.println("or get");
                 final CausePage causePage = new CausePage();
                 causePage.setCauses(Collections.emptyList());
                 causePage.setTotalPages(1);
@@ -252,6 +258,7 @@ public class CauseService {
                 return causePage;
             });
         } else {
+            System.out.println("else");
             List<CauseEntity> allCauseEntities = this.causeRepository.findByCurrentStateAndStartDateLessThanEqual(Cause.State.ACTIVE.name(), LocalDateTime.now(Clock.systemUTC()));
             List<Cause> causes = this.causeEntitiesToCause(allCauseEntities);
             return this.sortedCause(sortBy, causes, pageable);
@@ -263,9 +270,17 @@ public class CauseService {
         final List<Customer> customers = this.customerAdaptor.fetchAllCustomers();
         for (CauseEntity causeEntity : causeEntities) {
             final Cause cause = CauseMapper.map(causeEntity);
-            customers.stream().filter(customer -> customer.getIdentifier().equals(causeEntity.getCreatedBy())).findFirst().ifPresent(customer -> {
+            customers
+                    .stream()
+                    .filter(customer -> {
+                        System.out.println("customer-> " + customer.getIdentifier() + " -------------causeEntity-> " + causeEntity.getCreatedBy());
+                        return customer.getIdentifier().equals(causeEntity.getCreatedBy());
+                    }).findFirst().ifPresent(customer -> {
+
                 cause.setCreatedByUrl(customer.getPortraitUrl());
             });
+
+            System.out.println("set cause------------------------");
 
             cause.setCauseStatistics(this.getCauseStatistics(cause));
 

@@ -88,6 +88,8 @@ public final class CauseMapper {
         causeEntity.setResubmited(cause.getResubmited());
         causeEntity.setCauseImplementationDuration(cause.getFrequencyCauseImplementationUpdates());
         causeEntity.setFrequencyCauseImplementationUpdates(cause.getFrequencyCauseImplementationUpdates());
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
         return causeEntity;
     }
 
@@ -142,6 +144,8 @@ public final class CauseMapper {
         cause.setResubmited(causeEntity.getResubmited());
         cause.setFrequencyCauseImplementationUpdates(cause.getFrequencyCauseImplementationUpdates());
         cause.setCauseImplementationDuration(cause.getCauseImplementationDuration());
+        cause.setLastModifiedBy(causeEntity.getLastModifiedBy());
+        cause.setLastModifiedOn(causeEntity.getLastModifiedOn().toString());
         return cause;
     }
 

@@ -62,6 +62,7 @@ public class CauseJournalEntryMapper {
         );
         journalEntry.setAnonymous(entry.isAnonymous());
         journalEntry.setMessage(entry.getMessage());
+        System.out.println("entry.getClerk()--------------------------------------------------: " + entry.getClerk());
         return journalEntry;
     }
 }

@@ -43,6 +43,7 @@ public class CauseAdaptor {
 
 
     public CaAdminCauseData fetchCauseData() {
+        logger.debug("fetch cause data from cause MS");
         return this.cAdminCauseManager.findAllCauseData();
     }
 

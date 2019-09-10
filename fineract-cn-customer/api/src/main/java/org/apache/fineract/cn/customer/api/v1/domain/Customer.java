@@ -107,10 +107,12 @@ public final class Customer {
     private String ngoRegistrationNumber;
     private String dateOfRegistration;
     private String refAccountNumber;
-    private Double refferalBalance;
+
+    //    used for front-end support
+    @JsonProperty("refferalBalance")
+    private Double referralBalance;
     private SocialMatrix socialMatrix;
     private CustomerDocument customerDocument;
-
 
     //    used for front-end support
     @JsonProperty(value = "isProfileComplete")
@@ -335,12 +337,12 @@ public final class Customer {
         this.refAccountNumber = refAccountNumber;
     }
 
-    public Double getRefferalBalance() {
-        return this.refferalBalance;
+    public Double getReferralBalance() {
+        return this.referralBalance;
     }
 
-    public void setRefferalBalance(final Double refferalBalance) {
-        this.refferalBalance = refferalBalance;
+    public void setReferralBalance(final Double referralBalance) {
+        this.referralBalance = referralBalance;
     }
 
     public SocialMatrix getSocialMatrix() {
@@ -523,7 +525,7 @@ public final class Customer {
                 ", ngoRegistrationNumber='" + ngoRegistrationNumber + '\'' +
                 ", dateOfRegistration='" + dateOfRegistration + '\'' +
                 ", refAccountNumber='" + refAccountNumber + '\'' +
-                ", refferalBalance=" + refferalBalance +
+                ", refferalBalance=" + referralBalance +
                 ", socialMatrix=" + socialMatrix +
                 ", customerDocument=" + customerDocument +
                 '}';

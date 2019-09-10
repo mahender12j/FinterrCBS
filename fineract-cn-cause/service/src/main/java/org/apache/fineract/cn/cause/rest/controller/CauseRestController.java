@@ -156,11 +156,14 @@ public class CauseRestController {
                                           @RequestParam(value = "sortDirection", required = false) final String sortDirection) {
 
         Pageable pageable = this.createPageRequest(pageIndex, size, sortColumn, sortDirection);
-        String currentUserType = this.customerAdaptor.findCustomerByIdentifier(UserContextHolder.checkedGetUser()).getType();
+
+        final String userIdentifier = UserContextHolder.checkedGetUser();
+
+        System.out.println("UserContextHolder: " + userIdentifier);
+
+        String currentUserType = this.customerAdaptor.findCustomerByIdentifier(userIdentifier).getType();
 
         System.out.println("current User Type: " + currentUserType);
-
-        System.out.println("UserContext: " + UserContextHolder.checkedGetUser());
 
         if (currentUserType.equals("BUSINESS")) {
             System.out.println("BUSINESS");

@@ -157,6 +157,8 @@ public class CauseAggregate {
         causeEntity.setHardTarget(cause.getHardTarget());
         causeEntity.setSoftTarget(cause.getSoftTarget());
         causeEntity.setCurrentState(Cause.State.PENDING.name());
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         causeEntity.setAcceptedDenominationAmounts(cause.getAcceptedDenominationAmounts());
         this.causeRepository.save(causeEntity);
         List<DocumentPageEntity> pageEntities = this.documentPageRepository.findByDocument(documentEntity);
@@ -179,6 +181,8 @@ public class CauseAggregate {
         final CauseEntity causeEntity = findCauseEntityOrThrow(publishCauseCommand.getIdentifier());
         causeEntity.setCurrentState(Cause.State.ACTIVE.name());
         causeEntity.setPublishDate(LocalDateTime.now(Clock.systemUTC()));
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
         return publishCauseCommand.getIdentifier();
     }
@@ -193,6 +197,8 @@ public class CauseAggregate {
         List<CauseEntity> mappedCauses = causes.stream().peek(causeEntity -> {
             causeEntity.setCurrentState(Cause.State.CLOSED.name());
             causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
+            causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+            causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         }).collect(Collectors.toList());
 
         causeRepository.save(mappedCauses);
@@ -236,6 +242,8 @@ public class CauseAggregate {
         causeEntity.setRejectedReason(rejectCauseCommand.getCauseReject().getRejectedReason());
         causeEntity.setFeeRevisionRequired(rejectCauseCommand.getCauseReject().isFeeRevisionRequired());
         causeEntity.setRejectedBy(UserContextHolder.checkedGetUser());
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
 
 //        set the pending status to zero
@@ -259,6 +267,8 @@ public class CauseAggregate {
         causeEntity.setExtended(true);
         causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
         CauseStateEntity stateEntity = CauseMapper.map(causeEntity, extendCauseCommand.getExtendDate(), Cause.State.EXTENDED.name());
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
         this.causeStateRepository.save(stateEntity);
         return extendCauseCommand.getIdentifier();
@@ -271,6 +281,8 @@ public class CauseAggregate {
     public String ExtendCause(final UnpublishCauseCommand unpublishCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(unpublishCauseCommand.getIdentifier());
         CauseStateEntity stateEntity = CauseMapper.mapComment(causeEntity, unpublishCauseCommand.getComment(), Cause.State.UNPUBLISH.name());
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         this.causeStateRepository.save(stateEntity);
         return unpublishCauseCommand.toString();
     }
@@ -286,6 +298,8 @@ public class CauseAggregate {
 //        causeEntity.setSuccessFees(approveCauseCommand.getSuccessFees());
         causeEntity.setApprovedOn(LocalDateTime.now(Clock.systemUTC()));
         causeEntity.setApprovedBy(UserContextHolder.checkedGetUser());
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         this.causeRepository.save(causeEntity);
 
         updateCauseStateForApproval(causeEntity);
@@ -321,6 +335,7 @@ public class CauseAggregate {
             causeEntity.setEndDate(causeStateEntity.getNewDate());
             causeEntity.setExtended(false);
             causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+            causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
             this.causeRepository.save(causeEntity);
             causeStateEntity.setStatus(Cause.State.APPROVED.name());
             this.causeStateRepository.save(causeStateEntity);
@@ -343,6 +358,7 @@ public class CauseAggregate {
             causeEntity.setEndDate(causeStateEntity.getNewDate());
             causeEntity.setExtended(false);
             causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+            causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
             this.causeRepository.save(causeEntity);
             causeStateEntity.setStatus(Cause.State.REJECTED.name());
             causeStateEntity.setComment(rejectExtendedCauseCommand.getCauseStateRejected().getRejectionReason());
@@ -372,6 +388,8 @@ public class CauseAggregate {
         final CauseEntity causeEntity = findCauseEntityOrThrow(deleteCauseCommand.getCauseIdentifier());
         setStateAndTimestamp(causeEntity, Cause.State.DELETED);
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
+        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
 //        this.commandRepository.save(CommandMapper.create(savedCauseEntity, Command.Action.LOCK.name(), deleteCauseCommand.comment()));
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.UNLOCK);
         return deleteCauseCommand.getCauseIdentifier();

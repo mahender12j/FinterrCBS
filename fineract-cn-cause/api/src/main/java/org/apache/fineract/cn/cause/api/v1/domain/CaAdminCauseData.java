@@ -98,4 +98,18 @@ public class CaAdminCauseData {
     public void setCauseCompleted(Long causeCompleted) {
         this.causeCompleted = causeCompleted;
     }
+
+    @Override
+    public String toString() {
+        return "CaAdminCauseData{" +
+                "noOfCause=" + noOfCause +
+                ", activeCause=" + activeCause +
+                ", noOfCauseThisWeek=" + noOfCauseThisWeek +
+                ", causePerMonth=" + causePerMonth +
+                ", inactiveCausePerMonth=" + inactiveCausePerMonth +
+                ", activeCausePerMonth=" + activeCausePerMonth +
+                ", causePending=" + causePending +
+                ", causeCompleted=" + causeCompleted +
+                '}';
+    }
 }
