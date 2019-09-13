@@ -51,14 +51,18 @@ public final class CustomerMapper {
         }
         customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
         customerEntity.setCurrentState(Customer.UserState.PENDING.name());
+//        if (customer.getApplicationDate() != null) {
+//            final String editedApplicationDate;
+//            if (!customer.getApplicationDate().endsWith("Z")) {
+//                editedApplicationDate = customer.getApplicationDate() + "Z";
+//            } else {
+//                editedApplicationDate = customer.getApplicationDate();
+//            }
+//            customerEntity.setApplicationDate(DateConverter.dateFromIsoString(editedApplicationDate));
+//        }
+
         if (customer.getApplicationDate() != null) {
-            final String editedApplicationDate;
-            if (!customer.getApplicationDate().endsWith("Z")) {
-                editedApplicationDate = customer.getApplicationDate() + "Z";
-            } else {
-                editedApplicationDate = customer.getApplicationDate();
-            }
-            customerEntity.setApplicationDate(DateConverter.dateFromIsoString(editedApplicationDate));
+            customerEntity.setApplicationDate(LocalDateTime.parse(customer.getApplicationDate()).toLocalDate());
         }
         customerEntity.setCreatedBy(UserContextHolder.checkedGetUser());
         customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
