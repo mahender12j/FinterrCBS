@@ -29,7 +29,9 @@ import org.apache.fineract.cn.lang.DateOfBirth;
 
 import java.sql.Date;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public final class CustomerMapper {
 
@@ -62,7 +64,10 @@ public final class CustomerMapper {
 //        }
 
         if (customer.getApplicationDate() != null) {
-            customerEntity.setApplicationDate(LocalDateTime.parse(customer.getApplicationDate()).toLocalDate());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-dd");
+            LocalDate dt = LocalDate.parse(customer.getApplicationDate(), formatter);
+            System.out.println("date time" + dt);
+            customerEntity.setApplicationDate(dt);
         }
         customerEntity.setCreatedBy(UserContextHolder.checkedGetUser());
         customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
