@@ -26,11 +26,12 @@ import org.apache.fineract.cn.customer.api.v1.domain.UserVerification;
 import org.apache.fineract.cn.customer.internal.repository.CustomerEntity;
 import org.apache.fineract.cn.lang.DateConverter;
 import org.apache.fineract.cn.lang.DateOfBirth;
-import org.joda.time.DateTime;
 
 import java.sql.Date;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public final class CustomerMapper {
 
@@ -47,27 +48,36 @@ public final class CustomerMapper {
         customerEntity.setMiddleName(customer.getMiddleName());
         customerEntity.setSurname(customer.getSurname());
         customerEntity.setGender(customer.getGender());
-        System.out.println("customer.getDateOfBirth()-------------> " + customer.getDateOfBirth());
         if (customer.getDateOfBirth() != null) {
             customerEntity.setDateOfBirth(Date.valueOf(customer.getDateOfBirth().toLocalDate()));
         }
         customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
         customerEntity.setCurrentState(Customer.UserState.PENDING.name());
-        System.out.println("customer.getApplicationDate()------------------> " + customer.getApplicationDate());
+//        if (customer.getApplicationDate() != null) {
+//            final String editedApplicationDate;
+//            if (!customer.getApplicationDate().endsWith("Z")) {
+//                editedApplicationDate = customer.getApplicationDate() + "Z";
+//            } else {
+//                editedApplicationDate = customer.getApplicationDate();
+//            }
+//            customerEntity.setApplicationDate(DateConverter.dateFromIsoString(editedApplicationDate));
+//        }
+
         if (customer.getApplicationDate() != null) {
-            customerEntity.setApplicationDate(Date.valueOf(customer.getApplicationDate()).toLocalDate());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-dd");
+            LocalDate dt = LocalDate.parse(customer.getApplicationDate(), formatter);
+            System.out.println("date time" + dt);
+            customerEntity.setApplicationDate(dt);
         }
         customerEntity.setCreatedBy(UserContextHolder.checkedGetUser());
         customerEntity.setCreatedOn(LocalDateTime.now(Clock.systemUTC()));
         customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
         customerEntity.setEthAddress(customer.getEthAddress());
-        System.out.println("deposited------------> " + customer.getDeposited());
         if (customer.getDeposited() != null) {
             customerEntity.setIsDeposited(customer.getDeposited());
         } else {
-            customerEntity.setIsDeposited(false);
+            customerEntity.setIsDeposited(Boolean.FALSE);
         }
-        System.out.println("kyc status-------------->: " + customer.getKycStatus());
         if (customer.getKycStatus() != null) {
             customerEntity.setKycStatus(customer.getKycStatus());
         } else {
@@ -83,7 +93,6 @@ public final class CustomerMapper {
         customerEntity.setNgoName(customer.getNgoName());
         customerEntity.setDesignation(customer.getDesignation());
         customerEntity.setNgoRegistrationNumber(customer.getNgoRegistrationNumber());
-        System.out.println("customer.getDateOfRegistration()------------> " + customer.getDateOfRegistration());
         if (customer.getDateOfRegistration() != null) {
             customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
         }
@@ -128,14 +137,10 @@ public final class CustomerMapper {
         } else {
             customer.setDeposited(false);
         }
-        if (customerEntity.getActivationDate() != null) {
-            customer.setActivationDate(customerEntity.getActivationDate().toString());
-        }
-
         if (customerEntity.getKycStatus() != null) {
             customer.setKycStatus(customerEntity.getKycStatus());
         } else {
-            customer.setKycStatus(Customer.KycStatus.NOTUPLOADED.name());
+            customer.setKycStatus("NOTUPLOADED");
         }
         customer.setAccountNumbers(customerEntity.getAccountNumbers());
         if (customerEntity.getAvgMonthlyIncome() != null) {

@@ -72,9 +72,7 @@ public final class Customer {
     private UserType type;
     @NotNull
     private RegistrationType registrationType;
-    @NotBlank
     private String givenName;
-    @NotBlank
     private String surname;
     private String middleName;
     private String gender;
@@ -442,8 +440,7 @@ public final class Customer {
     }
 
     //    for the user status
-
-
+    
     public boolean isProfileComplete() {
         return profileComplete;
     }
