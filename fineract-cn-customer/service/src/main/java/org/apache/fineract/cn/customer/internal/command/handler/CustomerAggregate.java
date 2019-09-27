@@ -191,6 +191,7 @@ public class CustomerAggregate {
         if (customer.getReferenceCustomer() != null) {
             customerEntity.setReferenceCustomer(customer.getReferenceCustomer());
         }
+        System.out.println("date of birth");
         if (customer.getDateOfBirth() != null) {
             final LocalDate newDateOfBirth = customer.getDateOfBirth().toLocalDate();
             if (customerEntity.getDateOfBirth() == null) {
@@ -204,26 +205,29 @@ public class CustomerAggregate {
         } else {
             customerEntity.setDateOfBirth(null);
         }
-
+        System.out.println("custom value");
         if (customer.getCustomValues() != null) {
             this.fieldValueRepository.deleteByCustomer(customerEntity);
             this.fieldValueRepository.flush();
             this.setCustomValues(customer, customerEntity);
         }
 
-
+        System.out.println("address");
 //        set customer address
         if (customer.getAddress() != null) {
             this.updateAddress(new UpdateAddressCommand(customer.getIdentifier(), customer.getAddress()));
         }
-
+        System.out.println("contact");
 //        set customer contact address
         if (customer.getContactDetails() != null) {
             this.updateContactDetails(new UpdateContactDetailsCommand(customer.getIdentifier(), customer.getContactDetails()));
         }
 
+        System.out.println("modified by");
         customerEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
         customerEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+
+        System.out.println("ref id");
         if (customer.getRefferalCodeIdentifier() != null) {
             customerEntity.setRefferalCodeIdentifier(customer.getRefferalCodeIdentifier());
         }
@@ -255,9 +259,12 @@ public class CustomerAggregate {
         if (customer.getNgoRegistrationNumber() != null) {
             customerEntity.setNgoRegistrationNumber(customer.getNgoRegistrationNumber());
         }
+        System.out.println("date of registration");
         if (customer.getDateOfRegistration() != null) {
             customerEntity.setDateOfRegistration(LocalDateTime.parse(customer.getDateOfRegistration()));
         }
+
+        System.out.println("acc number");
         if (customer.getRefAccountNumber() != null) {
             customerEntity.setRefAccountNumber(customer.getRefAccountNumber());
         }

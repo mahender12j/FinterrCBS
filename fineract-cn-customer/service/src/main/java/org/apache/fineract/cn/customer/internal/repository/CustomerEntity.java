@@ -96,8 +96,8 @@ public class CustomerEntity {
     private Boolean isDeposited;
 
     // added for the customer is deposited date
-    @Convert(converter = LocalDateTimeConverter.class)
     @Column(name = "activation_date")
+    @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime activationDate;
 
     @Column(name = "kyc_status")
@@ -112,9 +112,11 @@ public class CustomerEntity {
     private String designation;
     @Column(name = "ngo_registration_number")
     private String ngoRegistrationNumber;
+
     @Column(name = "date_of_registration")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime dateOfRegistration;
+
     @Column(name = "ref_account_number")
     private String refAccountNumber;
     @Column(name = "portrait_url")
