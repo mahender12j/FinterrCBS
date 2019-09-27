@@ -175,7 +175,7 @@ public class CustomerAggregate {
 
         System.out.println("customer is deposited------------: " + customer.getDeposited());
 //        setting deposited date
-        if (customer.getDeposited()) {
+        if (customer.getDeposited() != null && customer.getDeposited()) {
             customerEntity.setActivationDate(LocalDateTime.now(Clock.systemUTC()));
         }
 

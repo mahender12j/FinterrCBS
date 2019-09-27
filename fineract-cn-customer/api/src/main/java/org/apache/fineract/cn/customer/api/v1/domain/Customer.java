@@ -440,7 +440,7 @@ public final class Customer {
     }
 
     //    for the user status
-    
+
     public boolean isProfileComplete() {
         return profileComplete;
     }
