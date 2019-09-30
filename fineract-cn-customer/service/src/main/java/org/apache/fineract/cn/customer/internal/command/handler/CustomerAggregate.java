@@ -398,10 +398,10 @@ public class CustomerAggregate {
 
     @Transactional
     @CommandHandler
-    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME, selectorValue = CustomerEventConstants.PUT_CONTACT_DETAILS)
+    @EventEmitter(selectorName = CustomerEventConstants.SELECTOR_NAME,
+            selectorValue = CustomerEventConstants.PUT_CONTACT_DETAILS)
     public String updateContactDetails(final UpdateContactDetailsCommand updateContactDetailsCommand) {
         final CustomerEntity customerEntity = findCustomerEntityOrThrow(updateContactDetailsCommand.identifier());
-
         final List<ContactDetailEntity> oldContactDetails = this.contactDetailRepository.findByCustomer(customerEntity);
 
         System.out.println("requested address" + updateContactDetailsCommand.contactDetails());
@@ -416,6 +416,7 @@ public class CustomerAggregate {
                             .map(contact -> {
                                 final ContactDetailEntity newContactDetail = ContactDetailMapper.map(contact);
                                 newContactDetail.setValid(contact.getValidated());
+                                System.out.println("updated contact details: " + newContactDetail);
                                 newContactDetail.setCustomer(customerEntity);
                                 return newContactDetail;
                             })
