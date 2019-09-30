@@ -49,10 +49,11 @@ public final class ContactDetail {
     @Max(127)
     private Integer preferenceLevel;
 
-    private Boolean validated = false;
+    private Boolean validated;
 
     public ContactDetail() {
         super();
+        this.validated = false;
     }
 
     public String getType() {
@@ -97,7 +98,12 @@ public final class ContactDetail {
 
     @Override
     public String toString() {
-        return "ContactDetail [value=" + value + ", preferenceLevel=" + preferenceLevel + ", validated=" + validated
-                + ", toString()=" + super.toString() + "]";
+        return "ContactDetail{" +
+                "type=" + type +
+                ", group=" + group +
+                ", value='" + value + '\'' +
+                ", preferenceLevel=" + preferenceLevel +
+                ", validated=" + validated +
+                '}';
     }
 }
