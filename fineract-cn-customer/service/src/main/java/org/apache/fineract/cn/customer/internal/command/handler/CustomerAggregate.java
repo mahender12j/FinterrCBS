@@ -403,6 +403,9 @@ public class CustomerAggregate {
         final CustomerEntity customerEntity = findCustomerEntityOrThrow(updateContactDetailsCommand.identifier());
 
         final List<ContactDetailEntity> oldContactDetails = this.contactDetailRepository.findByCustomer(customerEntity);
+
+        System.out.println("requested address" + updateContactDetailsCommand.contactDetails());
+
         this.contactDetailRepository.delete(oldContactDetails);
         this.contactDetailRepository.flush();
 

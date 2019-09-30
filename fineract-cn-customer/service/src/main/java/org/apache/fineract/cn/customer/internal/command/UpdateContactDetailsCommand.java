@@ -40,4 +40,12 @@ public class UpdateContactDetailsCommand {
     public List<ContactDetail> contactDetails() {
         return this.contactDetails;
     }
+
+    @Override
+    public String toString() {
+        return "UpdateContactDetailsCommand{" +
+                "identifier='" + identifier + '\'' +
+                ", contactDetails=" + contactDetails +
+                '}';
+    }
 }
