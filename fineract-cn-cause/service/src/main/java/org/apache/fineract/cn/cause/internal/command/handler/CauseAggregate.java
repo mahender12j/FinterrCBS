@@ -86,18 +86,29 @@ public class CauseAggregate {
                 .orElseGet(() -> this.categoryRepository.save(CategoryMapper.map(cause.getCauseCategories())));
 
         final CauseEntity causeEntity = CauseMapper.map(cause);
+
+        System.out.println("cause ent" + causeEntity);
         causeEntity.setResubmited(false);
         causeEntity.setExtended(false);
         causeEntity.setCategory(categoryEntity);
         causeEntity.setCurrentState(Cause.State.PENDING.name());
         final CauseEntity savedCauseEntity = this.causeRepository.save(causeEntity);
 
+        System.out.println("saved cause" + savedCauseEntity);
+
         AddressEntity addressEntity = AddressMapper.map(cause.getAddress());
         addressEntity.setCause(causeEntity);
+        System.out.println("address ent" + addressEntity);
         this.addressRepository.save(addressEntity);
 
+
+        System.out.println("saved address ent" + addressEntity);
         DocumentEntity documentEntity = documentRepository.save(DocumentMapper.map(savedCauseEntity));
+
+        System.out.println("document ent" + documentEntity);
         documentPageRepository.save(DocumentMapper.map(cause, documentEntity));
+
+        System.out.println("d ent");
 
         this.taskAggregate.onCauseCommand(savedCauseEntity, Command.Action.ACTIVATE);
         return new CreateCauseCommandResponse(
