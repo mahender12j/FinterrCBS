@@ -22,22 +22,15 @@ public class ApproveCauseCommand {
 
 
     private final String identifier;
-    private final Double finRate;
 
 
-    public ApproveCauseCommand(final String identifier,
-                               final Double finRate) {
+    public ApproveCauseCommand(final String identifier) {
         super();
         this.identifier = identifier;
-        this.finRate = finRate;
     }
 
     public String getIdentifier() {
         return identifier;
-    }
-
-    public Double getFinRate() {
-        return finRate;
     }
 
 
@@ -45,7 +38,6 @@ public class ApproveCauseCommand {
     public String toString() {
         return "ApproveCauseCommand{" +
                 "identifier='" + identifier + '\'' +
-                ", finRate=" + finRate +
                 '}';
     }
 }

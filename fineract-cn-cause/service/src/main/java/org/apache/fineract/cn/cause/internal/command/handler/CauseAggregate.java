@@ -305,7 +305,7 @@ public class CauseAggregate {
     public String ApproveCause(final ApproveCauseCommand approveCauseCommand) {
         final CauseEntity causeEntity = findCauseEntityOrThrow(approveCauseCommand.getIdentifier());
         causeEntity.setCurrentState(Cause.State.APPROVED.name());
-        causeEntity.setFinRate(approveCauseCommand.getFinRate().toString());
+//        causeEntity.setFinRate(approveCauseCommand.getFinRate().toString());
 //        causeEntity.setSuccessFees(approveCauseCommand.getSuccessFees());
         causeEntity.setApprovedOn(LocalDateTime.now(Clock.systemUTC()));
         causeEntity.setApprovedBy(UserContextHolder.checkedGetUser());

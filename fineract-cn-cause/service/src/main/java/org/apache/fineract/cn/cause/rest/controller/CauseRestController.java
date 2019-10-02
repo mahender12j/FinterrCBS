@@ -256,7 +256,8 @@ public class CauseRestController {
     ResponseEntity<Void> publishCause(@PathVariable("identifier") final String identifier) {
 
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
-        if (causeEntity.getCurrentState().toLowerCase().equals(Cause.State.APPROVED.name().toLowerCase())) {
+        if (causeEntity.getCurrentState().toLowerCase().equals(APPROVED.name().toLowerCase()) ||
+                causeEntity.getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
             this.commandGateway.process(new PublishCauseCommand(identifier));
             return ResponseEntity.accepted().build();
         } else {
@@ -370,13 +371,12 @@ public class CauseRestController {
     )
     public
     @ResponseBody
-    ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier,
-                                      @RequestBody final CauseApprove cause) {
+    ResponseEntity<Void> approveCause(@PathVariable("identifier") final String identifier) {
         CauseEntity causeEntity = causeService.findCauseEntity(identifier).orElseThrow(() -> ServiceException.notFound("Cause {0} not found.", identifier));
         throwIfActionMoreThan2Times(identifier, new HashSet<>(Collections.singletonList(APPROVED.name())));
 
         if (causeEntity.getCurrentState().toLowerCase().equals(PENDING.name().toLowerCase())) {
-            this.commandGateway.process(new ApproveCauseCommand(identifier, cause.getFinRate()));
+            this.commandGateway.process(new ApproveCauseCommand(identifier));
             return ResponseEntity.accepted().build();
         } else {
             throw ServiceException.conflict("Cause {0} not PENDING state. Currently the cause is in {1} state.", identifier, causeEntity.getCurrentState());
@@ -883,9 +883,10 @@ public class CauseRestController {
 
 
     private void throwIfDocumentNotValid(Cause cause) {
-        if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("terms"))) {
-            throw ServiceException.badRequest("Terms document is required");
-        } else if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("feature"))) {
+//        if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("terms"))) {
+//            throw ServiceException.badRequest("Terms document is required");
+//        } else
+        if (cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("feature"))) {
             throw ServiceException.badRequest("Feature document is required");
         } else if (cause.getTaxExamption() && cause.getCauseFiles().stream().noneMatch(d -> d.getType().toLowerCase().equals("tax"))) {
             throw ServiceException.badRequest("Tax document is required when Tax is not exemption");
