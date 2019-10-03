@@ -221,7 +221,7 @@ public class CauseService {
         System.out.println("access the hard cap scheduler");
         List<CauseEntity> causeEntities = this.causeRepository.findAll().stream().peek(causeEntity -> {
             Double accountBalance = this.accountingAdaptor.findAccount(causeEntity.getAccountNumber()).getBalance();
-            if (accountBalance == causeEntity.getHardTarget()) {
+            if (accountBalance >= causeEntity.getHardTarget()) {
                 causeEntity.setCurrentState(Cause.State.CLOSED.name());
                 causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
                 causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
