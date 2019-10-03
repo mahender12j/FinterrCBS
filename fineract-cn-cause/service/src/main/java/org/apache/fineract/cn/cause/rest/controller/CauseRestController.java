@@ -178,6 +178,51 @@ public class CauseRestController {
     }
 
 
+    //    todo #RHYTHMCONFIG
+    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(
+            value = "/causes/{identifier}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public @ResponseBody
+    ResponseEntity<Cause> findCause(@PathVariable("identifier") final String identifier) {
+        System.out.println("Fetch Cause-----------: " + identifier);
+        return this.causeService.findCause(identifier)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> ServiceException
+                        .notFound("Cause {0} not found.", identifier));
+    }
+
+
+//    // #RHYTHMCONFIG
+//    @Permittable(value = AcceptedTokenType.SYSTEM)
+//    @RequestMapping(value = "/causes/list",
+//            method = RequestMethod.GET,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.ALL_VALUE
+//    )
+//    public @ResponseBody
+//    List<Cause> fetchCauseList() {
+//        System.out.println("Fetch Cause list-----------: ");
+//        return this.causeService.fetchCauseList();
+//    }
+
+
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(value = "/causes/CompleteOnHardCapReach",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public @ResponseBody
+    void causeCompleteOnHardCapReach() {
+        this.causeService.CauseCompleteOnHardCapReach();
+    }
+
+
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.PORTRAIT)
     @RequestMapping(
             value = "/causes/{identifier}",
@@ -199,24 +244,6 @@ public class CauseRestController {
 
         this.commandGateway.process(new DeleteCauseCommand(identifier, "DELETING CAUSE"));
         return ResponseEntity.accepted().build();
-    }
-
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(
-            value = "/causes/{identifier}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE
-    )
-    public
-    @ResponseBody
-    ResponseEntity<Cause> findCause(@PathVariable("identifier") final String identifier) {
-        final Optional<Cause> cause = this.causeService.findCause(identifier);
-        if (cause.isPresent()) {
-            return ResponseEntity.ok(cause.get());
-        } else {
-            throw ServiceException.notFound("Cause {0} not found.", identifier);
-        }
     }
 
 

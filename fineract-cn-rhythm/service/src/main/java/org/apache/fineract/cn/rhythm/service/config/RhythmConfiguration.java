@@ -20,8 +20,8 @@ package org.apache.fineract.cn.rhythm.service.config;
 
 import org.apache.fineract.cn.anubis.config.EnableAnubis;
 import org.apache.fineract.cn.api.config.EnableApiFactory;
-import org.apache.fineract.cn.async.config.EnableAsync;
 import org.apache.fineract.cn.cassandra.config.EnableCassandra;
+import org.apache.fineract.cn.cause.api.v1.client.CauseManager;
 import org.apache.fineract.cn.command.config.EnableCommandProcessing;
 import org.apache.fineract.cn.lang.config.EnableApplicationName;
 import org.apache.fineract.cn.lang.config.EnableServiceException;
@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -63,30 +64,35 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnablePermissionRequestingFeignClient(feignClasses = {ApplicationPermissionRequestCreator.class})
 @RibbonClient(name = "rhythm-v1")
 @EnableApplicationName
-@EnableFeignClients(clients = {ApplicationPermissionRequestCreator.class})
+@EnableFeignClients(
+        clients = {
+                ApplicationPermissionRequestCreator.class,
+                CauseManager.class
+        }
+)
 @ComponentScan({
-    "org.apache.fineract.cn.rhythm.service.rest",
-    "org.apache.fineract.cn.rhythm.service.config",
-    "org.apache.fineract.cn.rhythm.service.internal.service",
-    "org.apache.fineract.cn.rhythm.service.internal.repository",
-    "org.apache.fineract.cn.rhythm.service.internal.command.handler"
+        "org.apache.fineract.cn.rhythm.service.rest",
+        "org.apache.fineract.cn.rhythm.service.config",
+        "org.apache.fineract.cn.rhythm.service.internal.service",
+        "org.apache.fineract.cn.rhythm.service.internal.repository",
+        "org.apache.fineract.cn.rhythm.service.internal.command.handler"
 })
 @EnableJpaRepositories({
-    "org.apache.fineract.cn.rhythm.service.internal.repository"
+        "org.apache.fineract.cn.rhythm.service.internal.repository"
 })
 public class RhythmConfiguration extends WebMvcConfigurerAdapter {
 
-  public RhythmConfiguration() {
-    super();
-  }
+    public RhythmConfiguration() {
+        super();
+    }
 
-  @Bean(name = ServiceConstants.LOGGER_NAME)
-  public Logger logger() {
-    return LoggerFactory.getLogger(ServiceConstants.LOGGER_NAME);
-  }
+    @Bean(name = ServiceConstants.LOGGER_NAME)
+    public Logger logger() {
+        return LoggerFactory.getLogger(ServiceConstants.LOGGER_NAME);
+    }
 
-  @Override
-  public void configurePathMatch(final PathMatchConfigurer configurer) {
-    configurer.setUseSuffixPatternMatch(Boolean.FALSE);
-  }
+    @Override
+    public void configurePathMatch(final PathMatchConfigurer configurer) {
+        configurer.setUseSuffixPatternMatch(Boolean.FALSE);
+    }
 }

@@ -70,3 +70,4 @@ flyway:
 
 rhythm:
   user: scheduler
+  password: testpassword

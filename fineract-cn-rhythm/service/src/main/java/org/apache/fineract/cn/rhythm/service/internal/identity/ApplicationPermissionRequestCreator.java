@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.cn.rhythm.service.internal.identity;
 
-import javax.validation.Valid;
-
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.api.annotation.ThrowsException;
 import org.apache.fineract.cn.identity.api.v1.PermittableGroupIds;
@@ -35,11 +33,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.validation.Valid;
+
 /**
  * @author Myrle Krantz
  */
 @EndpointSet(identifier = "rhythm__v1__identity__v1")
-@FeignClient(name = "identity-v1", path = "/identity/v1", configuration = PermittedFeignClientsConfiguration.class)
+@FeignClient(name = "identity-v1", path = "/identity-v1", configuration = PermittedFeignClientsConfiguration.class)
 public interface ApplicationPermissionRequestCreator {
 
     @RequestMapping(value = "/applications/{applicationidentifier}/permissions", method = RequestMethod.POST,

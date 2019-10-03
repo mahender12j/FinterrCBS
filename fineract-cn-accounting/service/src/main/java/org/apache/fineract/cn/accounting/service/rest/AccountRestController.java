@@ -111,20 +111,19 @@ public class AccountRestController {
     }
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.THOTH_ACCOUNT)
-    @RequestMapping(
-            value = "/{identifier}",
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(value = "/{identifier}",
             method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.ALL_VALUE}
     )
     @ResponseBody
     ResponseEntity<Account> findAccount(@PathVariable("identifier") final String identifier) {
-        final Optional<Account> optionalAccount = this.accountService.findAccount(identifier);
-        if (optionalAccount.isPresent()) {
-            return ResponseEntity.ok(optionalAccount.get());
-        } else {
-            throw ServiceException.notFound("Account {0} not found.", identifier);
-        }
+        return this.accountService.findAccount(identifier)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> ServiceException
+                        .notFound("Account {0} not found.", identifier));
+
     }
 
 
@@ -212,8 +211,6 @@ public class AccountRestController {
                 message,
                 PageableBuilder.create(pageIndex, size, sortColumn == null ? "transactionDate" : sortColumn, sortDirection)));
     }
-
-
 
 
     @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.THOTH_ACCOUNT)

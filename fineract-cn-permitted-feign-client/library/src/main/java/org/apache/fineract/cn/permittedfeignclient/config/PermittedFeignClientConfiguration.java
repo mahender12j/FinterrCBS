@@ -22,20 +22,21 @@ import feign.Client;
 import feign.Feign;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
-import org.apache.fineract.cn.permittedfeignclient.LibraryConstants;
-import javax.annotation.Nonnull;
 import org.apache.fineract.cn.anubis.config.EnableAnubis;
 import org.apache.fineract.cn.api.util.AnnotatedErrorDecoder;
 import org.apache.fineract.cn.api.util.EmptyBodyInterceptor;
 import org.apache.fineract.cn.api.util.TenantedTargetInterceptor;
 import org.apache.fineract.cn.api.util.TokenedTargetInterceptor;
 import org.apache.fineract.cn.identity.api.v1.client.IdentityManager;
+import org.apache.fineract.cn.permittedfeignclient.LibraryConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.netflix.feign.support.SpringMvcContract;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Myrle Krantz
@@ -61,6 +62,6 @@ public class PermittedFeignClientConfiguration {
             .requestInterceptor(new EmptyBodyInterceptor())
             .decoder(new GsonDecoder())
             .encoder(new GsonEncoder())
-            .target(IdentityManager.class, "http://identity-v1/identity/v1");
+            .target(IdentityManager.class, "http://identity-v1/identity-v1");
   }
 }

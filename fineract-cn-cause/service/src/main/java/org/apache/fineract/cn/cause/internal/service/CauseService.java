@@ -216,6 +216,22 @@ public class CauseService {
     }
 
 
+    //    todo move to CQRS later if possible, this can block the connection since its running on direct rest connection
+    public void CauseCompleteOnHardCapReach() {
+        System.out.println("access the hard cap scheduler");
+        List<CauseEntity> causeEntities = this.causeRepository.findAll().stream().peek(causeEntity -> {
+            Double accountBalance = this.accountingAdaptor.findAccount(causeEntity.getAccountNumber()).getBalance();
+            if (accountBalance == causeEntity.getHardTarget()) {
+                causeEntity.setCurrentState(Cause.State.CLOSED.name());
+                causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
+                causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
+                causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+            }
+        }).collect(Collectors.toList());
+        System.out.println("save the hard cap scheduler");
+        this.causeRepository.save(causeEntities);
+    }
+
     public CausePage fetchAllCause(final String param, final Pageable pageable) {
         final Page<CauseEntity> causeEntities;
         CausePage causePage = new CausePage();

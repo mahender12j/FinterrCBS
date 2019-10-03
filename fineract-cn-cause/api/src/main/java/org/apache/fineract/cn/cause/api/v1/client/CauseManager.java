@@ -64,6 +64,22 @@ public interface CauseManager {
                           @RequestParam(value = "sortColumn", required = false) final String sortColumn,
                           @RequestParam(value = "sortDirection", required = false) final String sortDirection);
 
+
+//    @RequestMapping(value = "/causes/list",
+//            method = RequestMethod.GET,
+//            produces = MediaType.ALL_VALUE,
+//            consumes = MediaType.APPLICATION_JSON_VALUE
+//    )
+//    List<Cause> fetchCauseList();
+
+
+    @RequestMapping(value = "/causes/CompleteOnHardCapReach",
+            method = RequestMethod.GET,
+            produces = MediaType.ALL_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    void causeCompleteOnHardCapReach();
+
     @RequestMapping(
             value = "/causes/{identifier}",
             method = RequestMethod.GET,

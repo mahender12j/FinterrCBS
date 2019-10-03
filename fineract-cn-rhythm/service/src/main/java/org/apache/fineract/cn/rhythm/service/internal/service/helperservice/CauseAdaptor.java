@@ -19,7 +19,6 @@
 package org.apache.fineract.cn.rhythm.service.internal.service.helperservice;
 
 import org.apache.fineract.cn.cause.api.v1.client.CauseManager;
-import org.apache.fineract.cn.cause.api.v1.domain.Cause;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,18 +35,13 @@ public class CauseAdaptor {
         this.authenticationAdoptor = authenticationAdoptor;
     }
 
-    public Cause findCause(final String causeIdentifier) {
-//        try {
-//            final Customer customer = this.customerManager.findCustomer(customerIdentifier.replaceAll("\"", ""));
-//            return Optional.of(customer);
-//        } catch (final CustomerNotFoundException cnfex) {
-//            this.logger.warn("Customer {} not found.", customerIdentifier.replaceAll("\"", ""));
-//        }
-//        return Optional.empty();
-
-        this.authenticationAdoptor.authenticate("malaysia");
-        Cause cause = this.causeManager.findCause(causeIdentifier);
-        System.out.println("cause---------------" + cause);
-        return cause;
+    public void CompleteOnHardCapReach(final String tanent) {
+        try {
+            String accessToken = this.authenticationAdoptor.authenticate(tanent);
+            System.out.println("access token: " + accessToken);
+            this.causeManager.causeCompleteOnHardCapReach();
+        } catch (final Exception ex) {
+            System.out.println("Something went wrong on CompleteOnHardCapReach: " + ex.getMessage());
+        }
     }
 }

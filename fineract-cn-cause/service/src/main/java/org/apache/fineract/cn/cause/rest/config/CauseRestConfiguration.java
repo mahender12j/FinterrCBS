@@ -19,6 +19,7 @@
 package org.apache.fineract.cn.cause.rest.config;
 
 
+import org.apache.fineract.cn.accounting.api.v1.client.AccountManager;
 import org.apache.fineract.cn.accounting.api.v1.client.JournalManager;
 import org.apache.fineract.cn.anubis.config.EnableAnubis;
 import org.apache.fineract.cn.async.config.EnableAsync;
@@ -57,7 +58,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableFeignClients(
         clients = {
                 JournalManager.class,
-                CustomerManager.class
+                CustomerManager.class,
+                AccountManager.class
         }
 )
 @ComponentScan({

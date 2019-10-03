@@ -27,13 +27,16 @@ import org.apache.fineract.cn.identity.api.v1.client.IdentityManager;
 import org.apache.fineract.cn.identity.api.v1.domain.Authentication;
 import org.apache.fineract.cn.lang.TenantContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Base64Utils;
 
 @Component
 public class AuthenticationAdoptor {
-    private final String USER_PASSWORD = "cDRzc3cwcmQ=";
-    private final String USER_IDENTIFIER = "imhotep";
+
+    @Value("${rhythm.password}")
+    private String USER_PASSWORD;
+    @Value("${rhythm.user}")
+    private String USER_IDENTIFIER;
 
     private IdentityManager identityManager;
 
@@ -42,11 +45,15 @@ public class AuthenticationAdoptor {
         this.identityManager = identityManager;
     }
 
-    public void authenticate(String tenant) {
+    String authenticate(String tenant) {
+        System.out.println("username: " + USER_IDENTIFIER);
+        System.out.println("password: " + USER_PASSWORD);
         TenantContextHolder.clear();
         TenantContextHolder.setIdentifier(tenant);
-        final Authentication authentication = this.identityManager.login(USER_IDENTIFIER, Base64Utils.encodeToString(USER_PASSWORD.getBytes()));
+        final Authentication authentication = this.identityManager.login(USER_IDENTIFIER, USER_PASSWORD);
         UserContextHolder.clear();
         UserContextHolder.setAccessToken(USER_IDENTIFIER, authentication.getAccessToken());
+        System.out.println("User context: " + UserContextHolder.checkedGetUser());
+        return authentication.getAccessToken();
     }
 }

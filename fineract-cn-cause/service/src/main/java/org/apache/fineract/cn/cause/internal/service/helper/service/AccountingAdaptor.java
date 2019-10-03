@@ -18,7 +18,9 @@
  */
 package org.apache.fineract.cn.cause.internal.service.helper.service;
 
+import org.apache.fineract.cn.accounting.api.v1.client.AccountManager;
 import org.apache.fineract.cn.accounting.api.v1.client.JournalManager;
+import org.apache.fineract.cn.accounting.api.v1.domain.Account;
 import org.apache.fineract.cn.cause.ServiceConstants;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseJournalEntry;
 import org.apache.fineract.cn.cause.internal.mapper.CauseJournalEntryMapper;
@@ -35,13 +37,16 @@ public class AccountingAdaptor {
 
     private final Logger logger;
     private final JournalManager journalManager;
+    private final AccountManager accountManager;
 
     @Autowired
     public AccountingAdaptor(@Qualifier(ServiceConstants.LOGGER_NAME) final Logger logger,
-                             final JournalManager journalManager) {
+                             final JournalManager journalManager,
+                             final AccountManager accountManager) {
         super();
         this.logger = logger;
         this.journalManager = journalManager;
+        this.accountManager = accountManager;
     }
 
     public List<CauseJournalEntry> fetchJournalEntriesJournalEntries(final String creditorsAccountNumber) {
@@ -49,6 +54,11 @@ public class AccountingAdaptor {
                 .stream()
                 .map(CauseJournalEntryMapper::map)
                 .collect(Collectors.toList());
+    }
+
+
+    public Account findAccount(final String identifier) {
+        return this.accountManager.findAccount(identifier);
     }
 }
 

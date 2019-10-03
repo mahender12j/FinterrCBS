@@ -33,20 +33,25 @@ import java.util.stream.Stream;
  */
 @Repository
 public interface BeatRepository extends JpaRepository<BeatEntity, Long> {
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
-  void deleteByTenantIdentifierAndApplicationIdentifier
-      (String tenantIdentifier, String applicationIdentifier);
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
-  void deleteByTenantIdentifierAndApplicationIdentifierAndBeatIdentifier
-      (String tenantIdentifier,
-       String applicationIdentifier,
-       String beatIdentifier);
-  List<BeatEntity> findByTenantIdentifierAndApplicationIdentifier
-          (String tenantIdentifier, String applicationIdentifier);
-  Optional<BeatEntity> findByTenantIdentifierAndApplicationIdentifierAndBeatIdentifier
-          (String tenantIdentifier, String applicationIdentifier, String beatIdentifier);
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
-  Stream<BeatEntity> findByNextBeatBefore(LocalDateTime currentTime);
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
-  Stream<BeatEntity> findByTenantIdentifier(String tenantIdentifier);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    void deleteByTenantIdentifierAndApplicationIdentifier
+            (String tenantIdentifier, String applicationIdentifier);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    void deleteByTenantIdentifierAndApplicationIdentifierAndBeatIdentifier
+            (String tenantIdentifier,
+             String applicationIdentifier,
+             String beatIdentifier);
+
+    List<BeatEntity> findByTenantIdentifierAndApplicationIdentifier
+            (String tenantIdentifier, String applicationIdentifier);
+
+    Optional<BeatEntity> findByTenantIdentifierAndApplicationIdentifierAndBeatIdentifier
+            (String tenantIdentifier, String applicationIdentifier, String beatIdentifier);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Stream<BeatEntity> findByNextBeatBefore(LocalDateTime currentTime);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Stream<BeatEntity> findByTenantIdentifier(String tenantIdentifier);
 }

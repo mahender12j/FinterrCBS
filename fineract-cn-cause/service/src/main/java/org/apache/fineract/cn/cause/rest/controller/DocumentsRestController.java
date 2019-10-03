@@ -22,7 +22,6 @@ import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.cause.api.v1.PermittableGroupIds;
 import org.apache.fineract.cn.cause.api.v1.domain.CauseDocument;
-import org.apache.fineract.cn.cause.api.v1.domain.CauseDocumentPage;
 import org.apache.fineract.cn.cause.internal.command.ChangeDocumentCommand;
 import org.apache.fineract.cn.cause.internal.command.CompleteDocumentCommand;
 import org.apache.fineract.cn.cause.internal.command.DeleteDocumentCommand;

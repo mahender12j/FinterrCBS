@@ -41,6 +41,16 @@ public interface AccountManager {
     List<AccountEntry> findByAccountIdentifier(@PathVariable("identifier") final String holder);
 
 
-    @RequestMapping(value = "accounts/user/{identifier}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.ALL_VALUE})
+    @RequestMapping(value = "accounts/user/{identifier}",
+            method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.ALL_VALUE})
     Account findAccountByIdentifier(@PathVariable("identifier") final String identifier);
+
+
+    @RequestMapping(value = "accounts/{identifier}",
+            method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.ALL_VALUE})
+    Account findAccount(@PathVariable("identifier") final String identifier);
 }
