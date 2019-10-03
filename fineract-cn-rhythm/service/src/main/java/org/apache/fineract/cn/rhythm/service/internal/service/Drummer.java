@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.cn.rhythm.service.internal.service;
 
+import org.apache.fineract.cn.rhythm.api.v1.domain.ClockOffset;
 import org.apache.fineract.cn.rhythm.service.ServiceConstants;
 import org.apache.fineract.cn.rhythm.service.internal.mapper.BeatMapper;
 import org.apache.fineract.cn.rhythm.service.internal.repository.BeatEntity;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -116,41 +118,41 @@ public class Drummer {
             beatRepository.save(x);
         });
     }
-//
-//    private LocalDateTime checkBeatForPublish(
-//            final LocalDateTime now,
-//            final String beatIdentifier,
-//            final String tenantIdentifier,
-//            final String applicationIdentifier,
-//            final Integer alignmentHour,
-//            final LocalDateTime nextBeat) {
-//        final ClockOffset clockOffset = clockOffsetService.findByTenantIdentifier(tenantIdentifier);
-//        return checkBeatForPublishHelper(now, alignmentHour, nextBeat, clockOffset,
-//                x -> beatPublisherService.publishBeat(beatIdentifier, tenantIdentifier, applicationIdentifier, x));
-//    }
-//
-//    //Helper is separated from original function so that it can be unit-tested separately from publishBeat.
-//    static LocalDateTime checkBeatForPublishHelper(
-//            final LocalDateTime now,
-//            final Integer alignmentHour,
-//            final LocalDateTime nextBeat,
-//            final ClockOffset clockOffset,
-//            final Predicate<LocalDateTime> publishSucceeded) {
-//        LocalDateTime beatToPublish = nextBeat;
-//        for (;
-//             !beatToPublish.isAfter(now);
-//             beatToPublish = incrementToAlignment(beatToPublish, alignmentHour, clockOffset)) {
-//            if (!publishSucceeded.test(beatToPublish))
-//                break;
-//        }
-//
-//        return beatToPublish;
-//    }
-//
-//    static LocalDateTime incrementToAlignment(
-//            final LocalDateTime toIncrement,
-//            final Integer alignmentHour,
-//            final ClockOffset clockOffset) {
-//        return BeatMapper.alignDateTime(toIncrement.plusDays(1), alignmentHour, clockOffset);
-//    }
+
+    private LocalDateTime checkBeatForPublish(
+            final LocalDateTime now,
+            final String beatIdentifier,
+            final String tenantIdentifier,
+            final String applicationIdentifier,
+            final Integer alignmentHour,
+            final LocalDateTime nextBeat) {
+        final ClockOffset clockOffset = clockOffsetService.findByTenantIdentifier(tenantIdentifier);
+        return checkBeatForPublishHelper(now, alignmentHour, nextBeat, clockOffset,
+                x -> beatPublisherService.publishBeat(beatIdentifier, tenantIdentifier, applicationIdentifier, x));
+    }
+
+    //Helper is separated from original function so that it can be unit-tested separately from publishBeat.
+    static LocalDateTime checkBeatForPublishHelper(
+            final LocalDateTime now,
+            final Integer alignmentHour,
+            final LocalDateTime nextBeat,
+            final ClockOffset clockOffset,
+            final Predicate<LocalDateTime> publishSucceeded) {
+        LocalDateTime beatToPublish = nextBeat;
+        for (;
+             !beatToPublish.isAfter(now);
+             beatToPublish = incrementToAlignment(beatToPublish, alignmentHour, clockOffset)) {
+            if (!publishSucceeded.test(beatToPublish))
+                break;
+        }
+
+        return beatToPublish;
+    }
+
+    static LocalDateTime incrementToAlignment(
+            final LocalDateTime toIncrement,
+            final Integer alignmentHour,
+            final ClockOffset clockOffset) {
+        return BeatMapper.alignDateTime(toIncrement.plusDays(1), alignmentHour, clockOffset);
+    }
 }
