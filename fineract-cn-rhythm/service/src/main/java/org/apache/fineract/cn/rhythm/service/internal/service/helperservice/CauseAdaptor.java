@@ -40,6 +40,7 @@ public class CauseAdaptor {
             String accessToken = this.authenticationAdoptor.authenticate(tanent);
             System.out.println("access token: " + accessToken);
             this.causeManager.causeCompleteOnHardCapReach();
+            System.out.println("after the Hard cash reach api called");
         } catch (final Exception ex) {
             System.out.println("Something went wrong on CompleteOnHardCapReach: " + ex.getMessage());
         }

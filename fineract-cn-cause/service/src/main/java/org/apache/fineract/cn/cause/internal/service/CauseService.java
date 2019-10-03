@@ -219,15 +219,19 @@ public class CauseService {
     //    todo move to CQRS later if possible, this can block the connection since its running on direct rest connection
     public void CauseCompleteOnHardCapReach() {
         System.out.println("access the hard cap scheduler");
-        List<CauseEntity> causeEntities = this.causeRepository.findAll().stream().peek(causeEntity -> {
-            Double accountBalance = this.accountingAdaptor.findAccount(causeEntity.getAccountNumber()).getBalance();
-            if (accountBalance >= causeEntity.getHardTarget()) {
-                causeEntity.setCurrentState(Cause.State.CLOSED.name());
-                causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
-                causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
-                causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
-            }
-        }).collect(Collectors.toList());
+        List<CauseEntity> causeEntities = this.causeRepository.findAll().stream()
+                .filter(causeEntity -> !causeEntity.getCurrentState().equals(Cause.State.CLOSED.name()))
+                .peek(causeEntity -> {
+                    Double accountBalance = this.accountingAdaptor.findAccount(causeEntity.getAccountNumber()).getBalance();
+                    System.out.println("account balance: " + accountBalance);
+                    System.out.println("Hard Target: " + causeEntity.getHardTarget());
+                    if (accountBalance >= causeEntity.getHardTarget()) {
+                        causeEntity.setCurrentState(Cause.State.CLOSED.name());
+                        causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
+                        causeEntity.setLastModifiedBy(UserContextHolder.checkedGetUser());
+                        causeEntity.setLastModifiedOn(LocalDateTime.now(Clock.systemUTC()));
+                    }
+                }).collect(Collectors.toList());
         System.out.println("save the hard cap scheduler");
         this.causeRepository.save(causeEntities);
     }
