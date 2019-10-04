@@ -93,7 +93,7 @@ public class Drummer {
     }
 
 
-    @Scheduled(cron = "0 0 0 * * ?", initialDelayString = "${rhythm.beatCheckRate}", fixedRateString = "${rhythm.beatCheckRate}")
+    @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     public synchronized void expiredCause() {
         try {
