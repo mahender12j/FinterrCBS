@@ -82,20 +82,28 @@ public class Drummer {
     @Scheduled(initialDelayString = "${rhythm.beatCheckRate}", fixedRateString = "${rhythm.beatCheckRate}")
     @Transactional
     public synchronized void checkForBeatsNeeded() {
-        logger.info("checkForBeatsNeeded begin.");
-        System.out.println("statring the bits");
         try {
-            //Get beats from the last two hours in case restart/start happens close to hour begin.
             beatRepository.findAll().forEach((beat) -> {
-                System.out.println("started the cause hard cap reach scheduler for tanent: " + beat.getTenantIdentifier());
                 this.causeAdaptor.CompleteOnHardCapReach(beat.getTenantIdentifier());
-                System.out.println("ended scheduler for tanent: " + beat.getTenantIdentifier());
             });
 
         } catch (final InvalidDataAccessResourceUsageException e) {
-            logger.info("InvalidDataAccessResourceUsageException in check for scheduled beats, probably because initialize hasn't been called yet. {}", e);
+            System.out.println("InvalidDataAccessResourceUsageException in check for scheduled beats, probably because initialize hasn't been called yet." + e);
         }
-        logger.info("checkForBeatsNeeded end.");
+    }
+
+
+    @Scheduled(cron = "0 0 0 * * ?", initialDelayString = "${rhythm.beatCheckRate}", fixedRateString = "${rhythm.beatCheckRate}")
+    @Transactional
+    public synchronized void expiredCause() {
+        try {
+            beatRepository.findAll().forEach((beat) -> {
+                this.causeAdaptor.CompleteOnHardCapReach(beat.getTenantIdentifier());
+            });
+
+        } catch (final InvalidDataAccessResourceUsageException e) {
+            System.out.println("InvalidDataAccessResourceUsageException in check for scheduled beats, probably because initialize hasn't been called yet. " + e);
+        }
     }
 
     @Transactional

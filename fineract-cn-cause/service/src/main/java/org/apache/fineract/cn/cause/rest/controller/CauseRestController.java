@@ -338,9 +338,9 @@ public class CauseRestController {
     }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT,
-            groupId = PermittableGroupIds.CAUSE)
-    @RequestMapping(value = "/causes/expired", method = RequestMethod.PUT,
+    @Permittable(value = AcceptedTokenType.SYSTEM)
+    @RequestMapping(value = "/causes/expired",
+            method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public

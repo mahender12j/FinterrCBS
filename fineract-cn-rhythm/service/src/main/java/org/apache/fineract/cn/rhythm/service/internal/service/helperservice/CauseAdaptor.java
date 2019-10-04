@@ -37,10 +37,19 @@ public class CauseAdaptor {
 
     public void CompleteOnHardCapReach(final String tanent) {
         try {
-            String accessToken = this.authenticationAdoptor.authenticate(tanent);
-//            System.out.println("access token: " + accessToken);
+            this.authenticationAdoptor.authenticate(tanent);
             this.causeManager.causeCompleteOnHardCapReach();
-//            System.out.println("after the Hard cash reach api called");
+            this.causeManager.expiredCause();
+        } catch (final Exception ex) {
+            System.out.println("Something went wrong on CompleteOnHardCapReach: " + ex.getMessage());
+        }
+    }
+
+
+    public void expiredCause(final String tanent) {
+        try {
+            this.authenticationAdoptor.authenticate(tanent);
+            this.causeManager.expiredCause();
         } catch (final Exception ex) {
             System.out.println("Something went wrong on CompleteOnHardCapReach: " + ex.getMessage());
         }

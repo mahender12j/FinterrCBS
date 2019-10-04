@@ -80,6 +80,14 @@ public interface CauseManager {
     )
     void causeCompleteOnHardCapReach();
 
+
+    @RequestMapping(value = "/causes/expired",
+            method = RequestMethod.PUT,
+            produces = MediaType.ALL_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    void expiredCause();
+
     @RequestMapping(
             value = "/causes/{identifier}",
             method = RequestMethod.GET,
