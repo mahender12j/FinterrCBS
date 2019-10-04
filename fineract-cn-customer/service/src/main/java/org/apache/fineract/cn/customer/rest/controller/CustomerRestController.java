@@ -205,9 +205,10 @@ public class CustomerRestController {
     }
 
 
-    @Permittable(value = AcceptedTokenType.TENANT, groupId = PermittableGroupIds.CUSTOMER)
-    @RequestMapping(
-            value = "/customers/{identifier}/details/verify",
+    @Permittable(value = AcceptedTokenType.TENANT,
+            groupId = PermittableGroupIds.CUSTOMER)
+    @Permittable(value = AcceptedTokenType.GUEST)
+    @RequestMapping(value = "/customers/{identifier}/details/verify",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE

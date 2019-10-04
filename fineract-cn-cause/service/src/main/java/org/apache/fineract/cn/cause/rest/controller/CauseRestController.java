@@ -189,7 +189,6 @@ public class CauseRestController {
     )
     public @ResponseBody
     ResponseEntity<Cause> findCause(@PathVariable("identifier") final String identifier) {
-        System.out.println("Fetch Cause-----------: " + identifier);
         return this.causeService.findCause(identifier)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> ServiceException

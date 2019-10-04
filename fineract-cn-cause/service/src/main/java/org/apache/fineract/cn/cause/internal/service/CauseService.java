@@ -330,10 +330,20 @@ public class CauseService {
         CauseStatistics causeStatistics = new CauseStatistics();
         if (cause.getAccountNumber() != null) {
             final List<CauseJournalEntry> journalEntry = accountingAdaptor.fetchJournalEntriesJournalEntries(cause.getAccountNumber());
-            causeStatistics.setTotalSupporter(journalEntry.stream().map(CauseJournalEntry::getClerk).collect(Collectors.toSet()).size());
-            causeStatistics.setTotalRaised(journalEntry.stream().mapToDouble(d -> Double.parseDouble(d.getCreditors().stream().findFirst().map(CauseCreditor::getAmount).orElse("0"))).sum());
-
-            causeStatistics.setJournalEntry(journalEntry.stream().peek(entry -> entry.setClerkUrl(this.customerAdaptor.findCustomerByIdentifier(entry.getClerk()).getPortraitUrl())).collect(Collectors.toList()));
+            causeStatistics.setTotalSupporter(journalEntry.stream()
+                    .map(CauseJournalEntry::getClerk)
+                    .collect(Collectors.toSet()).size());
+            causeStatistics.setTotalRaised(journalEntry.stream()
+                    .mapToDouble(d -> Double.parseDouble(d.getCreditors()
+                            .stream().findFirst()
+                            .map(CauseCreditor::getAmount).orElse("0"))).sum());
+            causeStatistics.setJournalEntry(journalEntry.stream().peek(entry -> {
+                Customer clerk = this.customerAdaptor.findCustomerByIdentifier(entry.getClerk());
+                entry.setClerkUrl(clerk.getPortraitUrl());
+                if (clerk.getRegistrationType().equals(Customer.RegistrationType.GUEST.name())) {
+                    entry.setClerk(Customer.RegistrationType.GUEST.name().toLowerCase());
+                }
+            }).collect(Collectors.toList()));
             cause.setCauseStatistics(causeStatistics);
         }
         return causeStatistics;
