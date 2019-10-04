@@ -58,6 +58,7 @@ public class AccountingAdaptor {
 
 
     public Account findAccount(final String identifier) {
+        System.out.println("ACCOUNT NUMBER:: " + identifier);
         return this.accountManager.findAccount(identifier);
     }
 }

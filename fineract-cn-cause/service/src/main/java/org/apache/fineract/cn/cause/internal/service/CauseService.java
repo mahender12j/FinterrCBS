@@ -222,9 +222,10 @@ public class CauseService {
         List<CauseEntity> causeEntities = this.causeRepository.findAll().stream()
                 .filter(causeEntity -> !causeEntity.getCurrentState().equals(Cause.State.CLOSED.name()))
                 .peek(causeEntity -> {
+                    System.out.println("Account number---------------" + causeEntity.getAccountNumber());
                     Double accountBalance = this.accountingAdaptor.findAccount(causeEntity.getAccountNumber()).getBalance();
-                    System.out.println("account balance: " + accountBalance);
-                    System.out.println("Hard Target: " + causeEntity.getHardTarget());
+//                    System.out.println("account balance: " + accountBalance);
+//                    System.out.println("Hard Target: " + causeEntity.getHardTarget());
                     if (accountBalance >= causeEntity.getHardTarget()) {
                         causeEntity.setCurrentState(Cause.State.CLOSED.name());
                         causeEntity.setClosedDate(LocalDateTime.now(Clock.systemUTC()));
