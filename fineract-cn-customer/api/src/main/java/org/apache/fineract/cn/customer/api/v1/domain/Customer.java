@@ -36,7 +36,8 @@ public final class Customer {
         SADMIN,
         CORPORATE,
         TRUST,
-        FUNDMANAGER
+        FUNDMANAGER,
+        GUEST
     }
 
     public enum RegistrationType {
@@ -44,7 +45,8 @@ public final class Customer {
         GOOGLEPLUS,
         LINKEDIN,
         TWITTER,
-        EMAIL
+        EMAIL,
+        GUEST
     }
 
     public enum UserState {

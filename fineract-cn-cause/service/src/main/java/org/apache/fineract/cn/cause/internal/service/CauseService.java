@@ -292,18 +292,11 @@ public class CauseService {
             final Cause cause = CauseMapper.map(causeEntity);
             customers
                     .stream()
-                    .filter(customer -> {
-                        System.out.println("customer-> " + customer.getIdentifier() + " -------------causeEntity-> " + causeEntity.getCreatedBy());
-                        return customer.getIdentifier().equals(causeEntity.getCreatedBy());
-                    }).findFirst().ifPresent(customer -> {
+                    .filter(customer -> customer.getIdentifier().equals(causeEntity.getCreatedBy())).findFirst().ifPresent(customer -> {
 
                 cause.setCreatedByUrl(customer.getPortraitUrl());
             });
-
-            System.out.println("set cause------------------------");
-
             cause.setCauseStatistics(this.getCauseStatistics(cause));
-
             cause.setAddress(AddressMapper.map(this.addressRepository.findByCause(causeEntity)));
             cause.setCauseCategories(CategoryMapper.map(causeEntity.getCategory()));
             setCauseExtendedAndResubmitValue(causeEntity, cause);
