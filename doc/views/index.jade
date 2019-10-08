@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  div.jumbotron.text-white.bg-dark
+    h1= title
+    span Welcome to #{title}
+    br
+    small Total commit #{obj.length}
+    hr
+    ul.list-group
+    each log in obj
+      .card
+        .card-body
+          h5.card-title.text-dark 
+            a(href='#{log.commit}') # #{log.commit}
+          h6.card-subtitle.mb-2.text-muted #{log.commiter.name} - #{log.subject}
+          p.card-text.text-muted
+            pre
+              code.JSON
+                !{JSON.stringify(log, null, '  ')}
+          div.text-right.pr-4
+            a.card-link(href='#{log.commit}') View Change
+            //- a.card-link(href='#') Another link

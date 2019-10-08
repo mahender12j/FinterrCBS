@@ -39,3 +39,7 @@ fineract-cn-rhythm/spi/.settings/
 fineract-cn-rhythm/spi/bin/
 
 *.pem
+
+# document in node server
+doc/node_modules/
+doc/files/

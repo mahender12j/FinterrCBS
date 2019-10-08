@@ -1,0 +1,11 @@
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+pre code {
+  display: block;
+  height: auto;
+  padding: 1em;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
