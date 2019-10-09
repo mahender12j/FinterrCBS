@@ -1,6 +1,63 @@
 extends layout
 
 block content
-  div.text-white.bg-dark
-    div.py-2.px-5
+  .text-white.bg-dark
+    .py-2.px-5
       h4= title
+  .card
+    .card-header Creating New Tenant
+    .card-body
+      div
+        span(style='color: #ff0000;')
+            strong ***  Warning **** 
+        div
+            | Make sure you create the same schema to each of the database. Otherwise the server will fail.
+        div  
+        div
+            strong Instruction
+        div  
+        div
+            | To create new Tenant, you will first need to create db schema for both MariaDB and Cassandra. Lest say we we are going to create a 'demo_server. Run the following commands below to create database.
+        div  
+        div
+            strong Cassandra: 
+        div
+            | CREATE KEYSPACE demo_server WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+        div  
+        div
+            strong Mariadb:
+        div Create datbase demo_server;
+        div  
+        div
+            | Now you will need to create all the db schema. If you can use sql dump, then use that. Its more easier. Otherwise use any thirdparty tools to migrate schema. 
+            strong Workbanch
+            |  or 
+            strong datagrip
+            |  has good support to migrate table. Once you have migrated the table for both cassandra and mariadb, you will now be required to create the users for admin, scheduler, and also for the system admin. I will suggest you to copy the users from the previous table. You can also use the api to create user. Below is the api for creating user in the Identity server:
+        div  
+        div
+            div
+                div
+                    sup curl --request POST \
+                div
+                    sup --url http://68.183.191.246:2021/identity-v1/users \
+                div
+                    sup --header 'Authorization: Bearer  JWT TOKEN' \
+                div
+                    sup --header 'Content-Type: application/json' \
+                div
+                    sup --header 'Postman-Token: 066942cd-9455-41f2-8911-9eb37ec11377' \
+                div
+                    sup --header 'User: antony' \
+                div
+                    sup --header 'cache-control: no-cache' \
+                div
+                    sup --header 'x-tenant-identifier: malaysia' \
+                div
+                    sup
+                        | --data '{\n "identifier": "YOUR USER ID",\n "password": "YOU RMD5 HASHED PASSWORD",\n "role": "YOUR USER ROLE"\n }'
+                br
+                | after that, you can use migrate table for ledger and also the user role. User role creating and permission is discussed in the 
+                strong microservice/identifier-ms 
+                | page.
+
