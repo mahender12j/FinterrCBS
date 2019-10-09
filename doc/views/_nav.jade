@@ -1,0 +1,30 @@
+nav.navbar.navbar-expand-lg.navbar-light.bg-light
+    .container
+        a.navbar-brand(href='/') ~FinterraCBS~
+        button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+            span.navbar-toggler-icon
+        #navbarSupportedContent.collapse.navbar-collapse
+            ul.navbar-nav
+            ul.navbar-nav.ml-auto
+                li.nav-item.active
+                    a.nav-link(href='/doc')
+                        | Documentation 
+                        span.sr-only (current)
+                li.nav-item
+                    a.nav-link(href='/diagram') Diagram
+                li.nav-item.dropdown
+                    a#navbarDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                        | Microservices
+                    .dropdown-menu(aria-labelledby='navbarDropdown')
+                        a.dropdown-item(href='/microservices/identity-ms') Identity-ms
+                        .dropdown-divider
+                        a.dropdown-item(href='/microservices/cause-ms') Cause-ms
+                        .dropdown-divider
+                        a.dropdown-item(href='/microservices/customer-ms') Customer-ms
+                        .dropdown-divider
+                        a.dropdown-item(href='/microservices/ledger-ms') Ledger-ms/Accounting-ms
+                        .dropdown-divider
+                        a.dropdown-item(href='/microservices/rhythm-ms') Rhythm-ms
+                li.nav-item
+                    a.nav-link(href='/about') About
+            
