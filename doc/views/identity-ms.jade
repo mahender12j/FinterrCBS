@@ -1,6 +1,277 @@
 extends layout
 
 block content
-  div.text-white.bg-dark
-    div.py-2.px-5
-      h4= title
+    div.text-white.bg-dark
+        div.py-2.px-5
+            h4= title
+
+    .card
+        .card-header Common API
+        .card-body
+            p
+                span(data-contrast='auto')
+                    | This is the microservice which handle the authentication and authorization of all the users. Aside from that, this node also
+                span(data-contrast='auto') handles
+                span(data-contrast='auto')  the role 
+                span(data-contrast='auto')
+                    | management and permission management. You should be able to use the below API to manage the
+                span(data-contrast='auto') authentication and permission management. 
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                strong
+                    span(data-contrast='auto') Auth::
+                    span(data-contrast='auto') Login
+                    span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto') curl --request POST \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --url '
+                a(href='http://localhost:2021/identity-v1/token?grant_type=password&username=mrhjishan&password=VXJqenFJWTdIV2MxK2tpdVZSL0dkRytjTFNBNUprcDRGUGNVc043Wmk2NzRIYWFsV05iL3pIR3BqdmVReW1DVkZ2MVlOaFV0T3hBVE5tMUdiVStZNzNxY2w2YVozMzZKY1ZwNjcvL1BLb05mR2F4SU1xTERJY0pudFBWU0VmeXo1YmlNZ3hpN1RLVHhwenF5dTAxZWdRU095bCt1eVRsQXV3QW5HMU9BeUhBPQ==')
+                    span(data-contrast='none')
+                        | http://localhost:2021/identity-v1/token?grant_type=password&username=mrhjishan&password=VXJqenFJWTdIV2MxK2tpdVZSL0dkRytjTFNBNUprcDRGUGNVc043Wmk2NzRIYWFsV05iL3pIR3BqdmVReW1DVkZ2MVlOaFV0T3hBVE5tMUdiVStZNzNxY2w2YVozMzZKY1ZwNjcvL1BLb05mR2F4SU1xTERJY0pudFBWU0VmeXo1YmlNZ3hpN1RLVHhwenF5dTAxZWdRU095bCt1eVRsQXV3QW5HMU9BeUhBPQ==
+                span(data-contrast='auto') ' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Content-Type: application/json' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'cache-control: no-cache' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'x-tenant-identifier: malaysia'
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                strong
+                    span(data-contrast='auto') Auth::RefreshToken
+                    span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto') curl --request POST \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --url '
+                a(href='http://localhost:2021/identity-v1/token?grant_type=password&username=padma1&password=cDRzc3cwcmQ=')
+                    span(data-contrast='none')
+                        | http://localhost:2021/identity-v1/token?grant_type=password&username=padma1&password=cDRzc3cwcmQ=
+                span(data-contrast='auto') ' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Content-Type: application/json' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Identity-RefreshToken: Bearer JWT_TOKEN' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Postman-Token: c031867a-9d73-451f-89b7-e84abe781a76' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'cache-control: no-cache' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'x-tenant-identifier: 
+                span(data-contrast='auto') malaysia
+                span(data-contrast='auto') '
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                strong
+                    span(data-contrast='auto') Auth::ChangePermission
+                    span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto') curl --request PUT \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --url 
+                a(href='http://52.196.146.151:2021/identity-v1/roles/donor')
+                    span(data-contrast='none') http://52.196.146.151:2021/identity-v1/roles/donor
+                span(data-contrast='auto')  \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Authorization: Bearer 
+                span(data-contrast='auto') JWTTOKEN
+                span(data-contrast='auto') ' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Content-Type: application/json' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'User: mrhjishan' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'cache-control: no-cache' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'x-tenant-identifier: malaysia' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --data '{
+                span(data-contrast='auto') YOUR_PERMISSION_ROLE
+                span(data-contrast='auto') }'
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                strong
+                    span(data-contrast='auto') Auth::ChangePassword
+                    span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto') curl --request PUT \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --url 
+                a(href='http://localhost:2021/identity-v1/users/caadmin/password')
+                    span(data-contrast='none') http://localhost:2021/identity-v1/users/caadmin/password
+                span(data-contrast='auto')  \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Authorization: Beare JWT TOKEN' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Content-Type: application/json' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Postman-Token: 3673aac4-ce18-49aa-ab3a-9b24a31fb7d4' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'User: imhotep' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'cache-control: no-cache' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'x-tenant-identifier: malaysia' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --data '{\
+                span(data-contrast='auto') n  "
+                span(data-contrast='auto')
+                    | password" : "VXJqenFJWTdIV2MxK2tpdVZSL0dkRytjTFNBNUprcDRGUGNVc043Wmk2NzRIYWFsV05iL3pIR3BqdmVReW1DVkZ2MVlOaFV0T3hBVE5tMUdiVStZNzNxY2w2YVozMzZKY1ZwNjcvL1BLb05mR2F4SU1xTERJY0pudFBWU0VmeXo1YmlNZ3hpN1RLVHhwenF5dTAxZWdRU095bCt1eVRsQXV3QW5HMU9BeUhBPQ=="\n}'
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                strong
+                    span(data-contrast='auto') Auth::DeactiveUser
+                    span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto') curl --request PUT \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --url 
+                a(href='http://localhost:2021/identity-v1/users/mrhjishan12102/deactivate')
+                    span(data-contrast='none') http://localhost:2021/identity-v1/users/mrhjishan12102/deactivate
+                span(data-contrast='auto')  \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Authorization: Bearer JWT TOKEN' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Content-Type: application/json' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Postman-Token: 916b4eb0-8293-478b-83a4-c602129eccf2' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'User: mrhjishan' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'cache-control: no-cache' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'x-tenant-identifier: malaysia' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --data '{}'
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                strong
+                    span(data-contrast='auto') Auth::PermitableGroup
+                    span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto') curl --request GET \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --url 
+                a(href='http://52.196.146.151:2021/identity-v1/permittablegroups/identity__v1__deactivate')
+                    span(data-contrast='none')
+                        | http://52.196.146.151:2021/identity-v1/permittablegroups/identity__v1__deactivate
+                span(data-contrast='auto')  \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Authorization: Bearer JWT TOKEN' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Content-Type: application/json' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'Postman-Token: bd136987-f292-46af-b837-9d31db43f443' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'User: mrhjishan' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'cache-control: no-cache' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --header 'x-tenant-identifier: malaysia' \
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+            p
+                span(data-contrast='auto')   --data '{\n    "identifier": "identity__v1__deactivate",\n    "
+                span(data-contrast='auto') permittables
+                span(data-contrast='auto')
+                    | ": [\n        {\n            "path": "identity-v1/users/*/deactivate",\n            "method": "PUT",\n            "
+                span(data-contrast='auto') groupId
+                span(data-contrast='auto') ": null,\n            "
+                span(data-contrast='auto') acceptTokenIntendedForForeignApplication
+                span(data-contrast='auto') ": false\n        }\n    ]\n}'
+                span(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+
+
+    .card
+        .card-header Changes in the system
+        .card-body
+            p
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0
+                        | Not much has been changed in the 
+                        strong identity-
+                strong
+                    span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                        span.SpellingError.SCXW55312351.BCX0 ms.
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0  Only new fileds added for the 
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0 deactivate
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0
+                        | user for the user>>role table to keep the previous role when user is set to deactivate.
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0 A side from that, several 
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.ContextualSpellingAndGrammarError.SCXW55312351.BCX0 role
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0  has been added to the databases like 
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.SpellingError.SCXW55312351.BCX0 cadmin
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0 , trust, fund managers and 
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0 many
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0  more and all of the users are given a generic access role. 
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0 I 
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0 believe
+                span.TextRun.SCXW55312351.BCX0(lang='EN-US', xml:lang='EN-US', data-contrast='auto')
+                    span.NormalTextRun.SCXW55312351.BCX0
+                        | this need to be updated in future to refactor the code to make the system more secure.
+                span.EOP.SCXW55312351.BCX0(data-ccp-props='{"201341983":0,"335559739":160,"335559740":259}')  
+
+    
