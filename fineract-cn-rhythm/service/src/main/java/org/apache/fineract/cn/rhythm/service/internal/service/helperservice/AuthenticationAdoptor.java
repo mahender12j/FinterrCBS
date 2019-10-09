@@ -46,14 +46,14 @@ public class AuthenticationAdoptor {
     }
 
     String authenticate(String tenant) {
-//        System.out.println("username: " + USER_IDENTIFIER);
-//        System.out.println("password: " + USER_PASSWORD);
+        System.out.println("username: " + USER_IDENTIFIER);
+        System.out.println("password: " + USER_PASSWORD);
         TenantContextHolder.clear();
         TenantContextHolder.setIdentifier(tenant);
         final Authentication authentication = this.identityManager.login(USER_IDENTIFIER, USER_PASSWORD);
         UserContextHolder.clear();
         UserContextHolder.setAccessToken(USER_IDENTIFIER, authentication.getAccessToken());
-//        System.out.println("User context: " + UserContextHolder.checkedGetUser());
+        System.out.println("User context: " + UserContextHolder.checkedGetUser());
         return authentication.getAccessToken();
     }
 }

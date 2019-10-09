@@ -203,6 +203,7 @@ public class CauseAggregate {
     @CommandHandler
     @EventEmitter(selectorName = CauseEventConstants.SELECTOR_NAME, selectorValue = CauseEventConstants.EXPIRE_CAUSE)
     public String expireCause(final ExpiredCauseCommand expiredCauseCommand) {
+        System.out.println("------------Expired cause api is called---------");
         List<CauseEntity> causes = causeRepository.findByEndDateAndCurrentState(Cause.State.ACTIVE.name(), Cause.State.EXTENDED.name());
         List<CauseEntity> mappedCauses = causes.stream().peek(causeEntity -> {
             causeEntity.setCurrentState(Cause.State.CLOSED.name());
