@@ -8,10 +8,9 @@ block content
     .card-header Creating New Tenant
     .card-body
       div
-        span(style='color: #ff0000;')
-            strong ***  Warning **** 
-        div
-            | Make sure you create the same schema to each of the database. Otherwise the server will fail.
+        .text-center
+            strong.text-danger ***  Warning **** 
+            p Make sure you create the same schema to each of the database. Otherwise the server will fail.
         div  
         div
             strong Instruction
@@ -60,4 +59,15 @@ block content
                 | after that, you can use migrate table for ledger and also the user role. User role creating and permission is discussed in the 
                 strong microservice/identifier-ms 
                 | page.
+        
+    .card
+    .card-header Major Changes into the Microservices 
+    .card-body
+      strong Cause-MS
+      p the whole microservice was created newly. So, all the api was created newly. Major API is where most changes has been done is creation of cause. below are the cause states where each cause can reach based on the action. The schedule will call the fun-rails api to make sure the cause move to inactive state once the hard cap is full-filled
+      pre
+        code.JAVA public enum State {PENDING, APPROVED, ACTIVE, LOCKED, REJECTED, CLOSED, DELETED, EXTENDED, INACTIVE, UNPUBLISH} 
+
+      
+
 
