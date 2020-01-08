@@ -37,6 +37,7 @@ public final class Customer {
         CORPORATE,
         TRUST,
         FUNDMANAGER,
+        WADMIN,
         GUEST
     }
 
