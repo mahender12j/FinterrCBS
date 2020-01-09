@@ -60,6 +60,12 @@ public class CAdminPage {
     private List<PerMonthRecord> inactiveFundManagerPerMonth;
     private List<PerMonthRecord> activeFundManagerPerMonth;
 
+    private Long NoOfWaqfAdmin;
+    private Long ActiveWaqfAdmin;
+    private Long NoOfWaqfAdminThisWeek;
+    private List<PerMonthRecord> waqfAdminPerMonth;
+    private List<PerMonthRecord> inactiveWaqfAdminPerMonth;
+    private List<PerMonthRecord> activeWaqfAdminPerMonth;
 
     private Long noOfCause;
     private Long activeCause;
@@ -432,6 +438,54 @@ public class CAdminPage {
 
     public void setActiveFundManagerPerMonth(List<PerMonthRecord> activeFundManagerPerMonth) {
         this.activeFundManagerPerMonth = activeFundManagerPerMonth;
+    }
+
+    public Long getNoOfWaqfAdmin() {
+        return this.NoOfWaqfAdmin;
+    }
+
+    public void setNoOfWaqfAdmin(Long NoOfWaqfAdmin) {
+        this.NoOfWaqfAdmin = NoOfWaqfAdmin;
+    }
+
+    public Long getActiveWaqfAdmin() {
+        return this.ActiveWaqfAdmin;
+    }
+
+    public void setActiveWaqfAdmin(Long ActiveWaqfAdmin) {
+        this.ActiveWaqfAdmin = ActiveWaqfAdmin;
+    }
+
+    public Long getNoOfWaqfAdminThisWeek() {
+        return this.NoOfWaqfAdminThisWeek;
+    }
+
+    public void setNoOfWaqfAdminThisWeek(Long NoOfWaqfAdminThisWeek) {
+        this.NoOfWaqfAdminThisWeek = NoOfWaqfAdminThisWeek;
+    }
+
+    public List<PerMonthRecord> getWaqfAdminPerMonth() {
+        return this.waqfAdminPerMonth;
+    }
+
+    public void setWaqfAdminPerMonth(List<PerMonthRecord> waqfAdminPerMonth) {
+        this.waqfAdminPerMonth = waqfAdminPerMonth;
+    }
+
+    public List<PerMonthRecord> getInactiveWaqfAdminPerMonth() {
+        return this.inactiveWaqfAdminPerMonth;
+    }
+
+    public void setInactiveWaqfAdminPerMonth(List<PerMonthRecord> inactiveWaqfAdminPerMonth) {
+        this.inactiveWaqfAdminPerMonth = inactiveWaqfAdminPerMonth;
+    }
+
+    public List<PerMonthRecord> getActiveWaqfAdminPerMonth() {
+        return this.activeWaqfAdminPerMonth;
+    }
+
+    public void setActiveWaqfAdminPerMonth(List<PerMonthRecord> activeWaqfAdminPerMonth) {
+        this.activeWaqfAdminPerMonth = activeWaqfAdminPerMonth;
     }
 
     @Override
