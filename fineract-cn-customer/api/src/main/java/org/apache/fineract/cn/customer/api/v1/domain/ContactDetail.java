@@ -31,7 +31,7 @@ public final class ContactDetail {
     }
 
     public enum Group {
-        PERSON, BUSINESS, CADMIN, SADMIN, CORPORATE, TRUST, FUNDMANAGER, WADMIN, GUEST
+        BUSINESS, PRIVATE, CADMIN, SADMIN, CORPORATE, TRUST, FUNDMANAGER, WADMIN, GUEST
     }
 
     @NotNull
