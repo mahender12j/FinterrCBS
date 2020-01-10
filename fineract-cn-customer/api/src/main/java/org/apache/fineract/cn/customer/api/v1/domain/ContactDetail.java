@@ -27,16 +27,11 @@ import javax.validation.constraints.NotNull;
 public final class ContactDetail {
 
     public enum Type {
-        EMAIL,
-        MOBILE
+        EMAIL, MOBILE
     }
 
     public enum Group {
-        BUSINESS,
-        PRIVATE,
-        CADMIN,
-        SADMIN,
-        CORPORATE
+        PERSON, BUSINESS, CADMIN, SADMIN, CORPORATE, TRUST, FUNDMANAGER, WADMIN, GUEST
     }
 
     @NotNull
@@ -98,12 +93,7 @@ public final class ContactDetail {
 
     @Override
     public String toString() {
-        return "ContactDetail{" +
-                "type=" + type +
-                ", group=" + group +
-                ", value='" + value + '\'' +
-                ", preferenceLevel=" + preferenceLevel +
-                ", validated=" + validated +
-                '}';
+        return "ContactDetail{" + "type=" + type + ", group=" + group + ", value='" + value + '\''
+                + ", preferenceLevel=" + preferenceLevel + ", validated=" + validated + '}';
     }
 }
